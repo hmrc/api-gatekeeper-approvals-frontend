@@ -15,17 +15,12 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import views.html.helper.CSPNonce
 
-@this(
-  appConfig: AppConfig,
-  hmrcLayout: HmrcLayout
-)
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@this(layout: Layout, applicationConfig: AppConfig)
 
-@hmrcLayout(
-    pageTitle = pageTitle,
-    nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-)(contentBlock)
+@()(implicit request : Request[_], messagesProvider: MessagesProvider)
+
+@layout(pageTitle = Some("Forbidden")) {
+  <h1>You do not have permission to access Gatekeeper</h1>
+  <h2>Contact your administrator for access</h2>
+}
