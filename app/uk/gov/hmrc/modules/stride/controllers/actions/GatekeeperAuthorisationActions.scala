@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.services
+package uk.gov.hmrc.modules.stride.controllers.actions
 
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.auth.core._
@@ -32,9 +32,9 @@ import play.api.mvc.ActionRefiner
 import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 
-trait GatekeeperAuthWrapper {
+trait GatekeeperAuthorisationActions {
   self: FrontendBaseController =>
-    
+
   def authConnector: AuthConnector
   def forbiddenResult(implicit request: MessagesRequest[_]): Result
 
