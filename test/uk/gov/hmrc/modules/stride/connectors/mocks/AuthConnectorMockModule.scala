@@ -22,8 +22,10 @@ import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.auth.core.retrieve.{~, Name, Retrieval}
 
-import scala.concurrent.Future.successful
+import scala.concurrent.Future.{successful, failed}
 import java.util.UUID
+import uk.gov.hmrc.auth.core.InsufficientEnrolments
+import uk.gov.hmrc.auth.core.SessionRecordNotFound
 
 class AuthConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
   trait BaseAuthConnectorMock {
@@ -42,6 +44,14 @@ class AuthConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
         val response = successful(new ~(Some(Name(Some(adminName), None)), Enrolments(Set(Enrolment(adminRole)))))
 
         when(aMock.authorise(*, any[Retrieval[~[Option[Name], Enrolments]]])(*, *)).thenReturn(response)
+      }
+
+      def thenReturnInsufficientEnrolments() = {
+        when(aMock.authorise(*, any[Retrieval[~[Option[Name], Enrolments]]])(*, *)).thenReturn(failed(new InsufficientEnrolments))
+      }
+
+      def thenReturnSessionRecordNotFound() = {
+        when(aMock.authorise(*, any[Retrieval[~[Option[Name], Enrolments]]])(*, *)).thenReturn(failed(new SessionRecordNotFound))
       }
     }
   }

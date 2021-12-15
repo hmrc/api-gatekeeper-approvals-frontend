@@ -74,5 +74,17 @@ class HelloWorldControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
     }
+
+    "return 403 for InsufficientEnrolments" in new Setup {
+      AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
+      val result = controller.helloWorld(fakeRequest)
+      status(result) shouldBe Status.FORBIDDEN
+    }
+    
+    "return 303 for SessionRecordNotFound" in new Setup {
+      AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
+      val result = controller.helloWorld(fakeRequest)
+      status(result) shouldBe Status.SEE_OTHER
+    }  
   }
 }
