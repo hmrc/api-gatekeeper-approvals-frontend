@@ -25,6 +25,14 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.inject.guice.GuiceApplicationBuilder
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
+import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
+import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
+
 class HelloWorldControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
@@ -36,15 +44,32 @@ class HelloWorldControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
   private val fakeRequest = FakeRequest("GET", "/")
 
-  private val controller = app.injector.instanceOf[HelloWorldController]
+  trait Setup extends AuthConnectorMockModule {
+    implicit val appConfig = app.injector.instanceOf[AppConfig]
+
+    val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
+    val forbiddenView = app.injector.instanceOf[ForbiddenView]
+    val mcc = app.injector.instanceOf[MessagesControllerComponents]
+    val helloWorldPage = app.injector.instanceOf[HelloWorldPage]
+
+    val controller = new HelloWorldController(
+      strideAuthConfig,
+      AuthConnectorMock.aMock,
+      forbiddenView,
+      mcc,
+      helloWorldPage
+    )
+  }
 
   "GET /" should {
-    "return 200" in {
+    "return 200" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
       val result = controller.helloWorld(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
-    "return HTML" in {
+    "return HTML" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
       val result = controller.helloWorld(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
