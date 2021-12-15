@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.model
+package uk.gov.hmrc.modules.stride.domain.models
 
-case class LoggedInUser(userFullName: Option[String])
+import play.api.mvc.MessagesRequest
+import uk.gov.hmrc.auth.core.Enrolments
+
+case class LoggedInRequest[A](name: Option[String], authorisedEnrolments: Enrolments, request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)

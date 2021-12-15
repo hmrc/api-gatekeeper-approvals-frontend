@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.Text
+package uk.gov.hmrc.modules.stride.domain.models
 
-@this(layout: Layout)
-
-@()(implicit request : Request[_], messagesProvider: MessagesProvider)
-
-@layout(pageTitle = Some("Forbidden")) {
-  <h1 class="govuk-heading-xl">@{Text("You do not have permission to access Gatekeeper").asHtml}</h1>
-  <p class="govuk-body">@{Text("Contact your administrator for access").asHtml}</h2>
-}
+case class LoggedInUser(userFullName: Option[String])

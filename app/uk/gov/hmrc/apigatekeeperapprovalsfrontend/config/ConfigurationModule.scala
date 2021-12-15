@@ -16,23 +16,12 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import com.google.inject.ImplementedBy
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import com.google.inject.AbstractModule
+import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
+import uk.gov.hmrc.modules.stride.config.StrideAuthConfigProvider
 
-@ImplementedBy(classOf[AppConfigImpl])
-trait AppConfig {
-  def welshLanguageSupportEnabled: Boolean
-
-  def appName: String
-}
-
-@Singleton
-class AppConfigImpl @Inject()(
-  config: Configuration
-) extends ServicesConfig(config) with AppConfig {
-  val appName = getString("appName")
-  
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+class ConfigurationModule extends AbstractModule {
+  override def configure() = {
+    bind(classOf[StrideAuthConfig]).toProvider(classOf[StrideAuthConfigProvider])
+  }
 }

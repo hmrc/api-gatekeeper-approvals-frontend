@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.model
+package uk.gov.hmrc.modules.stride.domain.models
 
 object GatekeeperRole extends Enumeration {
   type GatekeeperRole = Value
-  val USER,SUPERUSER,ADMIN = Value
+  val USER, SUPERUSER, ADMIN = Value
 }
