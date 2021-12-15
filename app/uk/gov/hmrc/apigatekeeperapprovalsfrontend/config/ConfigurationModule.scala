@@ -19,9 +19,11 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 import com.google.inject.AbstractModule
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfigProvider
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 
 class ConfigurationModule extends AbstractModule {
   override def configure() = {
     bind(classOf[StrideAuthConfig]).toProvider(classOf[StrideAuthConfigProvider])
+    bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
   }
 }
