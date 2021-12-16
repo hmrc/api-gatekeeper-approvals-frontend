@@ -21,27 +21,24 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import play.api.libs.json.Json
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
-import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
+import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 
 @Singleton
 class ApplicationController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
-  forbiddenView: ForbiddenView,
+  forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService
-)(implicit val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, mcc) with ApplicationActions {
-  
-  def forbiddenResult(implicit request: MessagesRequest[_]) = Forbidden(forbiddenView())
+)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
 
   def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application.applicationWrites

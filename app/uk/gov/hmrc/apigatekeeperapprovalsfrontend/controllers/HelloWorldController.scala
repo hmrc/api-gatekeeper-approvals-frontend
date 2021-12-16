@@ -23,22 +23,19 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
-import play.api.mvc.MessagesRequest
+import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 
 @Singleton
 class HelloWorldController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
-  forbiddenView: ForbiddenView,
+  forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
   helloWorldPage: HelloWorldPage
-)(implicit val appConfig: AppConfig, val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, mcc)  {
+)(implicit val appConfig: AppConfig, override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)  {
 
-  def forbiddenResult(implicit request: MessagesRequest[_]) = Forbidden(forbiddenView())
-  
   val helloWorld: Action[AnyContent] = anyStrideUserAction { implicit request =>
     Future.successful(Ok(helloWorldPage()))
   }

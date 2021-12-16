@@ -16,4 +16,10 @@
 
 package uk.gov.hmrc.modules.stride.domain.models
 
+import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+
 case class LoggedInUser(userFullName: Option[String])
+
+object LoggedInUser {
+  implicit def fromRequest(implicit request: LoggedInRequest[_]): LoggedInUser = LoggedInUser(request.name)
+}

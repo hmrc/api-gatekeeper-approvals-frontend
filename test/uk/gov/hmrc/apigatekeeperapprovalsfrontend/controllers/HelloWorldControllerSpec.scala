@@ -28,7 +28,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
@@ -48,14 +47,14 @@ class HelloWorldControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-    val forbiddenView = app.injector.instanceOf[ForbiddenView]
+    val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val helloWorldPage = app.injector.instanceOf[HelloWorldPage]
 
     val controller = new HelloWorldController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
-      forbiddenView,
+      forbiddenHandler,
       mcc,
       helloWorldPage
     )

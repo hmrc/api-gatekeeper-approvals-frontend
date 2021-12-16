@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.retrieve.{ ~ }
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.modules.stride.domain.models.{GatekeeperRole, LoggedInUser}
+import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
 import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 
@@ -33,16 +33,21 @@ import play.api.mvc.ActionRefiner
 import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 
+
+trait ForbiddenHandler {
+  def handle(msgResult: MessagesRequest[_]): Result
+}
+
 trait GatekeeperAuthorisationActions {
   self: FrontendBaseController =>
 
   def authConnector: AuthConnector
-  def forbiddenResult(implicit request: MessagesRequest[_]): Result
+  
+  def forbiddenHandler: ForbiddenHandler
 
   def strideAuthConfig: StrideAuthConfig
-  implicit def ec: ExecutionContext
 
-  implicit def loggedIn(implicit request: LoggedInRequest[_]): LoggedInUser = LoggedInUser(request.name)
+  implicit def ec: ExecutionContext
 
   def gatekeeperRoleActionRefiner(minimumRoleRequired: GatekeeperRole): ActionRefiner[MessagesRequest, LoggedInRequest] = 
     new ActionRefiner[MessagesRequest, LoggedInRequest] {
@@ -63,10 +68,10 @@ trait GatekeeperAuthorisationActions {
 
         authConnector.authorise(predicate, retrieval) map {
           case Some(name) ~ authorisedEnrolments => Right(LoggedInRequest(name.name, authorisedEnrolments, request))
-          case None ~ authorisedEnrolments       => Left(forbiddenResult)
+          case None ~ authorisedEnrolments       => Left(forbiddenHandler.handle(msgRequest))
         } recover {
           case _: NoActiveSession                => Left(loginRedirect)
-          case _: InsufficientEnrolments         => Left(forbiddenResult)
+          case _: InsufficientEnrolments         => Left(forbiddenHandler.handle(msgRequest))
         }
       }
     }   

@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import javax.inject.{Inject, Singleton}
+import play.api.mvc.MessagesRequest
+import play.api.mvc.Results.Forbidden
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
 
-class ConfigurationModule extends AbstractModule {
-  override def configure() = {
-    bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
-    
-    bind(classOf[ForbiddenHandler]).to(classOf[HandleForbiddenWithView])
-  }
+@Singleton
+class HandleForbiddenWithView @Inject()(forbiddenView: ForbiddenView) extends ForbiddenHandler {
+  def handle(m: MessagesRequest[_]) = Forbidden(forbiddenView()(m, m.messages))
 }
