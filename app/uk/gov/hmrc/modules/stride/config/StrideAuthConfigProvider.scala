@@ -33,10 +33,10 @@ class StrideAuthConfigProvider @Inject()(config: ServicesConfig) extends Provide
   override def get(): StrideAuthConfig = {
     val authBaseUrl = config.baseUrl("auth")
     val strideLoginUrl = s"${config.baseUrl("stride-auth-frontend")}/stride/sign-in"
-    val origin = config.getString("stride-origin")
-    val adminRole = config.getString("roles.admin")
-    val superUserRole = config.getString("roles.super-user")
-    val userRole = config.getString("roles.user")
+    val origin = config.getString("stride.origin")
+    val adminRole = config.getString("stride.roles.admin")
+    val superUserRole = config.getString("stride.roles.super-user")
+    val userRole = config.getString("stride.roles.user")
 
     StrideAuthConfig(authBaseUrl, strideLoginUrl, origin, adminRole, superUserRole, userRole)
   }
