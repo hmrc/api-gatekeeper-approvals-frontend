@@ -67,7 +67,7 @@ trait GatekeeperAuthorisationActions {
         val retrieval = Retrievals.name and Retrievals.authorisedEnrolments
 
         authConnector.authorise(predicate, retrieval) map {
-          case Some(name) ~ authorisedEnrolments => Right(LoggedInRequest(name.name, authorisedEnrolments, request))
+          case Some(name) ~ authorisedEnrolments => Right(new LoggedInRequest(name.name, authorisedEnrolments, request))
           case None ~ authorisedEnrolments       => Left(forbiddenHandler.handle(msgRequest))
         } recover {
           case _: NoActiveSession                => Left(loginRedirect)

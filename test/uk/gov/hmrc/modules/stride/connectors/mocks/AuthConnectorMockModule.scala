@@ -27,7 +27,7 @@ import java.util.UUID
 import uk.gov.hmrc.auth.core.InsufficientEnrolments
 import uk.gov.hmrc.auth.core.SessionRecordNotFound
 
-class AuthConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait AuthConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
   trait BaseAuthConnectorMock {
     def aMock: AuthConnector
 
