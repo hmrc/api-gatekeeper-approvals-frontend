@@ -22,7 +22,6 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 case class StrideAuthConfig(
   authBaseUrl: String,
   strideLoginUrl: String,
-  successUrl: String,
   origin: String,
   adminRole: String,
   superUserRole: String,
@@ -34,12 +33,11 @@ class StrideAuthConfigProvider @Inject()(config: ServicesConfig) extends Provide
   override def get(): StrideAuthConfig = {
     val authBaseUrl = config.baseUrl("auth")
     val strideLoginUrl = s"${config.baseUrl("stride-auth-frontend")}/stride/sign-in"
-    val successUrl = config.getString("stride-success-url")
     val origin = config.getString("stride-origin")
     val adminRole = config.getString("roles.admin")
     val superUserRole = config.getString("roles.super-user")
     val userRole = config.getString("roles.user")
 
-    StrideAuthConfig(authBaseUrl, strideLoginUrl, successUrl, origin, adminRole, superUserRole, userRole)
+    StrideAuthConfig(authBaseUrl, strideLoginUrl, origin, adminRole, superUserRole, userRole)
   }
 }

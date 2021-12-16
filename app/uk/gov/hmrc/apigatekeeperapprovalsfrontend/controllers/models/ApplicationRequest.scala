@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.domain.models
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
-import play.api.mvc.MessagesRequest
-import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 
-case class LoggedInRequest[A](name: Option[String], authorisedEnrolments: Enrolments, request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)
+class ApplicationRequest[A](
+    val application: Application,
+    loggedInRequest: LoggedInRequest[A]
+) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest.request)

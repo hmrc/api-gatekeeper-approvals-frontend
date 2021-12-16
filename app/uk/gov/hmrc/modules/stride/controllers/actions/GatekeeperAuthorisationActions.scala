@@ -24,8 +24,9 @@ import uk.gov.hmrc.auth.core.retrieve.{ ~ }
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.modules.stride.domain.models.{GatekeeperRole, LoggedInRequest, LoggedInUser}
+import uk.gov.hmrc.modules.stride.domain.models.{GatekeeperRole, LoggedInUser}
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
+import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.mvc.ActionRefiner
@@ -47,10 +48,12 @@ trait GatekeeperAuthorisationActions {
     new ActionRefiner[MessagesRequest, LoggedInRequest] {
       def executionContext = ec
       def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
+        val successUrl = s"${if(msgRequest.secure) "https" else "http"}://${msgRequest.host}${msgRequest.uri}"
+
         lazy val loginRedirect = 
           Redirect(
             strideAuthConfig.strideLoginUrl, 
-            Map("successURL" -> Seq(strideAuthConfig.successUrl), "origin" -> Seq(strideAuthConfig.origin))
+            Map("successURL" -> Seq(successUrl), "origin" -> Seq(strideAuthConfig.origin))
           )
 
         implicit val request = msgRequest
@@ -80,18 +83,17 @@ trait GatekeeperAuthorisationActions {
     }
   }
 
-  def anyStrideUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperRole)(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
-      gatekeeperRoleActionRefiner(GatekeeperRole.USER).invokeBlock(request, block)
+      gatekeeperRoleActionRefiner(minimumRoleRequired).invokeBlock(request, block)
     }
+
+  def anyStrideUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRole.USER)(block)
 
   def atLeastSuperUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
-    Action.async { implicit request =>
-      gatekeeperRoleActionRefiner(GatekeeperRole.SUPERUSER).invokeBlock(request, block)
-    }
+    gatekeeperRoleAction(GatekeeperRole.SUPERUSER)(block)
 
-  def adminOnlyAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    Action.async { implicit request =>
-      gatekeeperRoleActionRefiner(GatekeeperRole.ADMIN).invokeBlock(request, block)
-    }
+  def adminOnlyAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRole.ADMIN)(block)
 }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,6 +25,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import play.api.libs.json.Json
+import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
+import play.api.mvc.MessagesRequest
+import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 
 @Singleton
 class ApplicationController @Inject()(
@@ -33,17 +37,15 @@ class ApplicationController @Inject()(
   authConnector: AuthConnector,
   forbiddenView: ForbiddenView,
   mcc: MessagesControllerComponents,
-  applicationService: ApplicationService,
-  errorHandler: ErrorHandler
-)(implicit val ec: ExecutionContext) extends BaseController(forbiddenView, strideAuthConfig, authConnector, mcc) {
+  val errorHandler: ErrorHandler,
+  val applicationActionService: ApplicationActionService
+)(implicit val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, mcc) with ApplicationActions {
   
-  def getApplication(applicationId: ApplicationId): Action[AnyContent] = anyStrideUserAction { implicit request =>
+  def forbiddenResult(implicit request: MessagesRequest[_]) = Forbidden(forbiddenView())
+
+  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application.applicationWrites
 
-    applicationService.fetchByApplicationId(applicationId).map(o => 
-      o.fold(
-        NotFound(errorHandler.notFoundTemplate)
-      )(a => Ok(Json.toJson(a)))
-    )
+    successful(Ok(Json.toJson(request.application)))
   }
 }

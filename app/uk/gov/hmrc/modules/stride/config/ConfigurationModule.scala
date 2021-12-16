@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
+package uk.gov.hmrc.modules.stride.config
 
 import com.google.inject.AbstractModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 
 class ConfigurationModule extends AbstractModule {
   override def configure() = {
-    bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
+    bind(classOf[StrideAuthConfig]).toProvider(classOf[StrideAuthConfigProvider])
   }
 }

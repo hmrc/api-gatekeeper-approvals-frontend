@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
+package uk.gov.hmrc.modules.stride.controllers
 
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.MessagesRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.actions.GatekeeperAuthorisationActions
 
-abstract class BaseController(
-  val forbiddenView: ForbiddenView,
+abstract class GatekeeperBaseController(
   val strideAuthConfig: StrideAuthConfig,
   val authConnector: AuthConnector,
   mcc: MessagesControllerComponents
-) extends FrontendController(mcc) with GatekeeperAuthorisationActions  {
-  
-  def forbiddenResult(implicit request: MessagesRequest[_]) = Forbidden(forbiddenView())
-}
+) extends FrontendController(mcc) with GatekeeperAuthorisationActions

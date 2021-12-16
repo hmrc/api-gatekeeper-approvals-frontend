@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
+package uk.gov.hmrc.modules.stride.controllers.models
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import play.api.mvc.MessagesRequest
+import uk.gov.hmrc.auth.core.Enrolments
 
-class ConfigurationModule extends AbstractModule {
-  override def configure() = {
-    bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
-  }
-}
+case class LoggedInRequest[A](name: Option[String], authorisedEnrolments: Enrolments, request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)
