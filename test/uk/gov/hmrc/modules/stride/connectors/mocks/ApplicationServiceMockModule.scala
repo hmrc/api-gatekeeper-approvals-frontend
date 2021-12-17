@@ -20,7 +20,6 @@ import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
 
 import scala.concurrent.Future.successful
-import java.util.UUID
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId

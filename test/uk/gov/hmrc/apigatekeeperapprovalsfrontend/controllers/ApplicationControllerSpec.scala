@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -30,15 +29,12 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.utils.AsyncHmrcSpec
-import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
-import play.api.mvc.MessagesRequest
-import play.filters.csrf.CSRF
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
-  override def fakeApplication(): Application =
+  override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
         "metrics.jvm"     -> false,
@@ -68,19 +64,10 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   "GET /" should {
     "return 200" in new Setup {
-      import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
       val appId = ApplicationId.random
       val application = Application(appId, "app name")
 
-      val newEnrolments = Set(
-        Enrolment("IR-SA"),
-        Enrolment("IR-CT")
-      )
-
-      val csrfToken = "csrfToken" -> app.injector.instanceOf[CSRF.TokenProvider].generateToken
       val fakeRequest = FakeRequest()
-      val msgRequest = new MessagesRequest(fakeRequest, stubMessagesApi())
-      val loggedInRequest = new LoggedInRequest(Some("Bob"), Enrolments(newEnrolments), msgRequest)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
