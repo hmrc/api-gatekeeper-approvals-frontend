@@ -30,6 +30,7 @@ import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
+import java.net.URL
 
 
 trait ForbiddenHandler {
@@ -51,7 +52,8 @@ trait GatekeeperAuthorisationActions {
     new ActionRefiner[MessagesRequest, LoggedInRequest] {
       def executionContext = ec
       def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
-        val successUrl = s"${if(msgRequest.secure) "https" else "http"}://${msgRequest.host}${msgRequest.uri}"
+        val host = new URL(strideAuthConfig.strideLoginUrl).getHost()
+        val successUrl = s"${if(msgRequest.secure) "https" else "http"}://${host}${msgRequest.uri}"
 
         lazy val loginRedirect = 
           Redirect(
