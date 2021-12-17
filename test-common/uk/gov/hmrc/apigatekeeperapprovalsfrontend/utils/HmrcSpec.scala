@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.utils
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.OptionValues

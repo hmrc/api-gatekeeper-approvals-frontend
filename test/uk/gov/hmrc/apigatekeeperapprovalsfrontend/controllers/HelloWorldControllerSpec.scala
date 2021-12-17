@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status
@@ -31,8 +29,9 @@ import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class HelloWorldControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class HelloWorldControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(

@@ -31,7 +31,7 @@ import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
   override def fakeApplication() =
