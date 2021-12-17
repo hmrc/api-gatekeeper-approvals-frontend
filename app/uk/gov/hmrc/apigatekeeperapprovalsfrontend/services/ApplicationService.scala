@@ -26,10 +26,10 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ApplicationService @Inject()(
-  tpaConnector: ThirdPartyApplicationConnector
+  thirdPartyApplicationConnector: ThirdPartyApplicationConnector
 )(implicit val ec: ExecutionContext) {
   
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
-    tpaConnector.fetchApplicationById(applicationId)
+    thirdPartyApplicationConnector.fetchApplicationById(applicationId)
   }
 }

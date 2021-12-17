@@ -31,3 +31,12 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._"
     )
   )
+  .settings(
+    Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
+    Test / unmanagedSourceDirectories += (baseDirectory.value / "test-common")
+  )
+  .settings(
+    IntegrationTest / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
+    IntegrationTest / unmanagedSourceDirectories += (baseDirectory.value / "test-common")
+  )
+

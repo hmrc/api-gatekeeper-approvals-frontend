@@ -17,7 +17,8 @@
 package uk.gov.hmrc.modules.stride.config
 
 import javax.inject.{Inject, Provider, Singleton}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.Configuration
+import com.typesafe.config.Config
 
 case class StrideAuthConfig(
   authBaseUrl: String,
@@ -28,15 +29,32 @@ case class StrideAuthConfig(
   userRole: String
 )
 
+trait BaseUrl {
+  def config: Config
+
+  protected lazy val rootServices = "microservice.services"
+
+  def baseUrl(serviceName: String) = {
+    val protocol = config.getString(s"${rootServices}.$serviceName.protocol")
+    val host     = config.getString(s"${rootServices}.$serviceName.host")
+    val port     = config.getString(s"${rootServices}.$serviceName.port")
+    s"$protocol://$host:$port"
+  }
+}
+
 @Singleton
-class StrideAuthConfigProvider @Inject()(config: ServicesConfig) extends Provider[StrideAuthConfig] {
+class StrideAuthConfigProvider @Inject()(configuration: Configuration) extends Provider[StrideAuthConfig] with BaseUrl {
+  val config = configuration.underlying
+
   override def get(): StrideAuthConfig = {
-    val authBaseUrl = config.baseUrl("auth")
-    val strideLoginUrl = s"${config.baseUrl("stride-auth-frontend")}/stride/sign-in"
-    val origin = config.getString("stride.origin")
-    val adminRole = config.getString("stride.roles.admin")
-    val superUserRole = config.getString("stride.roles.super-user")
-    val userRole = config.getString("stride.roles.user")
+    val authBaseUrl = baseUrl("auth")
+    val strideLoginUrl = s"${baseUrl("stride-auth-frontend")}/stride/sign-in"
+    
+    val strideConfig = configuration.underlying.getConfig("stride")
+    val origin = strideConfig.getString("origin")
+    val adminRole = strideConfig.getString("roles.admin")
+    val superUserRole = strideConfig.getString("roles.super-user")
+    val userRole = strideConfig.getString("roles.user")
 
     StrideAuthConfig(authBaseUrl, strideLoginUrl, origin, adminRole, superUserRole, userRole)
   }

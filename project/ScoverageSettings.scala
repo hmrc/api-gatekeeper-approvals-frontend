@@ -2,7 +2,7 @@ import scoverage.ScoverageKeys._
 
 object ScoverageSettings {
   def apply() = Seq(
-    coverageMinimum := 75,
+    coverageMinimum := 80,
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageExcludedPackages :=  Seq(
