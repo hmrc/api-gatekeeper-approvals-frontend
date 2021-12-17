@@ -14,18 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import views.html.helper.CSPNonce
+@import uk.gov.hmrc.govukfrontend.views.html.components.Text
 
-@this(
-  appConfig: AppConfig,
-  hmrcLayout: HmrcLayout
-)
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@this(layout: Layout)
 
-@hmrcLayout(
-    pageTitle = pageTitle,
-    nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-)(contentBlock)
+@()(implicit request : Request[_], messagesProvider: MessagesProvider)
+
+@layout(pageTitle = Some("Forbidden")) {
+  <h1 class="govuk-heading-xl">@{Text("You do not have permission to access Gatekeeper").asHtml}</h1>
+  <p class="govuk-body">@{Text("Contact your administrator for access").asHtml}</h2>
+}

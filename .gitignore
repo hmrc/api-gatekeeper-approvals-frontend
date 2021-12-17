@@ -2,6 +2,7 @@
 
 !.gitignore
 !.scalafmt.conf
+!.scalafix.conf
 bin
 .bloop/
 .cache
@@ -22,7 +23,6 @@ lib_managed
 log
 logs
 .metals/
-modules
 /out
 precompiled
 /.project

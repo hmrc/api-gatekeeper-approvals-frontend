@@ -16,24 +16,16 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
-import com.google.inject.ImplementedBy
-import javax.inject.{Inject, Singleton}
+import com.google.inject.AbstractModule
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
+import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 
-@ImplementedBy(classOf[AppConfigImpl])
-trait AppConfig {
-  def welshLanguageSupportEnabled: Boolean
-
-  def appName: String
-}
-
-@Singleton
-class AppConfigImpl @Inject()(
-  config: Configuration
-) extends ServicesConfig(config) with AppConfig {
-  val appName = getString("appName")
-  
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+class ConfigurationModule extends AbstractModule {
+  override def configure() = {
+    bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
+    
+    bind(classOf[ForbiddenHandler]).to(classOf[HandleForbiddenWithView])
+  }
 }

@@ -17,27 +17,34 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future.successful
 
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 
 @Singleton
-class HelloWorldController @Inject()(
+class ApplicationController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  helloWorldPage: HelloWorldPage
-)(implicit val appConfig: AppConfig, override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)  {
+  val errorHandler: ErrorHandler,
+  val applicationActionService: ApplicationActionService
+)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
 
-  val helloWorld: Action[AnyContent] = anyStrideUserAction { implicit request =>
-    Future.successful(Ok(helloWorldPage()))
+  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+    import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application.applicationWrites
+
+    successful(Ok(Json.toJson(request.application)))
   }
 }

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -27,12 +26,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
+import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class HelloWorldControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
-  override def fakeApplication(): Application =
+class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
+  override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
         "metrics.jvm"     -> false,
@@ -42,46 +44,48 @@ class HelloWorldControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   private val fakeRequest = FakeRequest("GET", "/")
 
-  trait Setup extends AuthConnectorMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule {
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
-    val helloWorldPage = app.injector.instanceOf[HelloWorldPage]
+    val errorHandler = app.injector.instanceOf[ErrorHandler]
 
-    val controller = new HelloWorldController(
+    val controller = new ApplicationController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      helloWorldPage
+      errorHandler,
+      ApplicationActionServiceMock.aMock
     )
   }
 
   "GET /" should {
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
-      val result = controller.helloWorld(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
 
-    "return HTML" in new Setup {
+      val fakeRequest = FakeRequest()
+
       AuthConnectorMock.Authorise.thenReturn()
-      val result = controller.helloWorld(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      val result = controller.getApplication(appId)(fakeRequest)
+      status(result) shouldBe Status.OK
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val result = controller.helloWorld(fakeRequest)
+      val appId = ApplicationId.random
+      val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val result = controller.helloWorld(fakeRequest)
+      val appId = ApplicationId.random
+      val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
   }

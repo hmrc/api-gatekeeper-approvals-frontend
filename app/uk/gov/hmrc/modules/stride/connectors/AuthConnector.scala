@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
+package uk.gov.hmrc.modules.stride.connectors
 
-import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.http.HttpClient
 
-@ImplementedBy(classOf[AppConfigImpl])
-trait AppConfig {
-  def welshLanguageSupportEnabled: Boolean
-
-  def appName: String
-}
+import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 
 @Singleton
-class AppConfigImpl @Inject()(
-  config: Configuration
-) extends ServicesConfig(config) with AppConfig {
-  val appName = getString("appName")
-  
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+class AuthConnector @Inject()(val http: HttpClient, strideAuthConfig: StrideAuthConfig) extends PlayAuthConnector {
+  lazy val serviceUrl = strideAuthConfig.authBaseUrl
 }
+

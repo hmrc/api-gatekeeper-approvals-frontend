@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.mvc.MessagesRequest
+import play.api.mvc.Results.Forbidden
 
-@ImplementedBy(classOf[AppConfigImpl])
-trait AppConfig {
-  def welshLanguageSupportEnabled: Boolean
-
-  def appName: String
-}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
+import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 
 @Singleton
-class AppConfigImpl @Inject()(
-  config: Configuration
-) extends ServicesConfig(config) with AppConfig {
-  val appName = getString("appName")
-  
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+class HandleForbiddenWithView @Inject()(forbiddenView: ForbiddenView) extends ForbiddenHandler {
+  def handle(m: MessagesRequest[_]) = Forbidden(forbiddenView()(m, m.messages))
 }
