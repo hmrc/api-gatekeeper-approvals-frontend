@@ -17,13 +17,15 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
+import scala.concurrent.{ExecutionContext, Future}
+
 import cats.data.OptionT
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
+
+import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 
 @Singleton
 class ApplicationActionService @Inject()(

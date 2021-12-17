@@ -11,6 +11,11 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     pipelineStages in Assets := Seq(gzip)
   )
+  .settings(
+    ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
+    ThisBuild / semanticdbEnabled := true,
+    ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+  )
   .settings(publishingSettings: _*)
   .settings(ScoverageSettings(): _*)
   .settings(SilencerSettings())
@@ -30,4 +35,3 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
     IntegrationTest / unmanagedSourceDirectories += (baseDirectory.value / "test-common")
   )
-

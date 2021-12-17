@@ -17,8 +17,10 @@
 package uk.gov.hmrc.modules.stride.config
 
 import javax.inject.{Inject, Provider, Singleton}
-import play.api.Configuration
+
 import com.typesafe.config.Config
+
+import play.api.Configuration
 
 case class StrideAuthConfig(
   authBaseUrl: String,

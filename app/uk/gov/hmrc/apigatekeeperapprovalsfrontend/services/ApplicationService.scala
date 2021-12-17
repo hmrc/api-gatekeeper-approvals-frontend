@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Application}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
-import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 
 @Singleton
 class ApplicationService @Inject()(

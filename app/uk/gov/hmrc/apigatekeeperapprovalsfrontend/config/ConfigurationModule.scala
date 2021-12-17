@@ -17,9 +17,10 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
 import com.google.inject.AbstractModule
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
-import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
+import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 
 class ConfigurationModule extends AbstractModule {
   override def configure() = {

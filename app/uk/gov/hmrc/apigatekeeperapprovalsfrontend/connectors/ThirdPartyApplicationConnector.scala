@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import scala.concurrent.Future
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.http.HttpClient
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 
 object ThirdPartyApplicationConnector {
   case class Config(serviceBaseUrl: String)

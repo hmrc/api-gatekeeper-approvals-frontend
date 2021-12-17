@@ -17,8 +17,10 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+
 import play.api.mvc.MessagesRequest
 import play.api.mvc.Results.Forbidden
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 

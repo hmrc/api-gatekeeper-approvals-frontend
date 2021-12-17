@@ -16,16 +16,17 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-import uk.gov.hmrc.modules.stride.connectors.AuthConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
+import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 
 @Singleton
 class HelloWorldController @Inject()(

@@ -16,22 +16,20 @@
 
 package uk.gov.hmrc.modules.stride.controllers.actions
 
-import play.api.mvc.{Action, AnyContent, Result}
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.mvc.{Action, ActionRefiner, AnyContent, MessagesRequest, Result}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.{ ~ }
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
+import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
-
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.mvc.ActionRefiner
-import play.api.mvc.MessagesRequest
-import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 
 
 trait ForbiddenHandler {
@@ -74,7 +72,7 @@ trait GatekeeperAuthorisationActions {
           case _: InsufficientEnrolments         => Left(forbiddenHandler.handle(msgRequest))
         }
       }
-    }   
+    }
 
   private def authPredicate(minimumRoleRequired: GatekeeperRole): Predicate = {
     val adminEnrolment = Enrolment(strideAuthConfig.adminRole)
