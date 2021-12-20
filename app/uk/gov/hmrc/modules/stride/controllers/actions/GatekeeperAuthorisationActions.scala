@@ -52,8 +52,7 @@ trait GatekeeperAuthorisationActions {
     new ActionRefiner[MessagesRequest, LoggedInRequest] {
       def executionContext = ec
       def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
-        val host = new URL(strideAuthConfig.strideLoginUrl).getHost()
-        val successUrl = s"${if(msgRequest.secure) "https" else "http"}://${host}${msgRequest.uri}"
+        val successUrl = s"${strideAuthConfig.successUrlBase}${msgRequest.uri}"
 
         lazy val loginRedirect = 
           Redirect(

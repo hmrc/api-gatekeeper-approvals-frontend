@@ -28,7 +28,8 @@ case class StrideAuthConfig(
   origin: String,
   adminRole: String,
   superUserRole: String,
-  userRole: String
+  userRole: String,
+  successUrlBase: String
 )
 
 trait BaseUrl {
@@ -57,7 +58,8 @@ class StrideAuthConfigProvider @Inject()(configuration: Configuration) extends P
     val adminRole = strideConfig.getString("roles.admin")
     val superUserRole = strideConfig.getString("roles.super-user")
     val userRole = strideConfig.getString("roles.user")
+    val successUrlBase = strideConfig.getString("success-url-base")
 
-    StrideAuthConfig(authBaseUrl, strideLoginUrl, origin, adminRole, superUserRole, userRole)
+    StrideAuthConfig(authBaseUrl, strideLoginUrl, origin, adminRole, superUserRole, userRole, successUrlBase)
   }
 }

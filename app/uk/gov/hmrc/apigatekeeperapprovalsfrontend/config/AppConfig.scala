@@ -27,6 +27,7 @@ trait AppConfig {
   def welshLanguageSupportEnabled: Boolean
 
   def appName: String
+
 }
 
 @Singleton
