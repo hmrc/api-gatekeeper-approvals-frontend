@@ -1,2 +1,26 @@
 service.name = api-gatekeeper-approvals-frontend
 service.text = This is your new service
+
+breadcrumbs.home = Home
+breadcrumbs.prodrequests = Production Requests
+
+checklist.title = Complete the checklist
+checklist.requestFailedWarning = This request for production credentials has failed
+
+checklist.status.notstarted = Not Started
+checklist.status.inprogress = In Progress
+checklist.status.complete = Completed
+
+checklist.checkfailed.heading = Check answers that failed
+checklist.checkfailed.linktext = Check fails and warnings
+
+checklist.checkapplication.heading = Check application
+checklist.checkapplication.linktext.email = Email the responsible individual
+checklist.checkapplication.linktext.urls = Check that all URLs work
+checklist.checkapplication.linktext.sandbox = Check for evidence of testing in sandbox
+
+checklist.checkpassed.heading = Check answers that passed
+checklist.checkpassed.linktext = Answers that passed
+
+checklist.completed = Checklist completed
+checklist.save = Save and come back later

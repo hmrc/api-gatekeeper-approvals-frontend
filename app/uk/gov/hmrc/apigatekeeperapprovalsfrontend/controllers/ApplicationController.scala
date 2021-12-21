@@ -20,7 +20,6 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
@@ -31,6 +30,24 @@ import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+
+
+object ApplicationController {
+  sealed trait ChecklistItemStatus
+  case object Complete extends ChecklistItemStatus
+  case object InProgress extends ChecklistItemStatus
+  case object NotStarted extends ChecklistItemStatus
+
+  case class ChecklistItemStatuses(
+    failsAndWarnings: ChecklistItemStatus,
+    email: ChecklistItemStatus,
+    urls: ChecklistItemStatus,
+    sandboxTesting: ChecklistItemStatus,
+    passed: ChecklistItemStatus
+  )
+  case class ViewModel(appName: String, isSuccessful: Boolean, hasFailsOrWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+}
 
 @Singleton
 class ApplicationController @Inject()(
@@ -38,13 +55,15 @@ class ApplicationController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
+  applicationChecklistPage: ApplicationChecklistPage,
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+  import ApplicationController._
 
   def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application.applicationWrites
 
-    successful(Ok(Json.toJson(request.application)))
+    val itemStatuses = ChecklistItemStatuses(Complete, InProgress, NotStarted, NotStarted, NotStarted)
+    successful(Ok(applicationChecklistPage(ViewModel(request.application.name, false, true, itemStatuses))))
   }
 }
