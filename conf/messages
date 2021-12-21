@@ -1,4 +1,4 @@
-service.name = api-gatekeeper-approvals-frontend
+service.name = HMRC API Gatekeeper
 service.text = This is your new service
 
 breadcrumbs.home = Home
