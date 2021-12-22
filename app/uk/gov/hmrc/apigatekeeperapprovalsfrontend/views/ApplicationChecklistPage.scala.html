@@ -73,7 +73,7 @@
         @{messages("checklist.title")}
     </h1>
     
-    @if(!model.isSuccessful) {
+    @if(model.isFailure) {
         <div class="govuk-warning-text">
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">

@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, MarkedSubmission}
 
 object ThirdPartyApplicationConnector {
   case class Config(serviceBaseUrl: String)
@@ -40,5 +40,13 @@ class ThirdPartyApplicationConnector @Inject()(
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
 
     httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id.value}")
+  }
+
+  def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
+    import uk.gov.hmrc.http.HttpReads.Implicits._
+    import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.MarkedSubmission._
+
+    val url = s"$serviceBaseUrl/submissions/marked/application/${id.value}"
+    httpClient.GET[Option[MarkedSubmission]](url)
   }
 }
