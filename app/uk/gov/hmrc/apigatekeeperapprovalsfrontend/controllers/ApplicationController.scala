@@ -18,7 +18,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future.successful
 import uk.gov.hmrc.http.HeaderCarrier
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

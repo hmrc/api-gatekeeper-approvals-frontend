@@ -30,7 +30,6 @@ import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
-import java.net.URL
 
 
 trait ForbiddenHandler {
