@@ -15,11 +15,7 @@
  */
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
-import org.joda.time.DateTime
 import java.util.UUID
-import cats.data.NonEmptyList
-import play.api.libs.json.JsSuccess
-import play.api.libs.json.OFormat
 
 case class SubmissionId(value: String) extends AnyVal
 
