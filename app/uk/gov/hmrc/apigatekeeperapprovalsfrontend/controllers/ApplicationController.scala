@@ -19,6 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.http.HeaderCarrier
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -26,12 +27,15 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
-
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import play.api.mvc.Request
 
 object ApplicationController {
   sealed trait ChecklistItemStatus
@@ -57,13 +61,29 @@ class ApplicationController @Inject()(
   mcc: MessagesControllerComponents,
   applicationChecklistPage: ApplicationChecklistPage,
   val errorHandler: ErrorHandler,
-  val applicationActionService: ApplicationActionService
+  val applicationActionService: ApplicationActionService,
+  val applicationService: ApplicationService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ApplicationController._
 
-  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+  implicit override def hc(implicit request: Request[_]): HeaderCarrier =
+    HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
 
-    val itemStatuses = ChecklistItemStatuses(Complete, InProgress, NotStarted, NotStarted, NotStarted)
-    successful(Ok(applicationChecklistPage(ViewModel(request.application.name, false, true, itemStatuses))))
+  private def buildChecklistItemStatuses(markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
+    ChecklistItemStatuses(NotStarted, NotStarted, NotStarted, NotStarted, NotStarted)
+  }
+
+  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+    lazy val failed = NotFound("nope")//TODO
+        
+    val success = (markedSubmission: MarkedSubmission) => {
+      val appName = request.application.name
+      val isFailure = markedSubmission.isFail
+      val hasFailsOrWarnings = markedSubmission.hasWarnOrFail
+      val itemStatuses = buildChecklistItemStatuses(markedSubmission)
+
+      Ok(applicationChecklistPage(ViewModel(appName, isFailure, hasFailsOrWarnings, itemStatuses)))
+    }
+    applicationService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
   }
 }
