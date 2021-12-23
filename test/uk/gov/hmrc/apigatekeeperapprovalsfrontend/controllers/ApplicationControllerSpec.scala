@@ -76,7 +76,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      ApplicationServiceMock.FetchLatestMarkedSubmission.thenReturn()
+      ApplicationServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
       val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.OK
