@@ -41,6 +41,10 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
 
         when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(response))
       }
+
+      def thenNotFound() = {
+        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
+      }
     }
   }
 

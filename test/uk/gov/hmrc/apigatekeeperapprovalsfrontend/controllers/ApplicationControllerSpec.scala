@@ -30,10 +30,10 @@ import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockM
 import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationServiceMockModule
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application,MarkedSubmission}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
-import scala.concurrent.Future.successful
+
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
   override def fakeApplication() =
@@ -80,6 +80,32 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
       val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.OK
+    }
+
+    "return 404 if no marked application is found" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+
+      val fakeRequest = FakeRequest()
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+
+      val result = controller.getApplication(appId)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
+    }
+
+    "return 404 if no application is found" in new Setup {
+      val appId = ApplicationId.random
+
+      val fakeRequest = FakeRequest()
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenNotFound()
+
+      val result = controller.getApplication(appId)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
