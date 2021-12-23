@@ -18,15 +18,9 @@ package uk.gov.hmrc.modules.stride.connectors.mocks
 
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
-import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
-import uk.gov.hmrc.auth.core.retrieve.{~, Name, Retrieval}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application,Submission,SubmissionId,MarkedSubmission}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
-import scala.concurrent.Future.{successful, failed}
-import java.util.UUID
-import uk.gov.hmrc.auth.core.InsufficientEnrolments
-import uk.gov.hmrc.auth.core.SessionRecordNotFound
+import scala.concurrent.Future.successful
 
 trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
   trait BaseThirdPartyApplicationConnectorMock {
