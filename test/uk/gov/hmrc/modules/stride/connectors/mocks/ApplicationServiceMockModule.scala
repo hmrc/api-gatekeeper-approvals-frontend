@@ -28,18 +28,19 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
     def aMock: ApplicationService
 
     object FetchByApplicationId {
-      def thenReturn() = {
-        val response = Some(new Application(ApplicationId.random, "app name"))
-
-        when(aMock.fetchByApplicationId(*)(*)).thenReturn(successful(response))
+      def thenReturn(applicationId: ApplicationId) = {
+        val response = Some(new Application(applicationId, "app name"))
+        when(aMock.fetchByApplicationId(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+      def thenNotFound() = {
+        when(aMock.fetchByApplicationId(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
 
     object FetchLatestMarkedSubmission {
-      def thenReturn() = {
-        val response = Some(MarkedSubmission(Submission(SubmissionId.random, ApplicationId.random), Map.empty))
-
-        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(response))
+      def thenReturn(applicationId: ApplicationId) = {
+        val response = Some(MarkedSubmission(Submission(SubmissionId.random, applicationId), Map.empty))
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
