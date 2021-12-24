@@ -2,15 +2,19 @@ service.name = HMRC API Gatekeeper
 service.text = This is your new service
 
 breadcrumbs.home = Home
-breadcrumbs.prodrequests = Production Requests
+breadcrumbs.prodrequests = Production requests
 
 checklist.title = Complete the checklist
-checklist.requestFailedWarning = This request for production credentials has failed
+checklist.requestFailed = This request for production credentials has failed
+checklist.requestPassed = This request for production credentials has passed
+checklist.requestPassedWithWarnings = This request for production credentials has passed with warnings
 
 checklist.status.notstarted = Not Started
 checklist.status.inprogress = In Progress
 checklist.status.complete = Completed
 
+checklist.checkwarnings.heading = Check answers with warnings
+checklist.checkwarnings.linktext = Check warnings
 checklist.checkfailed.heading = Check answers that failed
 checklist.checkfailed.linktext = Check fails and warnings
 

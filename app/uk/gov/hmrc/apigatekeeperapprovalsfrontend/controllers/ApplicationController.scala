@@ -46,7 +46,7 @@ object ApplicationController {
     sandboxTesting: ChecklistItemStatus,
     passed: ChecklistItemStatus
   )
-  case class ViewModel(appName: String, isSuccessful: Boolean, hasFailsOrWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+  case class ViewModel(appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
 }
 
 @Singleton
