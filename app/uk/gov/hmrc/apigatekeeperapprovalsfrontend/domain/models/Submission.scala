@@ -16,6 +16,11 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 import java.util.UUID
+import play.api.libs.json.JsSuccess
+import play.api.libs.json.Reads
+import play.api.libs.json.JsString
+import play.api.libs.json.JsError
+import play.api.libs.json.Json
 
 case class SubmissionId(value: String) extends AnyVal
 
@@ -30,18 +35,27 @@ case class Submission(
   applicationId: ApplicationId
 )
 
-object MarkedSubmission {
-  import play.api.libs.json.Json
+sealed trait Mark
+case object Fail extends Mark
+case object Warn extends Mark
+case object Pass extends Mark
 
+object MarkedSubmission {
   implicit val submissionReads = Json.reads[Submission]
+  implicit val markReads : Reads[Mark] = Reads {
+    case JsString("fail") => JsSuccess(Fail)
+    case JsString("warn") => JsSuccess(Warn)
+    case JsString("pass") => JsSuccess(Pass)
+    case _ => JsError("Failed to parse Mark value")
+  }
   implicit val markedSubmissionReads = Json.reads[MarkedSubmission]
 }
 
 case class MarkedSubmission(
   submission: Submission,
-  markedAnswers: Map[String, Map[String,String]] //TODO can't get Json.read to work using proper types so using strings for now
+  markedAnswers: Map[String, Map[String,Mark]] //TODO is this ok (not using proper types)?
 ) {
   lazy val marks = markedAnswers.values.flatMap(_.values).toList
-  lazy val isFail = marks.contains("fail") | marks.filter(_ == "warn").size >= 4
-  lazy val hasWarnings = marks.contains("warn") 
+  lazy val isFail = marks.contains(Fail) | marks.filter(_ == Warn).size >= 4
+  lazy val hasWarnings = marks.contains(Warn) 
 }

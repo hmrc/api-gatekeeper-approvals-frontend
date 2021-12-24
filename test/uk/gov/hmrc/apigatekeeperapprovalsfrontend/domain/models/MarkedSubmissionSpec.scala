@@ -21,17 +21,17 @@ import java.util.UUID
 
 class MarkedSubmissionSpec extends HmrcSpec {
 
-  private def buildMarkedSubmissionWithMarks(marks: String*): MarkedSubmission = {
+  private def buildMarkedSubmissionWithMarks(marks: Mark*): MarkedSubmission = {
     val submission = mock[Submission]
     val markedQuestions = marks.toList.map(m => UUID.randomUUID.toString -> Map(("markAnswer" -> m))).toMap
     MarkedSubmission(submission, markedQuestions)
   }
 
   trait Setup {
-    val submissionWithAllPasses = buildMarkedSubmissionWithMarks("pass", "pass", "pass")
-    val submissionWithOneFail = buildMarkedSubmissionWithMarks("pass", "fail", "pass")
-    val submissionWithThreeWarnings = buildMarkedSubmissionWithMarks("pass", "warn", "warn", "pass", "warn")
-    val submissionWithFourWarnings = buildMarkedSubmissionWithMarks("warn", "warn", "warn", "pass", "warn")
+    val submissionWithAllPasses = buildMarkedSubmissionWithMarks(Pass, Pass, Pass)
+    val submissionWithOneFail = buildMarkedSubmissionWithMarks(Pass, Fail, Pass)
+    val submissionWithThreeWarnings = buildMarkedSubmissionWithMarks(Pass, Warn, Warn, Pass, Warn)
+    val submissionWithFourWarnings = buildMarkedSubmissionWithMarks(Warn, Warn, Warn, Pass, Warn)
     val submissionWithNoQuestions = buildMarkedSubmissionWithMarks()
   }
 
