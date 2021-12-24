@@ -77,11 +77,11 @@ class ApplicationController @Inject()(
         
     val success = (markedSubmission: MarkedSubmission) => {
       val appName = request.application.name
-      val isFailure = markedSubmission.isFail
-      val hasFailsOrWarnings = markedSubmission.hasWarnOrFail
+      val isSuccessful = ! markedSubmission.isFail
+      val hasWarnings = markedSubmission.hasWarnings
       val itemStatuses = buildChecklistItemStatuses(markedSubmission)
 
-      Ok(applicationChecklistPage(ViewModel(appName, isFailure, hasFailsOrWarnings, itemStatuses)))
+      Ok(applicationChecklistPage(ViewModel(appName, isSuccessful, hasWarnings, itemStatuses)))
     }
     applicationService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
   }

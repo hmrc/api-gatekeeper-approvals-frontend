@@ -43,5 +43,5 @@ case class MarkedSubmission(
 ) {
   lazy val marks = markedAnswers.values.flatMap(_.values).toList
   lazy val isFail = marks.contains("fail") | marks.filter(_ == "warn").size >= 4
-  lazy val hasWarnOrFail = marks.contains("fail") | marks.contains("warn") 
+  lazy val hasWarnings = marks.contains("warn") 
 }
