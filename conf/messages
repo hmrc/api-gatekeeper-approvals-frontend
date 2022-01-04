@@ -26,5 +26,8 @@ checklist.checkapplication.linktext.sandbox = Check for evidence of testing in s
 checklist.checkpassed.heading = Check answers that passed
 checklist.checkpassed.linktext = Answers that passed
 
+checklist.checkother.heading = Check other answers
+checklist.checkother.linktext = Other answers
+
 checklist.completed = Checklist completed
 checklist.save = Save and come back later

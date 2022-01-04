@@ -123,12 +123,23 @@
             )
         )
 
-        @checklistTable(
-            "checklist.checkpassed.heading", 
-            Map(
-                ("checklist.checkpassed.linktext" -> model.itemStatuses.passed)
-            )
-        )                  
+        @{
+            if (model.isSuccessful && !model.hasWarnings) {
+                checklistTable(
+                    "checklist.checkother.heading", 
+                    Map(
+                        ("checklist.checkother.linktext" -> model.itemStatuses.passed)
+                    )
+                )
+            } else {
+                checklistTable(
+                    "checklist.checkpassed.heading", 
+                    Map(
+                        ("checklist.checkpassed.linktext" -> model.itemStatuses.passed)
+                    )
+                )
+            }
+        }
     </ol>
 
     <div class="govuk-button-group">
