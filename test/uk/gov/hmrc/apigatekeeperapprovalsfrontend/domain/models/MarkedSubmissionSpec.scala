@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
-import java.util.UUID
 
 class MarkedSubmissionSpec extends HmrcSpec {
 
   private def buildMarkedSubmissionWithMarks(marks: Mark*): MarkedSubmission = {
     val submission = mock[Submission]
-    val markedQuestions = marks.toList.map(m => UUID.randomUUID.toString -> Map(("markAnswer" -> m))).toMap
+    val markedQuestions = marks.toList.map(m => QuestionId.random -> m).toMap
     MarkedSubmission(submission, markedQuestions)
   }
 
