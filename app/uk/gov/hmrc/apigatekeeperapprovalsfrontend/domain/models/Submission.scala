@@ -46,12 +46,11 @@ case object Pass extends Mark
 
 object MarkedSubmission {
   implicit val submissionReads = Json.reads[Submission]
-  implicit val markWrites : Writes[Mark] = new Writes[Mark] {
-    override def writes(o: Mark): JsValue = o match {
-      case Fail => JsString("fail")
-      case Warn => JsString("warn")
-      case Pass => JsString("pass")
-    }
+  
+  implicit val markWrites : Writes[Mark] = Writes {
+    case Fail => JsString("fail")
+    case Warn => JsString("warn")
+    case Pass => JsString("pass")
   }
   
   implicit val markReads : Reads[Mark] = Reads {
