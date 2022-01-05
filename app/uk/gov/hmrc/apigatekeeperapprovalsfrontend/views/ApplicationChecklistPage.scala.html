@@ -1,0 +1,155 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationController._
+
+@this(layout: Layout)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@checklistTable(headingKey: String, itemStatuses: Map[String,ChecklistItemStatus]) = {
+    <li>
+        <h2 class="govuk-heading-m">@{messages(headingKey)}</h2>
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">
+                        <span class="govuk-visually-hidden">Step</span>
+                    </th>
+                    <th scope="col" class="govuk-table__header">
+                        <span class="govuk-visually-hidden">Status</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for((linkTextKey, status) <- itemStatuses) {
+                    <tr class="govuk-table__row ">
+                        <td class="govuk-table__cell">
+                            <a href="#" class="govuk-link govuk-link--no-visited-state">@{messages(linkTextKey)}</a>
+                        </td>
+                        <td class="govuk-table__cell align-right">
+                            @{
+                                if (status == Complete) {
+                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.complete")}</div>
+                                } else if (status == InProgress) {
+                                    <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
+                                } else if (status == NotStarted) {
+                                    <div class="govuk-tag govuk-tag--grey app-task-list__tag">{messages("checklist.status.notstarted")}</div>
+                                }
+                            }                        
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </li>
+}
+
+@breadcrumbs = {
+    <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
+            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.prodrequests")}</a></li>
+        </ol>
+    </div>
+}
+
+@layout(pageTitle = Some("api-gatekeeper-approvals-frontend"), beforeContent = Some(breadcrumbs)) {
+    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+    <h1 class="govuk-heading-l">
+        <span class="govuk-caption-l">@model.appName</span>
+        @{messages("checklist.title")}
+    </h1>
+    
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @{
+                if (model.isSuccessful) {
+                    if (model.hasWarnings) {
+                        messages("checklist.requestPassedWithWarnings")
+                    } else {
+                        messages("checklist.requestPassed")
+                    }
+                } else {
+                    messages("checklist.requestFailed")
+                }
+            }
+        </strong>
+    </div>    
+
+    <ol class="govuk-list govuk-list--number">
+        @{
+            if(model.isSuccessful) {
+                if (model.hasWarnings) {
+                    checklistTable(
+                        "checklist.checkwarnings.heading", 
+                        Map(
+                            ("checklist.checkwarnings.linktext" -> model.itemStatuses.failsAndWarnings)
+                        )
+                    )
+                }
+            } else {
+                checklistTable(
+                    "checklist.checkfailed.heading", 
+                    Map(
+                        ("checklist.checkfailed.linktext" -> model.itemStatuses.failsAndWarnings)
+                    )
+                )
+            } 
+        }
+
+        @checklistTable(
+            "checklist.checkapplication.heading", 
+            Map(
+                ("checklist.checkapplication.linktext.email"   -> model.itemStatuses.email),
+                ("checklist.checkapplication.linktext.urls"    -> model.itemStatuses.urls),
+                ("checklist.checkapplication.linktext.sandbox" -> model.itemStatuses.sandboxTesting)
+            )
+        )
+
+        @{
+            if (model.isSuccessful && !model.hasWarnings) {
+                checklistTable(
+                    "checklist.checkother.heading", 
+                    Map(
+                        ("checklist.checkother.linktext" -> model.itemStatuses.passed)
+                    )
+                )
+            } else {
+                checklistTable(
+                    "checklist.checkpassed.heading", 
+                    Map(
+                        ("checklist.checkpassed.linktext" -> model.itemStatuses.passed)
+                    )
+                )
+            }
+        }
+    </ol>
+
+    <div class="govuk-button-group">
+        <a href="#" class="govuk-button" data-module="govuk-button">
+            @{messages("checklist.completed")}
+        </a>
+
+        <a href="#" class="govuk-button govuk-button--secondary">
+            @{messages("checklist.save")}
+        </a>
+    </div>
+
+}

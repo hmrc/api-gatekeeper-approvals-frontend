@@ -22,10 +22,11 @@
   appConfig: AppConfig,
   hmrcLayout: HmrcLayout
 )
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: Option[String] = None, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @hmrcLayout(
     pageTitle = pageTitle,
+    beforeContentBlock = beforeContent,
     nonce = CSPNonce.get,
     isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
 )(contentBlock)

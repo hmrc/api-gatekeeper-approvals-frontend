@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, MarkedSubmission}
 
 @Singleton
 class ApplicationService @Inject()(
@@ -32,4 +32,9 @@ class ApplicationService @Inject()(
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
   }
+
+  def fetchLatestMarkedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
+    thirdPartyApplicationConnector.fetchLatestMarkedSubmission(applicationId)
+  }
+  
 }

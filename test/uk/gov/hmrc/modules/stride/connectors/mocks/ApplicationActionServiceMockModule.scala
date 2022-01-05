@@ -39,6 +39,13 @@ trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatch
         when(aMock.process[A](eqTo(application.id), *)(*))
           .thenAnswer( (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req)))
        }
+
+       def thenNotFound[A]() = {
+        import cats.implicits._
+
+        when(aMock.process[A](*[ApplicationId], *)(*))
+          .thenAnswer( (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none)
+       }
      }
   }
 

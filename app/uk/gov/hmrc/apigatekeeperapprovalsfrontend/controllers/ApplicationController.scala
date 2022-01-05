@@ -18,19 +18,39 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future.successful
+import uk.gov.hmrc.http.HeaderCarrier
 
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import play.api.mvc.Request
+
+object ApplicationController {
+  sealed trait ChecklistItemStatus
+  case object Complete extends ChecklistItemStatus
+  case object InProgress extends ChecklistItemStatus
+  case object NotStarted extends ChecklistItemStatus
+
+  case class ChecklistItemStatuses(
+    failsAndWarnings: ChecklistItemStatus,
+    email: ChecklistItemStatus,
+    urls: ChecklistItemStatus,
+    sandboxTesting: ChecklistItemStatus,
+    passed: ChecklistItemStatus
+  )
+  case class ViewModel(appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+}
 
 @Singleton
 class ApplicationController @Inject()(
@@ -38,13 +58,31 @@ class ApplicationController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
+  applicationChecklistPage: ApplicationChecklistPage,
   val errorHandler: ErrorHandler,
-  val applicationActionService: ApplicationActionService
+  val applicationActionService: ApplicationActionService,
+  val applicationService: ApplicationService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+  import ApplicationController._
+
+  implicit override def hc(implicit request: Request[_]): HeaderCarrier =
+    HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
+
+  private def buildChecklistItemStatuses(markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
+    ChecklistItemStatuses(NotStarted, NotStarted, NotStarted, NotStarted, NotStarted)
+  }
 
   def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application.applicationWrites
+    lazy val failed = NotFound("nope")//TODO
+        
+    val success = (markedSubmission: MarkedSubmission) => {
+      val appName = request.application.name
+      val isSuccessful = ! markedSubmission.isFail
+      val hasWarnings = markedSubmission.hasWarnings
+      val itemStatuses = buildChecklistItemStatuses(markedSubmission)
 
-    successful(Ok(Json.toJson(request.application)))
+      Ok(applicationChecklistPage(ViewModel(appName, isSuccessful, hasWarnings, itemStatuses)))
+    }
+    applicationService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
   }
 }

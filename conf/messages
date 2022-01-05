@@ -1,2 +1,33 @@
-service.name = api-gatekeeper-approvals-frontend
+service.name = HMRC API Gatekeeper
 service.text = This is your new service
+
+breadcrumbs.home = Home
+breadcrumbs.prodrequests = Production requests
+
+checklist.title = Complete the checklist
+checklist.requestFailed = This request for production credentials has failed
+checklist.requestPassed = This request for production credentials has passed
+checklist.requestPassedWithWarnings = This request for production credentials has passed with warnings
+
+checklist.status.notstarted = Not Started
+checklist.status.inprogress = In Progress
+checklist.status.complete = Completed
+
+checklist.checkwarnings.heading = Check answers with warnings
+checklist.checkwarnings.linktext = Check warnings
+checklist.checkfailed.heading = Check answers that failed
+checklist.checkfailed.linktext = Check fails and warnings
+
+checklist.checkapplication.heading = Check application
+checklist.checkapplication.linktext.email = Email the responsible individual
+checklist.checkapplication.linktext.urls = Check that all URLs work
+checklist.checkapplication.linktext.sandbox = Check for evidence of testing in sandbox
+
+checklist.checkpassed.heading = Check answers that passed
+checklist.checkpassed.linktext = Answers that passed
+
+checklist.checkother.heading = Check other answers
+checklist.checkother.linktext = Other answers
+
+checklist.completed = Checklist completed
+checklist.save = Save and come back later

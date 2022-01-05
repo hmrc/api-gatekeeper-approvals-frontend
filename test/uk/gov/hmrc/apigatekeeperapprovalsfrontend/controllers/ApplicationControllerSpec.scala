@@ -27,11 +27,13 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
+import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationServiceMockModule
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
   override def fakeApplication() =
@@ -44,12 +46,13 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   private val fakeRequest = FakeRequest("GET", "/")
 
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with ApplicationServiceMockModule {
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
+    val appChecklistPage = app.injector.instanceOf[ApplicationChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
 
     val controller = new ApplicationController(
@@ -57,8 +60,10 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
+      appChecklistPage,
       errorHandler,
-      ApplicationActionServiceMock.aMock
+      ApplicationActionServiceMock.aMock,
+      ApplicationServiceMock.aMock
     )
   }
 
@@ -71,8 +76,36 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
       val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.OK
+    }
+
+    "return 404 if no marked application is found" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+
+      val fakeRequest = FakeRequest()
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+
+      val result = controller.getApplication(appId)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
+    }
+
+    "return 404 if no application is found" in new Setup {
+      val appId = ApplicationId.random
+
+      val fakeRequest = FakeRequest()
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenNotFound()
+
+      val result = controller.getApplication(appId)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
