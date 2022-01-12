@@ -27,8 +27,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationServiceMockModule
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
+import uk.gov.hmrc.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
@@ -46,7 +46,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   private val fakeRequest = FakeRequest("GET", "/")
 
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with ApplicationServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -63,7 +63,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       appChecklistPage,
       errorHandler,
       ApplicationActionServiceMock.aMock,
-      ApplicationServiceMock.aMock
+      SubmissionServiceMock.aMock
     )
   }
 
@@ -76,7 +76,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      ApplicationServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
       val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -90,7 +90,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      ApplicationServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.getApplication(appId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND

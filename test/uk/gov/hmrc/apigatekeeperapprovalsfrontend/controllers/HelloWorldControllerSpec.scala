@@ -30,6 +30,9 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.NoopConnectorMetrics
+import play.api.inject.bind
 
 class HelloWorldControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
   override def fakeApplication(): Application =
@@ -38,6 +41,7 @@ class HelloWorldControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
         "metrics.jvm"     -> false,
         "metrics.enabled" -> false
       )
+      .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .build()
 
   private val fakeRequest = FakeRequest("GET", "/")

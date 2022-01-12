@@ -25,15 +25,34 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
+import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc.modules.common.services.EitherTHelper
+
+trait HasApplication {
+  def application: Application
+}
 
 trait ApplicationActionBuilders {
   def errorHandler: ErrorHandler
   def applicationActionService: ApplicationActionService
+  def submissionService: SubmissionService
+  implicit val ec: ExecutionContext
+  
+  object StateFilter {
+    type Type = State => Boolean
+    val notProduction: Type = _ != State.PRODUCTION
+    val inTesting: Type = _ == State.TESTING
+    val allAllowed: Type = _ => true
+    val pendingApproval: Type = s => s == State.PENDING_GATEKEEPER_APPROVAL || s == State.PENDING_REQUESTER_VERIFICATION
+  }
+
+  val E = EitherTHelper.make[Result]
 
   implicit def hc(implicit request: Request[_]): HeaderCarrier =
     HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -49,6 +68,21 @@ trait ApplicationActionBuilders {
         applicationActionService.process(applicationId, request)
         .toRight(NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi)))).value
       }
+    }
+  }
+
+  def applicationSubmissionRefiner(implicit ec: ExecutionContext): ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] =
+  new ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] {
+    override def executionContext = ec
+    override def refine[A](request: ApplicationRequest[A]): Future[Either[Result, MarkedSubmissionApplicationRequest[A]]] = {
+      implicit val implicitRequest: MessagesRequest[A] = request
+      
+      (
+        for {
+          submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)) )
+        } yield new MarkedSubmissionApplicationRequest(submission, request)
+      )
+      .value
     }
   }
 }

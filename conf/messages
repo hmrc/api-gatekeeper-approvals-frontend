@@ -31,3 +31,19 @@ checklist.checkother.linktext = Other answers
 
 checklist.completed = Checklist completed
 checklist.save = Save and come back later
+
+answersThatFailed.failsOnly.title = Answers with fails
+answersThatFailed.warnsOnly.title = Answers with warnings
+answersThatFailed.failsAndWarns.title = Answers with fails and warnings
+
+answersThatFailed.failsOnly.completed = Fails checked
+answersThatFailed.warnsOnly.completed = Warnings checked
+answersThatFailed.failsAndWarns.completed = Fails and warnings checked
+
+answersThatFailed.failsOnly.save = Check fails later
+answersThatFailed.warnsOnly.save = Check warnings later
+answersThatFailed.failsAndWarns.save = Check fails and warnings later
+
+answersThatFailed.failsOnly.helptext = Advise the developer about these fails when you email the decision
+answersThatFailed.warnsOnly.helptext = Advise the developer about these warnings when you email the decision
+answersThatFailed.failsAndWarns.helptext = Advise the developer about these fails and warnings when you email the decision

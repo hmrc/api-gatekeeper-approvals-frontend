@@ -17,13 +17,14 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
+import uk.gov.hmrc.modules.submissions.domain.models._
 
 class MarkedSubmissionSpec extends HmrcSpec {
 
   private def buildMarkedSubmissionWithMarks(marks: Mark*): MarkedSubmission = {
     val submission = mock[Submission]
     val markedQuestions = marks.toList.map(m => QuestionId.random -> m).toMap
-    MarkedSubmission(submission, markedQuestions)
+    MarkedSubmission(submission, Map.empty ,markedQuestions)
   }
 
   trait Setup {

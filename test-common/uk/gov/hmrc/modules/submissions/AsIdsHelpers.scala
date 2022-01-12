@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
+package uk.gov.hmrc.modules.submissions
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import cats.data.NonEmptyList
+import uk.gov.hmrc.modules.submissions.domain.models._
 
-class ApplicationRequest[A](
-    val application: Application,
-    val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest)
+trait AsIdsHelpers {
+  implicit class ListQIdSyntax(questionItems: List[QuestionItem]) {
+    def asIds(): List[QuestionId] = {
+      questionItems.map(_.question.id)
+    }
+  }
+
+  implicit class NELQIdSyntax(questionItems: NonEmptyList[QuestionItem]) {
+    def asIds(): List[QuestionId] = {
+      questionItems.toList.map(_.question.id)
+    }
+  }
+}
+
+object AsIdsHelpers extends AsIdsHelpers

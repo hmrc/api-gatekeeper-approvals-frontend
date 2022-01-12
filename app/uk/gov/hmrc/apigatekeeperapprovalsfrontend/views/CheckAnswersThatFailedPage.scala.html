@@ -1,0 +1,71 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController._
+
+@this(layout: Layout)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+
+@breadcrumbs = {
+    <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
+            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.prodrequests")}</a></li>
+        </ol>
+    </div>
+}
+
+@layout(pageTitle = Some("api-gatekeeper-approvals-frontend"), beforeContent = Some(breadcrumbs)) {
+    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+    <h1 class="govuk-heading-l">        
+        <span class="govuk-caption-l">@model.appName</span>
+        @{messages("answersThatFailed.title")}
+    </h1>
+
+    <p class="govuk-body">
+        @{messages("answersThatFailed.helptext")}
+    </p>
+
+    <table class="govuk-table">
+        <tbody>
+            @for(answer <- model.answers) {
+                <tr class="govuk-table__row ">
+                    <td class="govuk-table__cell">
+                        @{messages(answer.question)}
+                    </td>
+                    <td class="govuk-table__cell">
+                        @{messages(answer.answer)}
+                    </td>
+                    <td class="govuk-table__cell">
+                        @{messages(answer.status.toString)}
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="govuk-button-group">
+        <a href="#" class="govuk-button" data-module="govuk-button">
+            @{messages("answersThatFailed.completed")}
+        </a>
+
+        <a href="#" class="govuk-button govuk-button--secondary">
+            @{messages("answersThatFailed.save")}
+        </a>
+    </div>
+}

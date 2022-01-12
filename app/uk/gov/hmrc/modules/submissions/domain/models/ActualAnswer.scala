@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
+package uk.gov.hmrc.modules.submissions.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
-
-class ApplicationRequest[A](
-    val application: Application,
-    val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest)
+sealed trait ActualAnswer
+case class MultipleChoiceAnswer(values: Set[String]) extends ActualAnswer
+case class SingleChoiceAnswer(value: String) extends ActualAnswer
+case class TextAnswer(value: String) extends ActualAnswer
+case object AcknowledgedAnswer extends ActualAnswer
+case object NoAnswer extends ActualAnswer

@@ -26,13 +26,14 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
+import uk.gov.hmrc.modules.submissions.domain.models._
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.modules.submissions.services._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
 
@@ -61,7 +62,7 @@ class ApplicationController @Inject()(
   applicationChecklistPage: ApplicationChecklistPage,
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val applicationService: ApplicationService
+  val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ApplicationController._
 
@@ -83,6 +84,6 @@ class ApplicationController @Inject()(
 
       Ok(applicationChecklistPage(ViewModel(appName, isSuccessful, hasWarnings, itemStatuses)))
     }
-    applicationService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
+    submissionService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
   }
 }
