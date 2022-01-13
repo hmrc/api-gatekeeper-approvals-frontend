@@ -20,6 +20,7 @@ import uk.gov.hmrc.time.DateTimeUtils
 import cats.data.NonEmptyList
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.modules.submissions.domain.models._
+import scala.collection.immutable.ListMap
 
 trait SubmissionsTestData {
   object DevelopmentPractices {
@@ -99,12 +100,104 @@ trait SubmissionsTestData {
     )
   }
 
+  object CustomersAuthorisingYourSoftware {
+    val question1 = AcknowledgementOnly(
+      QuestionId("95da25e8-af3a-4e05-a621-4a5f4ca788f6"),
+      Wording("Customers authorising your software"),
+      Statement(
+        List(
+          StatementText("Your customers will see the information you provide here when they authorise your software to interact with HMRC."),
+          StatementText("Before you continue, you will need:"),
+          StatementBullets(
+            List(
+              StatementText("the name of your software"),
+              StatementText("the location of your servers which store customer data"),
+              StatementText("a link to your privacy policy"),
+              StatementText("a link to your terms and conditions")
+            )
+          )
+        )
+      )
+    )
+
+    val question2 = TextQuestion(
+      QuestionId("4d5a41c8-8727-4d09-96c0-e2ce1bc222d3"),
+      Wording("Confirm the name of your software"),
+      Statement(
+        List(
+          StatementText("We show this name to your users when they authorise your software to interact with HMRC."),
+          CompoundFragment(
+            StatementText("It must comply with our "),
+            StatementLink("naming guidelines (opens in a new tab)", "https://developer.service.hmrc.gov.uk/api-documentation/docs/using-the-hub/name-guidelines"),
+            StatementText(".")            
+          ),
+          StatementText("Application name")
+        )
+      )
+    )
+
+    val question3 = MultiChoiceQuestion(
+      QuestionId("57d706ad-c0b8-462b-a4f8-90e7aa58e57a"),
+      Wording("Where are your servers that store customer information?"),
+      Statement(
+        StatementText("Select all that apply.")
+      ),
+      ListMap(
+        (PossibleAnswer("In the UK") -> Pass),
+        (PossibleAnswer("In the European Economic Area") -> Pass),
+        (PossibleAnswer("Outside the European Economic Area") -> Warn)
+      )
+    )
+
+    val question4 = TextQuestion(
+      QuestionId("c0e4b068-23c9-4d51-a1fa-2513f50e428f"),
+      Wording("Give us your privacy policy URL"),
+      Statement(
+        List(
+          StatementText("Include the policy which covers the software you are requesting production credentials for."),
+          StatementText("For example https://example.com/privacy-policy")
+        )
+      ),
+      Some(("I don't have a privacy policy", Fail))
+    )
+      
+    val question5 = TextQuestion(
+      QuestionId("0a6d6973-c49a-49c3-93ff-de58daa1b90c"),
+      Wording("Give us your terms and conditions URL"),
+      Statement(
+        List(
+          StatementText("Your terms and conditions should cover the software you are requesting production credentials for."),
+          StatementText("For example https://example.com/terms-conditions")
+        )
+      ),
+      Some(("I don't have terms and conditions", Fail))
+    )
+      
+    val questionnaire = Questionnaire(
+      id = QuestionnaireId("3a7f3369-8e28-447c-bd47-efbabeb6d93f"),
+      label = Label("Customers authorising your software"),
+      questions = NonEmptyList.of(
+        QuestionItem(question1),
+        QuestionItem(question2),
+        QuestionItem(question3, AskWhenContext(DeriveContext.Keys.IN_HOUSE_SOFTWARE, "No")),
+        QuestionItem(question4),
+        QuestionItem(question5)
+      )
+    )
+  }
+
   val activeQuestionnaireGroupings = 
     NonEmptyList.of(
       GroupOfQuestionnaires(
         heading = "Your processes",
         links = NonEmptyList.of(
           DevelopmentPractices.questionnaire
+        )            
+      ),
+      GroupOfQuestionnaires(
+        heading = "Your software",
+        links = NonEmptyList.of(
+          CustomersAuthorisingYourSoftware.questionnaire
         )            
       ),
       GroupOfQuestionnaires(
@@ -130,17 +223,40 @@ trait SubmissionsTestData {
   def firstQuestion(questionnaire: Questionnaire) = questionnaire.questions.head.question.id
 
   import AsIdsHelpers._
-  val initialProgress = List(DevelopmentPractices.questionnaire, BusinessDetails.questionnaire).map(q => q.id -> QuestionnaireProgress(NotStarted, q.questions.asIds)).toMap
-  val completedProgress = List(DevelopmentPractices.questionnaire, BusinessDetails.questionnaire).map(q => q.id -> QuestionnaireProgress(Completed, q.questions.asIds)).toMap
+  val initialProgress = List(DevelopmentPractices.questionnaire, BusinessDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(NotStarted, q.questions.asIds)).toMap
+  val completedProgress = List(DevelopmentPractices.questionnaire, BusinessDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(Completed, q.questions.asIds)).toMap
   val notApplicableProgress = (
     List(BusinessDetails.questionnaire).map(q => q.id -> QuestionnaireProgress(NotStarted, q.questions.asIds)) ++ 
     List(DevelopmentPractices.questionnaire).map(q => q.id -> QuestionnaireProgress(NotApplicable, q.questions.asIds))
   ).toMap
 
-  val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, Map.empty)
+  val answersToQuestions = Map(
+    (DevelopmentPractices.question1.id -> SingleChoiceAnswer("Yes")),
+    (DevelopmentPractices.question2.id -> SingleChoiceAnswer("No")),
+    (DevelopmentPractices.question3.id -> SingleChoiceAnswer("No")),
+    (BusinessDetails.question1.id -> SingleChoiceAnswer("Yes")),
+    (CustomersAuthorisingYourSoftware.question1.id -> AcknowledgedAnswer),
+    (CustomersAuthorisingYourSoftware.question2.id -> TextAnswer("name of software")),
+    (CustomersAuthorisingYourSoftware.question3.id -> MultipleChoiceAnswer(Set("In the UK"))),
+    (CustomersAuthorisingYourSoftware.question4.id -> TextAnswer("https://example.com/privacy-policy")),
+    (CustomersAuthorisingYourSoftware.question5.id -> NoAnswer)
+  )
 
+  val markedAnswers: Map[QuestionId, Mark] = Map(
+    (DevelopmentPractices.question1.id -> Pass),
+    (DevelopmentPractices.question2.id -> Fail),
+    (DevelopmentPractices.question3.id -> Warn),
+    (BusinessDetails.question1.id -> Pass),
+    (CustomersAuthorisingYourSoftware.question3.id -> Pass),
+    (CustomersAuthorisingYourSoftware.question4.id -> Pass),
+    (CustomersAuthorisingYourSoftware.question5.id -> Fail)
+  )
+
+
+  val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, answersToQuestions)
   val extendedSubmission = ExtendedSubmission(submission, initialProgress)
-  
+  val markedSubmission = MarkedSubmission(submission, completedProgress, markedAnswers)
+
   val allQuestions = submission.allQuestions.map(_.id)
   val allCorrect: Map[QuestionId, Mark] = allQuestions.toList.map(_ -> Pass).toMap
 
