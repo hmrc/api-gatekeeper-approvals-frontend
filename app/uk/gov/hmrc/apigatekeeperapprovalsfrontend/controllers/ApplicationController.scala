@@ -37,6 +37,8 @@ import uk.gov.hmrc.modules.submissions.services._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
 
+import scala.concurrent.Future.successful
+
 object ApplicationController {
   sealed trait ChecklistItemStatus
   case object Complete extends ChecklistItemStatus
@@ -73,17 +75,12 @@ class ApplicationController @Inject()(
     ChecklistItemStatuses(NotStarted, NotStarted, NotStarted, NotStarted, NotStarted)
   }
 
-  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    lazy val failed = NotFound("nope")//TODO
-        
-    val success = (markedSubmission: MarkedSubmission) => {
+  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
-      val isSuccessful = ! markedSubmission.isFail
-      val hasWarnings = markedSubmission.hasWarnings
-      val itemStatuses = buildChecklistItemStatuses(markedSubmission)
+      val isSuccessful = ! request.markedSubmission.isFail
+      val hasWarnings = request.markedSubmission.hasWarnings
+      val itemStatuses = buildChecklistItemStatuses(request.markedSubmission)
 
-      Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
-    }
-    submissionService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
+      successful(Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses))))
   }
 }

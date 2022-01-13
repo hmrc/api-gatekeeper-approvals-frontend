@@ -81,7 +81,7 @@ trait GatekeeperAuthorisationActions {
 
     minimumRoleRequired match {
       case GatekeeperRole.ADMIN => adminEnrolment
-      case GatekeeperRole.SUPERUSER => adminEnrolment or superUserEnrolment
+      // case GatekeeperRole.SUPERUSER => adminEnrolment or superUserEnrolment
       case GatekeeperRole.USER => adminEnrolment or superUserEnrolment or userEnrolment
     }
   }
@@ -94,9 +94,4 @@ trait GatekeeperAuthorisationActions {
   def anyStrideUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
     gatekeeperRoleAction(GatekeeperRole.USER)(block)
 
-  def atLeastSuperUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
-    gatekeeperRoleAction(GatekeeperRole.SUPERUSER)(block)
-
-  def adminOnlyAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
-    gatekeeperRoleAction(GatekeeperRole.ADMIN)(block)
 }

@@ -90,15 +90,6 @@ trait ApplicationActionBuilders {
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-  private def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    Action.async { implicit request =>
-      (
-        gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
-        applicationRequestRefiner(applicationId)
-      )
-      .invokeBlock(request, block)
-    }
-
   private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[_] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
@@ -108,15 +99,6 @@ trait ApplicationActions extends ApplicationActionBuilders {
       )
       .invokeBlock(request, block)
     }
-
-  def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.USER)(applicationId)(block)
-
-  def superUserWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.SUPERUSER)(applicationId)(block)
-
-  def adminWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.ADMIN)(applicationId)(block)
 
   def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[_] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
