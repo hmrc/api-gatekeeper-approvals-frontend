@@ -32,14 +32,24 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFai
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.modules.submissions.domain.models._
 import uk.gov.hmrc.modules.submissions.services.SubmissionService
-import uk.gov.hmrc
+
+import scala.concurrent.Future.successful
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
+
   case class ViewModel(appName: String, answers: List[AnswerDetails]) {
     lazy val hasFails: Boolean = answers.exists(_.status == Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsAndWarns" else "failsOnly"} else "warnsOnly"
+  }
+
+  def convertAnswer(answer: ActualAnswer): Option[String] = answer match {
+    case SingleChoiceAnswer(value) => Some(value)
+    case TextAnswer(value) => Some(value)
+    case MultipleChoiceAnswer(values) => Some(values.mkString)
+    case NoAnswer => Some("n/a")
+    case AcknowledgedAnswer => None
   }
 }
 
@@ -61,16 +71,25 @@ class CheckAnswersThatFailedController @Inject()(
     HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
 
 
-  def getCheckAnswersThatFailed(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    lazy val failed = NotFound("nope")//TODO
-        
-    val success = (markedSubmission: MarkedSubmission) => {
-      val appName = request.application.name
+  def getCheckAnswersThatFailed(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    val appName = request.application.name
 
-      Ok(checkAnswersThatFailedPage(ViewModel(appName, List(AnswerDetails("q1","a1", Fail), AnswerDetails("q2","a2", Warn)))))
-    }
-    
-    submissionService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
 
+    val questionsAndAnswers: Map[Question, ActualAnswer] = request.submission.answersToQuestions.map(e => (request.submission.findQuestion(e._1) -> e._2)).collect {
+      case (q: Some[Question], a) => q.get -> a
+    }//filter(e => e._1.isDefined).map(e => e._1.get -> e._2)
+
+    val answerDetails = questionsAndAnswers.map(e => AnswerDetails(e._1.wording.value, convertAnswer(e._2).getOrElse(""), Warn)).toList
+
+    successful(
+      Ok(
+        checkAnswersThatFailedPage(
+          ViewModel(
+            appName,
+            answerDetails
+          )
+        )
+      )
+    )
   }
 }

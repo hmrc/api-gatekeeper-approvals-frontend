@@ -72,19 +72,19 @@ trait ApplicationActionBuilders {
   }
 
   def applicationSubmissionRefiner(implicit ec: ExecutionContext): ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] =
-  new ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] {
-    override def executionContext = ec
-    override def refine[A](request: ApplicationRequest[A]): Future[Either[Result, MarkedSubmissionApplicationRequest[A]]] = {
-      implicit val implicitRequest: MessagesRequest[A] = request
-      
-      (
-        for {
-          submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)) )
-        } yield new MarkedSubmissionApplicationRequest(submission, request)
-      )
-      .value
+    new ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] {
+      override def executionContext = ec
+      override def refine[A](request: ApplicationRequest[A]): Future[Either[Result, MarkedSubmissionApplicationRequest[A]]] = {
+        implicit val implicitRequest: MessagesRequest[A] = request
+        
+        (
+          for {
+            submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)) )
+          } yield new MarkedSubmissionApplicationRequest(submission, request)
+        )
+        .value
+      }
     }
-  }
 }
 
 trait ApplicationActions extends ApplicationActionBuilders {
@@ -99,6 +99,16 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
+  private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[_] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      (
+        gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
+        applicationRequestRefiner(applicationId) andThen
+        applicationSubmissionRefiner
+      )
+      .invokeBlock(request, block)
+    }
+
   def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplication(GatekeeperRole.USER)(applicationId)(block)
 
@@ -107,4 +117,7 @@ trait ApplicationActions extends ApplicationActionBuilders {
 
   def adminWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplication(GatekeeperRole.ADMIN)(applicationId)(block)
+
+  def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[_] => Future[Result]): Action[AnyContent] =
+    strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
 }
