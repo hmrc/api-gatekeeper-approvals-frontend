@@ -77,9 +77,9 @@ class CheckAnswersThatFailedController @Inject()(
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = request.submission.answersToQuestions.map(e => (request.submission.findQuestion(e._1) -> e._2)).collect {
       case (q: Some[Question], a) => q.get -> a
-    }//filter(e => e._1.isDefined).map(e => e._1.get -> e._2)
+    }
 
-    val answerDetails = questionsAndAnswers.map(e => AnswerDetails(e._1.wording.value, convertAnswer(e._2).getOrElse(""), Warn)).toList
+    val answerDetails = questionsAndAnswers.map(e => AnswerDetails(e._1.wording.value, convertAnswer(e._2).getOrElse(""), request.markedAnswers(e._1.id))).toList.filter(_.status != Pass)
 
     successful(
       Ok(

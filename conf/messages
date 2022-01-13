@@ -47,3 +47,6 @@ answersThatFailed.failsAndWarns.save = Check fails and warnings later
 answersThatFailed.failsOnly.helptext = Advise the developer about these fails when you email the decision
 answersThatFailed.warnsOnly.helptext = Advise the developer about these warnings when you email the decision
 answersThatFailed.failsAndWarns.helptext = Advise the developer about these fails and warnings when you email the decision
+
+answersThatFailed.status.failed = Fail
+answersThatFailed.status.warning = Warning

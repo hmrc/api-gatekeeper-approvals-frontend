@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController._
+@import uk.gov.hmrc.modules.submissions.domain.models._
 
 @this(layout: Layout)
 
@@ -51,8 +52,13 @@
                     <td class="govuk-table__cell">
                         @{messages(answer.answer)}
                     </td>
-                    <td class="govuk-table__cell">
-                        @{messages(answer.status.toString)}
+                    <td class="govuk-table__cell govuk-table__cell--numeric">
+                        @{ if (answer.status == Fail) {
+                                <strong class="govuk-tag govuk-tag--red"> {messages("answersThatFailed.status.failed")} </strong>
+                            } else {
+                                <strong class="govuk-tag govuk-tag--yellow"> {messages("answersThatFailed.status.warning")} </strong>
+                            }
+                        }
                     </td>
                 </tr>
             }
