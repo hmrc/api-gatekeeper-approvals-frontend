@@ -38,7 +38,7 @@ import scala.concurrent.Future.successful
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class ViewModel(appName: String, answers: List[AnswerDetails]) {
+  case class ViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails]) {
     lazy val hasFails: Boolean = answers.exists(_.status == Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsAndWarns" else "failsOnly"} else "warnsOnly"
@@ -85,6 +85,7 @@ class CheckAnswersThatFailedController @Inject()(
       Ok(
         checkAnswersThatFailedPage(
           ViewModel(
+            applicationId,
             appName,
             answerDetails
           )

@@ -70,7 +70,7 @@
             @{messages(s"answersThatFailed.${model.messageKey}.completed")}
         </a>
 
-        <a href="#" class="govuk-button govuk-button--secondary">
+        <a href="@uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.getApplication(model.applicationId)" class="govuk-button govuk-button--secondary">
             @{messages(s"answersThatFailed.${model.messageKey}.save")}
         </a>
     </div>
