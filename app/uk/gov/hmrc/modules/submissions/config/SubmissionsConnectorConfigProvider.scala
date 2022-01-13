@@ -24,8 +24,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 class SubmissionsConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[Config] {
     override def get(): Config = {
 
-      val serviceBaseUrl: String = config.baseUrl("third-party-application-production")
-      val apiKey: String = config.getConfString("third-party-application-production.api-key", "")
+      val serviceBaseUrl: String = config.baseUrl("third-party-application")
+      val apiKey: String = config.getConfString("third-party-application.api-key", "")
 
       Config(serviceBaseUrl, apiKey)
     }
