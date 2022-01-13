@@ -52,8 +52,10 @@ class SubmissionsConnector @Inject() (
   
   def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
-
     val url = s"$serviceBaseUrl/submissions/marked/application/${id.value}"
-    http.GET[Option[MarkedSubmission]](url)
+    
+    metrics.record(api) {
+      http.GET[Option[MarkedSubmission]](url)
+    }
   }
 }

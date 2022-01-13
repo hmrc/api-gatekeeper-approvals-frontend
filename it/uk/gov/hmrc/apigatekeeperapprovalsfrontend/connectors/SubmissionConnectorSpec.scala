@@ -24,12 +24,9 @@ import play.api.{Application => PlayApplication}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
-import play.api.inject.bind
 import uk.gov.hmrc.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.modules.submissions.domain.models.ExtendedSubmission
 import uk.gov.hmrc.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.modules.submissions.domain.services.SubmissionsJsonFormatters
 
@@ -43,7 +40,6 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
   override def fakeApplication(): PlayApplication =
     GuiceApplicationBuilder()
       .configure(appConfig)
-      .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)
       .build()
 

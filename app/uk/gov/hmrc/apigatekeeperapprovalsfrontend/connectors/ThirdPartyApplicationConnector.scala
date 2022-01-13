@@ -22,6 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.play.http.metrics.common.API
 
 object ThirdPartyApplicationConnector {
   case class Config(serviceBaseUrl: String)
@@ -30,16 +31,21 @@ object ThirdPartyApplicationConnector {
 @Singleton
 class ThirdPartyApplicationConnector @Inject()(
   httpClient: HttpClient,
-  config: ThirdPartyApplicationConnector.Config
+  config: ThirdPartyApplicationConnector.Config,
+  val metrics: ConnectorMetrics
 )(implicit val ec: ExecutionContext) {
 
   val serviceBaseUrl = config.serviceBaseUrl
 
+  val api = API("third-party-application")
+  
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
 
-    httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id.value}")
+    metrics.record(api) {
+      httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id.value}")
+    }
   }
 
 }

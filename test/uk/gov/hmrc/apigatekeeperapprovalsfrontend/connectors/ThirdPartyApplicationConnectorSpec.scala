@@ -42,7 +42,7 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
     val urlBase = "http://example.com"
     val appId = ApplicationId.random
 
-    val connector = new ThirdPartyApplicationConnector(httpClient, ThirdPartyApplicationConnector.Config(urlBase))
+    val connector = new ThirdPartyApplicationConnector(httpClient, ThirdPartyApplicationConnector.Config(urlBase), new NoopConnectorMetrics())
 
     def assertHttpClientWasCalledWithUrl(expectedUrl: String) = 
       verify(httpClient).GET(eqTo(expectedUrl), *[Seq[(String, String)]], *[Seq[(String, String)]])(*,*,*)

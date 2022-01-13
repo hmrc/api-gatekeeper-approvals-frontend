@@ -28,7 +28,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
-import play.api.inject.bind
 
 class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions {
   private val appConfig = Configuration(
@@ -40,7 +39,6 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
   override def fakeApplication(): PlayApplication =
     GuiceApplicationBuilder()
       .configure(appConfig)
-      .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)
       .build()
 
