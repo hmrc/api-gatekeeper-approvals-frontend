@@ -34,11 +34,11 @@
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
     <h1 class="govuk-heading-l">        
         <span class="govuk-caption-l">@model.appName</span>
-        @{messages("answersThatFailed.title")}
+        @{messages(s"answersThatFailed.${model.messageKey}.title")}
     </h1>
 
     <p class="govuk-body">
-        @{messages("answersThatFailed.helptext")}
+        @{messages(s"answersThatFailed.${model.messageKey}.helptext")}
     </p>
 
     <table class="govuk-table">
@@ -61,11 +61,11 @@
 
     <div class="govuk-button-group">
         <a href="#" class="govuk-button" data-module="govuk-button">
-            @{messages("answersThatFailed.completed")}
+            @{messages(s"answersThatFailed.${model.messageKey}.completed")}
         </a>
 
         <a href="#" class="govuk-button govuk-button--secondary">
-            @{messages("answersThatFailed.save")}
+            @{messages(s"answersThatFailed.${model.messageKey}.save")}
         </a>
     </div>
 }

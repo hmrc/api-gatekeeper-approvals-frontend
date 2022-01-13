@@ -38,6 +38,7 @@ object CheckAnswersThatFailedController {
   case class ViewModel(appName: String, answers: List[AnswerDetails]) {
     lazy val hasFails: Boolean = answers.exists(_.status == Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
+    lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsAndWarns" else "failsOnly"} else "warnsOnly"
   }
 }
 

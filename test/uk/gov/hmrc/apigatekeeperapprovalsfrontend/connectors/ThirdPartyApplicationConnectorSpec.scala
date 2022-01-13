@@ -36,7 +36,6 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
       .in(Mode.Test)
       .build()
 
-
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val httpClient = mock[HttpClient]
