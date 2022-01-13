@@ -50,7 +50,7 @@ object ApplicationController {
     sandboxTesting: ChecklistItemStatus,
     passed: ChecklistItemStatus
   )
-  case class ViewModel(appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+  case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
 }
 
 @Singleton
@@ -82,7 +82,7 @@ class ApplicationController @Inject()(
       val hasWarnings = markedSubmission.hasWarnings
       val itemStatuses = buildChecklistItemStatuses(markedSubmission)
 
-      Ok(applicationChecklistPage(ViewModel(appName, isSuccessful, hasWarnings, itemStatuses)))
+      Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
     }
     submissionService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
   }

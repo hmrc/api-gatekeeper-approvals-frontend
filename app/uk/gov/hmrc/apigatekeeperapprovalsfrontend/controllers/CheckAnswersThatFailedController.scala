@@ -32,6 +32,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFai
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.modules.submissions.domain.models._
 import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -68,6 +69,7 @@ class CheckAnswersThatFailedController @Inject()(
 
       Ok(checkAnswersThatFailedPage(ViewModel(appName, List(AnswerDetails("q1","a1", Fail), AnswerDetails("q2","a2", Warn)))))
     }
+    
     submissionService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
 
   }

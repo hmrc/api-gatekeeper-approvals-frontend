@@ -20,7 +20,7 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@checklistTable(headingKey: String, itemStatuses: Map[String,ChecklistItemStatus]) = {
+@checklistTable(headingKey: String, itemStatuses: List[(String, String, ChecklistItemStatus)]) = {
     <li>
         <h2 class="govuk-heading-m">@{messages(headingKey)}</h2>
 
@@ -36,10 +36,10 @@
                 </tr>
             </thead>
             <tbody>
-                @for((linkTextKey, status) <- itemStatuses) {
+                @for((linkTextKey, uri, status) <- itemStatuses) {
                     <tr class="govuk-table__row ">
                         <td class="govuk-table__cell">
-                            <a href="#" class="govuk-link govuk-link--no-visited-state">@{messages(linkTextKey)}</a>
+                            <a href="@uri" class="govuk-link govuk-link--no-visited-state">@{messages(linkTextKey)}</a>
                         </td>
                         <td class="govuk-table__cell align-right">
                             @{
@@ -91,7 +91,7 @@
                 }
             }
         </strong>
-    </div>    
+    </div> 
 
     <ol class="govuk-list govuk-list--number">
         @{
@@ -99,16 +99,16 @@
                 if (model.hasWarnings) {
                     checklistTable(
                         "checklist.checkwarnings.heading", 
-                        Map(
-                            ("checklist.checkwarnings.linktext" -> model.itemStatuses.failsAndWarnings)
+                        List(
+                            ("checklist.checkwarnings.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.getCheckAnswersThatFailed(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                         )
                     )
                 }
             } else {
                 checklistTable(
                     "checklist.checkfailed.heading", 
-                    Map(
-                        ("checklist.checkfailed.linktext" -> model.itemStatuses.failsAndWarnings)
+                    List(
+                        ("checklist.checkfailed.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.getCheckAnswersThatFailed(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                     )
                 )
             } 
@@ -116,10 +116,10 @@
 
         @checklistTable(
             "checklist.checkapplication.heading", 
-            Map(
-                ("checklist.checkapplication.linktext.email"   -> model.itemStatuses.email),
-                ("checklist.checkapplication.linktext.urls"    -> model.itemStatuses.urls),
-                ("checklist.checkapplication.linktext.sandbox" -> model.itemStatuses.sandboxTesting)
+            List(
+                ("checklist.checkapplication.linktext.email", "#", model.itemStatuses.email),
+                ("checklist.checkapplication.linktext.urls", "#", model.itemStatuses.urls),
+                ("checklist.checkapplication.linktext.sandbox", "#", model.itemStatuses.sandboxTesting)
             )
         )
 
@@ -127,15 +127,15 @@
             if (model.isSuccessful && !model.hasWarnings) {
                 checklistTable(
                     "checklist.checkother.heading", 
-                    Map(
-                        ("checklist.checkother.linktext" -> model.itemStatuses.passed)
+                    List(
+                        ("checklist.checkother.linktext", "#", model.itemStatuses.passed)
                     )
                 )
             } else {
                 checklistTable(
                     "checklist.checkpassed.heading", 
-                    Map(
-                        ("checklist.checkpassed.linktext" -> model.itemStatuses.passed)
+                    List(
+                        ("checklist.checkpassed.linktext", "#", model.itemStatuses.passed)
                     )
                 )
             }
