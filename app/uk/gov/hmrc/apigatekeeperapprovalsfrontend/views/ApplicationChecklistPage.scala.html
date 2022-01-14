@@ -100,7 +100,7 @@
                     checklistTable(
                         "checklist.checkwarnings.heading", 
                         List(
-                            ("checklist.checkwarnings.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.getCheckAnswersThatFailed(model.applicationId).url, model.itemStatuses.failsAndWarnings)
+                            ("checklist.checkwarnings.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                         )
                     )
                 }
@@ -108,7 +108,7 @@
                 checklistTable(
                     "checklist.checkfailed.heading", 
                     List(
-                        ("checklist.checkfailed.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.getCheckAnswersThatFailed(model.applicationId).url, model.itemStatuses.failsAndWarnings)
+                        ("checklist.checkfailed.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                     )
                 )
             } 

@@ -78,7 +78,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
-      val result = controller.getApplication(appId)(fakeRequest)
+      val result = controller.applicationPage(appId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -92,7 +92,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.getApplication(appId)(fakeRequest)
+      val result = controller.applicationPage(appId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -104,21 +104,21 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.getApplication(appId)(fakeRequest)
+      val result = controller.applicationPage(appId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
       val appId = ApplicationId.random
-      val result = controller.getApplication(appId)(fakeRequest)
+      val result = controller.applicationPage(appId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
       val appId = ApplicationId.random
-      val result = controller.getApplication(appId)(fakeRequest)
+      val result = controller.applicationPage(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
   }

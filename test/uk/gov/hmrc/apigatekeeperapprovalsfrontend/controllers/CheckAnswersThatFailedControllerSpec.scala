@@ -32,8 +32,9 @@ import play.api.test.FakeRequest
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
-class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
+class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
   val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
   val mcc = app.injector.instanceOf[MessagesControllerComponents]
@@ -56,39 +57,39 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     val application = Application(appId, "app name")
   }
 
-  "getCheckAnswersThatFailed" should {
+  "checkAnswersThatFailedPage" should {
     "return 200" in new Setup {
-      val fakeRequest = FakeRequest()
+      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
-      val result = controller.getCheckAnswersThatFailed(appId)(fakeRequest)
+      val result = controller.checkAnswersThatFailedPage(appId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
 
     "return 200 if unknown questions exist" in new Setup {
-      val fakeRequest = FakeRequest()
+      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(appId)
 
-      val result = controller.getCheckAnswersThatFailed(appId)(fakeRequest)
+      val result = controller.checkAnswersThatFailedPage(appId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
 
     "return 404" in new Setup {
-      val fakeRequest = FakeRequest()
+      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.getCheckAnswersThatFailed(appId)(fakeRequest)
+      val result = controller.checkAnswersThatFailedPage(appId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
     }

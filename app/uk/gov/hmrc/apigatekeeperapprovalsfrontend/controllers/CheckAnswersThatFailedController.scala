@@ -15,6 +15,7 @@
  */
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
@@ -68,12 +69,11 @@ class CheckAnswersThatFailedController @Inject()(
   import CheckAnswersThatFailedController._
 
   implicit override def hc(implicit request: Request[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
+    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
 
-  def getCheckAnswersThatFailed(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkAnswersThatFailedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
-
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = request.submission.answersToQuestions.map(e => (request.submission.findQuestion(e._1) -> e._2)).collect {
       case (q: Some[Question], a) => q.get -> a
@@ -100,5 +100,18 @@ class CheckAnswersThatFailedController @Inject()(
         )
       )
     )
+  }
+
+  def checkAnswersThatFailedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    def handleAction(action: String) = action match {
+      case "checked"          => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId)) // TODO: Add actual route when implementing button actions
+      case "come-back-later"  => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId)) // TODO: Add actual route when implementing button actions
+      case _                  => BadRequest(errorHandler.badRequestTemplate)
+    }
+
+    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action") match {
+      case Some(value) => successful(value.headOption.fold(BadRequest(errorHandler.badRequestTemplate))(handleAction(_)))
+      case None => successful(BadRequest(errorHandler.badRequestTemplate))
+    }
   }
 }

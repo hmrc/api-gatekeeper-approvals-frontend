@@ -62,7 +62,7 @@ trait ApplicationActionBuilders {
       override protected def executionContext: ExecutionContext = ec
 
       override def refine[A](request: LoggedInRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
-        implicit val implicitRequest: Request[_] = request
+        implicit val implicitRequest: Request[A] = request
         import cats.implicits._
 
         applicationActionService.process(applicationId, request)
@@ -90,7 +90,7 @@ trait ApplicationActionBuilders {
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-  private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[_] => Future[Result]): Action[AnyContent] =
+  private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
@@ -100,6 +100,6 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
-  def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[_] => Future[Result]): Action[AnyContent] =
+  def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
 }

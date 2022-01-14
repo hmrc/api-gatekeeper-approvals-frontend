@@ -75,7 +75,7 @@ class ApplicationController @Inject()(
     ChecklistItemStatuses(NotStarted, NotStarted, NotStarted, NotStarted, NotStarted)
   }
 
-  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def applicationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
       val isSuccessful = ! request.markedSubmission.isFail
       val hasWarnings = request.markedSubmission.hasWarnings
