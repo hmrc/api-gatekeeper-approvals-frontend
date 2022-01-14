@@ -2,7 +2,7 @@ import scoverage.ScoverageKeys._
 
 object ScoverageSettings {
   def apply() = Seq(
-    coverageMinimum := 80,
+    coverageMinimum := 75,
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageExcludedPackages :=  Seq(
@@ -15,8 +15,7 @@ object ScoverageSettings {
       "com\\.kenshoo\\.play\\.metrics\\.*",
       ".*definition.*",
       ".*BuildInfo.*",
-      ".*javascript",
-      "uk.gov.hmrc.modules.common.services.EitherTHelper"
+      ".*javascript"
     ).mkString(";")
   )
 }

@@ -1,7 +1,6 @@
 # microservice specific routes
 
 ->         /hmrc-frontend                                   hmrcfrontend.Routes
-GET        /                                                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HelloWorldController.helloWorld
 GET        /applications/:id                                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationController.applicationPage(id: ApplicationId)
 GET        /applications/:id/answers-that-failed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.checkAnswersThatFailedPage(id: ApplicationId)
 POST       /applications/:id/answers-that-failed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.checkAnswersThatFailedAction(id: ApplicationId)
