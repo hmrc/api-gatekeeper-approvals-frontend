@@ -44,13 +44,13 @@ trait ApplicationActionBuilders {
   def submissionService: SubmissionService
   implicit val ec: ExecutionContext
   
-  object StateFilter {
-    type Type = State => Boolean
-    val notProduction: Type = _ != State.PRODUCTION
-    val inTesting: Type = _ == State.TESTING
-    val allAllowed: Type = _ => true
-    val pendingApproval: Type = s => s == State.PENDING_GATEKEEPER_APPROVAL || s == State.PENDING_REQUESTER_VERIFICATION
-  }
+  // object StateFilter {
+  //   type Type = State => Boolean
+  //   val notProduction: Type = _ != State.PRODUCTION
+  //   val inTesting: Type = _ == State.TESTING
+  //   val allAllowed: Type = _ => true
+  //   val pendingApproval: Type = s => s == State.PENDING_GATEKEEPER_APPROVAL || s == State.PENDING_REQUESTER_VERIFICATION
+  // }
 
   val E = EitherTHelper.make[Result]
 

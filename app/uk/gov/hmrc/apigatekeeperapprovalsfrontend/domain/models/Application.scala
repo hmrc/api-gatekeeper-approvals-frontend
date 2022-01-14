@@ -46,7 +46,7 @@ object ApplicationState {
     ApplicationState(State.PRODUCTION, Some(requestedBy), Some(verificationCode))
 }
 
-sealed trait State extends EnumEntry{
+sealed trait State extends EnumEntry {
   def isApproved: Boolean = this == State.PRODUCTION
 
   def isPendingApproval: Boolean = (this == State.PENDING_REQUESTER_VERIFICATION

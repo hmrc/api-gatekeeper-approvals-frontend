@@ -94,4 +94,61 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       status(result) shouldBe Status.NOT_FOUND
     }
   }
+
+  "checkAnswersThatFailedAction" should {
+    "redirect to correct page when marking answers as checked" in new Setup {
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "checked")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
+      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+
+      status(result) shouldBe SEE_OTHER
+    }
+
+    "redirect to correct page when marking answers as come-back-later" in new Setup {
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "come-back-later")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
+      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+
+      status(result) shouldBe SEE_OTHER
+    }
+
+    "return bad request when marking answers as anything that we don't understand" in new Setup {
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "bobbins")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
+      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+
+    "return bad request when sending an empty submit-action" in new Setup {
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
+      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
 }

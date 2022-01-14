@@ -15,7 +15,8 @@ object ScoverageSettings {
       "com\\.kenshoo\\.play\\.metrics\\.*",
       ".*definition.*",
       ".*BuildInfo.*",
-      ".*javascript"
+      ".*javascript",
+      "uk.gov.hmrc.modules.common.services.EitherTHelper"
     ).mkString(";")
   )
 }
