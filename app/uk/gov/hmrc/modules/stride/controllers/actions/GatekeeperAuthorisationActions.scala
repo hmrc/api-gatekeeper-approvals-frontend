@@ -81,7 +81,7 @@ trait GatekeeperAuthorisationActions {
 
     minimumRoleRequired match {
       case GatekeeperRole.ADMIN => adminEnrolment
-      // case GatekeeperRole.SUPERUSER => adminEnrolment or superUserEnrolment
+      case GatekeeperRole.SUPERUSER => adminEnrolment or superUserEnrolment
       case GatekeeperRole.USER => adminEnrolment or superUserEnrolment or userEnrolment
     }
   }

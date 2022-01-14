@@ -55,12 +55,4 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
       assertHttpClientWasCalledWithUrl(s"$urlBase/application/${appId.value}")      
     }
   }
-
-  // "fetchLatestMarkedSubmission" should {
-  //   "call the correct endpoint" in new Setup {
-  //     connector.fetchLatestMarkedSubmission(appId)
-
-  //     assertHttpClientWasCalledWithUrl(s"$urlBase/submissions/marked/application/${appId.value}")      
-  //   }
-  // }
 }

@@ -37,13 +37,4 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       result.value.id shouldBe applicationId
     }
   }
-
-  // "fetchLatestMarkedSubmission" should {
-  //   "return the correct marked submission" in new Setup {
-  //     SubmissionsConnectorMock.FetchLatestMarkedSubmission.thenReturn()
-  //     val result = await(service.fetchLatestMarkedSubmission(applicationId))
-  //     result.value.submission.applicationId shouldBe applicationId
-  //   }
-  // }
-
 }
