@@ -68,17 +68,22 @@ class CheckAnswersThatFailedController @Inject()(
   def checkAnswersThatFailedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
 
-    val questionsAndAnswers: Map[Question, ActualAnswer] = request.submission.answersToQuestions.map(e => (request.submission.findQuestion(e._1) -> e._2)).collect {
-      case (q: Some[Question], a) => q.get -> a
-    }
+    val questionsAndAnswers: Map[Question, ActualAnswer] = 
+      request.submission.answersToQuestions.map {
+        case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
+      }
+      .collect {
+        case (q: Some[Question], a) => q.get -> a
+      }
 
-    val answerDetails = questionsAndAnswers.map(e => 
-      AnswerDetails(
-        e._1.wording.value,
-        ActualAnswersAsText(e._2),
-        request.markedAnswers.getOrElse(e._1.id, Pass)
-      )
-    )
+    val answerDetails = questionsAndAnswers.map {
+      case (question, answer) => 
+        AnswerDetails(
+          question.wording.value,
+          ActualAnswersAsText(answer),
+          request.markedAnswers.getOrElse(question.id, Pass)
+        )
+    }
     .toList
     .filter(_.status != Pass)
 

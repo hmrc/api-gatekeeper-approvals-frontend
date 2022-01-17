@@ -10,3 +10,26 @@ ol li::marker {
 .govuk-heading-m {
   margin-bottom: 0;
 }
+
+.govuk-summary-list__80 {
+  display: table-cell;
+  padding-top: 10px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #b1b4b6;
+  margin-bottom: 5px;
+  margin: 0;
+  width: 80%;
+  overflow-wrap: break-word;
+}
+
+.govuk-summary-list__20 {
+  display: table-cell;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #b1b4b6;
+  margin-bottom: 5px;
+  margin: 0;
+  width: 20%;
+  overflow-wrap: break-word;
+}
