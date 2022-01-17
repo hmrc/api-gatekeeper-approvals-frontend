@@ -50,3 +50,7 @@ answersThatFailed.failsAndWarns.helptext = Advise the developer about these fail
 
 answersThatFailed.status.failed = Fail
 answersThatFailed.status.warning = Warning
+
+answersThatPassed.title = Check other answers
+answersThatPassed.save = Check answers later
+answersThatPassed.completed = Answers checked
