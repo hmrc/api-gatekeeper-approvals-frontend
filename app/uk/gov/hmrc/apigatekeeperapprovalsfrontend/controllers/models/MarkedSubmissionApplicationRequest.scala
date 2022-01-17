@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.modules.submissions.domain.models.MarkedSubmission
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.HasApplication
 
-class ApplicationRequest[A](
-    val application: Application,
-    val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest)
+class MarkedSubmissionApplicationRequest[A](val markedSubmission: MarkedSubmission, applicationRequest: ApplicationRequest[A]) extends ApplicationRequest[A](applicationRequest.application, applicationRequest.loggedInRequest) with HasApplication {
+  lazy val submission = markedSubmission.submission
+  lazy val answersToQuestions = submission.answersToQuestions
+  lazy val markedAnswers = markedSubmission.markedAnswers
+}

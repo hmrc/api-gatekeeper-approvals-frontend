@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.modules.submissions.domain.models
 
-@()(implicit request: Request[_], messages: Messages)
+import cats.data.NonEmptyList
 
-@layout(pageTitle = Some("api-gatekeeper-approvals-frontend")) {
-    <h1 class="govuk-heading-xl">api-gatekeeper-approvals-frontend</h1>
-    <p class="govuk-body">@{messages("service.text")}</p>
-}
+case class GroupOfQuestionnaires(
+  heading: String,
+  links: NonEmptyList[Questionnaire]
+)

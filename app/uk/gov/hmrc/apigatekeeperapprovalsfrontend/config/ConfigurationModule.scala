@@ -21,10 +21,17 @@ import com.google.inject.AbstractModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetricsImpl
+import uk.gov.hmrc.modules.submissions.config.SubmissionsConnectorConfigProvider
+import uk.gov.hmrc.modules.submissions.connectors.SubmissionsConnector
 
 class ConfigurationModule extends AbstractModule {
   override def configure() = {
+    bind(classOf[ConnectorMetrics]).to(classOf[ConnectorMetricsImpl])
+
     bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
+    bind(classOf[SubmissionsConnector.Config]).toProvider(classOf[SubmissionsConnectorConfigProvider])
     
     bind(classOf[ForbiddenHandler]).to(classOf[HandleForbiddenWithView])
   }

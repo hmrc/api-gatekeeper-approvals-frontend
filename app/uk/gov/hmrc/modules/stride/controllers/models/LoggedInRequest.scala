@@ -19,4 +19,4 @@ package uk.gov.hmrc.modules.stride.controllers.models
 import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.auth.core.Enrolments
 
-class LoggedInRequest[A](val name: Option[String], val authorisedEnrolments: Enrolments, request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)
+class LoggedInRequest[A](val name: Option[String], val authorisedEnrolments: Enrolments, val msgRequest: MessagesRequest[A]) extends MessagesRequest[A](msgRequest, msgRequest.messagesApi)

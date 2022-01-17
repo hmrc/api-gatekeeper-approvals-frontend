@@ -18,9 +18,10 @@ package uk.gov.hmrc.modules.stride.connectors.mocks
 
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application,Submission,SubmissionId,MarkedSubmission}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
   trait BaseThirdPartyApplicationConnectorMock {
@@ -29,13 +30,6 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
     object FetchApplicationById {
       def thenReturn() = {
         when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) => successful(Some(Application(appId, "app name"))))
-      }
-    }
-
-    object FetchLatestMarkedSubmission {
-      def thenReturn() = {
-        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) => 
-          successful(Some(MarkedSubmission(Submission(SubmissionId.random, appId), Map.empty))))
       }
     }
   }

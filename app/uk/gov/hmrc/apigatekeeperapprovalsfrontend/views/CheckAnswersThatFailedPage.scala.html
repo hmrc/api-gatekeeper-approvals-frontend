@@ -1,0 +1,76 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController._
+@import uk.gov.hmrc.modules.submissions.domain.models._
+
+@this(layout: Layout)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+
+@breadcrumbs = {
+  <div class="govuk-breadcrumbs">
+    <ol class="govuk-breadcrumbs__list">
+      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
+      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.prodrequests")}</a></li>
+    </ol>
+  </div>
+}
+
+@layout(pageTitle = Some("api-gatekeeper-approvals-frontend"), beforeContent = Some(breadcrumbs)) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <h1 class="govuk-heading-l">        
+    <span class="govuk-caption-l">@model.appName</span>
+    @{messages(s"answersThatFailed.${model.messageKey}.title")}
+  </h1>
+
+  <p class="govuk-body">
+    @{messages(s"answersThatFailed.${model.messageKey}.helptext")}
+  </p>
+
+  <table class="govuk-table">
+    <tbody>
+      @for(answer <- model.answers) {
+        <tr class="govuk-table__row ">
+          <td class="govuk-table__cell">
+            @{messages(answer.question)}
+          </td>
+          <td class="govuk-table__cell">
+            @{messages(answer.answer)}
+          </td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            @{ if (answer.status == Fail) {
+                <strong class="govuk-tag govuk-tag--red"> {messages("answersThatFailed.status.failed")} </strong>
+              } else {
+                <strong class="govuk-tag govuk-tag--yellow"> {messages("answersThatFailed.status.warning")} </strong>
+              }
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedAction(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+
+    <div class="govuk-button-group">
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages(s"answersThatFailed.${model.messageKey}.completed")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages(s"answersThatFailed.${model.messageKey}.save")}</button>
+    </div>
+  }
+}

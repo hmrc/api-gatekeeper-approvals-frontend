@@ -25,15 +25,26 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
+import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc.modules.common.services.EitherTHelper
+
+trait HasApplication {
+  def application: Application
+}
 
 trait ApplicationActionBuilders {
   def errorHandler: ErrorHandler
   def applicationActionService: ApplicationActionService
+  def submissionService: SubmissionService
+  implicit val ec: ExecutionContext
+  
+  val E = EitherTHelper.make[Result]
 
   implicit def hc(implicit request: Request[_]): HeaderCarrier =
     HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -43,7 +54,7 @@ trait ApplicationActionBuilders {
       override protected def executionContext: ExecutionContext = ec
 
       override def refine[A](request: LoggedInRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
-        implicit val implicitRequest: Request[_] = request
+        implicit val implicitRequest: Request[A] = request
         import cats.implicits._
 
         applicationActionService.process(applicationId, request)
@@ -51,26 +62,36 @@ trait ApplicationActionBuilders {
       }
     }
   }
+
+  def applicationSubmissionRefiner(implicit ec: ExecutionContext): ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] =
+    new ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] {
+      override def executionContext = ec
+      override def refine[A](request: ApplicationRequest[A]): Future[Either[Result, MarkedSubmissionApplicationRequest[A]]] = {
+        implicit val implicitRequest: MessagesRequest[A] = request
+        
+        (
+          for {
+            submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)) )
+          } yield new MarkedSubmissionApplicationRequest(submission, request)
+        )
+        .value
+      }
+    }
 }
 
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-  private def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
+  private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
-        applicationRequestRefiner(applicationId)
+        applicationRequestRefiner(applicationId) andThen
+        applicationSubmissionRefiner
       )
       .invokeBlock(request, block)
     }
 
-  def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.USER)(applicationId)(block)
-
-  def superUserWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.SUPERUSER)(applicationId)(block)
-
-  def adminWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[_] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.ADMIN)(applicationId)(block)
+  def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
 }

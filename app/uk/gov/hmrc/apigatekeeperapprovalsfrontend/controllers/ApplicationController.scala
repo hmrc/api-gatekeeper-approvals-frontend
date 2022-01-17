@@ -26,15 +26,18 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
+import uk.gov.hmrc.modules.submissions.domain.models._
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.modules.submissions.services._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
+
+import scala.concurrent.Future.successful
 
 object ApplicationController {
   sealed trait ChecklistItemStatus
@@ -49,7 +52,7 @@ object ApplicationController {
     sandboxTesting: ChecklistItemStatus,
     passed: ChecklistItemStatus
   )
-  case class ViewModel(appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+  case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
 }
 
 @Singleton
@@ -61,7 +64,7 @@ class ApplicationController @Inject()(
   applicationChecklistPage: ApplicationChecklistPage,
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val applicationService: ApplicationService
+  val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ApplicationController._
 
@@ -72,17 +75,12 @@ class ApplicationController @Inject()(
     ChecklistItemStatuses(NotStarted, NotStarted, NotStarted, NotStarted, NotStarted)
   }
 
-  def getApplication(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    lazy val failed = NotFound("nope")//TODO
-        
-    val success = (markedSubmission: MarkedSubmission) => {
+  def applicationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
-      val isSuccessful = ! markedSubmission.isFail
-      val hasWarnings = markedSubmission.hasWarnings
-      val itemStatuses = buildChecklistItemStatuses(markedSubmission)
+      val isSuccessful = ! request.markedSubmission.isFail
+      val hasWarnings = request.markedSubmission.hasWarnings
+      val itemStatuses = buildChecklistItemStatuses(request.markedSubmission)
 
-      Ok(applicationChecklistPage(ViewModel(appName, isSuccessful, hasWarnings, itemStatuses)))
-    }
-    applicationService.fetchLatestMarkedSubmission(applicationId).map(_.fold(failed)(success))
+      successful(Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses))))
   }
 }

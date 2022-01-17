@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.modules.stride.connectors.mocks.ThirdPartyApplicationConnectorMockModule
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ApplicationServiceSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
+class ApplicationServiceSpec extends AsyncHmrcSpec {
 
   trait Setup extends ThirdPartyApplicationConnectorMockModule {
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -39,13 +37,4 @@ class ApplicationServiceSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       result.value.id shouldBe applicationId
     }
   }
-
-  "fetchLatestMarkedSubmission" should {
-    "return the correct marked submission" in new Setup {
-      ThirdPartyApplicationConnectorMock.FetchLatestMarkedSubmission.thenReturn()
-      val result = await(service.fetchLatestMarkedSubmission(applicationId))
-      result.value.submission.applicationId shouldBe applicationId
-    }
-  }
-
 }

@@ -22,14 +22,15 @@ import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
+import uk.gov.hmrc.modules.submissions.connectors.SubmissionsConnector
+import uk.gov.hmrc.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.modules.submissions.domain.services.SubmissionsJsonFormatters
 
-class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions {
+class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with SubmissionsTestData {
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port" -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
@@ -44,41 +45,35 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
       .in(Mode.Test)
       .build()
 
-  private val applicationId = ApplicationId("applicationId")
+  trait Setup extends SubmissionsJsonFormatters {
+    val connector = app.injector.instanceOf[SubmissionsConnector]
 
-  trait Setup {
-    val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
-
-    def applicationResponse(appId: ApplicationId, appName: String = "My Application") = new Application(
-      appId,
-      appName
-    )
+    val extSubmission = extendedSubmission
+    val markSubmission = markedSubmission
 
     implicit val hc = HeaderCarrier()
   }
   
-  "fetch application by id" should {
-    val url = s"/application/${applicationId.value}"
-    val appName = "app name"
+  "fetch latest submission by id" should {
+    val url = s"/submissions/application/${applicationId.value}"
 
-    "return an application" in new Setup {
+    "return a submission" in new Setup {
       stubFor(
         get(urlEqualTo(url))
         .willReturn(
             aResponse()
             .withStatus(OK)
-            .withJsonBody(applicationResponse(applicationId, appName))
+            .withJsonBody(extSubmission)
         )
       )
       
-      val result = await(connector.fetchApplicationById(applicationId))
+      val result = await(connector.fetchLatestSubmission(applicationId))
 
       result shouldBe defined
-      result.get.id shouldBe applicationId
-      result.get.name shouldBe appName
+      result.get.submission.id shouldBe extSubmission.submission.id
     }
 
-    "return None if the application cannot be found" in new Setup {
+    "return None if the submission cannot be found" in new Setup {
       stubFor(
         get(urlEqualTo(url))
         .willReturn(
@@ -87,7 +82,41 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
         )
       )
 
-      val result = await(connector.fetchApplicationById(applicationId))
+      val result = await(connector.fetchLatestSubmission(applicationId))
+
+      result shouldBe empty
+    }
+  }
+
+  "fetch latest marked submission by id" should {
+    val url = s"/submissions/marked/application/${applicationId.value}"
+
+    "return a marked submission" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+        .willReturn(
+            aResponse()
+            .withStatus(OK)
+            .withJsonBody(markSubmission)
+        )
+      )
+      
+      val result = await(connector.fetchLatestMarkedSubmission(applicationId))
+
+      result shouldBe defined
+      result.get.submission.id shouldBe extSubmission.submission.id
+    }
+
+    "return None if the submission cannot be found" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+        .willReturn(
+            aResponse()
+            .withStatus(NOT_FOUND)
+        )
+      )
+
+      val result = await(connector.fetchLatestMarkedSubmission(applicationId))
 
       result shouldBe empty
     }

@@ -9,8 +9,14 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28" % "5.17.0",
     "uk.gov.hmrc"             %% "play-frontend-hmrc"         % "1.31.0-play-28",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-28"         % "0.58.0",
+    "uk.gov.hmrc"             %% "http-metrics"               % "2.5.0-play-28",
+    "uk.gov.hmrc"             %% "play-json-union-formatter"  % "1.15.0-play-28",
     "org.typelevel"           %% "cats-core"                  % "2.6.1",
-    "uk.gov.hmrc"             %% "time"                       % "3.25.0"
+    "uk.gov.hmrc"             %% "time"                       % "3.25.0",
+    "com.beachape"            %% "enumeratum"                 % "1.5.12",
+    "com.beachape"            %% "enumeratum-play"            % "1.5.12",
+    "com.typesafe.play"       %% "play-json"                  % "2.9.2",
+    "com.typesafe.play"       %% "play-json-joda"             % "2.9.2"
   )
 
   val test = Seq(

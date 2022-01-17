@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.test.{CSRFTokenHelper, FakeRequest}
+import play.filters.csrf.CSRFAddToken
 
-class ApplicationRequest[A](
-    val application: Application,
-    val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest)
+trait WithCSRFAddToken {
+  self: GuiceOneAppPerSuite =>
+
+  val addToken = app.injector.instanceOf[CSRFAddToken]
+
+  implicit class CSRFRequest[T](request: FakeRequest[T]) {
+    def withCSRFToken: FakeRequest[T] = CSRFTokenHelper.addCSRFToken(request).asInstanceOf[FakeRequest[T]]
+  }
+}

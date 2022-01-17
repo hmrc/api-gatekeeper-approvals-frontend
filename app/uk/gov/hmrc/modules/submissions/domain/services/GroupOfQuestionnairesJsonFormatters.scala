@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
+package uk.gov.hmrc.modules.submissions.domain.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import play.api.libs.json.Json
 
-class ApplicationRequest[A](
-    val application: Application,
-    val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest)
+import uk.gov.hmrc.modules.submissions.domain.models._
+
+trait GroupOfQuestionnairesJsonFormatters extends QuestionnaireJsonFormatters {
+  implicit val groupOfQuestionnairesJsonFormat = Json.format[GroupOfQuestionnaires]
+}
+
+object GroupOfQuestionnairesJsonFormatters extends GroupOfQuestionnairesJsonFormatters

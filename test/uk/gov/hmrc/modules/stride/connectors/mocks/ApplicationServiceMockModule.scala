@@ -21,7 +21,8 @@ import org.mockito.ArgumentMatchersSugar
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application,Submission,MarkedSubmission,ApplicationId,SubmissionId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
   trait BaseApplicationServiceMock {
@@ -34,17 +35,6 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
       }
       def thenNotFound() = {
         when(aMock.fetchByApplicationId(*[ApplicationId])(*)).thenReturn(successful(None))
-      }
-    }
-
-    object FetchLatestMarkedSubmission {
-      def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(MarkedSubmission(Submission(SubmissionId.random, applicationId), Map.empty))
-        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
-      }
-
-      def thenNotFound() = {
-        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
   }

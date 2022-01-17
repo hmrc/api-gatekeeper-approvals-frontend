@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.domain.models
+package uk.gov.hmrc.modules.submissions.config
 
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.modules.submissions.connectors.SubmissionsConnector.Config
+import javax.inject.{Inject, Provider, Singleton}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-case class LoggedInUser(userFullName: Option[String])
+@Singleton
+class SubmissionsConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[Config] {
+    override def get(): Config = {
 
-object LoggedInUser {
-  implicit def fromRequest(implicit request: LoggedInRequest[_]): LoggedInUser = LoggedInUser(request.name)
+      val serviceBaseUrl: String = config.baseUrl("third-party-application")
+      val apiKey: String = config.getConfString("third-party-application.api-key", "")
+
+      Config(serviceBaseUrl, apiKey)
+    }
 }
