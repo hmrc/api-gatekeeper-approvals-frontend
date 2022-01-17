@@ -128,14 +128,14 @@
                 checklistTable(
                     "checklist.checkother.heading", 
                     List(
-                        ("checklist.checkother.linktext", "#", model.itemStatuses.passed)
+                        ("checklist.checkother.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.itemStatuses.passed)
                     )
                 )
             } else {
                 checklistTable(
                     "checklist.checkpassed.heading", 
                     List(
-                        ("checklist.checkpassed.linktext", "#", model.itemStatuses.passed)
+                        ("checklist.checkpassed.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.itemStatuses.passed)
                     )
                 )
             }

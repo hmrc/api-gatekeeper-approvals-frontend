@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import com.kenshoo.play.metrics.MetricsImpl
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import play.api.inject.ApplicationLifecycle
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import com.kenshoo.play.metrics.Metrics
 
 sealed trait Timer {
   def stop(): Unit
@@ -34,7 +32,7 @@ trait ConnectorMetrics {
 }
 
 @Singleton
-class ConnectorMetricsImpl @Inject()(lifecycle: ApplicationLifecycle, config: Configuration) extends MetricsImpl(lifecycle, config) with ConnectorMetrics {
+class ConnectorMetricsImpl @Inject()(metrics: Metrics) extends ConnectorMetrics {
   def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
     val timer = startTimer(api)
 
@@ -47,13 +45,13 @@ class ConnectorMetricsImpl @Inject()(lifecycle: ApplicationLifecycle, config: Co
   }
 
   private def recordFailure(api: API): Unit =
-    defaultRegistry.counter(api.name ++ "-failed-counter").inc()
+    metrics.defaultRegistry.counter(api.name ++ "-failed-counter").inc()
 
   private def recordSuccess(api: API): Unit =
-    defaultRegistry.counter(api.name ++ "-success-counter").inc()
+    metrics.defaultRegistry.counter(api.name ++ "-success-counter").inc()
 
   private def startTimer(api: API): Timer = {
-    val context = defaultRegistry.timer(api.name ++ "-timer").time()
+    val context = metrics.defaultRegistry.timer(api.name ++ "-timer").time()
 
     new Timer {
       def stop: Unit = context.stop()

@@ -5,4 +5,7 @@ GET        /applications/:id                                uk.gov.hmrc.apigatek
 GET        /applications/:id/answers-that-failed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.checkAnswersThatFailedPage(id: ApplicationId)
 POST       /applications/:id/answers-that-failed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.checkAnswersThatFailedAction(id: ApplicationId)
 
+GET        /applications/:id/answers-that-passed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedPage(id: ApplicationId)
+POST       /applications/:id/answers-that-passed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedAction(id: ApplicationId)
+
 GET        /assets/*file                                    controllers.Assets.versioned(path = "/public", file: Asset)
