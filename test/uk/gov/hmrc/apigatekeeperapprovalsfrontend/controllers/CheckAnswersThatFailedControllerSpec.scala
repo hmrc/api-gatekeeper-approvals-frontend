@@ -34,12 +34,22 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
+import play.api.inject.guice.GuiceApplicationBuilder
+
 class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
   val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
   val mcc = app.injector.instanceOf[MessagesControllerComponents]
   val page = app.injector.instanceOf[CheckAnswersThatFailedPage]
   val errorHandler = app.injector.instanceOf[ErrorHandler]
+
+  override def fakeApplication() =
+    new GuiceApplicationBuilder()
+      .configure(
+        "metrics.jvm"     -> false,
+        "metrics.enabled" -> false
+      )
+      .build()
 
   trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
     val controller = new CheckAnswersThatFailedController(

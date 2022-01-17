@@ -34,6 +34,10 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
     GuiceApplicationBuilder()
       .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)
+      .configure(
+        "metrics.jvm"     -> false,
+        "metrics.enabled" -> false
+      )
       .build()
 
   trait Setup {

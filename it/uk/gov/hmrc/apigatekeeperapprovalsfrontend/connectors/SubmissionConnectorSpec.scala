@@ -35,6 +35,8 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
     "microservice.services.third-party-application.port" -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
     "microservice.services.third-party-application.api-key" -> "",
+    "metrics.jvm"     -> false,
+    "metrics.enabled" -> false
   )
 
   override def fakeApplication(): PlayApplication =
