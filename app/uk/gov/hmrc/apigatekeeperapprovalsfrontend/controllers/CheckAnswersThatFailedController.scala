@@ -35,6 +35,7 @@ import uk.gov.hmrc.modules.submissions.domain.models._
 import uk.gov.hmrc.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.modules.submissions.domain.services.ActualAnswersAsText
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -43,14 +44,6 @@ object CheckAnswersThatFailedController {
     lazy val hasFails: Boolean = answers.exists(_.status == Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsAndWarns" else "failsOnly"} else "warnsOnly"
-  }
-
-  def convertAnswer(answer: ActualAnswer): Option[String] = answer match {
-    case SingleChoiceAnswer(value) => Some(value)
-    case TextAnswer(value) => Some(value)
-    case MultipleChoiceAnswer(values) => Some(values.mkString)
-    case NoAnswer => Some("n/a")
-    case AcknowledgedAnswer => None
   }
 }
 
@@ -82,7 +75,7 @@ class CheckAnswersThatFailedController @Inject()(
     val answerDetails = questionsAndAnswers.map(e => 
       AnswerDetails(
         e._1.wording.value,
-        convertAnswer(e._2).getOrElse(""),
+        ActualAnswersAsText(e._2),
         request.markedAnswers.getOrElse(e._1.id, Pass)
       )
     )
