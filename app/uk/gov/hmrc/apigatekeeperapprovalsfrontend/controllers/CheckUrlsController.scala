@@ -30,12 +30,14 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Access
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 
 object CheckUrlsController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: String, privacyPolicyUrl: String, termsAndConditionsUrl: String) {
-    lazy val hasOrganisationUrl: Boolean = ! organisationUrl.isEmpty
-    lazy val hasPrivacyPolicyUrl: Boolean = ! privacyPolicyUrl.isEmpty
-    lazy val hasTermsAndConditionsUrl: Boolean = ! termsAndConditionsUrl.isEmpty
+  case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String], privacyPolicyUrl: Option[String], termsAndConditionsUrl: Option[String]) {
+    lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
+    lazy val hasPrivacyPolicyUrl: Boolean = privacyPolicyUrl.isDefined
+    lazy val hasTermsAndConditionsUrl: Boolean = termsAndConditionsUrl.isDefined
   }
 }
 
@@ -51,6 +53,24 @@ class CheckUrlsController @Inject()(
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
 
+  def getOrganisationUrl(access: Access) =
+    access match {
+      case std: Standard => std.organisationUrl
+      case _             => None
+    }
+
+  def getPrivacyPolicyUrl(access: Access) =
+    access match {
+      case std: Standard => std.privacyPolicyUrl
+      case _             => None
+    }
+
+  def getTermsAndConditionsUrl(access: Access) =
+    access match {
+      case std: Standard => std.termsAndConditionsUrl
+      case _             => None
+    }
+
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
     successful(
@@ -58,7 +78,9 @@ class CheckUrlsController @Inject()(
         checkUrlsPage(
           CheckUrlsController.ViewModel(
             request.application.name, applicationId,
-            "http://example.com/org", "", "http://example.com/terms"
+            getOrganisationUrl(request.application.access), 
+            getPrivacyPolicyUrl(request.application.access), 
+            getTermsAndConditionsUrl(request.application.access)
           )
         )
       )

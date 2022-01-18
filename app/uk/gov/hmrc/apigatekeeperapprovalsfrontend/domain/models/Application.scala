@@ -79,7 +79,7 @@ case class Application(
   // redirectUris: List[String] = List.empty,
   // termsAndConditionsUrl: Option[String] = None,
   // privacyPolicyUrl: Option[String] = None,
-  // access: Access = Standard(List.empty, None, None),
+  access: Access = Standard(List.empty, None, None),
   state: ApplicationState = ApplicationState(name = State.TESTING)
   // rateLimitTier: RateLimitTier = BRONZE,
   // checkInformation: Option[CheckInformation] = None,

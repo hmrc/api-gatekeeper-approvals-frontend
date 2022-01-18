@@ -48,7 +48,7 @@
         <td class="govuk-table__cell">
           @{
             if (model.hasOrganisationUrl) {
-              <a href={model.organisationUrl} target="_blank">{model.organisationUrl}</a>
+              <a href={model.organisationUrl.get} target="_blank">{model.organisationUrl.get}</a>
             } else {
               {messages("checkUrls.noUrl")}
             }
@@ -62,7 +62,7 @@
         <td class="govuk-table__cell">
           @{
             if (model.hasPrivacyPolicyUrl) {
-              <a href={model.privacyPolicyUrl} target="_blank">{model.privacyPolicyUrl}</a>
+              <a href={model.privacyPolicyUrl.get} target="_blank">{model.privacyPolicyUrl.get}</a>
             } else {
               {messages("checkUrls.noUrl")}
             }
@@ -76,7 +76,7 @@
         <td class="govuk-table__cell">
           @{
             if (model.hasTermsAndConditionsUrl) {
-              <a href={model.termsAndConditionsUrl} target="_blank">{model.termsAndConditionsUrl}</a>
+              <a href={model.termsAndConditionsUrl.get} target="_blank">{model.termsAndConditionsUrl.get}</a>
             } else {
               {messages("checkUrls.noUrl")}
             }
