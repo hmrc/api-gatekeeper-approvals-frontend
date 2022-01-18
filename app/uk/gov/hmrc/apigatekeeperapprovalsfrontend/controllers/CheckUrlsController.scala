@@ -30,7 +30,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 import scala.concurrent.Future.successful
-import cats.data.NonEmptyList
 
 object CheckUrlsController {  
   case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: String, privacyPolicyUrl: String, termsAndConditionsUrl: String) {
@@ -51,8 +50,6 @@ class CheckUrlsController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
-
-  import CheckUrlsController._
 
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
