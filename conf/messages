@@ -54,3 +54,12 @@ answersThatFailed.status.warning = Warning
 answersThatPassed.title = Check other answers
 answersThatPassed.save = Check answers later
 answersThatPassed.completed = Answers checked
+
+checkUrls.title = Check that all URLs work
+checkUrls.pageTitle = HMRC API Gatekeeper - Check URLs
+checkUrls.organisationUrl = Organisation URL
+checkUrls.privacyPolicyUrl = Privacy policy URL
+checkUrls.termsAndConditionsUrl = Terms and conditions URL
+checkUrls.urlsChecked = URLs checked
+checkUrls.checkUrlsLater = Check URLs later
+checkUrls.noUrl = None

@@ -118,7 +118,7 @@
             "checklist.checkapplication.heading", 
             List(
                 ("checklist.checkapplication.linktext.email", "#", model.itemStatuses.email),
-                ("checklist.checkapplication.linktext.urls", "#", model.itemStatuses.urls),
+                ("checklist.checkapplication.linktext.urls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.itemStatuses.urls),
                 ("checklist.checkapplication.linktext.sandbox", "#", model.itemStatuses.sandboxTesting)
             )
         )

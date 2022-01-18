@@ -8,4 +8,10 @@ POST       /applications/:id/answers-that-failed            uk.gov.hmrc.apigatek
 GET        /applications/:id/answers-that-passed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedPage(id: ApplicationId)
 POST       /applications/:id/answers-that-passed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedAction(id: ApplicationId)
 
+GET        /applications/:id/check-urls                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
+POST       /applications/:id/check-urls                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
+
+GET        /applications/:id/url                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
+POST       /applications/:id/url                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
+
 GET        /assets/*file                                    controllers.Assets.versioned(path = "/public", file: Asset)
