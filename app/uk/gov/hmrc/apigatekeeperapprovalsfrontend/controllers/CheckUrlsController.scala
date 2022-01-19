@@ -52,39 +52,24 @@ class CheckUrlsController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
-
-  def getOrganisationUrl(access: Access) =
-    access match {
-      case std: Standard => std.organisationUrl
-      case _             => None
-    }
-
-  def getPrivacyPolicyUrl(access: Access) =
-    access match {
-      case std: Standard => std.privacyPolicyUrl
-      case _             => None
-    }
-
-  def getTermsAndConditionsUrl(access: Access) =
-    access match {
-      case std: Standard => std.termsAndConditionsUrl
-      case _             => None
-    }
-
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-
-    successful(
-      Ok(
-        checkUrlsPage(
-          CheckUrlsController.ViewModel(
-            request.application.name, applicationId,
-            getOrganisationUrl(request.application.access), 
-            getPrivacyPolicyUrl(request.application.access), 
-            getTermsAndConditionsUrl(request.application.access)
+    request.application.access match {
+      // Should only be uplifting and checking Standard apps
+      case std: Standard => 
+        successful(
+          Ok(
+            checkUrlsPage(
+              CheckUrlsController.ViewModel(
+                request.application.name, applicationId,
+                std.organisationUrl, 
+                std.privacyPolicyUrl, 
+                std.termsAndConditionsUrl
+              )
+            )
           )
         )
-      )
-    )
+      case _ => successful(BadRequest(errorHandler.badRequestTemplate))
+    }
   }
 
   def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
