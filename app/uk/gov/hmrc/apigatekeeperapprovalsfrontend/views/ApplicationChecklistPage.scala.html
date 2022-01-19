@@ -68,7 +68,7 @@
     </div>
 }
 
-@layout(pageTitle = Some("api-gatekeeper-approvals-frontend"), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checklist.pageTitle")), beforeContent = Some(breadcrumbs)) {
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
     <h1 class="govuk-heading-l">
         <span class="govuk-caption-l">@model.appName</span>
@@ -118,7 +118,7 @@
             "checklist.checkapplication.heading", 
             List(
                 ("checklist.checkapplication.linktext.email", "#", model.itemStatuses.email),
-                ("checklist.checkapplication.linktext.urls", "#", model.itemStatuses.urls),
+                ("checklist.checkapplication.linktext.urls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.itemStatuses.urls),
                 ("checklist.checkapplication.linktext.sandbox", "#", model.itemStatuses.sandboxTesting)
             )
         )

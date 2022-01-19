@@ -5,6 +5,7 @@ breadcrumbs.home = Home
 breadcrumbs.prodrequests = Production requests
 
 checklist.title = Complete the checklist
+checklist.pageTitle = HMRC API Gatekeeper - Complete the checklist
 checklist.requestFailed = This request for production credentials has failed
 checklist.requestPassed = This request for production credentials has passed
 checklist.requestPassedWithWarnings = This request for production credentials has passed with warnings
@@ -36,6 +37,8 @@ answersThatFailed.failsOnly.title = Answers with fails
 answersThatFailed.warnsOnly.title = Answers with warnings
 answersThatFailed.failsAndWarns.title = Answers with fails and warnings
 
+answersThatFailed.pageTitle = HMRC API Gatekeeper - Answers with fails and warnings
+
 answersThatFailed.failsOnly.completed = Fails checked
 answersThatFailed.warnsOnly.completed = Warnings checked
 answersThatFailed.failsAndWarns.completed = Fails and warnings checked
@@ -52,5 +55,15 @@ answersThatFailed.status.failed = Fail
 answersThatFailed.status.warning = Warning
 
 answersThatPassed.title = Check other answers
+answersThatPassed.pageTitle = HMRC API Gatekeeper - Check other answers
 answersThatPassed.save = Check answers later
 answersThatPassed.completed = Answers checked
+
+checkUrls.title = Check that all URLs work
+checkUrls.pageTitle = HMRC API Gatekeeper - Check URLs
+checkUrls.organisationUrl = Organisation URL
+checkUrls.privacyPolicyUrl = Privacy policy URL
+checkUrls.termsAndConditionsUrl = Terms and conditions URL
+checkUrls.urlsChecked = URLs checked
+checkUrls.checkUrlsLater = Check URLs later
+checkUrls.noUrl = None
