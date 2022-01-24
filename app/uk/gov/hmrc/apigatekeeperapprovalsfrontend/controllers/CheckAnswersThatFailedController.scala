@@ -69,7 +69,7 @@ class CheckAnswersThatFailedController @Inject()(
     val appName = request.application.name
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = 
-      request.submission.answersToQuestions.map {
+      request.submission.latestInstance.answersToQuestions.map {
         case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
       }
       .collect {

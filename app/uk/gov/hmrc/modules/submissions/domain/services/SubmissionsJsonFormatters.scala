@@ -19,24 +19,25 @@ package uk.gov.hmrc.modules.submissions.domain.services
 import uk.gov.hmrc.modules.submissions.domain.models._
 import play.api.libs.json._
 import org.joda.time.DateTimeZone
+import uk.gov.hmrc.play.json.Union
 
-trait SubmissionsJsonFormatters extends GroupOfQuestionnairesJsonFormatters {
-
+trait BaseSubmissionsJsonFormatters extends GroupOfQuestionnairesJsonFormatters {
+  
   implicit val keyReadsQuestionnaireId: KeyReads[QuestionnaireId] = key => JsSuccess(QuestionnaireId(key))
   implicit val keyWritesQuestionnaireId: KeyWrites[QuestionnaireId] = _.value
 
   implicit val stateWrites : Writes[QuestionnaireState] = Writes {
-    case NotStarted    => JsString("NotStarted")
-    case InProgress    => JsString("InProgress")
-    case NotApplicable => JsString("NotApplicable")
-    case Completed     => JsString("Completed")
+    case QuestionnaireState.NotStarted    => JsString("NotStarted")
+    case QuestionnaireState.InProgress    => JsString("InProgress")
+    case QuestionnaireState.NotApplicable => JsString("NotApplicable")
+    case QuestionnaireState.Completed     => JsString("Completed")
   }
   
   implicit val stateReads : Reads[QuestionnaireState] = Reads {
-    case JsString("NotStarted") => JsSuccess(NotStarted)
-    case JsString("InProgress") => JsSuccess(InProgress)
-    case JsString("NotApplicable") => JsSuccess(NotApplicable)
-    case JsString("Completed") => JsSuccess(Completed)
+    case JsString("NotStarted") => JsSuccess(QuestionnaireState.NotStarted)
+    case JsString("InProgress") => JsSuccess(QuestionnaireState.InProgress)
+    case JsString("NotApplicable") => JsSuccess(QuestionnaireState.NotApplicable)
+    case JsString("Completed") => JsSuccess(QuestionnaireState.Completed)
     case _ => JsError("Failed to parse QuestionnaireState value")
   }
 
@@ -44,11 +45,82 @@ trait SubmissionsJsonFormatters extends GroupOfQuestionnairesJsonFormatters {
 
   implicit val answersToQuestionsFormat: OFormat[Map[QuestionId, Option[ActualAnswer]]] = implicitly
 
+  implicit val questionIdsOfInterestFormat = Json.format[QuestionIdsOfInterest]
+}
+
+trait SubmissionsJsonFormatters extends BaseSubmissionsJsonFormatters {
+  import Submission.Status._
+  import Submission.Instance.Review._
+  
+  // TODO - reactive mongo not part of project and maybe shouldn't be - are these reads/writes correct?
   import JodaWrites.JodaDateTimeWrites
   implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
+
+  implicit val RejectedStatusFormat = Json.format[Rejected]
+  implicit val AcceptedStatusFormat = Json.format[Accepted]
+  implicit val SubmittedStatusFormat = Json.format[Submitted]
+  implicit val CreatedStatusFormat = Json.format[Created]
+  
+  implicit val submissionStatus = Union.from[Submission.Status]("Submission.StatusType")
+    .and[Rejected]("rejected")
+    .and[Accepted]("accepted")
+    .and[Submitted]("submitted")
+    .and[Created]("created")
+    .format
+
+  implicit val ReviewNotStartedStatusFormat = Json.format[ReviewNotStarted.type]
+  implicit val ReviewInProgressStatusFormat = Json.format[ReviewInProgress.type]
+  implicit val ReviewCompletedStatusFormat = Json.format[ReviewCompleted.type]
+
+  implicit val reviewStatus = Union.from[Submission.Instance.Review.Status]("Review.StatusType")
+    .and[ReviewNotStarted.type]("notstarted")
+    .and[ReviewInProgress.type]("inprogress")
+    .and[ReviewCompleted.type]("completed")
+    .format
+
+  implicit val submissionInstanceReviewFormat = Json.format[Submission.Instance.Review]
+  implicit val submissionInstanceFormat = Json.format[Submission.Instance]
   implicit val submissionFormat = Json.format[Submission]
   implicit val extendedSubmissionFormat = Json.format[ExtendedSubmission]
   implicit val markedSubmissionFormat = Json.format[MarkedSubmission]
 }
 
 object SubmissionsJsonFormatters extends SubmissionsJsonFormatters
+
+trait SubmissionsFrontendJsonFormatters extends BaseSubmissionsJsonFormatters {
+  import JodaWrites.JodaDateTimeWrites
+  import Submission.Status._
+  import Submission.Instance.Review._
+
+  implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
+
+  implicit val rejectedStatusFormat = Json.format[Rejected]
+  implicit val acceptedStatusFormat = Json.format[Accepted]
+  implicit val submittedStatusFormat = Json.format[Submitted]
+  implicit val createdStatusFormat = Json.format[Created]
+  
+  implicit val submissionStatus = Union.from[Submission.Status]("Submission.StatusType")
+    .and[Rejected]("rejected")
+    .and[Accepted]("accepted")
+    .and[Submitted]("submitted")
+    .and[Created]("created")
+    .format
+
+  implicit val ReviewNotStartedStatusFormat = Json.format[ReviewNotStarted.type]
+  implicit val ReviewInProgressStatusFormat = Json.format[ReviewInProgress.type]
+  implicit val ReviewCompletedStatusFormat = Json.format[ReviewCompleted.type]
+
+  implicit val reviewStatus = Union.from[Submission.Instance.Review.Status]("Review.StatusType")
+    .and[ReviewNotStarted.type]("notstarted")
+    .and[ReviewInProgress.type]("inprogress")
+    .and[ReviewCompleted.type]("completed")
+    .format
+
+  implicit val submissionInstanceReviewFormat = Json.format[Submission.Instance.Review]
+  implicit val submissionInstanceFormat = Json.format[Submission.Instance]
+  implicit val submissionFormat = Json.format[Submission]
+  implicit val extendedSubmissionFormat = Json.format[ExtendedSubmission]
+  implicit val markedSubmissionFormat = Json.format[MarkedSubmission]
+}
+
+object SubmissionsFrontendJsonFormatters extends SubmissionsFrontendJsonFormatters

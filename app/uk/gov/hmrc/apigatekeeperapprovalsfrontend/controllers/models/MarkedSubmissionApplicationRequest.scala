@@ -21,6 +21,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.HasApplica
 
 class MarkedSubmissionApplicationRequest[A](val markedSubmission: MarkedSubmission, applicationRequest: ApplicationRequest[A]) extends ApplicationRequest[A](applicationRequest.application, applicationRequest.loggedInRequest) with HasApplication {
   lazy val submission = markedSubmission.submission
-  lazy val answersToQuestions = submission.answersToQuestions
+  lazy val answersToQuestions = submission.latestInstance.answersToQuestions
   lazy val markedAnswers = markedSubmission.markedAnswers
 }

@@ -19,25 +19,16 @@ package uk.gov.hmrc.modules.submissions.domain.models
 import org.joda.time.DateTime
 import java.util.UUID
 import cats.data.NonEmptyList
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-
-case class SubmissionId(value: String) extends AnyVal
-
-object SubmissionId {
-  implicit val format = play.api.libs.json.Json.valueFormat[SubmissionId]
-  
-  def random: SubmissionId = SubmissionId(UUID.randomUUID().toString())
-}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, UserId}
 
 sealed trait QuestionnaireState
-case object NotStarted extends QuestionnaireState
-case object InProgress extends QuestionnaireState
-case object NotApplicable extends QuestionnaireState
-case object Completed extends QuestionnaireState
-
-case class QuestionnaireProgress(state: QuestionnaireState, questionsToAsk: List[QuestionId])
 
 object QuestionnaireState {
+  case object NotStarted extends QuestionnaireState
+  case object InProgress extends QuestionnaireState
+  case object NotApplicable extends QuestionnaireState
+  case object Completed extends QuestionnaireState
+
   def describe(state: QuestionnaireState): String = state match {
     case NotStarted => "Not Started"
     case InProgress => "In Progress"
@@ -51,16 +42,88 @@ object QuestionnaireState {
   }
 }
 
-object Submissions {
+case class QuestionnaireProgress(state: QuestionnaireState, questionsToAsk: List[QuestionId])
+
+
+case class QuestionIdsOfInterest(applicationNameId: QuestionId, privacyPolicyUrlId: QuestionId, termsAndConditionsUrlId: QuestionId, organisationUrlId: QuestionId)
+
+object Submission {
   type AnswersToQuestions = Map[QuestionId, ActualAnswer]
+
+  case class Id(value: String) extends AnyVal
+
+  object Id {
+    implicit val format = play.api.libs.json.Json.valueFormat[Id]
+    
+    def random: Id = Id(UUID.randomUUID().toString())
+  }
+
+  sealed trait Status {
+    def isInProgress = this match {
+      case _ : Submission.Status.Created => true
+      case _ => false
+    }
+  }
+
+  object Status {
+    case class Rejected(
+      timestamp: DateTime,
+      name: String,
+      reasons: String
+    ) extends Status
+
+    case class Accepted(
+      timestamp: DateTime,
+      name: String
+    ) extends Status
+
+    case class Submitted(
+      timestamp: DateTime,
+      userId: UserId
+    ) extends Status
+
+    case class Created(
+      timestamp: DateTime,
+      userId: UserId
+    ) extends Status
+  }
+
+  object Instance {
+    object Review {
+      sealed trait Status
+      case object ReviewNotStarted extends Status
+      case object ReviewInProgress extends Status
+      case object ReviewCompleted extends Status
+    }
+
+    case class Review(
+      checkedFailsAndWarnings: Review.Status = Review.ReviewNotStarted,
+      emailedResponsibleIndividual: Review.Status = Review.ReviewNotStarted,
+      checkedUrls: Review.Status = Review.ReviewNotStarted,
+      checkedForSandboxTesting: Review.Status = Review.ReviewNotStarted,
+      checkedPassedAnswers: Review.Status = Review.ReviewNotStarted
+    ) {
+      lazy val isCompleted = List(checkedFailsAndWarnings, emailedResponsibleIndividual, checkedUrls, checkedForSandboxTesting, checkedPassedAnswers).forall(s => s == Review.ReviewCompleted)
+    }
+  }
+
+  case class Instance(
+    index: Int,
+    answersToQuestions: Submission.AnswersToQuestions,
+    statusHistory: NonEmptyList[Submission.Status],
+    review: Instance.Review
+  ) {
+    def isInProgress = this.statusHistory.head.isInProgress
+  }
 }
 
 case class Submission(
-  id: SubmissionId,
+  id: Submission.Id,
   applicationId: ApplicationId,
   startedOn: DateTime,
   groups: NonEmptyList[GroupOfQuestionnaires],
-  answersToQuestions: Submissions.AnswersToQuestions
+  questionIdsOfInterest: QuestionIdsOfInterest,
+  instances: NonEmptyList[Submission.Instance]
 ) {
   lazy val allQuestionnaires: NonEmptyList[Questionnaire] = groups.flatMap(g => g.links)
 
@@ -74,7 +137,17 @@ case class Submission(
         qi.question.id == questionId
       )
     )
+
+  lazy val latestInstance = instances.head
+
+  def isInProgress = latestInstance.isInProgress
+
+  def setLatestAnswers(answers: Submission.AnswersToQuestions): Submission = {
+    val newLatest = latestInstance.copy(answersToQuestions = answers)
+    this.copy(instances = NonEmptyList.of(newLatest, this.instances.tail: _*))
+  }
 }
+
 
 case class ExtendedSubmission(
   submission: Submission,
@@ -86,12 +159,13 @@ case class ExtendedSubmission(
     .forall(QuestionnaireState.isCompleted)
 }
 
+// TODO - Should this contain a submission instance now that submission and instance are different?
 case class MarkedSubmission(
   submission: Submission,
   questionnaireProgress: Map[QuestionnaireId, QuestionnaireProgress],
   markedAnswers: Map[QuestionId, Mark]
 ) {
   lazy val isFail = markedAnswers.values.toList.contains(Fail) | markedAnswers.values.filter(_ == Warn).size >= 4
-  lazy val hasWarnings = markedAnswers.values.toList.contains(Warn)
-  lazy val isPass = !hasWarnings && !isFail
+  lazy val isWarn = markedAnswers.values.toList.contains(Warn)
+  lazy val isPass = !isWarn && !isFail
 }

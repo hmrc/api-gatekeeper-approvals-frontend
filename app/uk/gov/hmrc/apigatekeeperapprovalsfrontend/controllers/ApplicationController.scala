@@ -78,7 +78,7 @@ class ApplicationController @Inject()(
   def applicationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
       val isSuccessful = ! request.markedSubmission.isFail
-      val hasWarnings = request.markedSubmission.hasWarnings
+      val hasWarnings = request.markedSubmission.isWarn
       val itemStatuses = buildChecklistItemStatuses(request.markedSubmission)
 
       successful(Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses))))

@@ -21,6 +21,7 @@ import cats.data.NonEmptyList
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.modules.submissions.domain.models._
 import scala.collection.immutable.ListMap
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.UserId
 
 trait SubmissionsTestData {
   object DevelopmentPractices {
@@ -77,23 +78,21 @@ trait SubmissionsTestData {
     )
   }
     
-  object BusinessDetails {
-    val question1 = YesNoQuestion(
-      QuestionId("62a12d00-e64a-4386-8418-dfb82e8ef676"),
-      Wording("Do your development practices follow our guidance?"),
+  object OrganisationDetails {
+    val question1 = TextQuestion(
+      QuestionId("b9dbf0a5-e72b-4c89-a735-26f0858ca6cc"),
+      Wording("Give us your organisation's website URL"),
       Statement(
-        CompoundFragment(
-          StatementText("You must develop software following our"),
-          StatementLink("development practices (opens in a new tab)", "http://www.google.com")
+        List(
+          StatementText("For example https://example.com")
         )
       ),
-      yesMarking = Pass,
-      noMarking = Warn
+      Some(("My organisation doesn't have a website", Fail))
     )
 
     val questionnaire = Questionnaire(
       id = QuestionnaireId("ac69b129-524a-4d10-89a5-7bfa46ed95c7"),
-      label = Label("Business details"),
+      label = Label("Organisation details"),
       questions = NonEmptyList.of(
         QuestionItem(question1)
       )
@@ -203,7 +202,7 @@ trait SubmissionsTestData {
       GroupOfQuestionnaires(
         heading = "Your details",
         links = NonEmptyList.of(
-          BusinessDetails.questionnaire
+          OrganisationDetails.questionnaire
         )
       )
     )
@@ -213,28 +212,28 @@ trait SubmissionsTestData {
   val question = questionnaire.questions.head.question
   val questionId = question.id
   val question2Id = questionnaire.questions.tail.head.question.id
-  val questionnaireAlt = BusinessDetails.questionnaire
+  val questionnaireAlt = OrganisationDetails.questionnaire
   val questionnaireAltId = questionnaireAlt.id
   val questionAltId = questionnaireAlt.questions.head.question.id
 
-  val submissionId = SubmissionId.random
+  val submissionId = Submission.Id.random
   val applicationId = ApplicationId.random
 
   def firstQuestion(questionnaire: Questionnaire) = questionnaire.questions.head.question.id
 
   import AsIdsHelpers._
-  val initialProgress = List(DevelopmentPractices.questionnaire, BusinessDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(NotStarted, q.questions.asIds)).toMap
-  val completedProgress = List(DevelopmentPractices.questionnaire, BusinessDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(Completed, q.questions.asIds)).toMap
+  val initialProgress = List(DevelopmentPractices.questionnaire, OrganisationDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.NotStarted, q.questions.asIds)).toMap
+  val completedProgress: Map[QuestionnaireId, QuestionnaireProgress] = List(DevelopmentPractices.questionnaire, OrganisationDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.Completed, q.questions.asIds)).toMap
   val notApplicableProgress = (
-    List(BusinessDetails.questionnaire).map(q => q.id -> QuestionnaireProgress(NotStarted, q.questions.asIds)) ++ 
-    List(DevelopmentPractices.questionnaire).map(q => q.id -> QuestionnaireProgress(NotApplicable, q.questions.asIds))
+    List(OrganisationDetails.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.NotStarted, q.questions.asIds)) ++ 
+    List(DevelopmentPractices.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.NotApplicable, q.questions.asIds))
   ).toMap
 
   val answersToQuestions = Map(
     (DevelopmentPractices.question1.id -> SingleChoiceAnswer("Yes")),
     (DevelopmentPractices.question2.id -> SingleChoiceAnswer("No")),
     (DevelopmentPractices.question3.id -> SingleChoiceAnswer("No")),
-    (BusinessDetails.question1.id -> SingleChoiceAnswer("Yes")),
+    (OrganisationDetails.question1.id -> TextAnswer("https://example.com")),
     (CustomersAuthorisingYourSoftware.question1.id -> AcknowledgedAnswer),
     (CustomersAuthorisingYourSoftware.question2.id -> TextAnswer("name of software")),
     (CustomersAuthorisingYourSoftware.question3.id -> MultipleChoiceAnswer(Set("In the UK"))),
@@ -246,23 +245,31 @@ trait SubmissionsTestData {
     (DevelopmentPractices.question1.id -> Pass),
     (DevelopmentPractices.question2.id -> Fail),
     (DevelopmentPractices.question3.id -> Warn),
-    (BusinessDetails.question1.id -> Pass),
+    (OrganisationDetails.question1.id -> Pass),
     (CustomersAuthorisingYourSoftware.question3.id -> Pass),
     (CustomersAuthorisingYourSoftware.question4.id -> Pass),
     (CustomersAuthorisingYourSoftware.question5.id -> Fail)
   )
 
+  val questionIdsOfInterest = QuestionIdsOfInterest(
+    applicationNameId             = CustomersAuthorisingYourSoftware.question2.id,
+    privacyPolicyUrlId            = CustomersAuthorisingYourSoftware.question4.id,
+    termsAndConditionsUrlId       = CustomersAuthorisingYourSoftware.question5.id,
+    organisationUrlId             = OrganisationDetails.question1.id
+  )
 
-  val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, answersToQuestions)
+  val initialStatus = Submission.Status.Created(DateTimeUtils.now, UserId.random)
+  val initialInstances = NonEmptyList.of(Submission.Instance(0, answersToQuestions, NonEmptyList.of(initialStatus), Submission.Instance.Review()))
+  val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)
   val extendedSubmission = ExtendedSubmission(submission, initialProgress)
   val markedSubmission = MarkedSubmission(submission, completedProgress, markedAnswers)
 
   val allQuestions = submission.allQuestions.map(_.id)
   val allCorrect: Map[QuestionId, Mark] = allQuestions.toList.map(_ -> Pass).toMap
 
-  val altSubmissionId = SubmissionId.random
+  val altSubmissionId = Submission.Id.random
   require(altSubmissionId != submissionId)
-  val altSubmission = Submission(altSubmissionId, applicationId, DateTimeUtils.now.plusMillis(100), activeQuestionnaireGroupings, Map.empty)
+  val altSubmission = Submission(altSubmissionId, applicationId, DateTimeUtils.now.plusMillis(100), activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)
 
   val altExtendedSubmission = ExtendedSubmission(altSubmission, initialProgress)
 

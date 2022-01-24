@@ -55,19 +55,19 @@ class MarkedSubmissionSpec extends HmrcSpec {
 
   "MarkedSubmission.hasWarnings" should {
     "be false if all passed" in new Setup {
-      submissionWithAllPasses.hasWarnings shouldBe false
+      submissionWithAllPasses.isWarn shouldBe false
     }
     "be true if 1 warning" in new Setup {
-      submissionWithThreeWarnings.hasWarnings shouldBe true
+      submissionWithThreeWarnings.isWarn shouldBe true
     }
     "be true if 2 warnings" in new Setup {
-      submissionWithFourWarnings.hasWarnings shouldBe true
+      submissionWithFourWarnings.isWarn shouldBe true
     }
     "be false if 1 fail" in new Setup {
-      submissionWithOneFail.hasWarnings shouldBe false
+      submissionWithOneFail.isWarn shouldBe false
     }
     "be false if no questions" in new Setup {
-      submissionWithNoQuestions.hasWarnings shouldBe false
+      submissionWithNoQuestions.isWarn shouldBe false
     }
   }
 
