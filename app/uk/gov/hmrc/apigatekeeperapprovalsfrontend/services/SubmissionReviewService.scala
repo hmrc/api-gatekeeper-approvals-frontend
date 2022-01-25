@@ -35,4 +35,24 @@ class SubmissionReviewService @Inject()(
     repo.find(submissionId, instanceIndex)
       .flatMap( _.fold(createANewReview)(r => successful(r)))
   }
+
+  def updateCheckedFailsAndWarningsStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
+    ???
+  }
+
+  def updateEmailedResponsibleIndividualStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
+    ???
+  }
+
+  def updateCheckedUrlsStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
+    ???
+  }
+
+  def updateCheckedForSandboxTestingStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
+    ???
+  }
+
+  def updateCheckedPassedAnswersStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
+    ???
+  }
 }
