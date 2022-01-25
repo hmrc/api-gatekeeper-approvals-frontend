@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
+package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData._
 
 class SubmissionSpec extends AnyWordSpec with Matchers {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartyapplication.repository
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext,Future}

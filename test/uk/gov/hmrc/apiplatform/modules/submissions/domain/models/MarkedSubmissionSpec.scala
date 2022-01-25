@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
+package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 class MarkedSubmissionSpec extends HmrcSpec {
 

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import uk.gov.hmrc.thirdpartyapplication.repository.SubmissionReviewRepo
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.http.HeaderCarrier
@@ -24,6 +23,7 @@ import scala.concurrent.Future
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
 
 @Singleton
 class SubmissionReviewService @Inject()(
