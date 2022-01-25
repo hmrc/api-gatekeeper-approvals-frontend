@@ -80,7 +80,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
     "return 200" in new Setup {
       val appId = ApplicationId.random
       val application = Application(appId, "app name")
-      val submissionReview = SubmissionReview(Submission.Id.random, 0)
+      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0)
       val fakeRequest = FakeRequest()
 
       AuthConnectorMock.Authorise.thenReturn()
