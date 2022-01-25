@@ -38,6 +38,10 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
 
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewCompleted
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewInProgress
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewNotStarted
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
 object ApplicationController {
   sealed trait ChecklistItemStatus
@@ -53,6 +57,15 @@ object ApplicationController {
     passed: ChecklistItemStatus
   )
   case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+
+  private implicit class AsCheckListItemStatusSyntax(status: SubmissionReview.Status) {
+    def asChecklistItemStatus() = status match {
+      case ReviewNotStarted => NotStarted
+      case ReviewInProgress => InProgress
+      case ReviewCompleted => Complete
+    }
+  }
+
 }
 
 @Singleton
@@ -64,23 +77,34 @@ class ApplicationController @Inject()(
   applicationChecklistPage: ApplicationChecklistPage,
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
+  val submissionService: SubmissionService,
+  submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ApplicationController._
 
   implicit override def hc(implicit request: Request[_]): HeaderCarrier =
     HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
 
-  private def buildChecklistItemStatuses(markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
-    ChecklistItemStatuses(NotStarted, NotStarted, NotStarted, NotStarted, NotStarted)
+
+  private def buildChecklistItemStatuses(review: SubmissionReview, markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
+    ChecklistItemStatuses(
+      failsAndWarnings = review.checkedFailsAndWarnings.asChecklistItemStatus,
+      email = review.emailedResponsibleIndividual.asChecklistItemStatus,
+      urls  = review.checkedUrls.asChecklistItemStatus,
+      sandboxTesting = review.checkedForSandboxTesting.asChecklistItemStatus,
+      passed = review.checkedPassedAnswers.asChecklistItemStatus
+    )
   }
 
   def applicationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
       val isSuccessful = ! request.markedSubmission.isFail
       val hasWarnings = request.markedSubmission.isWarn
-      val itemStatuses = buildChecklistItemStatuses(request.markedSubmission)
 
-      successful(Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses))))
+      for {
+        review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index)
+        itemStatuses = buildChecklistItemStatuses(review, request.markedSubmission)
+      }
+      yield Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
   }
 }

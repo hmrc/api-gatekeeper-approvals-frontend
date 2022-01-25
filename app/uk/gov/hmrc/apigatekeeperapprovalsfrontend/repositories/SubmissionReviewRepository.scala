@@ -17,12 +17,13 @@
 package uk.gov.hmrc.thirdpartyapplication.repository
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext,Future}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionReviewJsonFormatters.submissionReviewFormat
-import org.mongodb.scala.model.{Indexes, IndexModel, IndexOptions}
+import org.mongodb.scala.model.{Indexes, IndexModel, IndexOptions, Filters}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 @Singleton
 class SubmissionReviewRepo @Inject()(mongo: MongoComponent)(implicit ec: ExecutionContext
@@ -31,6 +32,20 @@ class SubmissionReviewRepo @Inject()(mongo: MongoComponent)(implicit ec: Executi
   collectionName = "submission-review",
   domainFormat   = submissionReviewFormat,
   indexes        = Seq(
-    IndexModel(Indexes.ascending("submissionid", "instanceIndex"),IndexOptions().unique(true))
-  )
-)
+    IndexModel(Indexes.ascending("submissionId", "instanceIndex"),IndexOptions().unique(true))
+  )) {
+
+  def find(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    collection.find(
+      filter = Filters.and(
+                Filters.equal("submissionId", submissionId.value),
+                Filters.equal("instanceIndex", instanceIndex)
+      )
+    ).headOption
+  }
+
+  def create(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
+    val review = SubmissionReview(submissionId, instanceIndex)
+    collection.insertOne(review).toFuture.map(_ => review)
+  }
+}

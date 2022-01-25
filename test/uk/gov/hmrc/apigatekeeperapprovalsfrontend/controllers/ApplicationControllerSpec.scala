@@ -33,6 +33,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
@@ -46,7 +47,12 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   private val fakeRequest = FakeRequest("GET", "/")
 
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
+  trait Setup 
+      extends AuthConnectorMockModule
+      with ApplicationActionServiceMockModule 
+      with SubmissionServiceMockModule
+      with SubmissionReviewServiceMockModule {
+        
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -63,7 +69,8 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       appChecklistPage,
       errorHandler,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock
+      SubmissionServiceMock.aMock,
+      SubmissionReviewServiceMock.aMock
     )
   }
 
