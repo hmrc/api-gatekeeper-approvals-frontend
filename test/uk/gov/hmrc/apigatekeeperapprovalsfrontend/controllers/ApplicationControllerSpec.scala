@@ -34,6 +34,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,A
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
@@ -78,12 +80,13 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
     "return 200" in new Setup {
       val appId = ApplicationId.random
       val application = Application(appId, "app name")
-
+      val submissionReview = SubmissionReview(Submission.Id.random, 0)
       val fakeRequest = FakeRequest()
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
       val result = controller.applicationPage(appId)(fakeRequest)
       status(result) shouldBe Status.OK

@@ -31,7 +31,7 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
 
     object FindOrCreateReview {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.findOrCreateReview(*[Submission.Id], *)(*)).thenReturn(successful(review))
+        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex))(*)).thenReturn(successful(review))
       }
     }
   }
