@@ -27,11 +27,11 @@ import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.modules.submissions.domain.models._
-import uk.gov.hmrc.modules.submissions.domain.services.ActualAnswersAsText
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import cats.data.NonEmptyList
 
 object CheckAnswersThatPassedController {  

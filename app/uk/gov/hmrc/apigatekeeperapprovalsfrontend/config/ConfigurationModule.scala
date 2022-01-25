@@ -23,8 +23,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWit
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetricsImpl
-import uk.gov.hmrc.modules.submissions.config.SubmissionsConnectorConfigProvider
-import uk.gov.hmrc.modules.submissions.connectors.SubmissionsConnector
+import uk.gov.hmrc.apiplatform.modules.submissions.config.SubmissionsConnectorConfigProvider
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 
 class ConfigurationModule extends AbstractModule {
   override def configure() = {

@@ -28,7 +28,7 @@ import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
 import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
-import uk.gov.hmrc.modules.submissions.services.SubmissionServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec

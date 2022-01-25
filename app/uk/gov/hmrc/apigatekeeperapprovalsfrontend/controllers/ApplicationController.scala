@@ -26,14 +26,14 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.modules.submissions.services._
+import uk.gov.hmrc.apiplatform.modules.submissions.services._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
 
@@ -78,7 +78,7 @@ class ApplicationController @Inject()(
   def applicationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
       val isSuccessful = ! request.markedSubmission.isFail
-      val hasWarnings = request.markedSubmission.hasWarnings
+      val hasWarnings = request.markedSubmission.isWarn
       val itemStatuses = buildChecklistItemStatuses(request.markedSubmission)
 
       successful(Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses))))

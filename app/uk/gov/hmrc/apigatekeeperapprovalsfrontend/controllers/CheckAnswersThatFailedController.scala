@@ -31,11 +31,11 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents,Request}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.modules.submissions.domain.models._
-import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.modules.submissions.domain.services.ActualAnswersAsText
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -69,7 +69,7 @@ class CheckAnswersThatFailedController @Inject()(
     val appName = request.application.name
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = 
-      request.submission.answersToQuestions.map {
+      request.submission.latestInstance.answersToQuestions.map {
         case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
       }
       .collect {

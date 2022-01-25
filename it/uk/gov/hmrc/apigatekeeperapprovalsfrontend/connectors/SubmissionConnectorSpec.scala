@@ -26,9 +26,9 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
-import uk.gov.hmrc.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.modules.submissions.SubmissionsTestData
-import uk.gov.hmrc.modules.submissions.domain.services.SubmissionsJsonFormatters
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsFrontendJsonFormatters
 
 class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with SubmissionsTestData {
   private val appConfig = Configuration(
@@ -45,7 +45,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
       .in(Mode.Test)
       .build()
 
-  trait Setup extends SubmissionsJsonFormatters {
+  trait Setup extends SubmissionsFrontendJsonFormatters {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
     val extSubmission = extendedSubmission
