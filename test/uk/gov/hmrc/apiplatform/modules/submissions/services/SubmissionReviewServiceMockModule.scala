@@ -23,6 +23,8 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import scala.concurrent.Future
 
 trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
   trait BaseSubmissionReviewServiceMock {
@@ -32,6 +34,12 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
       def thenReturn(review: SubmissionReview) = {
         when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(review))
       }
+    }
+
+    object UpdateCheckedFailsAndWarningsStatus {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.updateCheckedFailsAndWarningsStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedFailsAndWarnings = status))))
+      } 
     }
   }
 

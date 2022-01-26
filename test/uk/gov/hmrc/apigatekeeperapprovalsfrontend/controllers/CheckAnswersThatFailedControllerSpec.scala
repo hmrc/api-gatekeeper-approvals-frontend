@@ -36,6 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -116,6 +117,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.UpdateCheckedFailsAndWarningsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
       val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
 
@@ -130,6 +132,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.UpdateCheckedFailsAndWarningsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
       val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
 

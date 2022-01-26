@@ -40,7 +40,7 @@ class SubmissionReviewService @Inject()(
 
   private def updateReview(fn: UpdateFn)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     OptionT(repo.find(submissionId, instanceIndex))
-    .semiflatMap(repo.update)
+    .semiflatMap(sr => repo.update(fn(sr)))
     .value
   }
 
