@@ -38,6 +38,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -54,7 +56,7 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       )
       .build()
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
     val controller = new CheckUrlsController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -63,7 +65,8 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       page,
       errorHandler,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock
+      SubmissionServiceMock.aMock,
+      SubmissionReviewServiceMock.aMock
     )
 
     val appId = ApplicationId.random
@@ -105,6 +108,7 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
       val result = controller.checkUrlsAction(appId)(fakeRequest)
 
@@ -119,6 +123,7 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
       val result = controller.checkUrlsAction(appId)(fakeRequest)
 

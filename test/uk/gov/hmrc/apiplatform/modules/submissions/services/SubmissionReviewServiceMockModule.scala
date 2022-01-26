@@ -41,8 +41,20 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
         when(aMock.updateCheckedFailsAndWarningsStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedFailsAndWarnings = status))))
       } 
     }
-  }
+ 
+    object UpdateCheckedPassedAnswersStatus {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.updateCheckedPassedAnswersStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedPassedAnswers = status))))
+      } 
+    }
 
+    object UpdateCheckedUrlsStatus {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.updateCheckedUrlsStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedUrls = status))))
+      } 
+    }
+    
+  }    
   object SubmissionReviewServiceMock extends BaseSubmissionReviewServiceMock {
     val aMock = mock[SubmissionReviewService](withSettings.lenient())
   }
