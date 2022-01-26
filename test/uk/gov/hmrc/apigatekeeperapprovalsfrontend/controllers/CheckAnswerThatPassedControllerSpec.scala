@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.modules.submissions.services.SubmissionServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
 import play.api.http.Status
@@ -38,6 +38,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -54,7 +56,7 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
       )
       .build()
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
     val controller = new CheckAnswersThatPassedController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -63,7 +65,8 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
       page,
       errorHandler,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock
+      SubmissionServiceMock.aMock,
+      SubmissionReviewServiceMock.aMock
     )
 
     val appId = ApplicationId.random
@@ -117,6 +120,7 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.UpdateCheckedPassedAnswersStatus.thenReturn(SubmissionReview(submissionId, 0))
 
       val result = controller.checkAnswersThatPassedAction(appId)(fakeRequest)
 
@@ -131,6 +135,7 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionReviewServiceMock.UpdateCheckedPassedAnswersStatus.thenReturn(SubmissionReview(submissionId, 0))
 
       val result = controller.checkAnswersThatPassedAction(appId)(fakeRequest)
 

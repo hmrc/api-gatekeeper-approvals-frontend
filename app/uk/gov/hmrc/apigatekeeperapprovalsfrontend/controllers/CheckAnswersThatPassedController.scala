@@ -20,19 +20,18 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.modules.submissions.domain.models._
-import uk.gov.hmrc.modules.submissions.domain.services.ActualAnswersAsText
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import cats.data.NonEmptyList
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
 object CheckAnswersThatPassedController {  
   case class AnswerDetails(question: String, answer: String)
@@ -47,10 +46,11 @@ class CheckAnswersThatPassedController @Inject()(
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
   checkAnswersThatPassedPage: CheckAnswersThatPassedPage,
-  val errorHandler: ErrorHandler,
+  errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+  val submissionService: SubmissionService,
+  submissionReviewService: SubmissionReviewService
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
 
   import CheckAnswersThatPassedController._
 
@@ -90,16 +90,6 @@ class CheckAnswersThatPassedController @Inject()(
     )
   }
 
-  def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleAction(action: String) = action match {
-      case "checked"          => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId)) // TODO: Add actual route when implementing button actions
-      case "come-back-later"  => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId)) // TODO: Add actual route when implementing button actions
-      case _                  => BadRequest(errorHandler.badRequestTemplate)
-    }
-
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action") match {
-      case Some(value) => successful(value.headOption.fold(BadRequest(errorHandler.badRequestTemplate))(handleAction(_)))
-      case None => successful(BadRequest(errorHandler.badRequestTemplate))
-    }
-  }
+  
+  def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatPassedAction", submissionReviewService.updateCheckedPassedAnswersStatus _)(applicationId)
 }

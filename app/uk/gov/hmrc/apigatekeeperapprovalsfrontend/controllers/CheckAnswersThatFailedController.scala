@@ -23,19 +23,16 @@ import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents,Request}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.modules.submissions.domain.models._
-import uk.gov.hmrc.modules.submissions.services.SubmissionService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.modules.submissions.domain.services.ActualAnswersAsText
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import play.api.mvc._
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -54,22 +51,20 @@ class CheckAnswersThatFailedController @Inject()(
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
   checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
-  val errorHandler: ErrorHandler,
+  errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
+  val submissionService: SubmissionService,
+  submissionReviewService: SubmissionReviewService
 
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  
   import CheckAnswersThatFailedController._
-
-  implicit override def hc(implicit request: Request[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
 
   def checkAnswersThatFailedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = 
-      request.submission.answersToQuestions.map {
+      request.submission.latestInstance.answersToQuestions.map {
         case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
       }
       .collect {
@@ -100,16 +95,5 @@ class CheckAnswersThatFailedController @Inject()(
     )
   }
 
-  def checkAnswersThatFailedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleAction(action: String) = action match {
-      case "checked"          => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId)) // TODO: Add actual route when implementing button actions
-      case "come-back-later"  => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId)) // TODO: Add actual route when implementing button actions
-      case _                  => BadRequest(errorHandler.badRequestTemplate)
-    }
-
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action") match {
-      case Some(value) => successful(value.headOption.fold(BadRequest(errorHandler.badRequestTemplate))(handleAction(_)))
-      case None => successful(BadRequest(errorHandler.badRequestTemplate))
-    }
-  }
+  def checkAnswersThatFailedAction(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatFailedAction", submissionReviewService.updateCheckedFailsAndWarningsStatus _)(applicationId)
 }
