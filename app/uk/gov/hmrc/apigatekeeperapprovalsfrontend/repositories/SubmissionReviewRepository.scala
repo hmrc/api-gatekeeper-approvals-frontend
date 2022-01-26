@@ -35,17 +35,24 @@ class SubmissionReviewRepo @Inject()(mongo: MongoComponent)(implicit ec: Executi
     IndexModel(Indexes.ascending("submissionId", "instanceIndex"),IndexOptions().unique(true))
   )) {
 
+  def filterBy(submissionId: Submission.Id, instanceIndex: Int) =
+    Filters.and(
+      Filters.equal("submissionId", submissionId.value),
+      Filters.equal("instanceIndex", instanceIndex)
+    )
+
   def find(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     collection.find(
-      filter = Filters.and(
-                Filters.equal("submissionId", submissionId.value),
-                Filters.equal("instanceIndex", instanceIndex)
-      )
+      filter = filterBy(submissionId, instanceIndex)
     ).headOption
   }
 
-  def create(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
-    val review = SubmissionReview(submissionId, instanceIndex)
+  def create(review: SubmissionReview): Future[SubmissionReview] = {
     collection.insertOne(review).toFuture.map(_ => review)
+  }
+
+  def update(review: SubmissionReview): Future[SubmissionReview] = {
+    val filter = filterBy(review.submissionId, review.instanceIndex)
+    collection.findOneAndReplace(filter, review).toFuture.map(_ => review)
   }
 }

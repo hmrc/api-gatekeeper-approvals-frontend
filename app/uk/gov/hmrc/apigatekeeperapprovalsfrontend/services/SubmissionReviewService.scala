@@ -18,41 +18,39 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
+import cats.data.OptionT
 
 @Singleton
 class SubmissionReviewService @Inject()(
   repo: SubmissionReviewRepo
 )(implicit val ec: ExecutionContext) {
-  
-  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int)(implicit hc: HeaderCarrier): Future[SubmissionReview] = {
-    def createANewReview = repo.create(submissionId, instanceIndex)
+
+  type UpdateFn = (SubmissionReview) => SubmissionReview
+
+  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
+    def createANewReview = repo.create(SubmissionReview(submissionId, instanceIndex))
     repo.find(submissionId, instanceIndex)
       .flatMap( _.fold(createANewReview)(r => successful(r)))
   }
 
-  def updateCheckedFailsAndWarningsStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
-    ???
+  private def updateReview(fn: UpdateFn)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    OptionT(repo.find(submissionId, instanceIndex))
+    .semiflatMap(repo.update)
+    .value
   }
 
-  def updateEmailedResponsibleIndividualStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
-    ???
-  }
+  def updateCheckedFailsAndWarningsStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedFailsAndWarnings = newStatus)) _
 
-  def updateCheckedUrlsStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
-    ???
-  }
+  def updateEmailedResponsibleIndividualStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(emailedResponsibleIndividual = newStatus)) _
 
-  def updateCheckedForSandboxTestingStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
-    ???
-  }
+  def updateCheckedUrlsStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedUrls = newStatus)) _
 
-  def updateCheckedPassedAnswersStatus(submissionId: Submission.Id, instanceIndex: Int, newStatus: SubmissionReview.Status): Future[Unit] = {
-    ???
-  }
+  def updateCheckedForSandboxTestingStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedForSandboxTesting = newStatus)) _
+  
+  def updateCheckedPassedAnswersStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedPassedAnswers = newStatus)) _
 }

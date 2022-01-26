@@ -36,16 +36,16 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
     def verifyZeroInteractions() = MockitoSugar.verifyZeroInteractions(aMock)
 
     object Create {
-      def thenReturn(submissionId: Submission.Id, instanceIndex: Int) = {
-        when(aMock.create(eqTo(submissionId), eqTo(instanceIndex))).thenReturn(successful(SubmissionReview(submissionId, instanceIndex)))
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.create(eqTo(review))).thenReturn(successful(review))
       }
       
       def verifyNotCalled() {
-        verify(never).create(*[Submission.Id], *)
+        verify(never).create(*)
       }
 
       def verifyCalled() {
-        verify(atLeastOnce).create(*[Submission.Id], *)
+        verify(atLeastOnce).create(*)
       }
     }
 

@@ -35,7 +35,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 
 class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {

@@ -37,7 +37,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
 
-import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewCompleted
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewInProgress
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewNotStarted

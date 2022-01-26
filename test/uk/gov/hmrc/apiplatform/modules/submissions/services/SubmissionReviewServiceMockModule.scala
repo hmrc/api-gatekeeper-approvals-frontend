@@ -21,7 +21,6 @@ import org.mockito.ArgumentMatchersSugar
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
@@ -31,7 +30,7 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
 
     object FindOrCreateReview {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex))(*)).thenReturn(successful(review))
+        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(review))
       }
     }
   }
