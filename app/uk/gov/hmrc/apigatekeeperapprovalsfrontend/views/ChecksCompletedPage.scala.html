@@ -43,8 +43,8 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button" type="submit" name="submit-action" value="checked">@{messages("checksCompleted.checksPassed")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checksCompleted.checksFailed")}</button>
+      <button id="checked" class="govuk-button" type="submit" name="submit-action" value="passed">@{messages("checksCompleted.checksPassed")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="failed">@{messages("checksCompleted.checksFailed")}</button>
     </div>
   }
 }

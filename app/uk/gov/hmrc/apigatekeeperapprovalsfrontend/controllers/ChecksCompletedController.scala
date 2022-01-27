@@ -55,5 +55,17 @@ class ChecksCompletedController @Inject()(
     successful(Ok(checksCompletedPage(ViewModel(applicationId, request.application.name))))
   }
 
-  def checksCompletedAction(applicationId: ApplicationId): Action[AnyContent] = ???
+  def checksCompletedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
+    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
+      case Some("passed") => {
+        println("passed")
+        successful(Ok("asd"))
+      }
+      case Some("failed") => {
+        println("failed")
+        successful(Ok("asd"))
+      }
+      case _ => successful(BadRequest(errorHandler.badRequestTemplate))
+    }
+  }
 }

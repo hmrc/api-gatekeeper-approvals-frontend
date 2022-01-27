@@ -31,6 +31,11 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector) {
     submissionConnector.fetchLatestMarkedSubmission(applicationId)
   }
 
+  // def approve(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+  //   // TODO - lots of logic
+  //   // submissionConnector.approve(applicationId)
+  // }
+
   def decline(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
     // TODO - lots of logic
     submissionConnector.decline(applicationId)
