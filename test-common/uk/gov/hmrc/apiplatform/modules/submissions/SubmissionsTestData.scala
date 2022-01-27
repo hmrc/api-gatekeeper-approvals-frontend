@@ -21,7 +21,6 @@ import cats.data.NonEmptyList
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import scala.collection.immutable.ListMap
-import uk.gov.hmrc.apiplatform.modules.developers.domain.models.UserId
 
 trait SubmissionsTestData {
   object DevelopmentPractices {
@@ -258,7 +257,7 @@ trait SubmissionsTestData {
     organisationUrlId             = OrganisationDetails.question1.id
   )
 
-  val initialStatus = Submission.Status.Created(DateTimeUtils.now, UserId.random)
+  val initialStatus = Submission.Status.Created(DateTimeUtils.now, "bob@example.com")
   val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
 
   val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)

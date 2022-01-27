@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.developers.domain.models
+package uk.gov.hmrc.apiplatform.modules.submissions.domain.services
 
-import java.{util => ju}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import cats.data.NonEmptyList
 
-case class UserId(value: ju.UUID) extends AnyVal
-
-object UserId {
-  import play.api.libs.json.Json
-  implicit val format = Json.valueFormat[UserId]
-
-   def random: UserId = UserId(ju.UUID.randomUUID())
+object SubmissionStatusChanges {
+  def appendNewState(newState: Submission.Status)(submission: Submission): Submission = {
+    val latestInstance = submission.latestInstance
+    val updatedInstance = latestInstance.copy(statusHistory = newState :: latestInstance.statusHistory)
+    submission.copy(instances = NonEmptyList(updatedInstance, submission.instances.tail))
+  }
 }
-
