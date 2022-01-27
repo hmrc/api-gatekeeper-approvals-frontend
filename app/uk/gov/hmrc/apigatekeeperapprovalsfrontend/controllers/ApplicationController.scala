@@ -36,6 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import play.api.mvc.Request
+import scala.concurrent.Future.successful
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewCompleted
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewInProgress
@@ -103,7 +104,10 @@ class ApplicationController @Inject()(
       for {
         review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index)
         itemStatuses = buildChecklistItemStatuses(review, request.markedSubmission)
-      }
-      yield Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
+      } yield Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
+  }
+
+  def applicationAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecksCompletedController.checksCompletedPage(applicationId)))
   }
 }

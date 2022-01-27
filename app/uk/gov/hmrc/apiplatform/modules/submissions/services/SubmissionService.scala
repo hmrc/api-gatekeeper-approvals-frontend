@@ -30,4 +30,9 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector) {
   def fetchLatestMarkedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     submissionConnector.fetchLatestMarkedSubmission(applicationId)
   }
+
+  def decline(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+    // TODO - lots of logic
+    submissionConnector.decline(applicationId)
+  }
 }

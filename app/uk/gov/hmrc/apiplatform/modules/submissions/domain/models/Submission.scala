@@ -66,13 +66,13 @@ object Submission {
   }
 
   object Status {
-    case class Rejected(
+    case class Declined(
       timestamp: DateTime,
       name: String,
       reasons: String
     ) extends Status
 
-    case class Accepted(
+    case class Granted(
       timestamp: DateTime,
       name: String
     ) extends Status

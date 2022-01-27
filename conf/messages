@@ -67,3 +67,8 @@ checkUrls.termsAndConditionsUrl = Terms and conditions URL
 checkUrls.urlsChecked = URLs checked
 checkUrls.checkUrlsLater = Check URLs later
 checkUrls.noUrl = None
+
+checksCompleted.pageTitle = HMRC API Gatekeeper - Checks Completed
+checksCompleted.title = Checks Completed
+checksCompleted.checksPassed = Checks Passed
+checksCompleted.checksFailed = Checks Failed

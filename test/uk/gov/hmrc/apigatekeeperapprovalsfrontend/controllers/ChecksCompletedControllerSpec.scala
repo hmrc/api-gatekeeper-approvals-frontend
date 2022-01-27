@@ -33,12 +33,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecksCompletedPage
 
 
-class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
+class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
@@ -47,13 +46,10 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
       )
       .build()
 
-  private val fakeRequest = FakeRequest("GET", "/")
-
   trait Setup 
       extends AuthConnectorMockModule
       with ApplicationActionServiceMockModule 
-      with SubmissionServiceMockModule
-      with SubmissionReviewServiceMockModule {
+      with SubmissionServiceMockModule {
         
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
@@ -62,90 +58,48 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val appChecklistPage = app.injector.instanceOf[ApplicationChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
+    val page = app.injector.instanceOf[ChecksCompletedPage]
 
-    val controller = new ApplicationController(
+    val controller = new ChecksCompletedController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      appChecklistPage,
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock
+      page
     )
   }
 
   "GET /" should {
     "return 200" in new Setup {
       val appId = ApplicationId.random
+      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0)
-      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
-      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checksCompletedPage(appId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
-    "return 404 if no marked application is found" in new Setup {
+    "return 404 if marked submission not found" in new Setup {
       val appId = ApplicationId.random
+      val fakeRequest = FakeRequest("POST", "/").withCSRFToken
       val application = Application(appId, "app name")
-
-      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checksCompletedPage(appId)(fakeRequest)
+      
       status(result) shouldBe Status.NOT_FOUND
     }
 
-    "return 404 if no application is found" in new Setup {
-      val appId = ApplicationId.random
-
-      val fakeRequest = FakeRequest().withCSRFToken
-
-      AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenNotFound()
-
-      val result = controller.applicationPage(appId)(fakeRequest)
-      status(result) shouldBe Status.NOT_FOUND
-    }
-
-    "return 403 for InsufficientEnrolments" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val appId = ApplicationId.random
-      val result = controller.applicationPage(appId)(fakeRequest)
-      status(result) shouldBe Status.FORBIDDEN
-    }
-    
-    "return 303 for SessionRecordNotFound" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val appId = ApplicationId.random
-      val result = controller.applicationPage(appId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-    }  
   }
 
-  "POST /" should {
-    "return 200" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-      val fakeRequest = FakeRequest().withCSRFToken
-            .withFormUrlEncodedBody("submit-action" -> "checked")
-
-      AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
-
-      val result = controller.applicationAction(appId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-    }
-  }
 }

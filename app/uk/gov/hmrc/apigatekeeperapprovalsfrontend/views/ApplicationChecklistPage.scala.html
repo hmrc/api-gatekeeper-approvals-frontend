@@ -142,14 +142,13 @@
         }
     </ol>
 
-    <div class="govuk-button-group">
-        <a id="completed" href="#" class="govuk-button" data-module="govuk-button">
-            @{messages("checklist.completed")}
-        </a>
-
-        <a id="come-back-later" href="#" class="govuk-button govuk-button--secondary">
-            @{messages("checklist.save")}
-        </a>
-    </div>
+    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationAction(model.applicationId), 'class -> "form") {
+        @helper.CSRF.formField
+    
+        <div class="govuk-button-group">
+          <button id="completed" class="govuk-button" type="submit" name="submit-action" value="checked">@{messages("checklist.completed")}</button>
+          <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checklist.save")}</button>
+        </div>
+      }
 
 }

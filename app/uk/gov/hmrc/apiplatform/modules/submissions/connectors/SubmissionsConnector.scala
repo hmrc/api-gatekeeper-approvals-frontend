@@ -58,4 +58,10 @@ class SubmissionsConnector @Inject() (
       http.GET[Option[MarkedSubmission]](url)
     }
   }
+
+  def decline(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+    metrics.record(api) {
+      ???
+    }
+  }
 }
