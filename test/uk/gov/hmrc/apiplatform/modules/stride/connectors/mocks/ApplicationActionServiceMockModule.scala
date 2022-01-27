@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.connectors.mocks
+package uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks
 
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
@@ -23,7 +23,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
 import cats.data.OptionT
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

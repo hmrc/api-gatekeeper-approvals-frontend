@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
 
 class ApplicationRequest[A](
     val application: Application,

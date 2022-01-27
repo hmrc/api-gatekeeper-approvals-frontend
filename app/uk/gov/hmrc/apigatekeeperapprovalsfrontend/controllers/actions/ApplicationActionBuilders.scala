@@ -28,9 +28,9 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.modules.stride.controllers.GatekeeperBaseController
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
-import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 

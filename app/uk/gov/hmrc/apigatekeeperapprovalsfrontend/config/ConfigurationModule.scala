@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
-import uk.gov.hmrc.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetricsImpl
 import uk.gov.hmrc.apiplatform.modules.submissions.config.SubmissionsConnectorConfigProvider

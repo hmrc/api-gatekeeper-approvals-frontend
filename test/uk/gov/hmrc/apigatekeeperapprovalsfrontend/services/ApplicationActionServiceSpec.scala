@@ -20,8 +20,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationServiceMockModule
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.auth.core.Enrolments
 import play.api.mvc.MessagesRequest
 import play.api.test.FakeRequest

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.controllers.models
+package uk.gov.hmrc.apiplatform.modules.stride.controllers.models
 
 import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.auth.core.Enrolments
