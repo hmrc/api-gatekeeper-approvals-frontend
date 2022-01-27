@@ -20,7 +20,7 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@checklistTable(headingKey: String, itemStatuses: List[(String, String, ChecklistItemStatus)]) = {
+@checklistTable(headingKey: String, itemStatuses: List[(String, String, String, ChecklistItemStatus)]) = {
     <li>
         <h2 class="govuk-heading-m">@{messages(headingKey)}</h2>
 
@@ -36,10 +36,10 @@
                 </tr>
             </thead>
             <tbody>
-                @for((linkTextKey, uri, status) <- itemStatuses) {
-                    <tr class="govuk-table__row ">
+                @for((linkTextKey, linkId, uri, status) <- itemStatuses) {
+                    <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
-                            <a href="@uri" class="govuk-link govuk-link--no-visited-state">@{messages(linkTextKey)}</a>
+                            <a id="@linkId" href="@uri" class="govuk-link govuk-link--no-visited-state">@{messages(linkTextKey)}</a>
                         </td>
                         <td class="govuk-table__cell align-right">
                             @{
@@ -50,7 +50,7 @@
                                 } else if (status == NotStarted) {
                                     <div class="govuk-tag govuk-tag--grey app-task-list__tag">{messages("checklist.status.notstarted")}</div>
                                 }
-                            }                        
+                            }
                         </td>
                     </tr>
                 }
@@ -100,7 +100,7 @@
                     checklistTable(
                         "checklist.checkwarnings.heading", 
                         List(
-                            ("checklist.checkwarnings.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
+                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                         )
                     )
                 }
@@ -108,7 +108,7 @@
                 checklistTable(
                     "checklist.checkfailed.heading", 
                     List(
-                        ("checklist.checkfailed.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
+                        ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                     )
                 )
             } 
@@ -117,9 +117,9 @@
         @checklistTable(
             "checklist.checkapplication.heading", 
             List(
-                ("checklist.checkapplication.linktext.email", "#", model.itemStatuses.email),
-                ("checklist.checkapplication.linktext.urls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.itemStatuses.urls),
-                ("checklist.checkapplication.linktext.sandbox", "#", model.itemStatuses.sandboxTesting)
+                ("checklist.checkapplication.linktext.email", "checkemail", "#", model.itemStatuses.email),
+                ("checklist.checkapplication.linktext.urls", "checkurls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.itemStatuses.urls),
+                ("checklist.checkapplication.linktext.sandbox", "checksandbox", "#", model.itemStatuses.sandboxTesting)
             )
         )
 
@@ -128,14 +128,14 @@
                 checklistTable(
                     "checklist.checkother.heading", 
                     List(
-                        ("checklist.checkother.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.itemStatuses.passed)
+                        ("checklist.checkother.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.itemStatuses.passed)
                     )
                 )
             } else {
                 checklistTable(
                     "checklist.checkpassed.heading", 
                     List(
-                        ("checklist.checkpassed.linktext", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.itemStatuses.passed)
+                        ("checklist.checkpassed.linktext", "checkother", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.itemStatuses.passed)
                     )
                 )
             }
