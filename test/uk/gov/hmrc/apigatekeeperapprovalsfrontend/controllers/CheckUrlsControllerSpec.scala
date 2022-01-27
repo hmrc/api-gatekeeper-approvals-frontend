@@ -21,13 +21,13 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.modules.stride.connectors.mocks.AuthConnectorMockModule
+import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest

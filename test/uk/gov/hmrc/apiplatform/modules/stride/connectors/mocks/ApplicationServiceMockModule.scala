@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.connectors.mocks
+package uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks
 
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
-trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
-  trait BaseThirdPartyApplicationConnectorMock {
-    def aMock: ThirdPartyApplicationConnector
+trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
+  trait BaseApplicationServiceMock {
+    def aMock: ApplicationService
 
-    object FetchApplicationById {
-      def thenReturn() = {
-        when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) => successful(Some(Application(appId, "app name"))))
+    object FetchByApplicationId {
+      def thenReturn(applicationId: ApplicationId) = {
+        val response = Some(new Application(applicationId, "app name"))
+        when(aMock.fetchByApplicationId(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+      def thenNotFound() = {
+        when(aMock.fetchByApplicationId(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
   }
 
-  object ThirdPartyApplicationConnectorMock extends BaseThirdPartyApplicationConnectorMock {
-    val aMock = mock[ThirdPartyApplicationConnector]
+  object ApplicationServiceMock extends BaseApplicationServiceMock {
+    val aMock = mock[ApplicationService](withSettings.lenient())
   }
 }

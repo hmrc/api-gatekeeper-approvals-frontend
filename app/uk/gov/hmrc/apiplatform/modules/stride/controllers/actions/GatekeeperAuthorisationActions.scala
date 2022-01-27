@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.modules.stride.controllers.actions
+package uk.gov.hmrc.apiplatform.modules.stride.controllers.actions
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,11 +25,11 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.{ ~ }
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import uk.gov.hmrc.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.modules.stride.controllers.models.LoggedInRequest
-import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole
-import uk.gov.hmrc.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
+import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
+import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
+import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole.GatekeeperRole
 
 
 trait ForbiddenHandler {
