@@ -82,8 +82,8 @@ class ApplicationController @Inject()(
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ApplicationController._
 
-  implicit override def hc(implicit request: Request[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
+  // implicit override def hc(implicit request: Request[_]): HeaderCarrier =
+  //   HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
 
 
   private def buildChecklistItemStatuses(review: SubmissionReview, markedSubmission: MarkedSubmission): ChecklistItemStatuses = {

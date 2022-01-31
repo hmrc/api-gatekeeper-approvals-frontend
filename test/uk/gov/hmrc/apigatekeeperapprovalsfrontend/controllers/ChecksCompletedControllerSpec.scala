@@ -35,6 +35,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecksCompletedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationDeclinedPage
 
 
 class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
@@ -59,6 +61,8 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     val appChecklistPage = app.injector.instanceOf[ApplicationChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
     val page = app.injector.instanceOf[ChecksCompletedPage]
+    val approvedPage = app.injector.instanceOf[ApplicationApprovedPage]
+    val declinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
 
     val controller = new ChecksCompletedController(
       strideAuthConfig,
@@ -68,7 +72,9 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      page
+      page,
+      approvedPage,
+      declinedPage
     )
   }
 

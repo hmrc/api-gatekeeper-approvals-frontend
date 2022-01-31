@@ -26,10 +26,18 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.play.http.metrics.common.API
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import play.api.libs.json.Json
 
 
 object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
+
+  case class ApprovedRequest(name: String)
+  implicit val writesApprovedRequest = Json.writes[ApprovedRequest]
+
+  case class DeclinedRequest(name: String, reasons: String)
+  implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
 }
 
 @Singleton
@@ -40,6 +48,7 @@ class SubmissionsConnector @Inject() (
 )(implicit val ec: ExecutionContext)
     extends SubmissionsFrontendJsonFormatters {
 
+  import SubmissionsConnector._
   import config._
 
   val api = API("third-party-application-submissions")
@@ -59,9 +68,23 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def decline(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+  def approve(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to approve application ${applicationId}"
+
     metrics.record(api) {
-      ???
+      http.POST[ApprovedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId}/grant", ApprovedRequest(requestedBy))
+      .map(_.leftMap(failed))
+    }
+  }
+
+  def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId}"
+
+    metrics.record(api) {
+      http.POST[DeclinedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId}/decline", DeclinedRequest(requestedBy, reason))
+      .map(_.leftMap(failed))
     }
   }
 }

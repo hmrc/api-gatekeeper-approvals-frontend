@@ -39,15 +39,18 @@ trait HasApplication {
 }
 
 trait ApplicationActionBuilders {
+  self: GatekeeperBaseController =>
+  
   def errorHandler: ErrorHandler
   def applicationActionService: ApplicationActionService
   def submissionService: SubmissionService
-  implicit val ec: ExecutionContext
+
+  // implicit val ec: ExecutionContext
   
   val E = EitherTHelper.make[Result]
 
-  implicit def hc(implicit request: Request[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  // implicit def hc(implicit request: Request[_]): HeaderCarrier =
+  //   HeaderCarrierConverter.fromRequestAndSession(request, request.session)
   
   def applicationRequestRefiner(applicationId: ApplicationId)(implicit ec: ExecutionContext): ActionRefiner[LoggedInRequest, ApplicationRequest] = {
     new ActionRefiner[LoggedInRequest, ApplicationRequest] {

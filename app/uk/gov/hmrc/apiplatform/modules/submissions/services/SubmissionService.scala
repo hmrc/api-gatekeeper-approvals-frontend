@@ -22,22 +22,32 @@ import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
+import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
-class SubmissionService @Inject() (submissionConnector: SubmissionsConnector) {
+class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
+(
+  implicit val ec: ExecutionContext
+) {
+
   def fetchLatestSubmission(appId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = submissionConnector.fetchLatestSubmission(appId)
 
   def fetchLatestMarkedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     submissionConnector.fetchLatestMarkedSubmission(applicationId)
   }
 
-  // def approve(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
-  //   // TODO - lots of logic
-  //   // submissionConnector.approve(applicationId)
-  // }
+  def approve(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    for {
+      // TODO - lots of logic
+      app <- submissionConnector.approve(applicationId, requestedBy)
+    } yield app
+  }
 
-  def decline(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
-    // TODO - lots of logic
-    submissionConnector.decline(applicationId)
+  def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    for {
+      // TODO - lots of logic
+      app <- submissionConnector.decline(applicationId, requestedBy, reason)
+    } yield app
   }
 }

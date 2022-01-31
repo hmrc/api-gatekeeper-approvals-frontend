@@ -72,3 +72,9 @@ checksCompleted.pageTitle = HMRC API Gatekeeper - Checks Completed
 checksCompleted.title = Checks Completed
 checksCompleted.checksPassed = Checks Passed
 checksCompleted.checksFailed = Checks Failed
+
+applicationApproved.pageTitle = HMRC API Gatekeeper - Application Approved
+applicationApproved.title = Application Approved
+
+applicationDeclined.pageTitle = HMRC API Gatekeeper - Application Declined
+applicationDeclined.title = Application Declined

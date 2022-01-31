@@ -19,6 +19,8 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import javax.inject.{Inject, Singleton}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecksCompletedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationDeclinedPage
 
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext
@@ -47,7 +49,9 @@ class ChecksCompletedController @Inject()(
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
-  checksCompletedPage: ChecksCompletedPage
+  checksCompletedPage: ChecksCompletedPage,
+  applicationApprovedPage: ApplicationApprovedPage,
+  applicationDeclinedPage: ApplicationDeclinedPage
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ChecksCompletedController._
 
@@ -58,12 +62,16 @@ class ChecksCompletedController @Inject()(
   def checksCompletedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
       case Some("passed") => {
-        println("passed")
-        successful(Ok("asd"))
+        submissionService.approve(applicationId, request.loggedInRequest.name.get).map(_ match {
+          case Right(application)  => Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name)))
+          case Left(err)           => BadRequest(err) 
+        })
       }
       case Some("failed") => {
-        println("failed")
-        successful(Ok("asd"))
+        submissionService.decline(applicationId, request.loggedInRequest.name.get, "TODO - reason").map(_ match {
+          case Right(application)  => Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name)))
+          case Left(err)           => BadRequest(err)
+        })
       }
       case _ => successful(BadRequest(errorHandler.badRequestTemplate))
     }
