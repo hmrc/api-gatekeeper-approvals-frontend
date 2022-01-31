@@ -70,21 +70,21 @@ class SubmissionsConnector @Inject() (
 
   def approve(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to approve application ${applicationId}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to approve application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[ApprovedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId}/grant", ApprovedRequest(requestedBy))
-      .map(_.leftMap(failed))
+      http.POST[ApprovedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", ApprovedRequest(requestedBy))
+      .map(_.leftMap(failed(_)))
     }
   }
 
   def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[DeclinedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId}/decline", DeclinedRequest(requestedBy, reason))
-      .map(_.leftMap(failed))
+      http.POST[DeclinedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/decline", DeclinedRequest(requestedBy, reason))
+      .map(_.leftMap(failed(_)))
     }
   }
 }

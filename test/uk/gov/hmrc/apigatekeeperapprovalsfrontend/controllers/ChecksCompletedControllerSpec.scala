@@ -94,7 +94,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
 
     "return 404 if marked submission not found" in new Setup {
       val appId = ApplicationId.random
-      val fakeRequest = FakeRequest("POST", "/").withCSRFToken
+      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -105,7 +105,71 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
       
       status(result) shouldBe Status.NOT_FOUND
     }
-
   }
 
+  "POST /" should {
+    "return 200 for approval" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "passed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Approve.thenReturn(appId, application)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
+    "return 200 for decline" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "failed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Decline.thenReturn(appId, application)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
+    "return bad request for unsuccessful approval" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "passed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Approve.thenReturnError(appId)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "return bad request for unsuccessful decline" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "failed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Decline.thenReturnError(appId)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+  }
 }

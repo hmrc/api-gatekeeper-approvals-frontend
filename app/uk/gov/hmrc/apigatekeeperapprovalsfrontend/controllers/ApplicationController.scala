@@ -18,7 +18,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.http.HeaderCarrier
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -34,8 +33,6 @@ import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandl
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services._
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import play.api.mvc.Request
 import scala.concurrent.Future.successful
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewCompleted
@@ -81,10 +78,6 @@ class ApplicationController @Inject()(
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ApplicationController._
-
-  // implicit override def hc(implicit request: Request[_]): HeaderCarrier =
-  //   HeaderCarrierConverter.fromRequestAndSession(request, request.session) //TODO
-
 
   private def buildChecklistItemStatuses(review: SubmissionReview, markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
     ChecklistItemStatuses(
