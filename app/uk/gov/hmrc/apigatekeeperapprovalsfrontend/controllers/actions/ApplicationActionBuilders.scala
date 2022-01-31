@@ -18,10 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc.Results.NotFound
 import play.api.mvc._
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
