@@ -56,6 +56,11 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
       def thenFindNone(submissionId: Submission.Id, instanceIndex: Int) =
         when(aMock.find(eqTo(submissionId), eqTo(instanceIndex))).thenReturn(successful(None))
     }
+
+    object Update {
+      def thenReturn() =
+        when(aMock.update(*[SubmissionReview])).thenAnswer((sr: SubmissionReview) => successful(sr))
+    }
   }
 
   object SubmissionReviewRepoMock extends BaseSubmissionReviewRepoMock {
