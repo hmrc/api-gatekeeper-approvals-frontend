@@ -27,7 +27,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.ApprovedRequest
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.DeclinedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsFrontendJsonFormatters
@@ -132,13 +132,13 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
     }
   }
 
-  "approve application" should {
+  "grant application" should {
     val url = s"/approvals/application/${applicationId.value}/grant"
 
     "return an application on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
-        .withJsonRequestBody(ApprovedRequest(requestedBy))
+        .withJsonRequestBody(GrantedRequest(requestedBy))
         .willReturn(
             aResponse()
             .withStatus(OK)
@@ -146,7 +146,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
         )
       )
       
-      val result = await(connector.approve(applicationId, requestedBy))
+      val result = await(connector.grant(applicationId, requestedBy))
 
       result shouldBe 'Right
       result.right.get.id shouldBe applicationId

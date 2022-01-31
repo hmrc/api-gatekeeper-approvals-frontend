@@ -37,10 +37,10 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
     submissionConnector.fetchLatestMarkedSubmission(applicationId)
   }
 
-  def approve(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
       // TODO - lots of logic
-      app <- submissionConnector.approve(applicationId, requestedBy)
+      app <- submissionConnector.grant(applicationId, requestedBy)
     } yield app
   }
 

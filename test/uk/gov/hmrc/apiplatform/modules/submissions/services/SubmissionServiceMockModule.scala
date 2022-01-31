@@ -47,15 +47,15 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
     }
 
-    object Approve {
+    object Grant {
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.approve(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.approve(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
     }
 

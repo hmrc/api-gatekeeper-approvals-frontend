@@ -33,8 +33,8 @@ import play.api.libs.json.Json
 object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
 
-  case class ApprovedRequest(name: String)
-  implicit val writesApprovedRequest = Json.writes[ApprovedRequest]
+  case class GrantedRequest(name: String)
+  implicit val writesApprovedRequest = Json.writes[GrantedRequest]
 
   case class DeclinedRequest(name: String, reasons: String)
   implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
@@ -68,12 +68,12 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def approve(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to approve application ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[ApprovedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", ApprovedRequest(requestedBy))
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy))
       .map(_.leftMap(failed(_)))
     }
   }

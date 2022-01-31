@@ -62,7 +62,7 @@ class ChecksCompletedController @Inject()(
   def checksCompletedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
       case Some("passed") => {
-        submissionService.approve(applicationId, request.loggedInRequest.name.get).map(_ match {
+        submissionService.grant(applicationId, request.loggedInRequest.name.get).map(_ match {
           case Right(application)  => Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name)))
           case Left(err)           => BadRequest(err) 
         })

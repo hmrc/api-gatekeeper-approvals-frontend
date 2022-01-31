@@ -108,7 +108,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
   }
 
   "POST /" should {
-    "return 200 for approval" in new Setup {
+    "return 200 for grant" in new Setup {
       val appId = ApplicationId.random
       val application = Application(appId, "app name")
       val fakeRequest = FakeRequest()
@@ -118,7 +118,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
-      SubmissionServiceMock.Approve.thenReturn(appId, application)
+      SubmissionServiceMock.Grant.thenReturn(appId, application)
 
       val result = controller.checksCompletedAction(appId)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -150,7 +150,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
-      SubmissionServiceMock.Approve.thenReturnError(appId)
+      SubmissionServiceMock.Grant.thenReturnError(appId)
 
       val result = controller.checksCompletedAction(appId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
