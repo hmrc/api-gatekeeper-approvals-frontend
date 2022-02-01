@@ -39,14 +39,12 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
 
   def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
-      // TODO - lots of logic
       app <- submissionConnector.grant(applicationId, requestedBy)
     } yield app
   }
 
   def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
-      // TODO - lots of logic
       app <- submissionConnector.decline(applicationId, requestedBy, reason)
     } yield app
   }
