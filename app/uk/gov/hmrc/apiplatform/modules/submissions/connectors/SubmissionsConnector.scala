@@ -33,10 +33,10 @@ import play.api.libs.json.Json
 object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
 
-  case class GrantedRequest(name: String)
+  case class GrantedRequest(gatekeeperUserName: String)
   implicit val writesApprovedRequest = Json.writes[GrantedRequest]
 
-  case class DeclinedRequest(name: String, reasons: String)
+  case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
   implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
 }
 
