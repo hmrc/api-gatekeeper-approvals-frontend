@@ -27,8 +27,12 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.DeclinedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsFrontendJsonFormatters
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with SubmissionsTestData {
   private val appConfig = Configuration(
@@ -50,8 +54,14 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
 
     val extSubmission = extendedSubmission
     val markSubmission = markedSubmission
-
+    val requestedBy = "bob@blockbusters.com"
+    val reason = "reason"
     implicit val hc = HeaderCarrier()
+
+    def applicationResponse(appId: ApplicationId, appName: String = "My Application") = new Application(
+      appId,
+      appName
+    )
   }
   
   "fetch latest submission by id" should {
@@ -119,6 +129,48 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
       val result = await(connector.fetchLatestMarkedSubmission(applicationId))
 
       result shouldBe empty
+    }
+  }
+
+  "grant application" should {
+    val url = s"/approvals/application/${applicationId.value}/grant"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+        .withJsonRequestBody(GrantedRequest(requestedBy))
+        .willReturn(
+            aResponse()
+            .withStatus(OK)
+            .withJsonBody(applicationResponse(applicationId))
+        )
+      )
+      
+      val result = await(connector.grant(applicationId, requestedBy))
+
+      result shouldBe 'Right
+      result.right.get.id shouldBe applicationId
+    }
+  }
+
+  "decline application" should {
+    val url = s"/approvals/application/${applicationId.value}/decline"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+        .withJsonRequestBody(DeclinedRequest(requestedBy, reason))
+        .willReturn(
+            aResponse()
+            .withStatus(OK)
+            .withJsonBody(applicationResponse(applicationId))
+        )
+      )
+      
+      val result = await(connector.decline(applicationId, requestedBy, reason))
+
+      result shouldBe 'Right
+      result.right.get.id shouldBe applicationId
     }
   }
 }

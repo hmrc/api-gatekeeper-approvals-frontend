@@ -18,10 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc.Results.NotFound
 import play.api.mvc._
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
@@ -39,16 +36,14 @@ trait HasApplication {
 }
 
 trait ApplicationActionBuilders {
+  self: GatekeeperBaseController =>
+  
   def errorHandler: ErrorHandler
   def applicationActionService: ApplicationActionService
   def submissionService: SubmissionService
-  implicit val ec: ExecutionContext
-  
+
   val E = EitherTHelper.make[Result]
 
-  implicit def hc(implicit request: Request[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-  
   def applicationRequestRefiner(applicationId: ApplicationId)(implicit ec: ExecutionContext): ActionRefiner[LoggedInRequest, ApplicationRequest] = {
     new ActionRefiner[LoggedInRequest, ApplicationRequest] {
       override protected def executionContext: ExecutionContext = ec

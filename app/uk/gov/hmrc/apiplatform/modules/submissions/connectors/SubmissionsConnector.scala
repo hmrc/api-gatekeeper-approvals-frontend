@@ -26,10 +26,18 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.play.http.metrics.common.API
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import play.api.libs.json.Json
 
 
 object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
+
+  case class GrantedRequest(gatekeeperUserName: String)
+  implicit val writesApprovedRequest = Json.writes[GrantedRequest]
+
+  case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
+  implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
 }
 
 @Singleton
@@ -40,6 +48,7 @@ class SubmissionsConnector @Inject() (
 )(implicit val ec: ExecutionContext)
     extends SubmissionsFrontendJsonFormatters {
 
+  import SubmissionsConnector._
   import config._
 
   val api = API("third-party-application-submissions")
@@ -56,6 +65,26 @@ class SubmissionsConnector @Inject() (
     
     metrics.record(api) {
       http.GET[Option[MarkedSubmission]](url)
+    }
+  }
+
+  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy))
+      .map(_.leftMap(failed(_)))
+    }
+  }
+
+  def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POST[DeclinedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/decline", DeclinedRequest(requestedBy, reason))
+      .map(_.leftMap(failed(_)))
     }
   }
 }

@@ -67,3 +67,17 @@ checkUrls.termsAndConditionsUrl = Terms and conditions URL
 checkUrls.urlsChecked = URLs checked
 checkUrls.checkUrlsLater = Check URLs later
 checkUrls.noUrl = None
+
+checksCompleted.pageTitle = HMRC API Gatekeeper - Checks Completed
+checksCompleted.title = Checks Completed
+checksCompleted.checksPassed = Checks Passed
+checksCompleted.checksFailed = Checks Failed
+
+applicationApproved.pageTitle = HMRC API Gatekeeper - Application Granted
+applicationApproved.title = Application Granted
+applicationApproved.text = The Application has been granted and is now in a state of Pending Requester Verification
+
+applicationDeclined.pageTitle = HMRC API Gatekeeper - Application Declined
+applicationDeclined.title = Application Declined
+applicationDeclined.text = The Application has been declined and has been put back in a state of Testing
+

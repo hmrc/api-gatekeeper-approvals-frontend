@@ -33,12 +33,13 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecksCompletedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationDeclinedPage
 
 
-class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
+class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
@@ -47,13 +48,10 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
       )
       .build()
 
-  private val fakeRequest = FakeRequest("GET", "/")
-
   trait Setup 
       extends AuthConnectorMockModule
       with ApplicationActionServiceMockModule 
-      with SubmissionServiceMockModule
-      with SubmissionReviewServiceMockModule {
+      with SubmissionServiceMockModule {
         
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
@@ -62,90 +60,116 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val appChecklistPage = app.injector.instanceOf[ApplicationChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
+    val page = app.injector.instanceOf[ChecksCompletedPage]
+    val approvedPage = app.injector.instanceOf[ApplicationApprovedPage]
+    val declinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
 
-    val controller = new ApplicationController(
+    val controller = new ChecksCompletedController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      appChecklistPage,
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock
+      page,
+      approvedPage,
+      declinedPage
     )
   }
 
   "GET /" should {
     "return 200" in new Setup {
       val appId = ApplicationId.random
+      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0)
-      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
-      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checksCompletedPage(appId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
-    "return 404 if no marked application is found" in new Setup {
+    "return 404 if marked submission not found" in new Setup {
       val appId = ApplicationId.random
+      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-
-      val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checksCompletedPage(appId)(fakeRequest)
+      
       status(result) shouldBe Status.NOT_FOUND
     }
-
-    "return 404 if no application is found" in new Setup {
-      val appId = ApplicationId.random
-
-      val fakeRequest = FakeRequest().withCSRFToken
-
-      AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenNotFound()
-
-      val result = controller.applicationPage(appId)(fakeRequest)
-      status(result) shouldBe Status.NOT_FOUND
-    }
-
-    "return 403 for InsufficientEnrolments" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val appId = ApplicationId.random
-      val result = controller.applicationPage(appId)(fakeRequest)
-      status(result) shouldBe Status.FORBIDDEN
-    }
-    
-    "return 303 for SessionRecordNotFound" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val appId = ApplicationId.random
-      val result = controller.applicationPage(appId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-    }  
   }
 
   "POST /" should {
-    "return 200" in new Setup {
+    "return 200 for grant" in new Setup {
       val appId = ApplicationId.random
       val application = Application(appId, "app name")
-      val fakeRequest = FakeRequest().withCSRFToken
-            .withFormUrlEncodedBody("submit-action" -> "checked")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "passed")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Grant.thenReturn(appId, application)
 
-      val result = controller.applicationAction(appId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
+    "return 200 for decline" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "failed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Decline.thenReturn(appId, application)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
+    "return bad request for unsuccessful approval" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "passed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Grant.thenReturnError(appId)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "return bad request for unsuccessful decline" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest()
+                          .withCSRFToken
+                          .withFormUrlEncodedBody("submit-action" -> "failed")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.Decline.thenReturnError(appId)
+
+      val result = controller.checksCompletedAction(appId)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 }
