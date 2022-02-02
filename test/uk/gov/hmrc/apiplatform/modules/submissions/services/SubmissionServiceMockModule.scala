@@ -18,6 +18,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
+import org.joda.time.DateTime
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -44,6 +45,24 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenNotFound() = {
         when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
+      }
+    }
+
+    object FetchLatestSubmission {
+      def thenReturn(applicationId: ApplicationId) = {
+        val response = Some(extendedSubmission)
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
+        val updatedInstance = submission.latestInstance.copy(statusHistory = Submission.Status.Submitted(DateTime.now, "user") :: submission.latestInstance.statusHistory)
+        val submittedSubmission = submission.copy(instances = NonEmptyList(updatedInstance, submission.instances.tail))
+        val response = Some(ExtendedSubmission(submittedSubmission, initialProgress))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenNotFound() = {
+        when(aMock.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
 

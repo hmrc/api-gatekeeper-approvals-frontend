@@ -30,7 +30,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import play.api.mvc._
 
 
@@ -63,9 +62,7 @@ class ApplicationSubmissionsController @Inject()(
   applicationSubmissionsPage: ApplicationSubmissionsPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-
+  val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import ApplicationSubmissionsController._
