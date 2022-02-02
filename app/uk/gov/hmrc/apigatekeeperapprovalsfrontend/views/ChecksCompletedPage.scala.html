@@ -30,12 +30,12 @@
   </div>
 }
 
-@layout(pageTitle = Some(messages("checksCompleted.pageTitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checkscompleted.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
 
   <h1 class="govuk-heading-l">        
-    @{messages("checksCompleted.title")}
+    @{messages("checkscompleted.title")}
   </h1>
 
 
@@ -43,8 +43,8 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button" type="submit" name="submit-action" value="passed">@{messages("checksCompleted.checksPassed")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="failed">@{messages("checksCompleted.checksFailed")}</button>
+      <button id="checked" class="govuk-button" type="submit" name="submit-action" value="passed">@{messages("checkscompleted.checkspassed")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="failed">@{messages("checkscompleted.checksfailed")}</button>
     </div>
   }
 }

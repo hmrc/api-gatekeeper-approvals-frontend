@@ -31,54 +31,54 @@
   </div>
 }
 
-@layout(pageTitle = Some(messages("checkUrls.pageTitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checkurls.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
 
   <h1 class="govuk-heading-l">        
-    @{messages("checkUrls.title")}
+    @{messages("checkurls.title")}
   </h1>
 
   <table class="govuk-table">
     <tbody>
       <tr class="govuk-table__row ">
         <td class="govuk-table__cell">
-          @{messages("checkUrls.organisationUrl")}
+          @{messages("checkurls.organisationurl")}
         </td>
         <td class="govuk-table__cell">
           @{
             if (model.hasOrganisationUrl) {
               <a href={model.organisationUrl.get} target="_blank">{model.organisationUrl.get}</a>
             } else {
-              {messages("checkUrls.noUrl")}
+              {messages("checkurls.nourl")}
             }
           }
         </td>
       </tr>
       <tr class="govuk-table__row ">
         <td class="govuk-table__cell">
-          @{messages("checkUrls.privacyPolicyUrl")}
+          @{messages("checkurls.privacypolicyurl")}
         </td>
         <td class="govuk-table__cell">
           @{
             if (model.hasPrivacyPolicyUrl) {
               <a href={model.privacyPolicyUrl.get} target="_blank">{model.privacyPolicyUrl.get}</a>
             } else {
-              {messages("checkUrls.noUrl")}
+              {messages("checkurls.nourl")}
             }
           }
         </td>
       </tr>
       <tr class="govuk-table__row ">
         <td class="govuk-table__cell">
-          @{messages("checkUrls.termsAndConditionsUrl")}
+          @{messages("checkurls.termsandconditionsurl")}
         </td>
         <td class="govuk-table__cell">
           @{
             if (model.hasTermsAndConditionsUrl) {
               <a href={model.termsAndConditionsUrl.get} target="_blank">{model.termsAndConditionsUrl.get}</a>
             } else {
-              {messages("checkUrls.noUrl")}
+              {messages("checkurls.nourl")}
             }
           }
         </td>
@@ -90,8 +90,8 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkUrls.urlsChecked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkUrls.checkUrlsLater")}</button>
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkurls.urlschecked")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkurls.checkurlslater")}</button>
     </div>
   }
 }

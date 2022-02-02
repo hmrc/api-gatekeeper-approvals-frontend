@@ -70,7 +70,7 @@
     </div>
 }
 
-@layout(pageTitle = Some(messages("checklist.pageTitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checklist.pagetitle")), beforeContent = Some(breadcrumbs)) {
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
     <h1 class="govuk-heading-l">
         <span class="govuk-caption-l">@model.appName</span>
@@ -84,12 +84,12 @@
             @{
                 if (model.isSuccessful) {
                     if (model.hasWarnings) {
-                        messages("checklist.requestPassedWithWarnings")
+                        messages("checklist.requestpassedwithwarnings")
                     } else {
-                        messages("checklist.requestPassed")
+                        messages("checklist.requestpassed")
                     }
                 } else {
-                    messages("checklist.requestFailed")
+                    messages("checklist.requestfailed")
                 }
             }
         </strong>
