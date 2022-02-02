@@ -12,7 +12,7 @@ checklist.requestPassedWithWarnings = This request for production credentials ha
 
 checklist.status.notstarted = Not Started
 checklist.status.inprogress = In Progress
-checklist.status.complete = Completed
+checklist.status.completed = Completed
 
 checklist.checkwarnings.heading = Check answers with warnings
 checklist.checkwarnings.linktext = Check warnings

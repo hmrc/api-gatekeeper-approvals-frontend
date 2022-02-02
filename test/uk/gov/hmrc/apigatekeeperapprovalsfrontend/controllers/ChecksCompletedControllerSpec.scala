@@ -32,7 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMoc
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecksCompletedPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
@@ -58,7 +58,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
-    val appChecklistPage = app.injector.instanceOf[ApplicationChecklistPage]
+    val appChecklistPage = app.injector.instanceOf[ChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
     val page = app.injector.instanceOf[ChecksCompletedPage]
     val approvedPage = app.injector.instanceOf[ApplicationApprovedPage]

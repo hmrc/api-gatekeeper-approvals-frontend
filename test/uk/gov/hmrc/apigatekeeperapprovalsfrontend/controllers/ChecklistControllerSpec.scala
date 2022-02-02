@@ -32,13 +32,13 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMoc
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 
-class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
+class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
@@ -60,10 +60,10 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
-    val appChecklistPage = app.injector.instanceOf[ApplicationChecklistPage]
+    val appChecklistPage = app.injector.instanceOf[ChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
 
-    val controller = new ApplicationController(
+    val controller = new ChecklistController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
       forbiddenHandler,
@@ -88,7 +88,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -102,7 +102,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -114,21 +114,21 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
       val appId = ApplicationId.random
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
       val appId = ApplicationId.random
-      val result = controller.applicationPage(appId)(fakeRequest)
+      val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
   }
@@ -144,7 +144,7 @@ class ApplicationControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite w
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
-      val result = controller.applicationAction(appId)(fakeRequest)
+      val result = controller.checklistAction(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
   }

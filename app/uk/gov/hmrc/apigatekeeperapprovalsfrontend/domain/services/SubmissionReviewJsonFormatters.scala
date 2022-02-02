@@ -21,14 +21,14 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.play.json.Union
 
 trait SubmissionReviewJsonFormatters {
-  implicit val ReviewNotStartedStatusFormat = Json.format[SubmissionReview.Status.ReviewNotStarted.type]
-  implicit val ReviewInProgressStatusFormat = Json.format[SubmissionReview.Status.ReviewInProgress.type]
-  implicit val ReviewCompletedStatusFormat = Json.format[SubmissionReview.Status.ReviewCompleted.type]
+  implicit val ReviewNotStartedStatusFormat = Json.format[SubmissionReview.Status.NotStarted.type]
+  implicit val ReviewInProgressStatusFormat = Json.format[SubmissionReview.Status.InProgress.type]
+  implicit val ReviewCompletedStatusFormat = Json.format[SubmissionReview.Status.Completed.type]
 
   implicit val reviewStatus = Union.from[SubmissionReview.Status]("Review.StatusType")
-    .and[SubmissionReview.Status.ReviewNotStarted.type]("notstarted")
-    .and[SubmissionReview.Status.ReviewInProgress.type]("inprogress")
-    .and[SubmissionReview.Status.ReviewCompleted.type]("completed")
+    .and[SubmissionReview.Status.NotStarted.type]("notstarted")
+    .and[SubmissionReview.Status.InProgress.type]("inprogress")
+    .and[SubmissionReview.Status.Completed.type]("completed")
     .format
 
   implicit val submissionReviewFormat = Json.format[SubmissionReview]    

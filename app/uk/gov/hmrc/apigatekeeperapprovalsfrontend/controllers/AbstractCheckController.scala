@@ -50,13 +50,13 @@ abstract class AbstractCheckController(
   }
 
   def actionAsStatus(action: String): Option[SubmissionReview.Status] = action match {
-    case "checked"          => Some(SubmissionReview.Status.ReviewCompleted)
-    case "come-back-later"  => Some(SubmissionReview.Status.ReviewInProgress)
+    case "checked"          => Some(SubmissionReview.Status.Completed)
+    case "come-back-later"  => Some(SubmissionReview.Status.InProgress)
     case _                  => None
   }
 
   def updateReviewAction(location: String, updateSubmissionReview: Fn)(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationPage(applicationId))
+    val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(location) _
 
     (

@@ -14,13 +14,15 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status._
 
 @this(layout: Layout)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@checklistTable(headingKey: String, itemStatuses: List[(String, String, String, ChecklistItemStatus)]) = {
+@checklistTable(headingKey: String, itemStatuses: List[(String, String, String, SubmissionReview.Status)]) = {
     <li>
         <h2 class="govuk-heading-m">@{messages(headingKey)}</h2>
 
@@ -43,8 +45,8 @@
                         </td>
                         <td class="govuk-table__cell align-right">
                             @{
-                                if (status == Complete) {
-                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.complete")}</div>
+                                if (status == Completed) {
+                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.completed")}</div>
                                 } else if (status == InProgress) {
                                     <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
                                 } else if (status == NotStarted) {
@@ -142,7 +144,7 @@
         }
     </ol>
 
-    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationAction(model.applicationId), 'class -> "form") {
+    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistAction(model.applicationId), 'class -> "form") {
         @helper.CSRF.formField
     
         <div class="govuk-button-group">
