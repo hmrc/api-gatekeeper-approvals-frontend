@@ -59,6 +59,8 @@ object Submission {
   }
 
   sealed trait Status {
+    def timestamp: DateTime
+    
     def isOpenToAnswers = isCreated
 
     def isCreated = this match {

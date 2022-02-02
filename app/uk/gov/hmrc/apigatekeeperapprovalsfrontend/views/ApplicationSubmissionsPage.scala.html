@@ -36,31 +36,47 @@
     @model.appName
   </h1>
 
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    Request for credentials
-  </h2>
-  <ul class="govuk-list">
-    <li>
-      <a href="#" class="govuk-link govuk-link--no-visited-state">28 January 2022</a>
-    </li>
-  </ul>
+  @if(model.currentSubmission.nonEmpty) {
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+      Request for credentials
+    </h2>
+    <ul class="govuk-list">
+      <li>
+        <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@model.currentSubmission.get.timestamp</a>
+      </li>
+    </ul>
+  }
 
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    Declined requests for credentials
-  </h2>
-  <ul class="govuk-list">
-    <li>
-      <a href="#" class="govuk-link govuk-link--no-visited-state">22 January 2022</a>
-    </li>
-    <li>
-      <a href="#" class="govuk-link govuk-link--no-visited-state">21 January 2022</a>
-    </li>
-  </ul>
+  @if(model.declinedInstances.nonEmpty) {
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+      Declined requests for credentials
+    </h2>
+    <ul class="govuk-list">
+      @for(instance <- model.declinedInstances) {
+        <li>
+          <a href="#" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
+        </li>
+      }
+    </ul>
+  }
 
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
     Application details
   </h2>
   <p class="govuk-body">
-    <a href="#" class="govuk-link">Review or manage application details</a>
+    <a href="@{model.applicationDetailsUrl}" class="govuk-link">Review or manage application details</a>
   </p>
+
+  @if(model.grantedInstance.isDefined) {
+    @defining(model.grantedInstance.get) { instance =>
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+        Terms of use acceptance
+      </h2>
+      <ul class="govuk-list">
+        <li>
+          <a href="#" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
+        </li>
+      </ul>
+    }
+  }
 }

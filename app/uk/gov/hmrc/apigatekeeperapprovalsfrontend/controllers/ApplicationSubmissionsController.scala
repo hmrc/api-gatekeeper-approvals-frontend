@@ -30,16 +30,27 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import play.api.mvc._
-import scala.concurrent.Future
 
 
 object ApplicationSubmissionsController {
   case class Config(gatekeeperBaseUrl: String)
 
-  case class ViewModel(appName: String)
+  case class CurrentSubmittedInstanceDetails(timestamp: String)
+
+  case class DeclinedInstanceDetails(timestamp: String)
+
+  case class GrantedInstanceDetails(timestamp: String)
+  
+  case class ViewModel(
+    applicationId: ApplicationId,
+    appName: String,
+    applicationDetailsUrl: String,
+    currentSubmission: Option[CurrentSubmittedInstanceDetails],
+    declinedInstances: List[DeclinedInstanceDetails],
+    grantedInstance: Option[GrantedInstanceDetails]
+  )
 }
 
 @Singleton
@@ -81,7 +92,26 @@ class ApplicationSubmissionsController @Inject()(
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
+    val gatekeeperApplicationUrl = s"${config.gatekeeperBaseUrl}/applications/${applicationId.value}"
 
-    successful(Ok(applicationSubmissionsPage(ViewModel(appName))))
+    val latestInstance = request.markedSubmission.submission.latestInstance
+    val latestInstanceStatus = latestInstance.statusHistory.head
+    val currentSubmission = 
+      if(latestInstanceStatus.isSubmitted)
+        Some(CurrentSubmittedInstanceDetails(latestInstanceStatus.timestamp.toString("dd MMMM yyyy")))
+      else
+        None
+
+    val declinedSubmissions =
+      request.markedSubmission.submission.instances.filter(i => i.statusHistory.head.isDeclined)
+      .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.toString("dd MMMM yyyy")))
+      
+    val grantedInstance =
+      if(latestInstanceStatus.isGranted)
+        Some(GrantedInstanceDetails(latestInstanceStatus.timestamp.toString("dd MMMM yyyy")))
+      else
+        None
+
+    successful(Ok(applicationSubmissionsPage(ViewModel(applicationId, appName, gatekeeperApplicationUrl, currentSubmission, declinedSubmissions, grantedInstance))))
   }
 }
