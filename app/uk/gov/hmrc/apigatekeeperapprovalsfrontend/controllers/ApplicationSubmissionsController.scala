@@ -24,7 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -33,24 +33,23 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import play.api.mvc._
+import scala.concurrent.Future
 
-object CheckAnswersThatFailedController {  
-  case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class ViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails]) {
-    lazy val hasFails: Boolean = answers.exists(_.status == Fail)
-    lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
-    lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsAndWarns" else "failsOnly"} else "warnsOnly"
-  }
+object ApplicationSubmissionsController {
+  case class Config(gatekeeperBaseUrl: String)
+
+  case class ViewModel(appName: String)
 }
 
 @Singleton
-class CheckAnswersThatFailedController @Inject()(
+class ApplicationSubmissionsController @Inject()(
+  config: ApplicationSubmissionsController.Config,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
+  applicationSubmissionsPage: ApplicationSubmissionsPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
@@ -58,42 +57,31 @@ class CheckAnswersThatFailedController @Inject()(
 
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
-  import CheckAnswersThatFailedController._
+  import ApplicationSubmissionsController._
+  import cats.data.OptionT
+  import cats.implicits._
 
-  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName = request.application.name
+  def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.gatekeeperBaseUrl}/applications/${applicationId.value}"
 
-    val questionsAndAnswers: Map[Question, ActualAnswer] = 
-      request.submission.latestInstance.answersToQuestions.map {
-        case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
-      }
-      .collect {
-        case (q: Some[Question], a) => q.get -> a
-      }
+    val hasEverBeenSubmitted: Submission => Boolean = submission => submission.instances.find(i => i.isSubmitted || i.isGranted || i.isDeclined).nonEmpty
 
-    val answerDetails = questionsAndAnswers.map {
-      case (question, answer) => 
-        AnswerDetails(
-          question.wording.value,
-          ActualAnswersAsText(answer),
-          request.markedAnswers.getOrElse(question.id, Pass)
-        )
-    }
-    .toList
-    .filter(_.status != Pass)
-
-    successful(
-      Ok(
-        checkAnswersThatFailedPage(
-          ViewModel(
-            applicationId,
-            appName,
-            answerDetails
-          )
-        )
-      )
+    (
+      for {
+        extSubmission <- OptionT(submissionService.fetchLatestSubmission(request.application.id))
+        if hasEverBeenSubmitted(extSubmission.submission)
+      } yield extSubmission.submission
+    )
+    .fold(
+      Redirect(gatekeeperApplicationUrl)
+    )(
+      _ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId))
     )
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatFailedAction", submissionReviewService.updateCheckedFailsAndWarningsStatus _)(applicationId)
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    val appName = request.application.name
+
+    successful(Ok(applicationSubmissionsPage(ViewModel(appName))))
+  }
 }

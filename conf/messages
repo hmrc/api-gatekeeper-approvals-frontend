@@ -3,6 +3,7 @@ service.text = This is your new service
 
 breadcrumbs.home = Home
 breadcrumbs.prodrequests = Production requests
+breadcrumbs.applications = Applications
 
 checklist.title = Complete the checklist
 checklist.pagetitle = HMRC API Gatekeeper - Complete the checklist
@@ -81,4 +82,4 @@ applicationdeclined.pagetitle = HMRC API Gatekeeper - Application Declined
 applicationdeclined.title = Application Declined
 applicationdeclined.text = The Application has been declined and has been put back in a state of Testing
 
-applicationsubmissions.pagetitle = SOMETHING
+applicationsubmissions.pagetitle = TODO

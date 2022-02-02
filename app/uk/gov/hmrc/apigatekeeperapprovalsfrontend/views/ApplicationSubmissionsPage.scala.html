@@ -14,9 +14,11 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController._
+
 @this(layout: Layout)
 
-@()(implicit request: Request[_], messages: Messages)
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
 @breadcrumbs = {
   <div class="govuk-breadcrumbs">
@@ -29,5 +31,36 @@
 
 @layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">Request for production credentials</span>
+  <h1 class="govuk-heading-l">
+    @model.appName
+  </h1>
 
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+    Request for credentials
+  </h2>
+  <ul class="govuk-list">
+    <li>
+      <a href="#" class="govuk-link govuk-link--no-visited-state">28 January 2022</a>
+    </li>
+  </ul>
+
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+    Declined requests for credentials
+  </h2>
+  <ul class="govuk-list">
+    <li>
+      <a href="#" class="govuk-link govuk-link--no-visited-state">22 January 2022</a>
+    </li>
+    <li>
+      <a href="#" class="govuk-link govuk-link--no-visited-state">21 January 2022</a>
+    </li>
+  </ul>
+
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+    Application details
+  </h2>
+  <p class="govuk-body">
+    <a href="#" class="govuk-link">Review or manage application details</a>
+  </p>
 }
