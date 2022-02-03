@@ -84,8 +84,6 @@ object Submission {
     }
   }
 
-
-
   object Status {
     case class Declined(
       timestamp: DateTime,

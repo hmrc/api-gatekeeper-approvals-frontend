@@ -54,7 +54,7 @@
     <ul class="govuk-list">
       @for(instance <- model.declinedInstances) {
         <li>
-          <a href="#" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
+          <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, instance.index)}" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
         </li>
       }
     </ul>

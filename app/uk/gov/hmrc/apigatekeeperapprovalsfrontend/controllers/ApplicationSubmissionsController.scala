@@ -38,7 +38,7 @@ object ApplicationSubmissionsController {
 
   case class CurrentSubmittedInstanceDetails(timestamp: String)
 
-  case class DeclinedInstanceDetails(timestamp: String)
+  case class DeclinedInstanceDetails(timestamp: String, index: Int)
 
   case class GrantedInstanceDetails(timestamp: String)
   
@@ -95,17 +95,17 @@ class ApplicationSubmissionsController @Inject()(
     val latestInstanceStatus = latestInstance.statusHistory.head
     val currentSubmission = 
       if(latestInstanceStatus.isSubmitted)
-        Some(CurrentSubmittedInstanceDetails(latestInstanceStatus.timestamp.toString("dd MMMM yyyy")))
+        Some(CurrentSubmittedInstanceDetails(latestInstanceStatus.timestamp.asText))
       else
         None
 
     val declinedSubmissions =
       request.markedSubmission.submission.instances.filter(i => i.statusHistory.head.isDeclined)
-      .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.toString("dd MMMM yyyy")))
+      .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.asText, i.index))
       
     val grantedInstance =
       if(latestInstanceStatus.isGranted)
-        Some(GrantedInstanceDetails(latestInstanceStatus.timestamp.toString("dd MMMM yyyy")))
+        Some(GrantedInstanceDetails(latestInstanceStatus.timestamp.asText))
       else
         None
 

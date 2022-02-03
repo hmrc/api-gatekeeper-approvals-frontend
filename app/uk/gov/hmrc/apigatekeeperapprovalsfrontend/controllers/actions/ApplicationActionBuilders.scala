@@ -31,10 +31,6 @@ import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 
-trait HasApplication {
-  def application: Application
-}
-
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
   
@@ -72,6 +68,7 @@ trait ApplicationActionBuilders {
         .value
       }
     }
+
 }
 
 trait ApplicationActions extends ApplicationActionBuilders {
@@ -101,4 +98,5 @@ trait ApplicationActions extends ApplicationActionBuilders {
 
   def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
+
 }

@@ -21,8 +21,11 @@ import cats.data.NonEmptyList
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import scala.collection.immutable.ListMap
+import scala.util.Random
+import java.util.Date
+import org.joda.time.DateTime
 
-trait SubmissionsTestData {
+trait QuestionnaireTestData {
   object DevelopmentPractices {
     val question1 = YesNoQuestion(
       QuestionId("653d2ee4-09cf-46a0-bc73-350a385ae860"),
@@ -206,27 +209,92 @@ trait SubmissionsTestData {
       )
     )
 
-  val questionnaire = DevelopmentPractices.questionnaire
-  val questionnaireId = questionnaire.id
-  val question = questionnaire.questions.head.question
-  val questionId = question.id
-  val question2Id = questionnaire.questions.tail.head.question.id
-  val questionnaireAlt = OrganisationDetails.questionnaire
-  val questionnaireAltId = questionnaireAlt.id
-  val questionAltId = questionnaireAlt.questions.head.question.id
+  val questionIdsOfInterest = QuestionIdsOfInterest(
+    applicationNameId             = CustomersAuthorisingYourSoftware.question2.id,
+    privacyPolicyUrlId            = CustomersAuthorisingYourSoftware.question4.id,
+    termsAndConditionsUrlId       = CustomersAuthorisingYourSoftware.question5.id,
+    organisationUrlId             = OrganisationDetails.question1.id
+  )
+
+  object DeriveContext {
+    object Keys {
+      val VAT_OR_ITSA = "VAT_OR_ITSA"
+      val IN_HOUSE_SOFTWARE = "IN_HOUSE_SOFTWARE" // Stored on Application
+    }
+  }
+
+  val simpleContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "No")
+  val soldContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "No", DeriveContext.Keys.VAT_OR_ITSA -> "No")
+  val vatContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "Yes")
+
+  def answer(desiredMark: Mark)(question: Question): Map[QuestionId, Option[ActualAnswer]] = {
+    val answers: List[Option[ActualAnswer]] = question match {
+
+      case YesNoQuestion(id, _, _, yesMarking, noMarking, absence) =>
+        (if(yesMarking == desiredMark) Some(SingleChoiceAnswer("Yes")) else None) ::
+        (if(noMarking == desiredMark) Some(SingleChoiceAnswer("No")) else None) ::
+        (absence.flatMap(a => if(a._2 == desiredMark) Some(NoAnswer) else None)) ::
+        List.empty[Option[ActualAnswer]]
+
+      case ChooseOneOfQuestion(id, _, _, marking, absence) => {
+        marking.map {
+          case (pa, mark) => Some(SingleChoiceAnswer(pa.value))
+          case _ => None
+        }
+        .toList ++
+        List(absence.flatMap(a => if(a._2 == desiredMark) Some(NoAnswer) else None))
+      }
+
+      case TextQuestion(id, _, _, absence) => 
+        if(desiredMark == Pass)
+          Some(TextAnswer(Random.nextString(Random.nextInt(25)+1))) ::
+          absence.flatMap(a => if(a._2 == desiredMark) Some(NoAnswer) else None) ::
+          List.empty[Option[ActualAnswer]]
+        else
+          List(Some(NoAnswer))  // Cos we can't do anything else
+
+      case AcknowledgementOnly(id, _, _) => List(Some(NoAnswer))
+
+      case MultiChoiceQuestion(id, _, _, marking, absence) => 
+        marking.map {
+          case (pa, mark) if(mark == desiredMark) => Some(MultipleChoiceAnswer(Set(pa.value)))
+          case _ => None
+        }
+        .toList ++
+        List(absence.flatMap(a => if(a._2 == desiredMark) Some(NoAnswer) else None))
+    }
+
+    Map(question.id -> Random.shuffle(
+      answers.collect {
+        case Some(a) => a
+      }
+    ).headOption)
+  }
+
+  def answersQ(desiredMark: Mark)(questionnaire: Questionnaire): Map[QuestionId, ActualAnswer] = {
+    questionnaire.questions
+    .toList
+    .map(qi => qi.question)
+    .flatMap(x => answer(desiredMark)(x))
+    .collect {
+      case (id, Some(a)) => id -> a
+    }
+    .toMap
+  }
+
+  def answersG(desiredMark: Mark)(groups: NonEmptyList[GroupOfQuestionnaires]): Map[QuestionId, ActualAnswer] = {
+    groups
+    .flatMap(g => g.links)
+    .toList
+    .flatMap(qn => answersQ(desiredMark)(qn))
+    .toMap
+  }
+}
+
+trait SubmissionsTestData extends QuestionnaireTestData {
 
   val submissionId = Submission.Id.random
   val applicationId = ApplicationId.random
-
-  def firstQuestion(questionnaire: Questionnaire) = questionnaire.questions.head.question.id
-
-  import AsIdsHelpers._
-  val initialProgress = List(DevelopmentPractices.questionnaire, OrganisationDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.NotStarted, q.questions.asIds)).toMap
-  val completedProgress = List(DevelopmentPractices.questionnaire, OrganisationDetails.questionnaire, CustomersAuthorisingYourSoftware.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.Completed, q.questions.asIds)).toMap
-  val notApplicableProgress = (
-    List(OrganisationDetails.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.NotStarted, q.questions.asIds)) ++ 
-    List(DevelopmentPractices.questionnaire).map(q => q.id -> QuestionnaireProgress(QuestionnaireState.NotApplicable, q.questions.asIds))
-  ).toMap
 
   val sampleAnswersToQuestions = Map(
     (DevelopmentPractices.question1.id -> SingleChoiceAnswer("Yes")),
@@ -240,6 +308,31 @@ trait SubmissionsTestData {
     (CustomersAuthorisingYourSoftware.question5.id -> NoAnswer)
   )
 
+  val initialStatus = Submission.Status.Created(DateTimeUtils.now, "bob@example.com")
+  val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
+
+  val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)
+  
+  val declinedInstanceStatus = Submission.Status.Declined(DateTimeUtils.now, "bob@example.com", "Test Reasons")
+  val declinedInstance = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(declinedInstanceStatus)))
+  val declinedSubmission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, declinedInstance)
+
+  private val answersIncludingUnknownQuestion = submission.latestInstance.answersToQuestions ++ Map(QuestionId.random -> TextAnswer("not there"))
+  val submissionWithUnknownQuestion = submission.copy(instances = NonEmptyList.of(submission.latestInstance.copy(answersToQuestions = answersIncludingUnknownQuestion)))
+}
+
+trait ExtendedSubmissionsTestData extends SubmissionsTestData {
+  import AsIdsHelpers._
+
+  def progress(state: QuestionnaireState)(groups: NonEmptyList[GroupOfQuestionnaires]): Map[QuestionnaireId, QuestionnaireProgress] = groups.flatMap(g => g.links).map(qn => qn.id -> QuestionnaireProgress(state, qn.questions.asIds)).toList.toMap
+
+  val initialProgress = progress(QuestionnaireState.NotStarted)(activeQuestionnaireGroupings)
+  val completedProgress = progress(QuestionnaireState.Completed)(activeQuestionnaireGroupings)
+
+  val extendedSubmission = ExtendedSubmission(submission, initialProgress)
+}
+
+trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
   val markedAnswers: Map[QuestionId, Mark] = Map(
     (DevelopmentPractices.question1.id -> Pass),
     (DevelopmentPractices.question2.id -> Fail),
@@ -250,46 +343,59 @@ trait SubmissionsTestData {
     (CustomersAuthorisingYourSoftware.question5.id -> Fail)
   )
 
-  val questionIdsOfInterest = QuestionIdsOfInterest(
-    applicationNameId             = CustomersAuthorisingYourSoftware.question2.id,
-    privacyPolicyUrlId            = CustomersAuthorisingYourSoftware.question4.id,
-    termsAndConditionsUrlId       = CustomersAuthorisingYourSoftware.question5.id,
-    organisationUrlId             = OrganisationDetails.question1.id
-  )
-
-  val initialStatus = Submission.Status.Created(DateTimeUtils.now, "bob@example.com")
-  val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
-
-  val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)
-  val extendedSubmission = ExtendedSubmission(submission, initialProgress)
   val markedSubmission = MarkedSubmission(submission, completedProgress, markedAnswers)
 
-  val allQuestions = submission.allQuestions.map(_.id)
-  val allCorrect: Map[QuestionId, Mark] = allQuestions.toList.map(_ -> Pass).toMap
-
-  val altSubmissionId = Submission.Id.random
-  require(altSubmissionId != submissionId)
-  val altSubmission = Submission(altSubmissionId, applicationId, DateTimeUtils.now.plusMillis(100), activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)
-
-  val altExtendedSubmission = ExtendedSubmission(altSubmission, initialProgress)
-
-  def allFirstQuestions(questionnaires: NonEmptyList[Questionnaire]): Map[QuestionnaireId, QuestionId] =
-    questionnaires.map { qn =>
-        (qn.id, qn.questions.head.question.id)
-    }
-    .toList
-    .toMap
   
-  object DeriveContext {
-    object Keys {
-      val VAT_OR_ITSA = "VAT_OR_ITSA"
-      val IN_HOUSE_SOFTWARE = "IN_HOUSE_SOFTWARE" // Stored on Application
+  def markAsPass(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
+    val completedProgress = progress(QuestionnaireState.Completed)(submission.groups)
+    val answers = answersG(Pass)(submission.groups)
+    val marks = answers.map { case (q,a) => q -> Pass }
+
+    val initialInstance = Submission.Instance(0, answers, NonEmptyList.of(Submission.Status.Created(now, requestedBy)))
+    val newSub = submission.copy(instances = NonEmptyList.of(initialInstance))
+    MarkedSubmission(newSub, completedProgress, marks)
+  }
+
+  implicit class SubmissionSyntax(submission: Submission) {
+    def submit(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com"): Submission = {
+      require(submission.latestInstance.isCreated)
+
+      val replacementInstance = submission.latestInstance.copy(statusHistory = NonEmptyList(Submission.Status.Submitted(now, requestedBy), submission.latestInstance.statusHistory.toList))
+
+      submission.copy(
+        instances = NonEmptyList(replacementInstance, submission.instances.tail)
+      )
+    }
+
+    def declined(now: DateTime = DateTimeUtils.now, gatekeeperUserName: String = "Scooby Doo", reasons: String = "Cos it's scary"): Submission = {
+      require(submission.latestInstance.isSubmitted)
+
+      val answers = submission.latestInstance.answersToQuestions
+      val originalRequestedBy = submission.latestInstance.statusHistory.last match {
+        case Submission.Status.Created(_, requestedBy) => requestedBy
+        case _ => "bob@example.com"
+      }
+
+      val replaceLastInstance = submission.latestInstance.copy(statusHistory = NonEmptyList(Submission.Status.Declined(now, gatekeeperUserName, reasons), submission.latestInstance.statusHistory.toList))
+      val newInstance = Submission.Instance(0, answers, NonEmptyList.of(Submission.Status.Created(now, originalRequestedBy)))
+
+      submission.copy(
+        instances = NonEmptyList(newInstance, replaceLastInstance :: submission.instances.tail)
+      )
+    }
+
+    def granted(now: DateTime = DateTimeUtils.now, gatekeeperUserName: String = "Scooby Doo"): Submission = {
+      require(submission.latestInstance.isSubmitted)
+
+      val replaceLastInstance = submission.latestInstance.copy(statusHistory = NonEmptyList(Submission.Status.Granted(now, gatekeeperUserName), submission.latestInstance.statusHistory.toList))
+
+      submission.copy(
+        instances = NonEmptyList(replaceLastInstance, submission.instances.tail.toList)
+      )
     }
   }
 
-  val simpleContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "No")
-  val soldContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "No", DeriveContext.Keys.VAT_OR_ITSA -> "No")
-  val vatContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "Yes")
+
 }
 
 object SubmissionsTestData extends SubmissionsTestData

@@ -32,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
+import org.joda.time.DateTime
 
 
 abstract class AbstractCheckController(
@@ -66,6 +67,10 @@ abstract class AbstractCheckController(
         _      <- fromOptionF(updateSubmissionReview(status)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
       } yield ok
     ).fold(identity(_), identity(_))
+  }
+
+  implicit class TimestampSyntax(datetime: DateTime) {
+    def asText = datetime.toString("dd MMMM yyyy")
   }
 
 }
