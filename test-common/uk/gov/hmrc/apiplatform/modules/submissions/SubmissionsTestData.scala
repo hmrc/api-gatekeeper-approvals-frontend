@@ -377,7 +377,8 @@ trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
       }
 
       val replaceLastInstance = submission.latestInstance.copy(statusHistory = NonEmptyList(Submission.Status.Declined(now, gatekeeperUserName, reasons), submission.latestInstance.statusHistory.toList))
-      val newInstance = Submission.Instance(0, answers, NonEmptyList.of(Submission.Status.Created(now, originalRequestedBy)))
+      val newInstanceIndex = submission.latestInstance.index + 1
+      val newInstance = Submission.Instance(newInstanceIndex, answers, NonEmptyList.of(Submission.Status.Created(now, originalRequestedBy)))
 
       submission.copy(
         instances = NonEmptyList(newInstance, replaceLastInstance :: submission.instances.tail)

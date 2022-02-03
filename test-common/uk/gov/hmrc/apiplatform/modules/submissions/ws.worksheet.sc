@@ -13,5 +13,7 @@ answersG(Pass)(activeQuestionnaireGroupings).values
 
 submission.submit().declined().submit().granted().instances
 
+submission.latestInstance.answersToQuestions
+
 
 
