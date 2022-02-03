@@ -34,6 +34,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import org.joda.time.DateTime
 
 class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   override def fakeApplication() =
@@ -68,17 +69,42 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
+      val newDeclinedSubmission = submission.submit(DateTime.now, "userName").declined(DateTime.now, "userName", "reason01")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, newDeclinedSubmission)
 
       val result = controller.page(appId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
-      ???
+      val appId = ApplicationId.random
+      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
+      val application = Application(appId, "app name")
+      val newDeclinedSubmission = submission.submit(DateTime.now, "userName").declined(DateTime.now, "userName", "reason01")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, newDeclinedSubmission)
+
+      val result = controller.page(appId, 1)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "return 400 when given a submission that isn't declined" in new Setup {
+      val appId = ApplicationId.random
+      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
+      val application = Application(appId, "app name")
+      val submittedSubmission = submission.submit(DateTime.now, "userName")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, submittedSubmission)
+
+      val result = controller.page(appId, 0)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 }
