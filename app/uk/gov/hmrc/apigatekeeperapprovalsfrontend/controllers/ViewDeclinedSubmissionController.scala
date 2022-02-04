@@ -35,23 +35,11 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Stat
 
 
 object ViewDeclinedSubmissionController {
-  // case class CurrentSubmittedInstanceDetails(timestamp: String)
-
-  // case class DeclinedInstanceDetails(timestamp: String)
-
-  // case class GrantedInstanceDetails(timestamp: String)
-  
   case class ViewModel(
-    // applicationId: ApplicationId,
     appName: String,
     submitterEmail: String,
     submittedOn: String,
     reasons: String
-
-    // applicationDetailsUrl: String,
-    // currentSubmission: Option[CurrentSubmittedInstanceDetails],
-    // declinedInstances: List[DeclinedInstanceDetails],
-    // grantedInstance: Option[GrantedInstanceDetails]
   )
 }
 
