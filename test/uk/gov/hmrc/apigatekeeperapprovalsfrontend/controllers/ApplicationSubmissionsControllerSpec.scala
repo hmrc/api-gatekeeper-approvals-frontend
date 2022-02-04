@@ -157,7 +157,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
       val result = controller.whichPage(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/applications/${appId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${appId.value}")
     }
 
     "redirect to Gatekeeper when no submission found" in new Setup {
@@ -171,7 +171,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
       val result = controller.whichPage(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/applications/${appId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${appId.value}")
     }
   }
 }

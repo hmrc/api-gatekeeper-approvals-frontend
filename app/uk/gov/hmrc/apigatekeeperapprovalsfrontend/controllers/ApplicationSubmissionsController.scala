@@ -69,8 +69,10 @@ class ApplicationSubmissionsController @Inject()(
   import cats.data.OptionT
   import cats.implicits._
 
+  val serviceBaseUrl = s"${config.gatekeeperBaseUrl}/api-gatekeeper"
+
   def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.gatekeeperBaseUrl}/applications/${applicationId.value}"
+    val gatekeeperApplicationUrl = s"$serviceBaseUrl/applications/${applicationId.value}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission => submission.instances.find(i => i.isSubmitted || i.isGranted || i.isDeclined).nonEmpty
 
@@ -89,7 +91,7 @@ class ApplicationSubmissionsController @Inject()(
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
-    val gatekeeperApplicationUrl = s"${config.gatekeeperBaseUrl}/applications/${applicationId.value}"
+    val gatekeeperApplicationUrl = s"$serviceBaseUrl/applications/${applicationId.value}"
 
     val latestInstance = request.markedSubmission.submission.latestInstance
     val latestInstanceStatus = latestInstance.statusHistory.head

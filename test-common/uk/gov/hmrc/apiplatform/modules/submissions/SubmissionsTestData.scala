@@ -22,7 +22,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import scala.collection.immutable.ListMap
 import scala.util.Random
-import java.util.Date
 import org.joda.time.DateTime
 
 trait QuestionnaireTestData {
@@ -312,10 +311,6 @@ trait SubmissionsTestData extends QuestionnaireTestData {
   val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
 
   val submission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, initialInstances)
-  
-  val declinedInstanceStatus = Submission.Status.Declined(DateTimeUtils.now, "bob@example.com", "Test Reasons")
-  val declinedInstance = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(declinedInstanceStatus)))
-  val declinedSubmission = Submission(submissionId, applicationId, DateTimeUtils.now, activeQuestionnaireGroupings, questionIdsOfInterest, declinedInstance)
 
   private val answersIncludingUnknownQuestion = submission.latestInstance.answersToQuestions ++ Map(QuestionId.random -> TextAnswer("not there"))
   val submissionWithUnknownQuestion = submission.copy(instances = NonEmptyList.of(submission.latestInstance.copy(answersToQuestions = answersIncludingUnknownQuestion)))
@@ -344,7 +339,6 @@ trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
   )
 
   val markedSubmission = MarkedSubmission(submission, completedProgress, markedAnswers)
-
   
   def markAsPass(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
     val completedProgress = progress(QuestionnaireState.Completed)(submission.groups)
@@ -367,7 +361,7 @@ trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
       )
     }
 
-    def declined(now: DateTime = DateTimeUtils.now, gatekeeperUserName: String = "Scooby Doo", reasons: String = "Cos it's scary"): Submission = {
+    def declined(now: DateTime = DateTimeUtils.now, gatekeeperUserName: String = "Default Gatekeeper User Name", reasons: String = "Default Decline Reason"): Submission = {
       require(submission.latestInstance.isSubmitted)
 
       val answers = submission.latestInstance.answersToQuestions
@@ -385,7 +379,7 @@ trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
       )
     }
 
-    def granted(now: DateTime = DateTimeUtils.now, gatekeeperUserName: String = "Scooby Doo"): Submission = {
+    def granted(now: DateTime = DateTimeUtils.now, gatekeeperUserName: String = "Default Gatekeeper User Name"): Submission = {
       require(submission.latestInstance.isSubmitted)
 
       val replaceLastInstance = submission.latestInstance.copy(statusHistory = NonEmptyList(Submission.Status.Granted(now, gatekeeperUserName), submission.latestInstance.statusHistory.toList))
@@ -395,8 +389,6 @@ trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
       )
     }
   }
-
-
 }
 
 object SubmissionsTestData extends SubmissionsTestData

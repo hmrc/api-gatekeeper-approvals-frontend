@@ -65,15 +65,18 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
   }
 
   "GET /" should {
+    val gatekeeperUserName = "user name"
+    val submissionDeclinedReason = "declined due to testing"
+    
     "return 200" in new Setup {
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val newDeclinedSubmission = submission.submit(DateTime.now, "userName").declined(DateTime.now, "userName", "reason01")
+      val declinedSubmission = submission.submit(DateTime.now, gatekeeperUserName).declined(DateTime.now, gatekeeperUserName, submissionDeclinedReason)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, newDeclinedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
 
       val result = controller.page(appId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -83,11 +86,11 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val newDeclinedSubmission = submission.submit(DateTime.now, "userName").declined(DateTime.now, "userName", "reason01")
+      val declinedSubmission = submission.submit(DateTime.now, gatekeeperUserName).declined(DateTime.now, gatekeeperUserName, submissionDeclinedReason)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, newDeclinedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
 
       val result = controller.page(appId, 1)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
@@ -97,7 +100,7 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val submittedSubmission = submission.submit(DateTime.now, "userName")
+      val submittedSubmission = submission.submit(DateTime.now, gatekeeperUserName)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
