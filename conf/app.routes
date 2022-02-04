@@ -1,22 +1,25 @@
 # microservice specific routes
 
 ->         /hmrc-frontend                                   hmrcfrontend.Routes
-GET        /applications/:id                                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationController.applicationPage(id: ApplicationId)
-POST       /applications/:id                                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationController.applicationAction(id: ApplicationId)
 
-GET        /applications/:id/answers-that-failed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.checkAnswersThatFailedPage(id: ApplicationId)
-POST       /applications/:id/answers-that-failed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.checkAnswersThatFailedAction(id: ApplicationId)
+GET        /applications/:id                                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.whichPage(id: ApplicationId)
+GET        /applications/:id/reviews                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.page(id: ApplicationId)
 
-GET        /applications/:id/answers-that-passed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedPage(id: ApplicationId)
-POST       /applications/:id/answers-that-passed            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedAction(id: ApplicationId)
+GET        /applications/:id/checklist                      uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.checklistPage(id: ApplicationId)
+POST       /applications/:id/checklist                      uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.checklistAction(id: ApplicationId)
 
-GET        /applications/:id/check-urls                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
-POST       /applications/:id/check-urls                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
+GET        /applications/:id/checklist/answers-that-failed  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.page(id: ApplicationId)
+POST       /applications/:id/checklist/answers-that-failed  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.action(id: ApplicationId)
 
-GET        /applications/:id/url                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
-POST       /applications/:id/url                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
+GET        /applications/:id/checklist/answers-that-passed  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedPage(id: ApplicationId)
+POST       /applications/:id/checklist/answers-that-passed  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.checkAnswersThatPassedAction(id: ApplicationId)
+
+GET        /applications/:id/checklist/check-urls           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
+POST       /applications/:id/checklist/check-urls           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
 
 GET        /applications/:id/checks-completed               uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecksCompletedController.checksCompletedPage(id: ApplicationId)
 POST       /applications/:id/checks-completed               uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecksCompletedController.checksCompletedAction(id: ApplicationId)
+
+GET        /applications/:id/view-declined/:index           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ViewDeclinedSubmissionController.page(id: ApplicationId, index: Int)
 
 GET        /assets/*file                                    controllers.Assets.versioned(path = "/public", file: Asset)

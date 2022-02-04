@@ -16,24 +16,17 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
-import com.google.inject.ImplementedBy
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Provider, Singleton}
 
-import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-@ImplementedBy(classOf[AppConfigImpl])
-trait AppConfig {
-  def welshLanguageSupportEnabled: Boolean
-
-  def appName: String
-}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController
 
 @Singleton
-class AppConfigImpl @Inject()(
-  config: Configuration
-) extends ServicesConfig(config) with AppConfig {
-  val appName = getString("appName")
-  
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+class ApplicationSubmissionsControllerConfigProvider @Inject() (config: ServicesConfig) extends Provider[ApplicationSubmissionsController.Config] {
+
+  override def get(): ApplicationSubmissionsController.Config =
+    ApplicationSubmissionsController.Config(
+      config.baseUrl("api-gatekeeper-frontend")
+    )
 }

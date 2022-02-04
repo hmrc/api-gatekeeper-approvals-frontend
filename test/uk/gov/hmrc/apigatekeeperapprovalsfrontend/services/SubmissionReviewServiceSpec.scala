@@ -51,46 +51,46 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
   "updateCheckedFailsAndWarningsStatus" should {
     "set correct status in SubmissionReview for checkedFailsAndWarnings" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(checkedFailsAndWarnings = SubmissionReview.Status.ReviewInProgress)
+      val updatedReview = review.copy(checkedFailsAndWarnings = SubmissionReview.Status.InProgress)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateCheckedFailsAndWarningsStatus(SubmissionReview.Status.ReviewInProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateCheckedFailsAndWarningsStatus(SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
       result shouldBe Some(updatedReview)
     }
 
     "set correct status in SubmissionReview for emailedResponsibleIndividual" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(emailedResponsibleIndividual = SubmissionReview.Status.ReviewInProgress)
+      val updatedReview = review.copy(emailedResponsibleIndividual = SubmissionReview.Status.InProgress)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateEmailedResponsibleIndividualStatus(SubmissionReview.Status.ReviewInProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateEmailedResponsibleIndividualStatus(SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
       result shouldBe Some(updatedReview)
     }
 
     "set correct status in SubmissionReview for checkedUrls" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(checkedUrls = SubmissionReview.Status.ReviewInProgress)
+      val updatedReview = review.copy(checkedUrls = SubmissionReview.Status.InProgress)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateCheckedUrlsStatus(SubmissionReview.Status.ReviewInProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateCheckedUrlsStatus(SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
       result shouldBe Some(updatedReview)
     }
 
     "set correct status in SubmissionReview for checkedForSandboxTesting" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(checkedForSandboxTesting = SubmissionReview.Status.ReviewInProgress)
+      val updatedReview = review.copy(checkedForSandboxTesting = SubmissionReview.Status.InProgress)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateCheckedForSandboxTestingStatus(SubmissionReview.Status.ReviewInProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateCheckedForSandboxTestingStatus(SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
       result shouldBe Some(updatedReview)
     }
 
     "set correct status in SubmissionReview for checkedPassedAnswers" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(checkedPassedAnswers = SubmissionReview.Status.ReviewInProgress)
+      val updatedReview = review.copy(checkedPassedAnswers = SubmissionReview.Status.InProgress)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateCheckedPassedAnswersStatus(SubmissionReview.Status.ReviewInProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateCheckedPassedAnswersStatus(SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
       result shouldBe Some(updatedReview)
     }
   }

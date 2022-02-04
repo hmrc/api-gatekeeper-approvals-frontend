@@ -31,10 +31,6 @@ import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 
-trait HasApplication {
-  def application: Application
-}
-
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
   
@@ -72,10 +68,20 @@ trait ApplicationActionBuilders {
         .value
       }
     }
+
 }
 
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
+
+  private def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      (
+        gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
+        applicationRequestRefiner(applicationId)
+      )
+      .invokeBlock(request, block)
+    }
 
   private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
@@ -87,6 +93,10 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
+  def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    strideRoleWithApplication(GatekeeperRole.USER)(applicationId)(block)
+
   def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
+
 }

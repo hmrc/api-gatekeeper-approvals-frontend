@@ -22,9 +22,9 @@ object SubmissionReview {
   sealed trait Status
 
   object Status {
-    case object ReviewNotStarted extends Status
-    case object ReviewInProgress extends Status
-    case object ReviewCompleted extends Status
+    case object NotStarted extends Status
+    case object InProgress extends Status
+    case object Completed extends Status
   }
 }
 
@@ -33,11 +33,11 @@ import SubmissionReview.Status
 case class SubmissionReview(
   submissionId: Submission.Id,
   instanceIndex: Int,
-  checkedFailsAndWarnings: Status = SubmissionReview.Status.ReviewNotStarted,
-  emailedResponsibleIndividual: Status = SubmissionReview.Status.ReviewNotStarted,
-  checkedUrls: Status = SubmissionReview.Status.ReviewNotStarted,
-  checkedForSandboxTesting: Status = SubmissionReview.Status.ReviewNotStarted,
-  checkedPassedAnswers: Status = SubmissionReview.Status.ReviewNotStarted
+  checkedFailsAndWarnings: Status = SubmissionReview.Status.NotStarted,
+  emailedResponsibleIndividual: Status = SubmissionReview.Status.NotStarted,
+  checkedUrls: Status = SubmissionReview.Status.NotStarted,
+  checkedForSandboxTesting: Status = SubmissionReview.Status.NotStarted,
+  checkedPassedAnswers: Status = SubmissionReview.Status.NotStarted
 ) {
-  lazy val isCompleted = List(checkedFailsAndWarnings, emailedResponsibleIndividual, checkedUrls, checkedForSandboxTesting, checkedPassedAnswers).forall(s => s == Status.ReviewCompleted)
+  lazy val isCompleted = List(checkedFailsAndWarnings, emailedResponsibleIndividual, checkedUrls, checkedForSandboxTesting, checkedPassedAnswers).forall(s => s == Status.Completed)
 }

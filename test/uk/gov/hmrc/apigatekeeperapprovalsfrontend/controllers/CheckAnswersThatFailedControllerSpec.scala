@@ -78,7 +78,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
-      val result = controller.checkAnswersThatFailedPage(appId)(fakeRequest)
+      val result = controller.page(appId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
@@ -90,7 +90,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(appId)
 
-      val result = controller.checkAnswersThatFailedPage(appId)(fakeRequest)
+      val result = controller.page(appId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
@@ -102,7 +102,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkAnswersThatFailedPage(appId)(fakeRequest)
+      val result = controller.page(appId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -119,7 +119,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.UpdateCheckedFailsAndWarningsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+      val result = controller.action(appId)(fakeRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -134,7 +134,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.UpdateCheckedFailsAndWarningsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+      val result = controller.action(appId)(fakeRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -148,7 +148,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
-      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+      val result = controller.action(appId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -161,7 +161,7 @@ class CheckAnswersThatFailedControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
 
-      val result = controller.checkAnswersThatFailedAction(appId)(fakeRequest)
+      val result = controller.action(appId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

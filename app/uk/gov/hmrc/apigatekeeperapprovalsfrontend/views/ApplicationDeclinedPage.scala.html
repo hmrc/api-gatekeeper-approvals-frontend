@@ -30,13 +30,13 @@
   </div>
 }
 
-@layout(pageTitle = Some(messages("applicationDeclined.pageTitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("applicationdeclined.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
 
   <div class="govuk-box-highlight">
-    <h1 class="govuk-heading-l govuk-highlight-text">@{messages("applicationDeclined.title")}</h1>
-    <p class="govuk-body govuk-highlight-text">@{messages("applicationDeclined.text")}</p>
+    <h1 class="govuk-heading-l govuk-highlight-text">@{messages("applicationdeclined.title")}</h1>
+    <p class="govuk-body govuk-highlight-text">@{messages("applicationdeclined.text")}</p>
   </div>
 
 }

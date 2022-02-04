@@ -3,16 +3,17 @@ service.text = This is your new service
 
 breadcrumbs.home = Home
 breadcrumbs.prodrequests = Production requests
+breadcrumbs.applications = Applications
 
 checklist.title = Complete the checklist
-checklist.pageTitle = HMRC API Gatekeeper - Complete the checklist
-checklist.requestFailed = This request for production credentials has failed
-checklist.requestPassed = This request for production credentials has passed
-checklist.requestPassedWithWarnings = This request for production credentials has passed with warnings
+checklist.pagetitle = HMRC API Gatekeeper - Complete the checklist
+checklist.requestfailed = This request for production credentials has failed
+checklist.requestpassed = This request for production credentials has passed
+checklist.requestpassedwithwarnings = This request for production credentials has passed with warnings
 
 checklist.status.notstarted = Not Started
 checklist.status.inprogress = In Progress
-checklist.status.complete = Completed
+checklist.status.completed = Completed
 
 checklist.checkwarnings.heading = Check answers with warnings
 checklist.checkwarnings.linktext = Check warnings
@@ -33,51 +34,68 @@ checklist.checkother.linktext = Other answers
 checklist.completed = Checklist completed
 checklist.save = Save and come back later
 
-answersThatFailed.failsOnly.title = Answers with fails
-answersThatFailed.warnsOnly.title = Answers with warnings
-answersThatFailed.failsAndWarns.title = Answers with fails and warnings
+answersthatfailed.failsonly.title = Answers with fails
+answersthatfailed.warnsonly.title = Answers with warnings
+answersthatfailed.failsandwarns.title = Answers with fails and warnings
 
-answersThatFailed.pageTitle = HMRC API Gatekeeper - Answers with fails and warnings
+answersthatfailed.pagetitle = HMRC API Gatekeeper - Answers with fails and warnings
 
-answersThatFailed.failsOnly.completed = Fails checked
-answersThatFailed.warnsOnly.completed = Warnings checked
-answersThatFailed.failsAndWarns.completed = Fails and warnings checked
+answersthatfailed.failsonly.completed = Fails checked
+answersthatfailed.warnsonly.completed = Warnings checked
+answersthatfailed.failsandwarns.completed = Fails and warnings checked
 
-answersThatFailed.failsOnly.save = Check fails later
-answersThatFailed.warnsOnly.save = Check warnings later
-answersThatFailed.failsAndWarns.save = Check fails and warnings later
+answersthatfailed.failsonly.save = Check fails later
+answersthatfailed.warnsonly.save = Check warnings later
+answersthatfailed.failsandwarns.save = Check fails and warnings later
 
-answersThatFailed.failsOnly.helptext = Advise the developer about these fails when you email the decision
-answersThatFailed.warnsOnly.helptext = Advise the developer about these warnings when you email the decision
-answersThatFailed.failsAndWarns.helptext = Advise the developer about these fails and warnings when you email the decision
+answersthatfailed.failsonly.helptext = Advise the developer about these fails when you email the decision
+answersthatfailed.warnsonly.helptext = Advise the developer about these warnings when you email the decision
+answersthatfailed.failsandwarns.helptext = Advise the developer about these fails and warnings when you email the decision
 
-answersThatFailed.status.failed = Fail
-answersThatFailed.status.warning = Warning
+answersthatfailed.status.failed = Fail
+answersthatfailed.status.warning = Warning
 
-answersThatPassed.title = Check other answers
-answersThatPassed.pageTitle = HMRC API Gatekeeper - Check other answers
-answersThatPassed.save = Check answers later
-answersThatPassed.completed = Answers checked
+answersthatpassed.title = Check other answers
+answersthatpassed.pagetitle = HMRC API Gatekeeper - Check other answers
+answersthatpassed.save = Check answers later
+answersthatpassed.completed = Answers checked
 
-checkUrls.title = Check that all URLs work
-checkUrls.pageTitle = HMRC API Gatekeeper - Check URLs
-checkUrls.organisationUrl = Organisation URL
-checkUrls.privacyPolicyUrl = Privacy policy URL
-checkUrls.termsAndConditionsUrl = Terms and conditions URL
-checkUrls.urlsChecked = URLs checked
-checkUrls.checkUrlsLater = Check URLs later
-checkUrls.noUrl = None
+checkurls.title = Check that all URLs work
+checkurls.pagetitle = HMRC API Gatekeeper - Check URLs
+checkurls.organisationurl = Organisation URL
+checkurls.privacypolicyurl = Privacy policy URL
+checkurls.termsandconditionsurl = Terms and conditions URL
+checkurls.urlschecked = URLs checked
+checkurls.checkurlslater = Check URLs later
+checkurls.nourl = None
 
-checksCompleted.pageTitle = HMRC API Gatekeeper - Checks Completed
-checksCompleted.title = Checks Completed
-checksCompleted.checksPassed = Checks Passed
-checksCompleted.checksFailed = Checks Failed
+checkscompleted.pagetitle = HMRC API Gatekeeper - Checks Completed
+checkscompleted.title = Checks Completed
+checkscompleted.checkspassed = Checks Passed
+checkscompleted.checksfailed = Checks Failed
 
-applicationApproved.pageTitle = HMRC API Gatekeeper - Application Granted
-applicationApproved.title = Application Granted
-applicationApproved.text = The Application has been granted and is now in a state of Pending Requester Verification
+applicationapproved.pagetitle = HMRC API Gatekeeper - Application Granted
+applicationapproved.title = Application Granted
+applicationapproved.text = The Application has been granted and is now in a state of Pending Requester Verification
 
-applicationDeclined.pageTitle = HMRC API Gatekeeper - Application Declined
-applicationDeclined.title = Application Declined
-applicationDeclined.text = The Application has been declined and has been put back in a state of Testing
+applicationdeclined.pagetitle = HMRC API Gatekeeper - Application Declined
+applicationdeclined.title = Application Declined
+applicationdeclined.text = The Application has been declined and has been put back in a state of Testing
+
+applicationsubmissions.pagetitle = HMRC API Gatekeeper - Application Submissions
+applicationsubmissions.title = Request for production credentials
+applicationsubmissions.requestcreds = Request for credentials
+applicationsubmissions.declinedrequests = Declined requests for credentials
+applicationsubmissions.appdetails = Application details
+applicationsubmissions.reviewormanage = Review or manage application details
+applicationsubmissions.termsofuseaccept = Terms of use acceptance
+
+viewdeclinedsubmissions.pagetitle = HMRC API Gatekeeper - Declined request
+viewdeclinedsubmissions.pageheading = Declined request
+viewdeclinedsubmissions.submittedby = Submitted by
+viewdeclinedsubmissions.emailaddress = Email address
+viewdeclinedsubmissions.date = Date
+viewdeclinedsubmissions.declinedreason = Reasons the request was declined
+viewdeclinedsubmissions.submittedanswers = All submitted answers
+viewdeclinedsubmissions.checkanswers = Check answers
 

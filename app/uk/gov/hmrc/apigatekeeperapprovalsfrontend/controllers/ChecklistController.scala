@@ -30,66 +30,50 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationChecklistPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services._
 import scala.concurrent.Future.successful
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewCompleted
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewInProgress
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.ReviewNotStarted
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
-object ApplicationController {
-  sealed trait ChecklistItemStatus
-  case object Complete extends ChecklistItemStatus
-  case object InProgress extends ChecklistItemStatus
-  case object NotStarted extends ChecklistItemStatus
-
+object ChecklistController {
+  
   case class ChecklistItemStatuses(
-    failsAndWarnings: ChecklistItemStatus,
-    email: ChecklistItemStatus,
-    urls: ChecklistItemStatus,
-    sandboxTesting: ChecklistItemStatus,
-    passed: ChecklistItemStatus
+    failsAndWarnings: SubmissionReview.Status,
+    email: SubmissionReview.Status,
+    urls: SubmissionReview.Status,
+    sandboxTesting: SubmissionReview.Status,
+    passed: SubmissionReview.Status
   )
   case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
-
-  private implicit class AsCheckListItemStatusSyntax(status: SubmissionReview.Status) {
-    def asChecklistItemStatus() = status match {
-      case ReviewNotStarted => NotStarted
-      case ReviewInProgress => InProgress
-      case ReviewCompleted => Complete
-    }
-  }
-
 }
 
 @Singleton
-class ApplicationController @Inject()(
+class ChecklistController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  applicationChecklistPage: ApplicationChecklistPage,
+  checklistPage: ChecklistPage,
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
-  import ApplicationController._
+  import ChecklistController._
 
   private def buildChecklistItemStatuses(review: SubmissionReview, markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
     ChecklistItemStatuses(
-      failsAndWarnings = review.checkedFailsAndWarnings.asChecklistItemStatus,
-      email = review.emailedResponsibleIndividual.asChecklistItemStatus,
-      urls  = review.checkedUrls.asChecklistItemStatus,
-      sandboxTesting = review.checkedForSandboxTesting.asChecklistItemStatus,
-      passed = review.checkedPassedAnswers.asChecklistItemStatus
+      failsAndWarnings = review.checkedFailsAndWarnings,
+      email = review.emailedResponsibleIndividual,
+      urls  = review.checkedUrls,
+      sandboxTesting = review.checkedForSandboxTesting,
+      passed = review.checkedPassedAnswers
     )
   }
 
-  def applicationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checklistPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
       val isSuccessful = ! request.markedSubmission.isFail
       val hasWarnings = request.markedSubmission.isWarn
@@ -97,10 +81,10 @@ class ApplicationController @Inject()(
       for {
         review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index)
         itemStatuses = buildChecklistItemStatuses(review, request.markedSubmission)
-      } yield Ok(applicationChecklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
+      } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
   }
 
-  def applicationAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checklistAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { _ =>
     successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecksCompletedController.checksCompletedPage(applicationId)))
   }
 }

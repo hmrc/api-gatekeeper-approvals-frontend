@@ -14,13 +14,15 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status._
 
 @this(layout: Layout)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@checklistTable(headingKey: String, itemStatuses: List[(String, String, String, ChecklistItemStatus)]) = {
+@checklistTable(headingKey: String, itemStatuses: List[(String, String, String, SubmissionReview.Status)]) = {
     <li>
         <h2 class="govuk-heading-m">@{messages(headingKey)}</h2>
 
@@ -43,8 +45,8 @@
                         </td>
                         <td class="govuk-table__cell align-right">
                             @{
-                                if (status == Complete) {
-                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.complete")}</div>
+                                if (status == Completed) {
+                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.completed")}</div>
                                 } else if (status == InProgress) {
                                     <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
                                 } else if (status == NotStarted) {
@@ -68,7 +70,7 @@
     </div>
 }
 
-@layout(pageTitle = Some(messages("checklist.pageTitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checklist.pagetitle")), beforeContent = Some(breadcrumbs)) {
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
     <h1 class="govuk-heading-l">
         <span class="govuk-caption-l">@model.appName</span>
@@ -82,12 +84,12 @@
             @{
                 if (model.isSuccessful) {
                     if (model.hasWarnings) {
-                        messages("checklist.requestPassedWithWarnings")
+                        messages("checklist.requestpassedwithwarnings")
                     } else {
-                        messages("checklist.requestPassed")
+                        messages("checklist.requestpassed")
                     }
                 } else {
-                    messages("checklist.requestFailed")
+                    messages("checklist.requestfailed")
                 }
             }
         </strong>
@@ -100,7 +102,7 @@
                     checklistTable(
                         "checklist.checkwarnings.heading", 
                         List(
-                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
+                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                         )
                     )
                 }
@@ -108,7 +110,7 @@
                 checklistTable(
                     "checklist.checkfailed.heading", 
                     List(
-                        ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.checkAnswersThatFailedPage(model.applicationId).url, model.itemStatuses.failsAndWarnings)
+                        ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.itemStatuses.failsAndWarnings)
                     )
                 )
             } 
@@ -142,7 +144,7 @@
         }
     </ol>
 
-    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationController.applicationAction(model.applicationId), 'class -> "form") {
+    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistAction(model.applicationId), 'class -> "form") {
         @helper.CSRF.formField
     
         <div class="govuk-button-group">

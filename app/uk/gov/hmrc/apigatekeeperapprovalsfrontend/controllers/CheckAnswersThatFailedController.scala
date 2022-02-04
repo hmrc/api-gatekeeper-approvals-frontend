@@ -60,7 +60,7 @@ class CheckAnswersThatFailedController @Inject()(
   
   import CheckAnswersThatFailedController._
 
-  def checkAnswersThatFailedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = 
@@ -95,5 +95,5 @@ class CheckAnswersThatFailedController @Inject()(
     )
   }
 
-  def checkAnswersThatFailedAction(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatFailedAction", submissionReviewService.updateCheckedFailsAndWarningsStatus _)(applicationId)
+  def action(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatFailedAction", submissionReviewService.updateCheckedFailsAndWarningsStatus _)(applicationId)
 }

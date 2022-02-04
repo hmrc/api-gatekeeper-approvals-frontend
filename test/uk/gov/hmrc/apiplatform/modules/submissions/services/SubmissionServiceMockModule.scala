@@ -18,14 +18,15 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
+import org.joda.time.DateTime
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import cats.data.NonEmptyList
 
-trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
+trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData {
   trait BaseSubmissionServiceMock {
     def aMock: SubmissionService
 
@@ -36,14 +37,35 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnIncludingAnUnknownQuestion(applicationId: ApplicationId) = {
-        val answersIncludingUnknownQuestion = submission.latestInstance.answersToQuestions ++ Map(QuestionId.random -> TextAnswer("not there"))
-        val submissionWithUnknownQuestion = submission.copy(instances = NonEmptyList.of(submission.latestInstance.copy(answersToQuestions = answersIncludingUnknownQuestion)))
         val response = Some(MarkedSubmission(submissionWithUnknownQuestion, Map.empty, markedAnswers))
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenReturnWith(applicationId: ApplicationId, submission: Submission) = {
+        val response = Some(MarkedSubmission(submission, Map.empty, markedAnswers))
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
         when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
+      }
+    }
+
+    object FetchLatestSubmission {
+      def thenReturn(applicationId: ApplicationId) = {
+        val response = Some(extendedSubmission)
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
+        val updatedInstance = submission.latestInstance.copy(statusHistory = Submission.Status.Submitted(DateTime.now, "user") :: submission.latestInstance.statusHistory)
+        val submittedSubmission = submission.copy(instances = NonEmptyList(updatedInstance, submission.instances.tail))
+        val response = Some(ExtendedSubmission(submittedSubmission, initialProgress))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenNotFound() = {
+        when(aMock.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
 

@@ -59,6 +59,8 @@ object Submission {
   }
 
   sealed trait Status {
+    def timestamp: DateTime
+    
     def isOpenToAnswers = isCreated
 
     def isCreated = this match {
@@ -73,6 +75,11 @@ object Submission {
 
     def isGranted = this match {
       case _ : Submission.Status.Granted => true
+      case _ => false      
+    }
+
+    def isDeclined = this match {
+      case _ : Submission.Status.Declined => true
       case _ => false      
     }
   }
@@ -107,6 +114,10 @@ object Submission {
   ) {
     lazy val status: Status = statusHistory.head
     lazy val isOpenToAnswers = status.isOpenToAnswers
+    lazy val isCreated = status.isCreated
+    lazy val isGranted = status.isGranted
+    lazy val isDeclined = status.isDeclined
+    lazy val isSubmitted = status.isSubmitted
   }
 }
 
