@@ -29,19 +29,19 @@
   </div>
 }
 
-@layout(pageTitle = Some(messages("submissiondeclined.pagetitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("viewdeclinedsubmissions.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
   <h1 class="govuk-heading-l">
-    Declined request
+    @{messages("viewdeclinedsubmissions.pageheading")}
   </h1>
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    Submitted by
+    @{messages("viewdeclinedsubmissions.submittedby")}
   </h2>
   <dl class="govuk-summary-list govuk-!-margin-bottom-7">
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        Email address
+        @{messages("viewdeclinedsubmissions.emailaddress")}
       </dt>
       <dd class="govuk-summary-list__value">
         <p class="govuk-body">@model.submitterEmail</p>
@@ -49,7 +49,7 @@
     </div>
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        Date
+        @{messages("viewdeclinedsubmissions.date")}
       </dt>
       <dd class="govuk-summary-list__value">
         <p class="govuk-body">@model.submittedOn</p>
@@ -57,15 +57,15 @@
     </div>
   </dl>
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    Reasons the request was declined
+    @{messages("viewdeclinedsubmissions.declinedreason")}
   </h2>
   <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
     <p class="govuk-body">@model.reasons</p>
   </div>
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    All submitted answers
+    @{messages("viewdeclinedsubmissions.submittedanswers")}
   </h2>
   <p class="govuk-body">
-    <a href="submitted-answers" class="govuk-link govuk-link--no-visited-state">Check answers</a>
+    <a href="submitted-answers" class="govuk-link govuk-link--no-visited-state">@{messages("viewdeclinedsubmissions.checkanswers")}</a>
   </p>
 }

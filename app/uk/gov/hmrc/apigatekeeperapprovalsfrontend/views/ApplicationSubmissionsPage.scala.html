@@ -31,14 +31,14 @@
 
 @layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
-  <span class="govuk-caption-l">Request for production credentials</span>
+  <span class="govuk-caption-l">@{messages("applicationsubmissions.title")}</span>
   <h1 class="govuk-heading-l">
     @model.appName
   </h1>
 
   @if(model.currentSubmission.nonEmpty) {
     <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-      Request for credentials
+      @{messages("applicationsubmissions.requestcreds")}
     </h2>
     <ul class="govuk-list">
       <li>
@@ -49,7 +49,7 @@
 
   @if(model.declinedInstances.nonEmpty) {
     <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-      Declined requests for credentials
+      @{messages("applicationsubmissions.declinedrequests")}
     </h2>
     <ul class="govuk-list">
       @for(instance <- model.declinedInstances) {
@@ -61,16 +61,16 @@
   }
 
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    Application details
+    @{messages("applicationsubmissions.appdetails")}
   </h2>
   <p class="govuk-body">
-    <a href="@{model.applicationDetailsUrl}" class="govuk-link">Review or manage application details</a>
+    <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
   </p>
 
   @if(model.grantedInstance.isDefined) {
     @defining(model.grantedInstance.get) { instance =>
       <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-        Terms of use acceptance
+        @{messages("applicationsubmissions.termsofuseaccept")}
       </h2>
       <ul class="govuk-list">
         <li>

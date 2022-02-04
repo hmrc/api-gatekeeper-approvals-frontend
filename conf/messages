@@ -82,4 +82,20 @@ applicationdeclined.pagetitle = HMRC API Gatekeeper - Application Declined
 applicationdeclined.title = Application Declined
 applicationdeclined.text = The Application has been declined and has been put back in a state of Testing
 
-applicationsubmissions.pagetitle = TODO
+applicationsubmissions.pagetitle = HMRC API Gatekeeper - Application Submissions
+applicationsubmissions.title = Request for production credentials
+applicationsubmissions.requestcreds = Request for credentials
+applicationsubmissions.declinedrequests = Declined requests for credentials
+applicationsubmissions.appdetails = Application details
+applicationsubmissions.reviewormanage = Review or manage application details
+applicationsubmissions.termsofuseaccept = Terms of use acceptance
+
+viewdeclinedsubmissions.pagetitle = HMRC API Gatekeeper - Declined request
+viewdeclinedsubmissions.pageheading = Declined request
+viewdeclinedsubmissions.submittedby = Submitted by
+viewdeclinedsubmissions.emailaddress = Email address
+viewdeclinedsubmissions.date = Date
+viewdeclinedsubmissions.declinedreason = Reasons the request was declined
+viewdeclinedsubmissions.submittedanswers = All submitted answers
+viewdeclinedsubmissions.checkanswers = Check answers
+
