@@ -24,10 +24,9 @@
   appConfig: AppConfig
 )
 
-@()(implicit messages: Messages) = {
+@()(implicit messages: Messages)
   <div class="govuk-breadcrumbs">
     <ol class="govuk-breadcrumbs__list">
       <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="javascript:history.back()">&lt; @{messages("breadcrumbs.back")}</a></li>
     </ol>
   </div>
-}

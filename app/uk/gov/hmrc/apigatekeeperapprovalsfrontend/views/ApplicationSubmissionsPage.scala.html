@@ -21,9 +21,7 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@appBreadcrumb = @{Some(ApplicationBreadcrumbData(model.applicationId, model.appName))}
-
-@layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs(appBreadcrumb))) {
+@layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@{messages("applicationsubmissions.title")}</span>
   <h1 class="govuk-heading-l">
