@@ -1,6 +1,11 @@
 service.name = HMRC API Gatekeeper
 service.text = This is your new service
 
+topnav.applications = Applications
+topnav.developers = Developers
+topnav.emails = Emails
+topnav.apiapprovals = API Approvals
+
 breadcrumbs.home = Home
 breadcrumbs.prodrequests = Production requests
 breadcrumbs.applications = Applications
