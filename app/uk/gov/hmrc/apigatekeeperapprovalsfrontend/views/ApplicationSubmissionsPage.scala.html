@@ -29,9 +29,16 @@
   </div>
 }
 
+@titleText = @{
+  if(model.grantedInstance.isDefined) 
+    messages("applicationsubmissions.alttitle") 
+  else
+    messages("applicationsubmissions.title")
+}
+
 @layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs)) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
-  <span class="govuk-caption-l">@{messages("applicationsubmissions.title")}</span>
+  <span class="govuk-caption-l">@titleText</span>
   <h1 class="govuk-heading-l">
     @model.appName
   </h1>
