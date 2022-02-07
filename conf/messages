@@ -84,6 +84,7 @@ applicationdeclined.text = The Application has been declined and has been put ba
 
 applicationsubmissions.pagetitle = HMRC API Gatekeeper - Application Submissions
 applicationsubmissions.title = Request for production credentials
+applicationsubmissions.alttitle = Production application
 applicationsubmissions.requestcreds = Request for credentials
 applicationsubmissions.declinedrequests = Declined requests for credentials
 applicationsubmissions.appdetails = Application details
