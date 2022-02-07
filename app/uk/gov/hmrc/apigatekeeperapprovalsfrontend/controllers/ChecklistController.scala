@@ -34,7 +34,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services._
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
@@ -52,7 +51,6 @@ object ChecklistController {
 
 @Singleton
 class ChecklistController @Inject()(
-  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -62,7 +60,7 @@ class ChecklistController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ChecklistController._
 
   private def buildChecklistItemStatuses(review: SubmissionReview, markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
@@ -83,7 +81,7 @@ class ChecklistController @Inject()(
       for {
         review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index)
         itemStatuses = buildChecklistItemStatuses(review, request.markedSubmission)
-      } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses), breadcrumbsUrls))
+      } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
   }
 
   def checklistAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { _ =>

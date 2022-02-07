@@ -35,7 +35,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.Applicatio
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 object ChecksCompletedController {
   case class ViewModel(applicationId: ApplicationId, appName: String)
@@ -43,7 +42,6 @@ object ChecksCompletedController {
 
 @Singleton
 class ChecksCompletedController @Inject()(
-  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -54,24 +52,24 @@ class ChecksCompletedController @Inject()(
   checksCompletedPage: ChecksCompletedPage,
   applicationApprovedPage: ApplicationApprovedPage,
   applicationDeclinedPage: ApplicationDeclinedPage
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
   import ChecksCompletedController._
 
   def checksCompletedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(checksCompletedPage(ViewModel(applicationId, request.application.name), breadcrumbsUrls)))
+    successful(Ok(checksCompletedPage(ViewModel(applicationId, request.application.name))))
   }
 
   def checksCompletedAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
       case Some("passed") => {
         submissionService.grant(applicationId, request.loggedInRequest.name.get).map(_ match {
-          case Right(application)  => Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name), breadcrumbsUrls))
+          case Right(application)  => Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name)))
           case Left(err)           => BadRequest(err) 
         })
       }
       case Some("failed") => {
         submissionService.decline(applicationId, request.loggedInRequest.name.get, "TODO - reason").map(_ match {
-          case Right(application)  => Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name), breadcrumbsUrls))
+          case Right(application)  => Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name)))
           case Left(err)           => BadRequest(err)
         })
       }

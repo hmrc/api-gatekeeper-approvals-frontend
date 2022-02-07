@@ -20,7 +20,6 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 import scala.concurrent.Future
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
@@ -36,13 +35,12 @@ import org.joda.time.DateTime
 
 
 abstract class AbstractCheckController(
-  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
   val errorHandler: ErrorHandler
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions with EitherTHelper[Result] with ApplicationLogger {
+)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions with EitherTHelper[Result] with ApplicationLogger {
 
   type Fn = (SubmissionReview.Status) => (Submission.Id, Int) => Future[Option[SubmissionReview]]
 

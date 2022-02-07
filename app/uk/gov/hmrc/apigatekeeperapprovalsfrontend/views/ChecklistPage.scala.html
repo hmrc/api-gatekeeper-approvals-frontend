@@ -21,9 +21,9 @@
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(model: ViewModel, breadcrumbUrls: CommonBreadcrumbUrls)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@appBreadcrumb = @{Some(ApplicationBreadcrumb(model.applicationId, model.appName))}
+@appBreadcrumb = @{Some(ApplicationBreadcrumbData(model.applicationId, model.appName))}
 
 @checklistTable(headingKey: String, itemStatuses: List[(String, String, String, SubmissionReview.Status)]) = {
     <li>
@@ -64,7 +64,7 @@
     </li>
 }
 
-@layout(pageTitle = Some(messages("checklist.pagetitle")), beforeContent = Some(breadcrumbs(breadcrumbUrls, appBreadcrumb))) {
+@layout(pageTitle = Some(messages("checklist.pagetitle")), beforeContent = Some(breadcrumbs(appBreadcrumb))) {
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
     <h1 class="govuk-heading-l">
         <span class="govuk-caption-l">@model.appName</span>

@@ -20,21 +20,16 @@ import scala.concurrent.ExecutionContext
 
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.{ForbiddenHandler, GatekeeperAuthorisationActions}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.CommonBreadcrumbUrls
 
 abstract class GatekeeperBaseController(
-  config: GatekeeperConfig,
   val strideAuthConfig: StrideAuthConfig,
   val authConnector: AuthConnector,
 
   val forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents
 )(implicit val ec: ExecutionContext) extends FrontendController(mcc) with GatekeeperAuthorisationActions {
-    val breadcrumbsUrls = CommonBreadcrumbUrls(s"${config.gatekeeperBaseUrl}/api-gatekeeper/applications")
-  
 }

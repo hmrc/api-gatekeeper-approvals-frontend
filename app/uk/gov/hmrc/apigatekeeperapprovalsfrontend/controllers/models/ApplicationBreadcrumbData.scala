@@ -18,11 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
-case class CommonBreadcrumbUrls(
-  applicationsPage: String
-)
-
-case class ApplicationBreadcrumb(
+case class ApplicationBreadcrumbData(
   id: ApplicationId,
   applicationName: String
 )

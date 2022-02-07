@@ -14,19 +14,20 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
 
 @this(
-  appConfig: AppConfig
+  config: GatekeeperConfig
 )
-@(breadcrumbUrls: CommonBreadcrumbUrls, applicationBreadcrumb: Option[ApplicationBreadcrumb])(implicit messages: Messages) = {
+
+@(applicationBreadcrumb: Option[ApplicationBreadcrumbData])(implicit messages: Messages) = {
   <div class="govuk-breadcrumbs">
     <ol class="govuk-breadcrumbs__list">
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@{breadcrumbUrls.applicationsPage}">@{messages("breadcrumbs.applications")}</a></li>
+      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href=s"${config.gatekeeperBaseUrl}/api-gatekeeper/applications">@{messages("breadcrumbs.applications")}</a></li>
       @{applicationBreadcrumb match {
         case Some(app)  => {<li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.whichPage(app.id)}">@{app.applicationName}</a></li>}
         case None       => {}
