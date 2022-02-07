@@ -15,21 +15,15 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
-@this(layout: Layout)
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel, breadcrumbUrls: CommonBreadcrumbUrls)(implicit request: Request[_], messages: Messages)
 
-@breadcrumbs = {
-  <div class="govuk-breadcrumbs">
-    <ol class="govuk-breadcrumbs__list">
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.applications")}</a></li>
-    </ol>
-  </div>
-}
+@appBreadcrumb = @{Some(ApplicationBreadcrumb(model.applicationId, model.appName))}
 
-@layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs(breadcrumbUrls, appBreadcrumb))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@{messages("applicationsubmissions.title")}</span>
   <h1 class="govuk-heading-l">

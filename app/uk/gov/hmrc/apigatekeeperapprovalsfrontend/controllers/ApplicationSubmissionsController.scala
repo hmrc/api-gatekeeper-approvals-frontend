@@ -21,7 +21,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{GatekeeperConfig, ErrorHandler}
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
@@ -34,7 +34,6 @@ import play.api.mvc._
 
 
 object ApplicationSubmissionsController {
-  case class Config(gatekeeperBaseUrl: String)
 
   case class CurrentSubmittedInstanceDetails(timestamp: String)
 
@@ -54,7 +53,7 @@ object ApplicationSubmissionsController {
 
 @Singleton
 class ApplicationSubmissionsController @Inject()(
-  config: ApplicationSubmissionsController.Config,
+  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -63,7 +62,7 @@ class ApplicationSubmissionsController @Inject()(
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import ApplicationSubmissionsController._
   import cats.data.OptionT
@@ -111,6 +110,6 @@ class ApplicationSubmissionsController @Inject()(
       else
         None
 
-    successful(Ok(applicationSubmissionsPage(ViewModel(applicationId, appName, gatekeeperApplicationUrl, currentSubmission, declinedSubmissions, grantedInstance))))
+    successful(Ok(applicationSubmissionsPage(ViewModel(applicationId, appName, gatekeeperApplicationUrl, currentSubmission, declinedSubmissions, grantedInstance), breadcrumbsUrls)))
   }
 }

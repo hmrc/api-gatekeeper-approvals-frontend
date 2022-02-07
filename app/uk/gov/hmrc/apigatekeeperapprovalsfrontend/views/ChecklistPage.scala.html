@@ -17,10 +17,13 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController._
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
-@this(layout: Layout)
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel, breadcrumbUrls: CommonBreadcrumbUrls)(implicit request: Request[_], messages: Messages)
+
+@appBreadcrumb = @{Some(ApplicationBreadcrumb(model.applicationId, model.appName))}
 
 @checklistTable(headingKey: String, itemStatuses: List[(String, String, String, SubmissionReview.Status)]) = {
     <li>
@@ -61,16 +64,7 @@
     </li>
 }
 
-@breadcrumbs = {
-    <div class="govuk-breadcrumbs">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
-            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.prodrequests")}</a></li>
-        </ol>
-    </div>
-}
-
-@layout(pageTitle = Some(messages("checklist.pagetitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checklist.pagetitle")), beforeContent = Some(breadcrumbs(breadcrumbUrls, appBreadcrumb))) {
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
     <h1 class="govuk-heading-l">
         <span class="govuk-caption-l">@model.appName</span>

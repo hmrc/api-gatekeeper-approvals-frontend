@@ -4,6 +4,7 @@ service.text = This is your new service
 breadcrumbs.home = Home
 breadcrumbs.prodrequests = Production requests
 breadcrumbs.applications = Applications
+breadcrumbs.back = Back
 
 checklist.title = Complete the checklist
 checklist.pagetitle = HMRC API Gatekeeper - Complete the checklist

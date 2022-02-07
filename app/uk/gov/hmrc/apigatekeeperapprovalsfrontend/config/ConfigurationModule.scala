@@ -25,7 +25,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetricsImpl
 import uk.gov.hmrc.apiplatform.modules.submissions.config.SubmissionsConnectorConfigProvider
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController
 
 class ConfigurationModule extends AbstractModule {
   override def configure() = {
@@ -36,6 +35,6 @@ class ConfigurationModule extends AbstractModule {
     
     bind(classOf[ForbiddenHandler]).to(classOf[HandleForbiddenWithView])
 
-    bind(classOf[ApplicationSubmissionsController.Config]).toProvider(classOf[ApplicationSubmissionsControllerConfigProvider])
+    bind(classOf[GatekeeperConfig]).toProvider(classOf[GatekeeperConfigProvider])
   }
 }

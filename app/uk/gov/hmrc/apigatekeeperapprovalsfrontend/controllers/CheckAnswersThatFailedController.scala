@@ -33,6 +33,7 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import play.api.mvc._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -46,6 +47,7 @@ object CheckAnswersThatFailedController {
 
 @Singleton
 class CheckAnswersThatFailedController @Inject()(
+  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -56,7 +58,7 @@ class CheckAnswersThatFailedController @Inject()(
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
 
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import CheckAnswersThatFailedController._
 

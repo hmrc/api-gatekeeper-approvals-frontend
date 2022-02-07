@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
+@import views.html.helper.CSPNonce
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
-import javax.inject.{Inject, Provider, Singleton}
 
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+@this(
+  appConfig: AppConfig
+)
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController
-
-@Singleton
-class ApplicationSubmissionsControllerConfigProvider @Inject() (config: ServicesConfig) extends Provider[ApplicationSubmissionsController.Config] {
-
-  override def get(): ApplicationSubmissionsController.Config =
-    ApplicationSubmissionsController.Config(
-      config.baseUrl("api-gatekeeper-frontend")
-    )
+@()(implicit messages: Messages) = {
+  <div class="govuk-breadcrumbs">
+    <ol class="govuk-breadcrumbs__list">
+      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="javascript:history.back()">&lt; @{messages("breadcrumbs.back")}</a></li>
+    </ol>
+  </div>
 }

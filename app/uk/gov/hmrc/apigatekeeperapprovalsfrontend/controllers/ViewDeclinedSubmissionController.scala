@@ -21,7 +21,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{GatekeeperConfig, ErrorHandler}
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
@@ -37,6 +37,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Stat
 object ViewDeclinedSubmissionController {
   case class ViewModel(
     appName: String,
+    applicationId: ApplicationId,
     submitterEmail: String,
     submittedOn: String,
     reasons: String
@@ -45,6 +46,7 @@ object ViewDeclinedSubmissionController {
 
 @Singleton
 class ViewDeclinedSubmissionController @Inject()(
+  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -53,7 +55,7 @@ class ViewDeclinedSubmissionController @Inject()(
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import ViewDeclinedSubmissionController._
 
@@ -67,7 +69,7 @@ class ViewDeclinedSubmissionController @Inject()(
       instance => {
         (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
           case (Declined(_, _, reasons), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, requestedBy, timestamp.asText, reasons))))
+            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, reasons), breadcrumbsUrls)))
           case _ => 
             logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
             successful(BadRequest(errorHandler.badRequestTemplate(request)))

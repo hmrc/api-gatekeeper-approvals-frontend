@@ -32,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import cats.data.NonEmptyList
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 object CheckAnswersThatPassedController {  
   case class AnswerDetails(question: String, answer: String)
@@ -41,6 +42,7 @@ object CheckAnswersThatPassedController {
 
 @Singleton
 class CheckAnswersThatPassedController @Inject()(
+  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -50,7 +52,7 @@ class CheckAnswersThatPassedController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(config, strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
 
   import CheckAnswersThatPassedController._
 

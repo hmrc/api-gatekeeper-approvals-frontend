@@ -21,14 +21,16 @@
 
 
 @this(
-  appConfig: AppConfig,
-  hmrcLayout: HmrcLayout
+  appConfig: AppConfig
 )
-@(pageTitle: Option[String] = None, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
-
-@hmrcLayout(
-    pageTitle = pageTitle,
-    beforeContentBlock = beforeContent,
-    nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-)(contentBlock)
+@(breadcrumbUrls: CommonBreadcrumbUrls, applicationBreadcrumb: Option[ApplicationBreadcrumb])(implicit messages: Messages) = {
+  <div class="govuk-breadcrumbs">
+    <ol class="govuk-breadcrumbs__list">
+      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@{breadcrumbUrls.applicationsPage}">@{messages("breadcrumbs.applications")}</a></li>
+      @{applicationBreadcrumb match {
+        case Some(app)  => {<li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.whichPage(app.id)}">@{app.applicationName}</a></li>}
+        case None       => {}
+      }}
+    </ol>
+  </div>
+}
