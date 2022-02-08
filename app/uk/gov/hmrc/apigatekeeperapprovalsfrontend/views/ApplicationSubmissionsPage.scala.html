@@ -43,6 +43,13 @@
     @model.appName
   </h1>
 
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+    @{messages("applicationsubmissions.appdetails")}
+  </h2>
+  <p class="govuk-body">
+    <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
+  </p>
+
   @if(model.currentSubmission.nonEmpty) {
     <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
       @{messages("applicationsubmissions.requestcreds")}
@@ -52,6 +59,19 @@
         <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@model.currentSubmission.get.timestamp</a>
       </li>
     </ul>
+  }
+
+  @if(model.grantedInstance.isDefined) {
+    @defining(model.grantedInstance.get) { instance =>
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+        @{messages("applicationsubmissions.productionaccess")}
+      </h2>
+      <ul class="govuk-list">
+        <li>
+          <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
+        </li>
+      </ul>
+    }
   }
 
   @if(model.declinedInstances.nonEmpty) {
@@ -67,23 +87,4 @@
     </ul>
   }
 
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    @{messages("applicationsubmissions.appdetails")}
-  </h2>
-  <p class="govuk-body">
-    <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
-  </p>
-
-  @if(model.grantedInstance.isDefined) {
-    @defining(model.grantedInstance.get) { instance =>
-      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-        @{messages("applicationsubmissions.termsofuseaccept")}
-      </h2>
-      <ul class="govuk-list">
-        <li>
-          <a href="#" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
-        </li>
-      </ul>
-    }
-  }
 }
