@@ -1,0 +1,45 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.Header
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.En
+
+@this(hmrcHeader: HmrcHeader)
+
+
+@()(implicit messages: Messages)
+
+@navigation = @{
+    Seq(
+        NavigationItem(content = Text("Applications"), href = Some("#")),
+        NavigationItem(content = Text("Developers"), href = Some("#")),
+        NavigationItem(content = Text("Email"), href = Some("#")),
+        NavigationItem(content = Text("API Approvals"), href = Some("#")),
+        NavigationItem(content = Text("XML"), href = Some(uk.gov.hmrc.apigatekeeperxmlservicesfrontend.controllers.routes.OrganisationController.organisationsPage.url)),
+    )
+}
+
+@hmrcHeader(Header(
+    homepageUrl ="https://www.gov.uk",
+    serviceName = Some(messages("service.name")),
+    navigation = Some(navigation),
+    serviceUrl = "",
+    displayHmrcBanner = false,
+    containerClasses = "govuk-width-container",
+    signOutHref = None,
+    language = En
+))

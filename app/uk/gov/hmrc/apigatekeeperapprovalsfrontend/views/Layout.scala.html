@@ -14,21 +14,26 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{GatekeeperConfig,AppConfig}
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
-
 @this(
   appConfig: AppConfig,
-  hmrcLayout: HmrcLayout
+  gatekeeperConfig: GatekeeperConfig,
+  govukLayout: GovukLayout,
+  siteHeader: SiteHeader,
+  headerNavLinks: HeaderNavLinks
 )
+
 @(pageTitle: Option[String] = None, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
-@hmrcLayout(
+@govukLayout(
     pageTitle = pageTitle,
+    headerBlock = Some(siteHeader())
     beforeContentBlock = beforeContent,
-    nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+    cspNonce = CSPNonce.get,
+    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+    additionalBannersBlock = Some(headerNavLinks(StaticNavLinks.build(gatekeeperConfig)))
 )(contentBlock)

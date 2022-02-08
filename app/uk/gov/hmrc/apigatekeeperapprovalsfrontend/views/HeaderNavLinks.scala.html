@@ -15,14 +15,20 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.NavLink
+
+@this()
+
 @(navLinks: Seq[NavLink], anchorClass: Option[String] = None)(implicit messages: Messages)
 
-@for(link <- navLinks) {
-<li @if(link == navLinks.last) {class="hard--right"}>
-   @if(link.href.isDefined) {
-      <a class="align--middle inline-block @anchorClass.getOrElse("")" href="@{link.href}">@{messages(link.label)}</a>
-   } else {
-      <span class="align--middle inline-block">@{messages(link.label)}</span>
-   }
-</li>
-}
+<div class="govuk-width-container">
+  @for(link <- navLinks) {
+  <li @if(link == navLinks.last) {class="hard--right"}>
+    @if(link.href.isDefined) {
+        <a class="align--middle inline-block @anchorClass.getOrElse("")" href="@{link.href}">@{messages(link.label)}</a>
+    } else {
+        <span class="align--middle inline-block">@{messages(link.label)}</span>
+    }
+
+  </li>
+  }
+</div>
