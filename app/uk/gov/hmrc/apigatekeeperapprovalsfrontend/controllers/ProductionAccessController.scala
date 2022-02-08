@@ -38,7 +38,7 @@ object ProductionAccessController {
   case class ViewModel(
     appName: String,
     submitterEmail: String,
-    submittedOn: String,
+    submittedOn: String
   )
 }
 
