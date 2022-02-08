@@ -14,26 +14,28 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.Header
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.En
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
-@this(hmrcHeader: HmrcHeader)
-
+@this(
+  hmrcHeader: HmrcHeader,
+  gatekeeperConfig: GatekeeperConfig
+)
 
 @()(implicit messages: Messages)
 
 @navigation = @{
-    Seq(
-        NavigationItem(content = Text("Applications"), href = Some("#")),
-        NavigationItem(content = Text("Developers"), href = Some("#")),
-        NavigationItem(content = Text("Email"), href = Some("#")),
-        NavigationItem(content = Text("API Approvals"), href = Some("#")),
-        NavigationItem(content = Text("XML"), href = Some(uk.gov.hmrc.apigatekeeperxmlservicesfrontend.controllers.routes.OrganisationController.organisationsPage.url)),
-    )
+  Seq(
+    NavigationItem(content = Text("Applications"), href = Some(gatekeeperConfig.applicationsPageUri)),
+    NavigationItem(content = Text("Developers"), href = Some(gatekeeperConfig.developersPageUri)),
+    NavigationItem(content = Text("Email"), href = Some(gatekeeperConfig.emailsPageUri)),
+    NavigationItem(content = Text("API Approvals"), href = Some(gatekeeperConfig.pendingUri))
+  )
 }
 
-@hmrcHeader(Header(
+@hmrcHeader(
+  Header(
     homepageUrl ="https://www.gov.uk",
     serviceName = Some(messages("service.name")),
     navigation = Some(navigation),
@@ -42,4 +44,5 @@
     containerClasses = "govuk-width-container",
     signOutHref = None,
     language = En
-))
+  )
+)
