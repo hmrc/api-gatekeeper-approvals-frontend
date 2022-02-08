@@ -134,7 +134,7 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
   }
 
   "POST /" should {
-    "return 200" in new Setup {
+    "return 200 and send to checks completed page if Checks Completed button is clicked" in new Setup {
       val appId = ApplicationId.random
       val application = Application(appId, "app name")
       val fakeRequest = FakeRequest().withCSRFToken
@@ -146,6 +146,36 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
 
       val result = controller.checklistAction(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/checks-completed")
+    }
+
+    "return 200 and send to submissions page if Save and Come Back Later button is clicked" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest().withCSRFToken
+            .withFormUrlEncodedBody("submit-action" -> "come-back-later")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
+      val result = controller.checklistAction(appId)(fakeRequest)
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/reviews")
+    }
+
+    "return 400 if bad submission action is received" in new Setup {
+      val appId = ApplicationId.random
+      val application = Application(appId, "app name")
+      val fakeRequest = FakeRequest().withCSRFToken
+            .withFormUrlEncodedBody("submit-action" -> "nope")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+
+      val result = controller.checklistAction(appId)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 }
