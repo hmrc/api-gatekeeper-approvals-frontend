@@ -31,6 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import scala.concurrent.Future.successful
 import play.api.mvc._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 
 
 object SubmittedAnswersController {  
@@ -57,8 +58,10 @@ class SubmittedAnswersController @Inject()(
   def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
     val appName = request.application.name
+    val instance = request.submission.instances.toList(index)
     val questionAnswerGroups = request.markedSubmission.submission.groups.flatMap(_.links).map(link => {
-      (link.label.value -> link.questions.map(questionItem => (questionItem.question.wording.value, "OK")).toList)
+      (link.label.value -> link.questions.map(questionItem => 
+        (questionItem.question.wording.value, ActualAnswersAsText(instance.answersToQuestions.getOrElse(questionItem.question.id, NoAnswer)))).toList)
     }).toList.toMap
 
     successful(Ok(submittedAnswersPage(ViewModel(appName, questionAnswerGroups))))
