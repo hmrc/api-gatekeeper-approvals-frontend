@@ -30,5 +30,29 @@
 }
 
 @layout(pageTitle = Some(messages("submittedanswers.pagetitle")), beforeContent = Some(breadcrumbs)) {
-  hello
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <h1 class="govuk-heading-l">
+      <span class="govuk-caption-l">@model.appName</span>
+      @{messages("submittedanswers.title")}
+  </h1>
+
+  @for((heading, questionsAndAnswers) <- model.questionAnswerGroups.toSeq) {
+    <h3 class="govuk-heading-m">
+      @{heading}
+    </h3>
+    <table class="govuk-table">
+      <tbody>
+        @for(qa <- questionsAndAnswers) {
+          <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                  @{qa._1}
+              </td>
+              <td class="govuk-table__cell align-right">
+                @{qa._2}
+              </td>
+          </tr>
+        }
+      </tbody>
+    </table>    
+  }
 }

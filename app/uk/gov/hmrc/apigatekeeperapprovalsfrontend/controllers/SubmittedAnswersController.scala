@@ -33,9 +33,10 @@ import play.api.mvc._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 
 
-object SubmittedAnswersController {
+object SubmittedAnswersController {  
   case class ViewModel(
-    appName: String
+    appName: String,
+    questionAnswerGroups: Map[String,List[(String,String)]]
   )
 }
 
@@ -56,7 +57,10 @@ class SubmittedAnswersController @Inject()(
   def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
     val appName = request.application.name
+    val questionAnswerGroups = request.markedSubmission.submission.groups.flatMap(_.links).map(link => {
+      (link.label.value -> link.questions.map(questionItem => (questionItem.question.wording.value, "OK")).toList)
+    }).toList.toMap
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, questionAnswerGroups))))
   }
 }

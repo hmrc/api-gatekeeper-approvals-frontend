@@ -100,4 +100,5 @@ viewdeclinedsubmissions.declinedreason = Reasons the request was declined
 viewdeclinedsubmissions.submittedanswers = All submitted answers
 viewdeclinedsubmissions.checkanswers = Check answers
 
-submittedanswers.pagetitle = Submitted answers
+submittedanswers.pagetitle = HMRC API Gatekeeper - Submitted answers
+submittedanswers.title = Submitted answers
