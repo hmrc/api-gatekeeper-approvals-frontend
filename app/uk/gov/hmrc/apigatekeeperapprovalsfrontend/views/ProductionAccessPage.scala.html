@@ -52,6 +52,6 @@
     @{messages("productionaccess.submittedanswers")}
   </h2>
   <p class="govuk-body">
-    <a href="submitted-answers" class="govuk-link govuk-link--no-visited-state">@{messages("productionaccess.checkanswers")}</a>
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.SubmittedAnswersController.page(model.applicationId, model.index)}" class="govuk-link govuk-link--no-visited-state">@{messages("productionaccess.checkanswers")}</a>
   </p>
 }
