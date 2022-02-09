@@ -37,6 +37,8 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswers
 object SubmittedAnswersController {  
   case class ViewModel(
     appName: String,
+    applicationId: ApplicationId,
+    index: Int,
     questionAnswerGroups: Map[String,List[(String,String)]]
   )
 }
@@ -55,15 +57,21 @@ class SubmittedAnswersController @Inject()(
   
   import SubmittedAnswersController._
 
+  
   def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-
     val appName = request.application.name
     val instance = request.submission.instances.toList(index)
-    val questionAnswerGroups = request.markedSubmission.submission.groups.flatMap(_.links).map(link => {
-      (link.label.value -> link.questions.map(questionItem => 
-        (questionItem.question.wording.value, ActualAnswersAsText(instance.answersToQuestions.getOrElse(questionItem.question.id, NoAnswer)))).toList)
+    val links = request.markedSubmission.submission.groups.flatMap(_.links)
+
+    def getActualAnswer(questionItem: QuestionItem) = instance.answersToQuestions.getOrElse(questionItem.question.id, NoAnswer)
+    
+    val questionAnswerGroups: Map[String, List[(String,String)]] = links.map(link => {      
+      (link.label.value -> link.questions.map(questionItem => (questionItem.question.wording.value, getActualAnswer(questionItem))).filterNot(t => t._2 match {
+        case NoAnswer => true
+        case _ => false
+      }).map(t => (t._1, ActualAnswersAsText(t._2))).toList)
     }).toList.toMap
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, questionAnswerGroups))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, questionAnswerGroups))))
   }
 }
