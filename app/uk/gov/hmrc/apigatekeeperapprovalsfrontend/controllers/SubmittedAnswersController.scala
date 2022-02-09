@@ -39,7 +39,8 @@ object SubmittedAnswersController {
     appName: String,
     applicationId: ApplicationId,
     index: Int,
-    questionAnswerGroups: Map[String,List[(String,String)]]
+    questionAnswerGroups: Map[String,List[(String,String)]],
+    isGranted: Boolean
   )
 }
 
@@ -72,6 +73,6 @@ class SubmittedAnswersController @Inject()(
       }).map(t => (t._1, ActualAnswersAsText(t._2))).toList)
     }).toList.toMap
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, questionAnswerGroups))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, questionAnswerGroups, instance.isGranted))))
   }
 }

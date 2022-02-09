@@ -56,5 +56,10 @@
     </table>    
   }
 
-  <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, model.index)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
+  @if(model.isGranted) {
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, model.index)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
+  } else {
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, model.index)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
+  }
+  
 }
