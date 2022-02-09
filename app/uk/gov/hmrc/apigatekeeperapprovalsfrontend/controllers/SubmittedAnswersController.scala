@@ -24,57 +24,44 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
 import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers
 
 
-object ViewDeclinedSubmissionController {
+object SubmittedAnswersController {  
   case class ViewModel(
     appName: String,
     applicationId: ApplicationId,
-    submitterEmail: String,
-    submittedOn: String,
-    reasons: String,
-    index: Int
+    index: Int,
+    questionAnswerGroups: List[QuestionAndAnswerGroup],
+    isGranted: Boolean
   )
 }
 
 @Singleton
-class ViewDeclinedSubmissionController @Inject()(
+class SubmittedAnswersController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
+  submittedAnswersPage: SubmittedAnswersPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
-  import ViewDeclinedSubmissionController._
+  import SubmittedAnswersController._
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-
+  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
     val appName = request.application.name
+    val instance = request.submission.instances.toList(index)
 
-    request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
-      successful(BadRequest(errorHandler.badRequestTemplate(request)))
-    )(
-      instance => {
-        (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-          case (Declined(_, _, reasons), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, reasons, instance.index))))
-          case _ => 
-            logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
-            successful(BadRequest(errorHandler.badRequestTemplate(request)))
-        }
-    })
-    
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(request.submission, index), instance.isGranted))))
   }
 }

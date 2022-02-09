@@ -23,4 +23,6 @@ POST       /applications/:id/checks-completed               uk.gov.hmrc.apigatek
 GET        /applications/:id/view-declined/:index           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ViewDeclinedSubmissionController.page(id: ApplicationId, index: Int)
 GET        /applications/:id/production-access              uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ProductionAccessController.page(id: ApplicationId)
 
+GET        /applications/:id/submitted-answers/:index       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SubmittedAnswersController.page(id: ApplicationId, index: Int)
+
 GET        /assets/*file                                    controllers.Assets.versioned(path = "/public", file: Asset)

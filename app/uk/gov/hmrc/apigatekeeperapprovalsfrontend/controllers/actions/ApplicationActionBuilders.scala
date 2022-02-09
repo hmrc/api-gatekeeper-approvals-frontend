@@ -30,6 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
 import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
+import scala.concurrent.Future.successful
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -69,7 +70,17 @@ trait ApplicationActionBuilders {
       }
     }
 
-}
+    def submissionInstanceRefiner(index: Int)(implicit ec: ExecutionContext): ActionFilter[MarkedSubmissionApplicationRequest] =
+      new ActionFilter[MarkedSubmissionApplicationRequest] {
+        override def executionContext = ec
+        override protected def filter[A](request: MarkedSubmissionApplicationRequest[A]): Future[Option[Result]] = {
+          successful(request.submission.instances.find(_.index == index) match {
+            case None => Some(BadRequest(s"No submission with index $index found for application"))
+            case _ => None
+          })
+        }
+      }
+  }
 
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -93,10 +104,24 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
+  private def strideRoleWithApplicationAndSubmissionAndInstance(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId, index: Int)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      (
+        gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
+        applicationRequestRefiner(applicationId) andThen
+        applicationSubmissionRefiner andThen 
+        submissionInstanceRefiner(index)
+      )
+      .invokeBlock(request, block)
+    }
+
   def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplication(GatekeeperRole.USER)(applicationId)(block)
 
   def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
+
+  def loggedInWithApplicationAndSubmissionAndInstance(applicationId: ApplicationId, index: Int)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    strideRoleWithApplicationAndSubmissionAndInstance(GatekeeperRole.USER)(applicationId, index)(block)
 
 }
