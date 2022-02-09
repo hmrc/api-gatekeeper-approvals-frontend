@@ -17,21 +17,11 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController._
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-@this(layout: Layout)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-
-@breadcrumbs = {
-  <div class="govuk-breadcrumbs">
-    <ol class="govuk-breadcrumbs__list">
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.prodrequests")}</a></li>
-    </ol>
-  </div>
-}
-
-@layout(pageTitle = Some(messages("checkurls.pagetitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("checkurls.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
 

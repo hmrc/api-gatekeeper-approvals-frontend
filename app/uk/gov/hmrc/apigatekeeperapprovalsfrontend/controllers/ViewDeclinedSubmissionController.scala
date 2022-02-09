@@ -37,6 +37,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Stat
 object ViewDeclinedSubmissionController {
   case class ViewModel(
     appName: String,
+    applicationId: ApplicationId,
     submitterEmail: String,
     submittedOn: String,
     reasons: String
@@ -67,7 +68,7 @@ class ViewDeclinedSubmissionController @Inject()(
       instance => {
         (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
           case (Declined(_, _, reasons), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, requestedBy, timestamp.asText, reasons))))
+            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, reasons))))
           case _ => 
             logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
             successful(BadRequest(errorHandler.badRequestTemplate(request)))
