@@ -36,19 +36,19 @@
       @{messages("submittedanswers.title")}
   </h1>
 
-  @for((heading, questionsAndAnswers) <- model.questionAnswerGroups.toSeq) {
+  @for(group <- model.questionAnswerGroups) {
     <h3 class="govuk-heading-m">
-      @{heading}
+      @{group.heading}
     </h3>
     <table class="govuk-table">
       <tbody>
-        @for(qa <- questionsAndAnswers) {
+        @for(questionAndAnswer <- group.questionsAndAnswers) {
           <tr class="govuk-table__row">
               <td class="govuk-table__cell">
-                  @{qa._1}
+                  @{questionAndAnswer.question}
               </td>
               <td class="govuk-table__cell align-right">
-                @{qa._2}
+                @{questionAndAnswer.answer}
               </td>
           </tr>
         }

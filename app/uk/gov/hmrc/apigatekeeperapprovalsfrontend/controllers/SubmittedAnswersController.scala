@@ -32,6 +32,8 @@ import scala.concurrent.Future.successful
 import play.api.mvc._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers
 
 
 object SubmittedAnswersController {  
@@ -39,7 +41,7 @@ object SubmittedAnswersController {
     appName: String,
     applicationId: ApplicationId,
     index: Int,
-    questionAnswerGroups: Map[String,List[(String,String)]],
+    questionAnswerGroups: List[QuestionAndAnswerGroup],
     isGranted: Boolean
   )
 }
@@ -58,21 +60,10 @@ class SubmittedAnswersController @Inject()(
   
   import SubmittedAnswersController._
 
-  
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
     val appName = request.application.name
     val instance = request.submission.instances.toList(index)
-    val links = request.markedSubmission.submission.groups.flatMap(_.links)
 
-    def getActualAnswer(questionItem: QuestionItem) = instance.answersToQuestions.getOrElse(questionItem.question.id, NoAnswer)
-    
-    val questionAnswerGroups: Map[String, List[(String,String)]] = links.map(link => {      
-      (link.label.value -> link.questions.map(questionItem => (questionItem.question.wording.value, getActualAnswer(questionItem))).filterNot(t => t._2 match {
-        case NoAnswer => true
-        case _ => false
-      }).map(t => (t._1, ActualAnswersAsText(t._2))).toList)
-    }).toList.toMap
-
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, questionAnswerGroups, instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(request.submission, index), instance.isGranted))))
   }
 }
