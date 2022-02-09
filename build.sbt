@@ -12,6 +12,14 @@ lazy val microservice = Project(appName, file("."))
     pipelineStages in Assets := Seq(gzip)
   )
   .settings(
+    TwirlKeys.templateImports ++= Seq(
+      "views.html.helper.CSPNonce",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
+    )
+  )
+  .settings(
     ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
     ThisBuild / semanticdbEnabled := true,
     ThisBuild / semanticdbVersion := scalafixSemanticdb.revision

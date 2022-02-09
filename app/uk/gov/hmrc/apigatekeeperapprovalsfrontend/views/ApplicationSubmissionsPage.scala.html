@@ -15,33 +15,32 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
-@this(layout: Layout)
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@breadcrumbs = {
-  <div class="govuk-breadcrumbs">
-    <ol class="govuk-breadcrumbs__list">
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.home")}</a></li>
-      <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="#">@{messages("breadcrumbs.applications")}</a></li>
-    </ol>
-  </div>
-}
-
 @titleText = @{
-  if(model.grantedInstance.isDefined) 
-    messages("applicationsubmissions.alttitle") 
+  if(model.grantedInstance.isDefined)
+    messages("applicationsubmissions.alttitle")
   else
     messages("applicationsubmissions.title")
 }
 
-@layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs)) {
+@layout(pageTitle = Some(messages("applicationsubmissions.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@titleText</span>
   <h1 class="govuk-heading-l">
     @model.appName
   </h1>
+
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+    @{messages("applicationsubmissions.appdetails")}
+  </h2>
+  <p class="govuk-body">
+    <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
+  </p>
 
   @if(model.currentSubmission.nonEmpty) {
     <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
@@ -52,6 +51,19 @@
         <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@model.currentSubmission.get.timestamp</a>
       </li>
     </ul>
+  }
+
+  @if(model.grantedInstance.isDefined) {
+    @defining(model.grantedInstance.get) { instance =>
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+        @{messages("applicationsubmissions.productionaccess")}
+      </h2>
+      <ul class="govuk-list">
+        <li>
+          <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
+        </li>
+      </ul>
+    }
   }
 
   @if(model.declinedInstances.nonEmpty) {
@@ -67,23 +79,4 @@
     </ul>
   }
 
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    @{messages("applicationsubmissions.appdetails")}
-  </h2>
-  <p class="govuk-body">
-    <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
-  </p>
-
-  @if(model.grantedInstance.isDefined) {
-    @defining(model.grantedInstance.get) { instance =>
-      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-        @{messages("applicationsubmissions.termsofuseaccept")}
-      </h2>
-      <ul class="govuk-list">
-        <li>
-          <a href="#" class="govuk-link govuk-link--no-visited-state">@instance.timestamp</a>
-        </li>
-      </ul>
-    }
-  }
 }

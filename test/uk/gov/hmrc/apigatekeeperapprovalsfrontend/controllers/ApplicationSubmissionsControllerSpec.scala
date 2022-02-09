@@ -35,6 +35,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 
 class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
@@ -56,7 +57,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
         
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
-    val config = app.injector.instanceOf[ApplicationSubmissionsController.Config]
+    val config = app.injector.instanceOf[GatekeeperConfig]
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]

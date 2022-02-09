@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ViewDeclinedSubmissionController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ProductionAccessController._
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
@@ -23,19 +23,16 @@
 
 @appBreadcrumb = @{Some(ApplicationBreadcrumbData(model.applicationId, model.appName))}
 
-@layout(pageTitle = Some(messages("viewdeclinedsubmissions.pagetitle")), beforeContent = Some(breadcrumbs(appBreadcrumb))) {
+@layout(pageTitle = Some(messages("productionaccess.pagetitle")), beforeContent = Some(breadcrumbs(appBreadcrumb))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
   <h1 class="govuk-heading-l">
-    @{messages("viewdeclinedsubmissions.pageheading")}
+    @{messages("productionaccess.pageheading")}
   </h1>
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    @{messages("viewdeclinedsubmissions.submittedby")}
-  </h2>
   <dl class="govuk-summary-list govuk-!-margin-bottom-7">
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        @{messages("viewdeclinedsubmissions.emailaddress")}
+        @{messages("productionaccess.requestedby")}
       </dt>
       <dd class="govuk-summary-list__value">
         <p class="govuk-body">@model.submitterEmail</p>
@@ -43,23 +40,18 @@
     </div>
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        @{messages("viewdeclinedsubmissions.date")}
+        @{messages("productionaccess.date")}
       </dt>
       <dd class="govuk-summary-list__value">
         <p class="govuk-body">@model.submittedOn</p>
       </dd>
     </div>
   </dl>
+
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    @{messages("viewdeclinedsubmissions.declinedreason")}
-  </h2>
-  <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
-    <p class="govuk-body">@model.reasons</p>
-  </div>
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    @{messages("viewdeclinedsubmissions.submittedanswers")}
+    @{messages("productionaccess.submittedanswers")}
   </h2>
   <p class="govuk-body">
-    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.SubmittedAnswersController.page(model.applicationId, model.index)}" class="govuk-link govuk-link--no-visited-state">@{messages("viewdeclinedsubmissions.checkanswers")}</a>
+    <a href="submitted-answers" class="govuk-link govuk-link--no-visited-state">@{messages("productionaccess.checkanswers")}</a>
   </p>
 }

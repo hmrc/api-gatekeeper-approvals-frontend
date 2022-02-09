@@ -20,7 +20,6 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import scala.concurrent.ExecutionContext
-
 import scala.concurrent.Future
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController

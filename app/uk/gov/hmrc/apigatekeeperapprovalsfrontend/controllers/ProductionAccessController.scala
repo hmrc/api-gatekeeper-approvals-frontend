@@ -24,57 +24,51 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
 import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Granted
 
 
-object ViewDeclinedSubmissionController {
+object ProductionAccessController {
   case class ViewModel(
     appName: String,
     applicationId: ApplicationId,
     submitterEmail: String,
-    submittedOn: String,
-    reasons: String,
-    index: Int
+    submittedOn: String
   )
 }
 
 @Singleton
-class ViewDeclinedSubmissionController @Inject()(
+class ProductionAccessController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
+  productionAccessPage: ProductionAccessPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
-  import ViewDeclinedSubmissionController._
+  import ProductionAccessController._
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
     val appName = request.application.name
+    val instance = request.markedSubmission.submission.latestInstance
 
-    request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
-      successful(BadRequest(errorHandler.badRequestTemplate(request)))
-    )(
-      instance => {
-        (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-          case (Declined(_, _, reasons), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, reasons, instance.index))))
-          case _ => 
-            logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
-            successful(BadRequest(errorHandler.badRequestTemplate(request)))
-        }
-    })
+    (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
+      case (Granted(_, _), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
+        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText))))
+      case _ => 
+        logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
+        successful(BadRequest(errorHandler.badRequestTemplate(request)))
+    }
     
   }
 }

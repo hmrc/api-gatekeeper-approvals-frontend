@@ -1,9 +1,15 @@
 service.name = HMRC API Gatekeeper
 service.text = This is your new service
 
+topnav.applications = Applications
+topnav.developers = Developers
+topnav.emails = Emails
+topnav.apiapprovals = API Approvals
+
 breadcrumbs.home = Home
 breadcrumbs.prodrequests = Production requests
 breadcrumbs.applications = Applications
+breadcrumbs.back = Back
 
 checklist.title = Complete the checklist
 checklist.pagetitle = HMRC API Gatekeeper - Complete the checklist
@@ -89,7 +95,7 @@ applicationsubmissions.requestcreds = Request for credentials
 applicationsubmissions.declinedrequests = Declined requests for credentials
 applicationsubmissions.appdetails = Application details
 applicationsubmissions.reviewormanage = Review or manage application details
-applicationsubmissions.termsofuseaccept = Terms of use acceptance
+applicationsubmissions.productionaccess = Production access
 
 viewdeclinedsubmissions.pagetitle = HMRC API Gatekeeper - Declined request
 viewdeclinedsubmissions.pageheading = Declined request
@@ -100,6 +106,15 @@ viewdeclinedsubmissions.declinedreason = Reasons the request was declined
 viewdeclinedsubmissions.submittedanswers = All submitted answers
 viewdeclinedsubmissions.checkanswers = Check answers
 
+
 submittedanswers.pagetitle = HMRC API Gatekeeper - Submitted answers
 submittedanswers.title = Submitted answers
 submittedanswers.continue = Continue
+
+productionaccess.pagetitle = HMRC API Gatekeeper - Production Access
+productionaccess.pageheading = Production Access
+productionaccess.requestedby = Requested by
+productionaccess.date = Date
+productionaccess.submittedanswers = All submitted answers
+productionaccess.checkanswers = Check answers
+

@@ -21,7 +21,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{GatekeeperConfig, ErrorHandler}
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
@@ -34,7 +34,6 @@ import play.api.mvc._
 
 
 object ApplicationSubmissionsController {
-  case class Config(gatekeeperBaseUrl: String)
 
   case class CurrentSubmittedInstanceDetails(timestamp: String)
 
@@ -54,7 +53,7 @@ object ApplicationSubmissionsController {
 
 @Singleton
 class ApplicationSubmissionsController @Inject()(
-  config: ApplicationSubmissionsController.Config,
+  config: GatekeeperConfig,
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -69,10 +68,8 @@ class ApplicationSubmissionsController @Inject()(
   import cats.data.OptionT
   import cats.implicits._
 
-  val serviceBaseUrl = s"${config.gatekeeperBaseUrl}/api-gatekeeper"
-
   def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"$serviceBaseUrl/applications/${applicationId.value}"
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission => submission.instances.find(i => i.isSubmitted || i.isGranted || i.isDeclined).nonEmpty
 
@@ -91,7 +88,7 @@ class ApplicationSubmissionsController @Inject()(
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
-    val gatekeeperApplicationUrl = s"$serviceBaseUrl/applications/${applicationId.value}"
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     val latestInstance = request.markedSubmission.submission.latestInstance
     val latestInstanceStatus = latestInstance.statusHistory.head
