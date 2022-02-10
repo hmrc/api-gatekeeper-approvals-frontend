@@ -31,6 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.SubmissionInstanceApplicationRequest
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -70,17 +71,18 @@ trait ApplicationActionBuilders {
       }
     }
 
-    def submissionInstanceRefiner(index: Int)(implicit ec: ExecutionContext): ActionFilter[MarkedSubmissionApplicationRequest] =
-      new ActionFilter[MarkedSubmissionApplicationRequest] {
+    def submissionInstanceRefiner(index: Int)(implicit ec: ExecutionContext): ActionRefiner[MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest] =
+      new ActionRefiner[MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest] {
         override def executionContext = ec
-        override protected def filter[A](request: MarkedSubmissionApplicationRequest[A]): Future[Option[Result]] = {
+        
+        override def refine[A](request: MarkedSubmissionApplicationRequest[A]): Future[Either[Result, SubmissionInstanceApplicationRequest[A]]] = {          
           successful(request.submission.instances.find(_.index == index) match {
-            case None => Some(BadRequest(s"No submission with index $index found for application"))
-            case _ => None
+            case Some(instance) => Right(new SubmissionInstanceApplicationRequest(request.markedSubmission, instance, request))
+            case None => Left(BadRequest(s"No submission with index $index found for application"))
           })
         }
       }
-  }
+    }
 
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -104,7 +106,7 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
-  private def strideRoleWithApplicationAndSubmissionAndInstance(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId, index: Int)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  private def strideRoleWithApplicationAndSubmissionAndInstance(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
@@ -121,7 +123,7 @@ trait ApplicationActions extends ApplicationActionBuilders {
   def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
 
-  def loggedInWithApplicationAndSubmissionAndInstance(applicationId: ApplicationId, index: Int)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  def loggedInWithApplicationAndSubmissionAndInstance(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmissionAndInstance(GatekeeperRole.USER)(applicationId, index)(block)
 
 }
