@@ -60,8 +60,9 @@ class SubmittedAnswersController @Inject()(
 
   def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
     val appName = request.application.name
-    val instance = request.submission.instances.toList(index)
+    val submission = request.submission
+    val instance = request.instance
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(request.submission, index), instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, index), instance.isGranted))))
   }
 }
