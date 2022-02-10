@@ -31,10 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import scala.concurrent.Future.successful
-<<<<<<< HEAD
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.SubmissionInstanceApplicationRequest
-=======
->>>>>>> main
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
