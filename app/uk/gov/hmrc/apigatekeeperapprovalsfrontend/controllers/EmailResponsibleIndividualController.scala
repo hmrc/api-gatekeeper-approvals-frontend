@@ -26,43 +26,48 @@ import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.EmailResponsibleIndividualPage
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ResponsibleIndividualExtractor
 
-object CheckUrlsController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String], privacyPolicyUrl: Option[String], termsAndConditionsUrl: Option[String]) {
-    lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
-    lazy val hasPrivacyPolicyUrl: Boolean = privacyPolicyUrl.isDefined
-    lazy val hasTermsAndConditionsUrl: Boolean = termsAndConditionsUrl.isDefined
+case class ResponsibleIndividual(fullName: String, emailAddress: String)
+
+object EmailResponsibleIndividualController {  
+  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: ResponsibleIndividual, verificationLink: String) {
   }
 }
 
 @Singleton
-class CheckUrlsController @Inject()(
+class EmailResponsibleIndividualController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  checkUrlsPage: CheckUrlsPage,
+  emailResponsibleIndividualPage: EmailResponsibleIndividualPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
-  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    request.application.access match {
-      // Should only be uplifting and checking Standard apps
-      case std: Standard => 
+
+  import EmailResponsibleIndividualController._
+
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    val ori = ResponsibleIndividualExtractor(request.submission)
+
+    // Should only be uplifting and checking Standard apps
+    (request.application.access, ori) match {
+      case (std: Standard, Some(ri)) if(request.submission.isSubmitted) => 
         successful(
           Ok(
-            checkUrlsPage(
-              CheckUrlsController.ViewModel(
-                request.application.name, applicationId,
-                std.organisationUrl, 
-                std.privacyPolicyUrl, 
-                std.termsAndConditionsUrl
+            emailResponsibleIndividualPage(
+              ViewModel(
+                request.application.name,
+                applicationId,
+                ResponsibleIndividual(ri.fullName, ri.emailAddress),
+                "http://somedevhub/link"
               )
             )
           )
@@ -71,6 +76,7 @@ class CheckUrlsController @Inject()(
     }
   }
 
-  def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] = 
-    updateReviewAction("checkUrlsAction", submissionReviewService.updateCheckedUrlsStatus _)(applicationId)
+  def action(applicationId: ApplicationId): Action[AnyContent] = 
+    updateReviewAction("emailResponsibleIndividualAction", submissionReviewService.updateEmailedResponsibleIndividualStatus _)(applicationId)
+
 }

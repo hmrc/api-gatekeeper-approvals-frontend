@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
+
 import org.joda.time.DateTime
 import java.util.UUID
 import cats.data.NonEmptyList
@@ -45,7 +46,14 @@ object QuestionnaireState {
 case class QuestionnaireProgress(state: QuestionnaireState, questionsToAsk: List[QuestionId])
 
 
-case class QuestionIdsOfInterest(applicationNameId: QuestionId, privacyPolicyUrlId: QuestionId, termsAndConditionsUrlId: QuestionId, organisationUrlId: QuestionId)
+case class QuestionIdsOfInterest(
+    applicationNameId: QuestionId,
+    privacyPolicyUrlId: QuestionId,
+    termsAndConditionsUrlId: QuestionId,
+    organisationUrlId: QuestionId,
+    responsibleIndividualNameId: QuestionId,
+    responsibleIndividualEmailId: QuestionId
+)
 
 object Submission {
   type AnswersToQuestions = Map[QuestionId, ActualAnswer]
@@ -77,7 +85,7 @@ object Submission {
       case _ : Submission.Status.Granted => true
       case _ => false      
     }
-
+  
     def isDeclined = this match {
       case _ : Submission.Status.Declined => true
       case _ => false      
@@ -90,7 +98,7 @@ object Submission {
       name: String,
       reasons: String
     ) extends Status
-
+    
     case class Granted(
       timestamp: DateTime,
       name: String
@@ -105,6 +113,14 @@ object Submission {
       timestamp: DateTime,
       requestedBy: String
     ) extends Status
+
+    def isLegalTransition(from: Submission.Status, to: Submission.Status): Boolean = (from, to) match {
+      case (c: Created,   s: Submitted) => true
+      case (s: Submitted, d: Declined)  => true
+      case (s: Submitted, g: Granted)   => true
+      case _                            => false
+    }
+
   }
 
   case class Instance(
@@ -147,7 +163,11 @@ case class Submission(
   lazy val isOpenToAnswers = latestInstance.isOpenToAnswers
   
   lazy val status: Submission.Status = latestInstance.statusHistory.head
-
+  lazy val isCreated = status.isCreated
+  lazy val isGranted = status.isGranted
+  lazy val isDeclined = status.isDeclined
+  lazy val isSubmitted = status.isSubmitted
+  
   def setLatestAnswers(answers: Submission.AnswersToQuestions): Submission = {
     val newLatest = latestInstance.copy(answersToQuestions = answers)
     this.copy(instances = NonEmptyList.of(newLatest, this.instances.tail: _*))
@@ -166,6 +186,7 @@ case class ExtendedSubmission(
 
   lazy val isOpenToAnswers = submission.isOpenToAnswers
   lazy val canBeSubmitted = isOpenToAnswers && isCompleted
+  lazy val status: Submission.Status = submission.status
 }
 
 case class MarkedSubmission(
