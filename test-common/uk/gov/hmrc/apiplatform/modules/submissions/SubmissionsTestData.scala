@@ -80,6 +80,41 @@ trait QuestionnaireTestData {
   }
     
   object OrganisationDetails {
+      val questionRI1 = TextQuestion(
+        QuestionId("36b7e670-83fc-4b31-8f85-4d3394908495"),
+        Wording("What is the name of your responsible individual"),
+        
+        Statement(
+          List(
+            StatementText("The responsible individual:"),
+            CompoundFragment(
+              StatementText("ensures your software meets our "),
+              StatementLink("terms of use", "/api-documentation/docs/terms-of-use")
+            ),
+            CompoundFragment(
+              StatementText("understands the "),
+              StatementLink("consequences of not meeting the terms of use", "/api-documentation/docs/terms-of-use")
+            )
+          )
+        )
+      )
+      val questionRI2 = TextQuestion(
+        QuestionId("fb9b8036-cc88-4f4e-ad84-c02caa4cebae"),
+        Wording("What is the email address of your responsible individual"),
+        Statement(
+          List(
+            StatementText("The responsible individual:"),
+            CompoundFragment(
+              StatementText("ensures your software meets our "),
+              StatementLink("terms of use", "/api-documentation/docs/terms-of-use")
+            ),
+            CompoundFragment(
+              StatementText("understands the "),
+              StatementLink("consequences of not meeting the terms of use", "/api-documentation/docs/terms-of-use")
+            )
+          )
+        )
+      )
     val question1 = TextQuestion(
       QuestionId("b9dbf0a5-e72b-4c89-a735-26f0858ca6cc"),
       Wording("Give us your organisation's website URL"),
@@ -209,10 +244,12 @@ trait QuestionnaireTestData {
     )
 
   val questionIdsOfInterest = QuestionIdsOfInterest(
+    responsibleIndividualNameId   = OrganisationDetails.questionRI1.id,
+    responsibleIndividualEmailId  = OrganisationDetails.questionRI2.id,
     applicationNameId             = CustomersAuthorisingYourSoftware.question2.id,
     privacyPolicyUrlId            = CustomersAuthorisingYourSoftware.question4.id,
     termsAndConditionsUrlId       = CustomersAuthorisingYourSoftware.question5.id,
-    organisationUrlId             = OrganisationDetails.question1.id
+    organisationUrlId             = OrganisationDetails.question1.id,
   )
 
   object DeriveContext {
@@ -300,6 +337,9 @@ trait SubmissionsTestData extends QuestionnaireTestData {
     (DevelopmentPractices.question2.id -> SingleChoiceAnswer("No")),
     (DevelopmentPractices.question3.id -> SingleChoiceAnswer("No")),
     (OrganisationDetails.question1.id -> TextAnswer("https://example.com")),
+    (OrganisationDetails.questionRI1.id -> TextAnswer("Bob Cratchett")),
+    (OrganisationDetails.questionRI2.id -> TextAnswer("bob@example.com")),
+    (OrganisationDetails.question1.id -> TextAnswer("https://example.com")),
     (CustomersAuthorisingYourSoftware.question1.id -> AcknowledgedAnswer),
     (CustomersAuthorisingYourSoftware.question2.id -> TextAnswer("name of software")),
     (CustomersAuthorisingYourSoftware.question3.id -> MultipleChoiceAnswer(Set("In the UK"))),
@@ -333,13 +373,19 @@ trait MarkedSubmissionsTestData extends ExtendedSubmissionsTestData {
     (DevelopmentPractices.question2.id -> Fail),
     (DevelopmentPractices.question3.id -> Warn),
     (OrganisationDetails.question1.id -> Pass),
+    (OrganisationDetails.questionRI1.id -> Pass),
+    (OrganisationDetails.questionRI2.id -> Pass),
     (CustomersAuthorisingYourSoftware.question3.id -> Pass),
     (CustomersAuthorisingYourSoftware.question4.id -> Pass),
     (CustomersAuthorisingYourSoftware.question5.id -> Fail)
   )
 
   val markedSubmission = MarkedSubmission(submission, completedProgress, markedAnswers)
+  val submittableStatus = Submission.Status.Created(DateTimeUtils.now, "bob@example.com")
+  val submittableInstance = Submission.Instance(0, sampleAnswersToQuestions, NonEmptyList.of(submittableStatus))
+  val submittableSubmission = submission.copy(instances = NonEmptyList.of(submittableInstance))
   
+
   def markAsPass(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
     val completedProgress = progress(QuestionnaireState.Completed)(submission.groups)
     val answers = answersG(Pass)(submission.groups)
