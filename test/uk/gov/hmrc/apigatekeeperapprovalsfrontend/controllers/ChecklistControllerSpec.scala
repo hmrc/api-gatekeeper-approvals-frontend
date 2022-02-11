@@ -146,7 +146,7 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
 
       val result = controller.checklistAction(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/checks-completed")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/confirm-decision")
     }
 
     "return 200 and send to submissions page if Save and Come Back Later button is clicked" in new Setup {

@@ -82,11 +82,6 @@ checkurls.urlschecked = URLs checked
 checkurls.checkurlslater = Check URLs later
 checkurls.nourl = None
 
-checkscompleted.pagetitle = HMRC API Gatekeeper - Checks Completed
-checkscompleted.title = Checks Completed
-checkscompleted.checkspassed = Checks Passed
-checkscompleted.checksfailed = Checks Failed
-
 applicationapproved.pagetitle = HMRC API Gatekeeper - Application Granted
 applicationapproved.title = Application Granted
 applicationapproved.text = The Application has been granted and is now in a state of Pending Requester Verification
