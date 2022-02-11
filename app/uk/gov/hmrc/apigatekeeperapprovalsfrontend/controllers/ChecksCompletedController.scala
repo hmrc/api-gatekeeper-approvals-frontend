@@ -63,13 +63,13 @@ class ChecksCompletedController @Inject()(
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
       case Some("passed") => {
         submissionService.grant(applicationId, request.loggedInRequest.name.get).map(_ match {
-          case Right(application)  => Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name)))
+          case Right(application)  => ??? //Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name)))
           case Left(err)           => BadRequest(err) 
         })
       }
       case Some("failed") => {
         submissionService.decline(applicationId, request.loggedInRequest.name.get, "TODO - reason").map(_ match {
-          case Right(application)  => Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name)))
+          case Right(application)  => ??? ///Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name)))
           case Left(err)           => BadRequest(err)
         })
       }

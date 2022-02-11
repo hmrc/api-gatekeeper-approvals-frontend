@@ -14,11 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecksCompletedController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-@this(layout: Layout, breadcrumbs: Breadcrumbs)
+@this(layout: Layout, breadcrumbs: Breadcrumbs, config: GatekeeperConfig)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
@@ -26,10 +27,20 @@
 
 @layout(pageTitle = Some(messages("applicationapproved.pagetitle")), beforeContent = Some(breadcrumbs(appBreadcrumb))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
-  <span class="govuk-caption-l">@model.appName</span>
+  <div class="govuk-grid-row">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        @messages("applicationapproved.productionaccessgranted")
+      </h1>
+      <div class="govuk-panel__body">
+        @model.appName
+      </div>
+    </div>
+    <br>
 
-  <div class="govuk-box-highlight">
-    <h1 class="govuk-heading-l govuk-highlight-text">@{messages("applicationapproved.title")}</h1>
-    <p class="govuk-body govuk-highlight-text">@{messages("applicationapproved.text")}</p>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="@{s"${config.applicationsPageUri}"}">Check another production credentials request.</a>
+    </p>
+
   </div>
 }
