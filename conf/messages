@@ -106,6 +106,10 @@ viewdeclinedsubmissions.declinedreason = Reasons the request was declined
 viewdeclinedsubmissions.submittedanswers = All submitted answers
 viewdeclinedsubmissions.checkanswers = Check answers
 
+emailresponsibleindividual.pagetitle = HMRC API Gatekeeper - Email the responsible individual
+emailresponsibleindividual.title = Email the responsible individual
+emailresponsibleindividual.continue = Continue
+emailresponsibleindividual.sendemaillater = Send email later
 
 submittedanswers.pagetitle = HMRC API Gatekeeper - Submitted answers
 submittedanswers.title = Submitted answers

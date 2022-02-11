@@ -113,7 +113,7 @@
         @checklistTable(
             "checklist.checkapplication.heading", 
             List(
-                ("checklist.checkapplication.linktext.email", "checkemail", "#", model.itemStatuses.email),
+                ("checklist.checkapplication.linktext.email", "checkemail", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.EmailResponsibleIndividualController.page(model.applicationId).url, model.itemStatuses.email),
                 ("checklist.checkapplication.linktext.urls", "checkurls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.itemStatuses.urls),
                 ("checklist.checkapplication.linktext.sandbox", "checksandbox", "#", model.itemStatuses.sandboxTesting)
             )
