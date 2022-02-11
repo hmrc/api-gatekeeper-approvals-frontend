@@ -29,22 +29,16 @@
     @{messages("checkcompanyregistration.title")}
   </h1>
 
-  <table class="govuk-table">
-    <tbody>
-      <tr class="govuk-table__row ">
-        <td class="govuk-table__cell">
-          {model.registrationType}
-        </td>
-        @{
-          if (model.hasRegistrationDetails) {
-            <td class="govuk-table__cell">
-              {model.registrationValue.get}
-            </td>
-          }
-        }
-      </tr>
-    </tbody>
-  </table>
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
+    @{model.registrationType}
+  </p>
+  @{
+    if (model.hasRegistrationDetails) {
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        {model.registrationValue.get}
+      </p>
+    }
+  }
 
   @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.checkCompanyRegistrationAction(model.applicationId), 'class -> "form") {
     @helper.CSRF.formField
