@@ -17,6 +17,9 @@ POST       /applications/:id/checklist/answers-that-passed           uk.gov.hmrc
 GET        /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
 POST       /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
 
+GET        /applications/:id/checklist/check-sandbox                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.checkSandboxPage(id: ApplicationId)
+POST       /applications/:id/checklist/check-sandbox                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.checkSandboxAction(id: ApplicationId)
+
 GET        /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.page(id: ApplicationId)
 POST       /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.action(id: ApplicationId)
 
