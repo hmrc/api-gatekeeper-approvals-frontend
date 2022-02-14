@@ -65,7 +65,7 @@ class SubmissionSpec extends AnyWordSpec with Matchers {
     "submission instance state history" in {
         submission.latestInstance.statusHistory.head.isOpenToAnswers shouldBe true
         submission.latestInstance.isOpenToAnswers shouldBe true
-        submission.isOpenToAnswers shouldBe true
+        submission.status.isOpenToAnswers shouldBe true
     }
 
     "submission instance is in progress" in {
@@ -73,7 +73,7 @@ class SubmissionSpec extends AnyWordSpec with Matchers {
     }
     
     "submission is in progress" in {
-        submission.isOpenToAnswers shouldBe true
+        submission.status.isOpenToAnswers shouldBe true
     }
 
     "submission findQuestionnaireContaining" in {

@@ -22,7 +22,8 @@ import scala.concurrent.Future.successful
 
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{MessagesControllerComponents, _}
+import play.api.mvc
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
@@ -34,22 +35,22 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
-object ConfirmYourDecisionController {
+object DeclinedJourneyController {
   case class ViewModel(applicationId: ApplicationId, appName: String)
 
-  case class DeclineForm(reasons: String)
+  case class ProvideReasonsForm(reasons: String)
 
-  val declineForm: Form[DeclineForm] = Form(
+  val provideReasonsForm: Form[ProvideReasonsForm] = Form(
     mapping(
       "reasons" -> nonEmptyText
-    )(DeclineForm.apply)(DeclineForm.unapply)
+    )(ProvideReasonsForm.apply)(ProvideReasonsForm.unapply)
   )
 }
 
 @Singleton
-class ConfirmYourDecisionController @Inject()(
+class DeclinedJourneyController @Inject()(
   strideAuthConfig: StrideAuthConfig,
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
@@ -57,29 +58,35 @@ class ConfirmYourDecisionController @Inject()(
   val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
-  confirmYourDecisionPage: ConfirmYourDecisionPage,
-  applicationApprovedPage: ApplicationApprovedPage,
-  applicationDeclinedPage: ApplicationDeclinedPage
-)(implicit override val ec: ExecutionContext) 
-    extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)
+  applicationDeclinedPage: ApplicationDeclinedPage,
+  provideReasonsForDecliningPage: ProvideReasonsForDecliningPage
+)(implicit override val ec: ExecutionContext)
+  extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)
     with ApplicationActions
     with ApplicationLogger {
-  import ConfirmYourDecisionController._
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
+  import DeclinedJourneyController._
+
+  def provideReasonsPage(applicationId: ApplicationId): mvc.Action[mvc.AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
-      case Some("decline")              => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
-      // case Some("grant-with-warnings")  => successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
-      // case Some("grant")                => successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
-      case _                            => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
+  def provideReasonsAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
+    def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
+      submissionService.decline(applicationId, request.name.get, form.reasons).map( _ match {
+        case Right(app) => Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name)))
+        case Left(err) => {
+          logger.warn(s"Decline application failed due to: $err")
+          BadRequest(errorHandler.badRequestTemplate)
+        }
+      })
     }
+
+    def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
+      successful(BadRequest(provideReasonsForDecliningPage(form, ViewModel(applicationId, request.application.name))))
+    }
+
+    DeclinedJourneyController.provideReasonsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
-  def grantedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
-  }
 }

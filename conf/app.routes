@@ -25,8 +25,8 @@ GET        /applications/:id/confirm-decision/granted                uk.gov.hmrc
 GET        /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.page(id: ApplicationId)
 POST       /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.action(id: ApplicationId)
 
-GET        /applications/:id/confirm-decision/decline                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.declinePage(id: ApplicationId)
-POST       /applications/:id/confirm-decision/decline                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.declineAction(id: ApplicationId)
+GET        /applications/:id/confirm-decision/decline                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.provideReasonsPage(id: ApplicationId)
+POST       /applications/:id/confirm-decision/decline                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.provideReasonsAction(id: ApplicationId)
 
 GET        /applications/:id/view-declined/:index                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ViewDeclinedSubmissionController.page(id: ApplicationId, index: Int)
 GET        /applications/:id/production-access                       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ProductionAccessController.page(id: ApplicationId)

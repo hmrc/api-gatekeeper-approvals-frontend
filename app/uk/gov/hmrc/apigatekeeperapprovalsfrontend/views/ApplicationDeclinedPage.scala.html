@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController._
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
@@ -24,10 +24,24 @@
 
 @layout(pageTitle = Some(messages("applicationdeclined.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
-  <span class="govuk-caption-l">@model.appName</span>
 
-  <div class="govuk-box-highlight">
-    <h1 class="govuk-heading-l govuk-highlight-text">@{messages("applicationdeclined.title")}</h1>
-    <p class="govuk-body govuk-highlight-text">@{messages("applicationdeclined.text")}</p>
-  </div>
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-three-quarters">
+        <div class="govuk-panel govuk-panel--confirmation">
+          <h1 class="govuk-panel__title">
+            You have declined this request
+          </h1>
+          <div class="govuk-panel__body">
+            @model.appName
+          </div>
+        </div>
+        <br>
+
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" href="../../index-results">Check another production credentials request.</a>
+        </p>
+      </div>
+    </div>
+</div>
 }
