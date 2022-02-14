@@ -59,7 +59,7 @@ class EmailResponsibleIndividualController @Inject()(
 
     // Should only be uplifting and checking Standard apps
     (request.application.access, ori) match {
-      case (std: Standard, Some(ri)) if(request.submission.isSubmitted) => 
+      case (std: Standard, Some(ri)) if(request.submission.status.isSubmitted) => 
         successful(
           Ok(
             emailResponsibleIndividualPage(
