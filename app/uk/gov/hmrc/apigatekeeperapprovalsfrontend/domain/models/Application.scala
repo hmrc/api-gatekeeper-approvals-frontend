@@ -66,7 +66,7 @@ object State extends PlayEnum[State] {
 
 case class Application(
   id: ApplicationId,
-  // clientId: ClientId,
+  clientId: ClientId,
   // gatewayId: String,
   name: String,
   // deployedTo: String,

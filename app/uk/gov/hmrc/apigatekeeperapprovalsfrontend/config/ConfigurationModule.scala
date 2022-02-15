@@ -17,12 +17,9 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
 import com.google.inject.AbstractModule
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl, ThirdPartyApplicationConnector}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetricsImpl
 import uk.gov.hmrc.apiplatform.modules.submissions.config.SubmissionsConnectorConfigProvider
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 
@@ -31,6 +28,7 @@ class ConfigurationModule extends AbstractModule {
     bind(classOf[ConnectorMetrics]).to(classOf[ConnectorMetricsImpl])
 
     bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
+    bind(classOf[ApmConnector.Config]).toProvider(classOf[ApmConnectorConfigProvider])
     bind(classOf[SubmissionsConnector.Config]).toProvider(classOf[SubmissionsConnectorConfigProvider])
     
     bind(classOf[ForbiddenHandler]).to(classOf[HandleForbiddenWithView])
