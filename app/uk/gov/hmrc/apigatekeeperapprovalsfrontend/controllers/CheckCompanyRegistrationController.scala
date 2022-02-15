@@ -63,8 +63,8 @@ class CheckCompanyRegistrationController @Inject()(
             checkCompanyRegistrationPage(
               CheckCompanyRegistrationController.ViewModel(
                 request.application.name, applicationId,
-                "Corporation Tax Unique Taxpayer Reference (UTR)", 
-                Some("1234567")
+                companyDetails.registrationType.get, 
+                companyDetails.registrationValue
               )
             )
           )
