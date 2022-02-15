@@ -18,18 +18,21 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 import uk.gov.hmrc.http.HeaderCarrier
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ThirdPartyApplicationConnector}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 
 @Singleton
 class ApplicationService @Inject()(
-  thirdPartyApplicationConnector: ThirdPartyApplicationConnector
+  thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
+  apmConnector: ApmConnector
 )(implicit val ec: ExecutionContext) {
   
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
+  }
+
+  def fetchLinkedSubordinateApplicationByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+    apmConnector.fetchLinkedSubordinateApplicationById(applicationId)
   }
 }
