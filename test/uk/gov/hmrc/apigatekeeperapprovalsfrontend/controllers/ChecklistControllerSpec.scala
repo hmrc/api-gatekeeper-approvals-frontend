@@ -30,12 +30,10 @@ import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationAction
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 
 class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
@@ -53,7 +51,8 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       extends AuthConnectorMockModule
       with ApplicationActionServiceMockModule 
       with SubmissionServiceMockModule
-      with SubmissionReviewServiceMockModule {
+      with SubmissionReviewServiceMockModule
+      with ApplicationTestData {
         
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
@@ -62,6 +61,9 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val appChecklistPage = app.injector.instanceOf[ChecklistPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
+
+    val appId = ApplicationId.random
+    val application = anApplication(id = appId)
 
     val controller = new ChecklistController(
       strideAuthConfig,
@@ -78,8 +80,6 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
 
   "GET /" should {
     "return 200" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val submissionReview = SubmissionReview(markedSubmission.submission.id, 0)
       val fakeRequest = FakeRequest().withCSRFToken
 
@@ -93,9 +93,6 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     }
 
     "return 404 if no marked application is found" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-
       val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -107,8 +104,6 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     }
 
     "return 404 if no application is found" in new Setup {
-      val appId = ApplicationId.random
-
       val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -120,14 +115,12 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val appId = ApplicationId.random
       val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val appId = ApplicationId.random
       val result = controller.checklistPage(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
@@ -135,8 +128,6 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
 
   "POST /" should {
     "return 200 and send to checks completed page if Checks Completed button is clicked" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest().withCSRFToken
             .withFormUrlEncodedBody("submit-action" -> "checked")
 
@@ -150,8 +141,6 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     }
 
     "return 200 and send to submissions page if Save and Come Back Later button is clicked" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest().withCSRFToken
             .withFormUrlEncodedBody("submit-action" -> "come-back-later")
 
@@ -165,8 +154,6 @@ class ChecklistControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     }
 
     "return 400 if bad submission action is received" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest().withCSRFToken
             .withFormUrlEncodedBody("submit-action" -> "nope")
 

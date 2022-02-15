@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
@@ -32,8 +32,6 @@ import play.api.test.Helpers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import org.joda.time.DateTime
 
 class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
@@ -45,12 +43,15 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       )
       .build()
 
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with ApplicationTestData{
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val viewDeclinedSubmissionPage = app.injector.instanceOf[ViewDeclinedSubmissionPage]
     val errorHandler = app.injector.instanceOf[ErrorHandler]
+
+    val appId = ApplicationId.random
+    val application = anApplication(id = appId)
 
     val controller = new ViewDeclinedSubmissionController(
       strideAuthConfig,
@@ -69,9 +70,7 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     val submissionDeclinedReason = "declined due to testing"
     
     "return 200" in new Setup {
-      val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
       val declinedSubmission = submission.submit(DateTime.now, gatekeeperUserName).declined(DateTime.now, gatekeeperUserName, submissionDeclinedReason)
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -83,9 +82,7 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
-      val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
       val declinedSubmission = submission.submit(DateTime.now, gatekeeperUserName).declined(DateTime.now, gatekeeperUserName, submissionDeclinedReason)
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -97,9 +94,7 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "return 400 when given a submission that isn't declined" in new Setup {
-      val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
       val submittedSubmission = submission.submit(DateTime.now, gatekeeperUserName)
 
       AuthConnectorMock.Authorise.thenReturn()
