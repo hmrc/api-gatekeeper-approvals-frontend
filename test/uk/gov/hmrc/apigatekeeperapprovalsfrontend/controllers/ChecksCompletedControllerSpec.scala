@@ -30,10 +30,9 @@ import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationAction
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ClientId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecksCompletedPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationDeclinedPage
@@ -51,7 +50,8 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
   trait Setup 
       extends AuthConnectorMockModule
       with ApplicationActionServiceMockModule 
-      with SubmissionServiceMockModule {
+      with SubmissionServiceMockModule
+      with ApplicationTestData {
         
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
@@ -63,6 +63,9 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     val page = app.injector.instanceOf[ChecksCompletedPage]
     val approvedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val declinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
+
+    val appId = ApplicationId.random
+    val application = anApplication(id = appId)
 
     val controller = new ChecksCompletedController(
       strideAuthConfig,
@@ -80,9 +83,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
 
   "GET /" should {
     "return 200" in new Setup {
-      val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -93,9 +94,7 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     }
 
     "return 404 if marked submission not found" in new Setup {
-      val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -109,8 +108,6 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
 
   "POST /" should {
     "return 200 for grant" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest()
                           .withCSRFToken
                           .withFormUrlEncodedBody("submit-action" -> "passed")
@@ -125,8 +122,6 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     }
 
     "return 200 for decline" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest()
                           .withCSRFToken
                           .withFormUrlEncodedBody("submit-action" -> "failed")
@@ -141,8 +136,6 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     }
 
     "return bad request for unsuccessful approval" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest()
                           .withCSRFToken
                           .withFormUrlEncodedBody("submit-action" -> "passed")
@@ -157,8 +150,6 @@ class ChecksCompletedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSui
     }
 
     "return bad request for unsuccessful decline" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
       val fakeRequest = FakeRequest()
                           .withCSRFToken
                           .withFormUrlEncodedBody("submit-action" -> "failed")

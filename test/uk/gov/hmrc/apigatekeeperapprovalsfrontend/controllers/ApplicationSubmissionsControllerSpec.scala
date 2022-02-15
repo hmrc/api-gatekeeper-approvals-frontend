@@ -30,10 +30,9 @@ import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationAction
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
@@ -53,7 +52,8 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       extends AuthConnectorMockModule
       with ApplicationActionServiceMockModule 
       with SubmissionServiceMockModule
-      with SubmissionReviewServiceMockModule {
+      with SubmissionReviewServiceMockModule
+      with ApplicationTestData {
         
     implicit val appConfig = app.injector.instanceOf[AppConfig]
 
@@ -80,7 +80,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
   "page" should {
     "return 200" in new Setup {
       val appId = ApplicationId.random
-      val application = Application(appId, "app name")
+      val application = anApplication(id = appId)
       val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -93,7 +93,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
     "return 404 if no marked application is found" in new Setup {
       val appId = ApplicationId.random
-      val application = Application(appId, "app name")
+      val application = anApplication(id = appId)
 
       val fakeRequest = FakeRequest().withCSRFToken
 
@@ -135,7 +135,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
       val appId = ApplicationId.random
-      val application = Application(appId, "app name")
+      val application = anApplication(id = appId)
       val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -149,7 +149,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
       val appId = ApplicationId.random
-      val application = Application(appId, "app name")
+      val application = anApplication(id = appId)
       val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -163,7 +163,7 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
     "redirect to Gatekeeper when no submission found" in new Setup {
       val appId = ApplicationId.random
-      val application = Application(appId, "app name")
+      val application = anApplication(id = appId)
       val fakeRequest = FakeRequest().withCSRFToken
 
       AuthConnectorMock.Authorise.thenReturn()

@@ -16,10 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
@@ -29,17 +26,13 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
 import play.api.test.FakeRequest
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -56,7 +49,7 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
       )
       .build()
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule with ApplicationTestData{
     val controller = new CheckAnswersThatPassedController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -70,7 +63,7 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
     )
 
     val appId = ApplicationId.random
-    val application = Application(appId, "app name")
+    val application = anApplication(id = appId)
   }
 
   "checkAnswersThatPassedPage" should {

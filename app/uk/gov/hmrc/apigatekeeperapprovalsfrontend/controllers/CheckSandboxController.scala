@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Standard}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService, SubscriptionService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
@@ -66,7 +66,7 @@ class CheckSandboxController @Inject()(
         sandboxApplication.name,
         sandboxApplication.id,
         sandboxApplication.clientId.value,
-        apiSubscriptions.map(_.name).mkString(",")
+        apiSubscriptions.map(_.name).mkString(", ")
       )
     )))
   }
