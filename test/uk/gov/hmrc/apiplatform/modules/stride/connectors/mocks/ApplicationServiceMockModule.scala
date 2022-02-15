@@ -37,6 +37,13 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.fetchByApplicationId(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
+
+    object FetchLinkedSubordinateApplicationByApplicationId {
+      def thenReturn(subordinateApplicationId: ApplicationId) = {
+        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
+          .thenReturn(successful(Some(anApplication(id = subordinateApplicationId))))
+      }
+    }
   }
 
   object ApplicationServiceMock extends BaseApplicationServiceMock {
