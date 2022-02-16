@@ -71,7 +71,7 @@ class SubmittedAnswersControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSu
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, aSubmission)
 
       val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -83,7 +83,7 @@ class SubmittedAnswersControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSu
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, aSubmission)
 
       val result = controller.page(applicationId, 1)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST

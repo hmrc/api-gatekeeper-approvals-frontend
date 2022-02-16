@@ -27,7 +27,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
   trait Setup extends SubmissionReviewRepoMockModule with SubmissionsTestData{
     val underTest = new SubmissionReviewService(SubmissionReviewRepoMock.aMock)
-    val review = SubmissionReview(submission.id, 0)
+    val review = SubmissionReview(aSubmission.id, 0)
     implicit val hc = HeaderCarrier()
   }
 

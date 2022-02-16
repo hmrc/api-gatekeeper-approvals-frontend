@@ -34,7 +34,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import org.joda.time.DateTime
 
 class ProductionAccessControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
   override def fakeApplication() =
@@ -65,13 +64,11 @@ class ProductionAccessControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSu
   }
 
   "GET /" should {
-    val gatekeeperUserName = "user name"
     
     "return 200" in new Setup {
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val grantedSubmission = submission.submit(DateTime.now, gatekeeperUserName).granted(DateTime.now, gatekeeperUserName)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -85,7 +82,6 @@ class ProductionAccessControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSu
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val submittedSubmission = submission.submit(DateTime.now, gatekeeperUserName)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

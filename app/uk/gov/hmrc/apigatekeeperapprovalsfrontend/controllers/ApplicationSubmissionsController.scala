@@ -75,9 +75,9 @@ class ApplicationSubmissionsController @Inject()(
 
     (
       for {
-        extSubmission <- OptionT(submissionService.fetchLatestSubmission(request.application.id))
-        if hasEverBeenSubmitted(extSubmission.submission)
-      } yield extSubmission.submission
+        submission <- OptionT(submissionService.fetchLatestSubmission(request.application.id))
+        if hasEverBeenSubmitted(submission)
+      } yield submission
     )
     .fold(
       Redirect(gatekeeperApplicationUrl)

@@ -46,16 +46,22 @@ class SubmissionsConnector @Inject() (
     val config: SubmissionsConnector.Config,
     val metrics: ConnectorMetrics
 )(implicit val ec: ExecutionContext)
-    extends SubmissionsFrontendJsonFormatters {
+    extends SubmissionsJsonFormatters {
 
   import SubmissionsConnector._
   import config._
 
   val api = API("third-party-application-submissions")
 
-  def fetchLatestSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+  def fetchLatestSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = {
     metrics.record(api) {
-      http.GET[Option[ExtendedSubmission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}")
+      http.GET[Option[Submission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}")
+    }
+  }
+  
+  def fetchLatestExtenedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+    metrics.record(api) {
+      http.GET[Option[ExtendedSubmission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}/extended")
     }
   }
   

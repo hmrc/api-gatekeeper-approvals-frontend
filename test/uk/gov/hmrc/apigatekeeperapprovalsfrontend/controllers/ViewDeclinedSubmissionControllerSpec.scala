@@ -34,9 +34,9 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import org.joda.time.DateTime
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
-class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
+class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
   override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
@@ -65,14 +65,11 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
   }
 
   "GET /" should {
-    val gatekeeperUserName = "user name"
-    val submissionDeclinedReason = "declined due to testing"
-    
+
     "return 200" in new Setup {
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val declinedSubmission = submission.submit(DateTime.now, gatekeeperUserName).declined(DateTime.now, gatekeeperUserName, submissionDeclinedReason)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -86,7 +83,6 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val declinedSubmission = submission.submit(DateTime.now, gatekeeperUserName).declined(DateTime.now, gatekeeperUserName, submissionDeclinedReason)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -100,7 +96,6 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
       val appId = ApplicationId.random
       val fakeRequest = FakeRequest("GET", "/").withCSRFToken
       val application = Application(appId, "app name")
-      val submittedSubmission = submission.submit(DateTime.now, gatekeeperUserName)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

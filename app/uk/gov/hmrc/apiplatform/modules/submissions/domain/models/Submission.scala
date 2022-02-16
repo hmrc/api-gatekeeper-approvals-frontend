@@ -65,6 +65,19 @@ object Submission {
     def random: Id = Id(UUID.randomUUID().toString())
   }
 
+  val create: (
+      String,
+      Submission.Id,
+      ApplicationId,
+      DateTime,
+      NonEmptyList[GroupOfQuestionnaires],
+      QuestionIdsOfInterest) => Submission = (requestedBy, id, applicationId, timestamp, groups, questionIdsOfInterest) => {
+
+      val initialStatus = Submission.Status.Created(timestamp, requestedBy)
+      val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
+    Submission(id, applicationId, timestamp, groups, questionIdsOfInterest, initialInstances)
+  }
+  
   val addInstance: (Submission.AnswersToQuestions, Submission.Status) => Submission => Submission = (answers, status) => s => {
     val newInstance = Submission.Instance(s.latestInstance.index+1, answers, NonEmptyList.of(status))
     s.copy(instances = newInstance :: s.instances)
@@ -108,13 +121,14 @@ object Submission {
   
   sealed trait Status {
     def timestamp: DateTime
- 
+    
     def isOpenToAnswers = isCreated || isAnswering
     
+    def canBeMarked = isAnsweredCompletely | isSubmitted | isDeclined | isGranted | isGrantedWithWarnings
+
     def isAnsweredCompletely = this match {
       case Submission.Status.Answering(_, completed) => completed
-      case Submission.Status.Created(_, _)           => false
-      case _                                         => true      
+      case _                                         => false      
     }
 
     def isCreated = this match {
@@ -235,25 +249,13 @@ case class Submission(
   lazy val latestInstance = instances.head
 
   lazy val status: Submission.Status = latestInstance.statusHistory.head
-  
-  def setLatestAnswers(answers: Submission.AnswersToQuestions): Submission = {
-    val newLatest = latestInstance.copy(answersToQuestions = answers)
-    this.copy(instances = NonEmptyList.of(newLatest, this.instances.tail: _*))
-  }
 }
 
 
 case class ExtendedSubmission(
   submission: Submission,
   questionnaireProgress: Map[QuestionnaireId, QuestionnaireProgress]
-) {
-  lazy val isCompleted = 
-    questionnaireProgress.values
-    .map(_.state)
-    .forall(QuestionnaireState.isCompleted)
-
-  lazy val status: Submission.Status = submission.status
-}
+)
 
 case class MarkedSubmission(
   submission: Submission,

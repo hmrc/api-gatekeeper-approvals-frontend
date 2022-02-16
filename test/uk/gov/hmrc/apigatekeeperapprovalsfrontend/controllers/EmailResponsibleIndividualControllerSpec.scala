@@ -41,8 +41,9 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.EmailResponsibleInd
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
-class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
+class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
   val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
   val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
   val mcc = app.injector.instanceOf[MessagesControllerComponents]
@@ -78,7 +79,7 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
     "return 200" in new Setup {
       val fakeRequest = FakeRequest().withCSRFToken
 
-      val mySubmission = MarkedSubmission(submittableSubmission.submit(), completedProgress, markedAnswers)
+      val mySubmission = MarkedSubmission(submittedSubmission, Map.empty, markedAnswers)
       
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -92,7 +93,7 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
     "return 404 if the submission is not submitted" in new Setup {
       val fakeRequest = FakeRequest().withCSRFToken
 
-      val mySubmission = MarkedSubmission(submittableSubmission, completedProgress, markedAnswers)
+      val mySubmission = MarkedSubmission(answeredSubmission, Map.empty, markedAnswers)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

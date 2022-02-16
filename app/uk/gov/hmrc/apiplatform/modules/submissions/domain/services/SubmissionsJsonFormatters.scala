@@ -48,20 +48,25 @@ trait BaseSubmissionsJsonFormatters extends GroupOfQuestionnairesJsonFormatters 
   implicit val questionIdsOfInterestFormat = Json.format[QuestionIdsOfInterest]
 }
 
-trait SubmissionsFrontendJsonFormatters extends BaseSubmissionsJsonFormatters {
+trait SubmissionsJsonFormatters extends BaseSubmissionsJsonFormatters {
   import JodaWrites.JodaDateTimeWrites
   import Submission.Status._
+
   implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
 
   implicit val rejectedStatusFormat = Json.format[Declined]
   implicit val acceptedStatusFormat = Json.format[Granted]
+  implicit val acceptedWithWarningsStatusFormat = Json.format[GrantedWithWarnings]
   implicit val submittedStatusFormat = Json.format[Submitted]
+  implicit val answeringStatusFormat = Json.format[Answering]
   implicit val createdStatusFormat = Json.format[Created]
   
   implicit val submissionStatus = Union.from[Submission.Status]("Submission.StatusType")
     .and[Declined]("declined")
     .and[Granted]("granted")
+    .and[GrantedWithWarnings]("grantedWithWarnings")
     .and[Submitted]("submitted")
+    .and[Answering]("answering")
     .and[Created]("created")
     .format
 
@@ -71,4 +76,4 @@ trait SubmissionsFrontendJsonFormatters extends BaseSubmissionsJsonFormatters {
   implicit val markedSubmissionFormat = Json.format[MarkedSubmission]
 }
 
-object SubmissionsFrontendJsonFormatters extends SubmissionsFrontendJsonFormatters
+object SubmissionsJsonFormatters extends SubmissionsJsonFormatters

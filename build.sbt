@@ -1,3 +1,4 @@
+import bloop.integrations.sbt.BloopDefaults
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
@@ -37,9 +38,13 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
-    Test / unmanagedSourceDirectories += (baseDirectory.value / "test-common")
+    Test / unmanagedSourceDirectories += (baseDirectory.value / "test-common"),
+    inConfig(Test)(BloopDefaults.configSettings)
   )
   .settings(
     IntegrationTest / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
-    IntegrationTest / unmanagedSourceDirectories += (baseDirectory.value / "test-common")
+    IntegrationTest / unmanagedSourceDirectories += (baseDirectory.value / "test-common"),
+    inConfig(IntegrationTest)(BloopDefaults.configSettings)
   )
+
+    

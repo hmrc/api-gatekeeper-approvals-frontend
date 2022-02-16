@@ -30,9 +30,10 @@ import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnect
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.DeclinedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsFrontendJsonFormatters
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
+import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
 
 class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
   private val appConfig = Configuration(
@@ -49,10 +50,10 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
       .in(Mode.Test)
       .build()
 
-  trait Setup extends SubmissionsFrontendJsonFormatters {
+  trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
-    val extSubmission = extendedSubmission
+    val extSubmission = aSubmission.withIncompleteProgress
     val markSubmission = markedSubmission
     val requestedBy = "bob@blockbusters.com"
     val reason = "reason"
@@ -73,14 +74,14 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
         .willReturn(
             aResponse()
             .withStatus(OK)
-            .withJsonBody(extSubmission)
+            .withJsonBody(aSubmission)
         )
       )
       
       val result = await(connector.fetchLatestSubmission(applicationId))
 
       result shouldBe defined
-      result.get.submission.id shouldBe extSubmission.submission.id
+      result.get.id shouldBe extSubmission.submission.id
     }
 
     "return None if the submission cannot be found" in new Setup {
