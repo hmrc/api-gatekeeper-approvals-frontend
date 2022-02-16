@@ -19,15 +19,15 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ThirdPartyApplicationConnectorMockModule
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ApplicationServiceSpec extends AsyncHmrcSpec {
 
-  trait Setup extends ThirdPartyApplicationConnectorMockModule {
+  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId = ApplicationId.random
-    val service = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock)
+    val service = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
   }
 
   "fetchByApplicationId" should {
@@ -35,6 +35,15 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       ThirdPartyApplicationConnectorMock.FetchApplicationById.thenReturn()
       val result = await(service.fetchByApplicationId(applicationId))
       result.value.id shouldBe applicationId
+    }
+  }
+
+  "fetchLinkedSubordinateApplicationByApplicationId" should {
+    val subordinateApplicationId = ApplicationId.random
+    "return the correct application" in new Setup {
+      ApmConnectorMock.FetchLinkedSubordinateApplicationById.thenReturn(subordinateApplicationId)
+      val result = await(service.fetchLinkedSubordinateApplicationByApplicationId(applicationId))
+      result.value.id shouldBe subordinateApplicationId
     }
   }
 }

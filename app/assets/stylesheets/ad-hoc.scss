@@ -34,6 +34,19 @@ ol li::marker {
   overflow-wrap: break-word;
 }
 
+.govuk-summary-list__50 {
+  display: table-cell;
+  font-weight: 700;
+  padding-top: 10px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #b1b4b6;
+  margin-bottom: 5px;
+  margin: 0;
+  width: 50%;
+  overflow-wrap: break-word;
+}
+
 .text-area-highlight {
   background-color: #f3f2f1;
   border: 1px solid #b1b4b6;
