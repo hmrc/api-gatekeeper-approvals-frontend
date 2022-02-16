@@ -37,10 +37,13 @@
       <p class="govuk-body govuk-!-margin-bottom-6">
         {model.registrationValue.get}
       </p>
+    } else {
+      <p class="govuk-body govuk-!-margin-bottom-6">
+      </p>
     }
   }
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.checkCompanyRegistrationAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group">

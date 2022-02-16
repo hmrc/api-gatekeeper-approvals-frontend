@@ -17,8 +17,8 @@ POST       /applications/:id/checklist/answers-that-passed           uk.gov.hmrc
 GET        /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
 POST       /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
 
-GET        /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.checkCompanyRegistrationPage(id: ApplicationId)
-POST       /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.checkCompanyRegistrationAction(id: ApplicationId)
+GET        /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.page(id: ApplicationId)
+POST       /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.action(id: ApplicationId)
 
 GET        /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.page(id: ApplicationId)
 POST       /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.action(id: ApplicationId)

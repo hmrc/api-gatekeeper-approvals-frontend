@@ -32,7 +32,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.CompanyDetailsExtractor
 
-case class CompanyRegistrationDetails(registrationType: Option[String], registrationValue: Option[String])
+case class CompanyRegistrationDetails(registrationType: String, registrationValue: Option[String])
 
 object CheckCompanyRegistrationController {  
   case class ViewModel(appName: String, applicationId: ApplicationId, registrationType: String, registrationValue: Option[String]) {
@@ -52,18 +52,18 @@ class CheckCompanyRegistrationController @Inject()(
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
-  def checkCompanyRegistrationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val companyDetails = CompanyDetailsExtractor(request.submission)    
     
     request.application.access match {
       // Should only be uplifting and checking Standard apps
-      case std: Standard => 
+      case std: Standard if(request.submission.isSubmitted) =>  
         successful(
           Ok(
             checkCompanyRegistrationPage(
               CheckCompanyRegistrationController.ViewModel(
                 request.application.name, applicationId,
-                companyDetails.registrationType.get, 
+                companyDetails.registrationType, 
                 companyDetails.registrationValue
               )
             )
@@ -73,6 +73,6 @@ class CheckCompanyRegistrationController @Inject()(
     }
   }
 
-  def checkCompanyRegistrationAction(applicationId: ApplicationId): Action[AnyContent] = 
+  def action(applicationId: ApplicationId): Action[AnyContent] = 
     updateReviewAction("checkCompanyRegistrationAction", submissionReviewService.updateCheckedCompanyRegistrationStatus _)(applicationId)
 }

@@ -53,17 +53,19 @@ object CompanyDetailsExtractor {
       }
     }
 
-    // TODO new questionIdsOfInterest for Identify your organisation
-    // and some way of getting the right answer depending on this answer
-    val registrationTypeQuestionId = QuestionId("cbdf264f-be39-4638-92ff-6ecd2259c662")
+    // Get the answer to the 'Identify your Organisation' question as the registration type
+    val registrationTypeQuestionId = submission.questionIdsOfInterest.identifyYourOrganisationId
     val registrationType = submission.latestInstance.answersToQuestions.get(registrationTypeQuestionId) flatMap extractSingleChoiceAnswer
 
-    val registrationQuestionnaire = submission.findQuestionnaireContaining(registrationTypeQuestionId)
+    // Get the answer to the next question for the value of the VAT number, UTR, etc.
+    // Note that the question is dependent upon your previous answer (i.e. you'll be asked 
+    // for a VAT number if you answered the previous question 'VAT registration number')
+    val registrationQuestionnaire = submission.findQuestionnaireContaining(registrationTypeQuestionId).get
     val simpleContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "No")
-    val registrationQuestions = questionsToAsk(registrationQuestionnaire.get, simpleContext, submission.latestInstance.answersToQuestions)
+    val registrationQuestions = questionsToAsk(registrationQuestionnaire, simpleContext, submission.latestInstance.answersToQuestions)
     val registrationValueQuestionId = registrationQuestions.dropWhile(_ != registrationTypeQuestionId).tail.headOption
     val registrationValue = submission.latestInstance.answersToQuestions.get(registrationValueQuestionId.get) flatMap extractTextAnswer
 
-    CompanyRegistrationDetails(registrationType, registrationValue)
+    CompanyRegistrationDetails(registrationType.get, registrationValue)
   }
 }
