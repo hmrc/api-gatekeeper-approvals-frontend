@@ -16,12 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import cats.data.NonEmptyList
-import org.joda.time.DateTime
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 import scala.concurrent.Future.successful
 

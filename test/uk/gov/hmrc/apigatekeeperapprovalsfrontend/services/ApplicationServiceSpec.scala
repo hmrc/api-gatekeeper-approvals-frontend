@@ -37,4 +37,13 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       result.value.id shouldBe applicationId
     }
   }
+
+  "fetchLinkedSubordinateApplicationByApplicationId" should {
+    val subordinateApplicationId = ApplicationId.random
+    "return the correct application" in new Setup {
+      ApmConnectorMock.FetchLinkedSubordinateApplicationById.thenReturn(subordinateApplicationId)
+      val result = await(service.fetchLinkedSubordinateApplicationByApplicationId(applicationId))
+      result.value.id shouldBe subordinateApplicationId
+    }
+  }
 }
