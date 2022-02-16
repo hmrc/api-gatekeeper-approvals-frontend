@@ -16,10 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
@@ -33,9 +30,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
@@ -56,7 +50,7 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       )
       .build()
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
+  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule with ApplicationTestData {
     val controller = new CheckUrlsController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -70,7 +64,7 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     )
 
     val appId = ApplicationId.random
-    val application = Application(appId, "app name")
+    val application = anApplication(id = appId)
   }
 
   "checkUrlsPage" should {

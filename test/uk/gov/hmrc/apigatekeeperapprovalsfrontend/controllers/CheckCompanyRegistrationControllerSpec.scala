@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, ApplicationTestData, WithCSRFAddToken}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
@@ -33,8 +32,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.test.FakeRequest
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
@@ -57,7 +54,13 @@ class CheckCompanyRegistrationControllerSpec extends AsyncHmrcSpec with GuiceOne
       )
       .build()
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
+  trait Setup 
+      extends AuthConnectorMockModule 
+      with ApplicationActionServiceMockModule 
+      with SubmissionServiceMockModule 
+      with SubmissionReviewServiceMockModule
+      with ApplicationTestData {
+
     val controller = new CheckCompanyRegistrationController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -71,7 +74,7 @@ class CheckCompanyRegistrationControllerSpec extends AsyncHmrcSpec with GuiceOne
     )
 
     val appId = ApplicationId.random
-    val application = Application(appId, "app name")
+    val application = anApplication(id = appId)
   }
 
   "checkCompanyRegistrationPage" should {
