@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.ViewModel
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
@@ -47,7 +47,7 @@ class CheckSandboxController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  page: CheckSandboxPage,
+  checkSandboxPage: CheckSandboxPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
@@ -59,7 +59,7 @@ class CheckSandboxController @Inject()(
     for {
       linkedSubordinateApplication <- applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId)
       apiSubscriptions <- subscriptionService.fetchSubscriptionsByApplicationId(applicationId)
-    } yield linkedSubordinateApplication.fold[Result](NotFound)(sandboxApplication => Ok(page(
+    } yield linkedSubordinateApplication.fold[Result](NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi))))(sandboxApplication => Ok(checkSandboxPage(
       ViewModel(
         request.application.name,
         applicationId,
