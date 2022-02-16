@@ -77,7 +77,7 @@ checkurls.checkurlslater = Check URLs later
 checkurls.nourl = None
 
 checkcompanyregistration.title = Check company registration
-checkcompanyregistration.pagetitle = HMRC API Gatekeeper - Check Check company registration
+checkcompanyregistration.pagetitle = HMRC API Gatekeeper - Check company registration
 checkcompanyregistration.checked = Company registration checked
 checkcompanyregistration.checklater = Check company registration later
 

@@ -133,6 +133,7 @@ class CheckCompanyRegistrationControllerSpec extends AsyncHmrcSpec with GuiceOne
       val result = controller.action(appId)(fakeRequest)
 
       status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/checklist")
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
@@ -148,6 +149,7 @@ class CheckCompanyRegistrationControllerSpec extends AsyncHmrcSpec with GuiceOne
       val result = controller.action(appId)(fakeRequest)
 
       status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/checklist")
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
