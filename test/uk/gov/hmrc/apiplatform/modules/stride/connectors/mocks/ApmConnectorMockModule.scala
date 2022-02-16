@@ -18,14 +18,33 @@ package uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationId, ApplicationWithSubscriptionData}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
-trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
+import scala.concurrent.Future.successful
+
+trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
   trait BaseApmConnectorMock {
     def aMock: ApmConnector
 
-    object FetchLinkedSubordinateApplicationById {}
-    object FetchSubscribableApisForApplication {}
-    object FetchApplicationWithSubscriptionData {}
+    object FetchLinkedSubordinateApplicationById {
+      def thenReturn(subordinateApplicationId: ApplicationId) =
+        when(aMock.fetchLinkedSubordinateApplicationById(*[ApplicationId])(*)).thenReturn(successful(Some(anApplication(subordinateApplicationId))))
+    }
+
+    object FetchSubscribableApisForApplication {
+      def thenReturn(apiDefinitions: Map[String,ApiDefinition]) =
+        when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(apiDefinitions))
+      def thenReturnNothing = when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(Map()))
+    }
+
+    object FetchApplicationWithSubscriptionData {
+      def thenReturn(apiIdentifiers: ApiIdentifier*) =
+        when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(
+          successful(Some(ApplicationWithSubscriptionData(anApplication(), apiIdentifiers.toSet)))
+        )
+      def thenReturnNothing = when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(successful(None))
+    }
   }
 
   object ApmConnectorMock extends BaseApmConnectorMock {

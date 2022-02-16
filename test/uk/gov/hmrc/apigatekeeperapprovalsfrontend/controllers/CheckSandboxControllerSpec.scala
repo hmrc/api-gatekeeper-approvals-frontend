@@ -97,7 +97,6 @@ class CheckSandboxControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite 
 
     "return 404 if no application is found" in new Setup {
       val fakeRequest = FakeRequest().withCSRFToken
-      val subordinateApplicationId = ApplicationId.random
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound
