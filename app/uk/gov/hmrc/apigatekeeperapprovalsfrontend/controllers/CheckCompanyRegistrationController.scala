@@ -55,16 +55,16 @@ class CheckCompanyRegistrationController @Inject()(
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val companyDetails = CompanyDetailsExtractor(request.submission)    
     
-    request.application.access match {
+    (request.application.access, companyDetails) match {
       // Should only be uplifting and checking Standard apps
-      case std: Standard if(request.submission.isSubmitted) =>  
+      case (std: Standard, Some(details)) if(request.submission.isSubmitted) =>  
         successful(
           Ok(
             checkCompanyRegistrationPage(
               CheckCompanyRegistrationController.ViewModel(
                 request.application.name, applicationId,
-                companyDetails.registrationType, 
-                companyDetails.registrationValue
+                details.registrationType, 
+                details.registrationValue
               )
             )
           )
