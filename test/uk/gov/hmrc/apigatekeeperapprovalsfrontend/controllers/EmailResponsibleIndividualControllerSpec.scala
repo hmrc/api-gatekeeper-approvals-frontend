@@ -79,7 +79,7 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
     "return 200" in new Setup {
       val fakeRequest = FakeRequest().withCSRFToken
 
-      val mySubmission = MarkedSubmission(submittedSubmission, Map.empty, markedAnswers)
+      val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -93,7 +93,7 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
     "return 404 if the submission is not submitted" in new Setup {
       val fakeRequest = FakeRequest().withCSRFToken
 
-      val mySubmission = MarkedSubmission(answeredSubmission, Map.empty, markedAnswers)
+      val mySubmission = MarkedSubmission(answeredSubmission, markedAnswers)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

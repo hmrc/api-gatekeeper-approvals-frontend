@@ -44,12 +44,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         val answersIncludingUnknownQuestion = aSubmission.latestInstance.answersToQuestions ++ Map(QuestionId.random -> TextAnswer("not there"))
         val submissionWithUnknownQuestion = aSubmission.answeringWith(answersIncludingUnknownQuestion)
 
-        val response = Some(MarkedSubmission(submissionWithUnknownQuestion, Map.empty, markedAnswers))
+        val response = Some(MarkedSubmission(submissionWithUnknownQuestion, markedAnswers))
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnWith(applicationId: ApplicationId, submission: Submission) = {
-        val response = Some(MarkedSubmission(submission, Map.empty, markedAnswers))
+        val response = Some(MarkedSubmission(submission, markedAnswers))
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
