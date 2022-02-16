@@ -55,8 +55,8 @@ object CompanyDetailsExtractor {
 
     def getRegistrationValue(registrationTypeQuestionId: QuestionId): Option[String] = {
       // Get the answer to the next question for the value of the VAT number, UTR, etc.
-      // Note that the question is dependent upon your previous answer (i.e. you'll be asked 
-      // for a VAT number if you answered the previous question 'VAT registration number')
+      // Note that the question is dependent upon your previous answer (i.e. you'll be asked for a 
+      // VAT number if you answered the 'Identify your Organisation' question 'VAT registration number')
       val registrationQuestionnaire = submission.findQuestionnaireContaining(registrationTypeQuestionId).get
       val simpleContext = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "No")
       val registrationQuestions = questionsToAsk(registrationQuestionnaire, simpleContext, submission.latestInstance.answersToQuestions)
