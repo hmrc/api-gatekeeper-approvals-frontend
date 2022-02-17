@@ -28,6 +28,7 @@ checklist.checkfailed.linktext = Check fails and warnings
 
 checklist.checkapplication.heading = Check application
 checklist.checkapplication.linktext.email = Email the responsible individual
+checklist.checkapplication.linktext.company = Check company registration
 checklist.checkapplication.linktext.urls = Check that all URLs work
 checklist.checkapplication.linktext.sandbox = Check for evidence of testing in sandbox
 
@@ -74,6 +75,11 @@ checkurls.termsandconditionsurl = Terms and conditions URL
 checkurls.urlschecked = URLs checked
 checkurls.checkurlslater = Check URLs later
 checkurls.nourl = None
+
+checkcompanyregistration.title = Check company registration
+checkcompanyregistration.pagetitle = HMRC API Gatekeeper - Check company registration
+checkcompanyregistration.checked = Company registration checked
+checkcompanyregistration.checklater = Check company registration later
 
 checksandbox.title = Check for evidence of testing in sandbox
 checksandbox.pagetitle = HMRC API Gatekeeper - Check Sandbox

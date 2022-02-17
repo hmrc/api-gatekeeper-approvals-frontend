@@ -42,6 +42,7 @@ object ChecklistController {
   case class ChecklistItemStatuses(
     failsAndWarnings: SubmissionReview.Status,
     email: SubmissionReview.Status,
+    company: SubmissionReview.Status,
     urls: SubmissionReview.Status,
     sandboxTesting: SubmissionReview.Status,
     passed: SubmissionReview.Status
@@ -67,6 +68,7 @@ class ChecklistController @Inject()(
     ChecklistItemStatuses(
       failsAndWarnings = review.checkedFailsAndWarnings,
       email = review.emailedResponsibleIndividual,
+      company = review.checkedCompanyRegistration,
       urls  = review.checkedUrls,
       sandboxTesting = review.checkedForSandboxTesting,
       passed = review.checkedPassedAnswers

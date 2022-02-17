@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AcknowledgedAns
 class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
   trait Setup extends SubmissionsTestData {
     val submissionWithAnswers = submission.setLatestAnswers(sampleAnswersToQuestions)
-    val submissionWithAnswersExceptForOrgDetails = submission.setLatestAnswers(sampleAnswersToQuestions - OrganisationDetails.question1.id)
+    val submissionWithAnswersExceptForOrgDetails = submission.setLatestAnswers(sampleAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id)
     val submissionWithNonDisplayableDevPracticesAnswers = submission.setLatestAnswers(sampleAnswersToQuestions + 
       (DevelopmentPractices.question1.id -> NoAnswer) + 
       (DevelopmentPractices.question2.id -> AcknowledgedAnswer) + 
@@ -38,7 +38,7 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
       
       result.length shouldBe 3
       result.find(_.heading == "Customers authorising your software").get.questionsAndAnswers.length shouldBe 3
-      result.find(_.heading == "Organisation details").get.questionsAndAnswers.length shouldBe 1
+      result.find(_.heading == "Organisation details").get.questionsAndAnswers.length shouldBe 5
       result.find(_.heading == "Development practices").get.questionsAndAnswers.length shouldBe 3
     }
 

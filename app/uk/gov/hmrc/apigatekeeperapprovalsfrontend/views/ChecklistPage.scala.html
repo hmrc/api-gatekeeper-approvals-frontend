@@ -114,6 +114,7 @@
             "checklist.checkapplication.heading", 
             List(
                 ("checklist.checkapplication.linktext.email", "checkemail", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.EmailResponsibleIndividualController.page(model.applicationId).url, model.itemStatuses.email),
+                ("checklist.checkapplication.linktext.company", "checkcompany", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.page(model.applicationId).url, model.itemStatuses.company),
                 ("checklist.checkapplication.linktext.urls", "checkurls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.itemStatuses.urls),
                 ("checklist.checkapplication.linktext.sandbox", "checksandbox", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckSandboxController.checkSandboxPage(model.applicationId).url, model.itemStatuses.sandboxTesting)
             )
