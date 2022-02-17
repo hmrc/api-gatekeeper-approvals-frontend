@@ -45,27 +45,27 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, declinedSubmission)
 
-      val result = controller.page(appId, 0)(fakeRequest)
+      val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, declinedSubmission)
 
-      val result = controller.page(appId, 1)(fakeRequest)
+      val result = controller.page(applicationId, 1)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
 
     "return 400 when given a submission that isn't declined" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, submittedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 
-      val result = controller.page(appId, 0)(fakeRequest)
+      val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

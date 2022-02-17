@@ -45,18 +45,18 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, grantedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, grantedSubmission)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return 400 when given a submission that isn't granted" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, submittedSubmission)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

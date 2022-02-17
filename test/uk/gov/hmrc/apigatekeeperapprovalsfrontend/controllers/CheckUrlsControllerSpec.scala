@@ -47,9 +47,9 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkUrlsPage(appId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
@@ -59,7 +59,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkUrlsPage(appId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -69,10 +69,10 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when marking URLs as checked" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkUrlsAction(appId)(fakeSubmitCheckedRequest)
+      val result = controller.checkUrlsAction(applicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -80,10 +80,10 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkUrlsAction(appId)(fakeSubmitComebackLaterRequest)
+      val result = controller.checkUrlsAction(applicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -91,9 +91,9 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     "return bad request when sending an empty submit-action" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkUrlsAction(appId)(fakeRequest)
+      val result = controller.checkUrlsAction(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

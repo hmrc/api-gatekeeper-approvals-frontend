@@ -48,9 +48,9 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
@@ -58,9 +58,9 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     "return 200 if unknown questions exist" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
@@ -70,7 +70,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -80,10 +80,10 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when marking answers as checked" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedFailsAndWarningsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.action(appId)(fakeSubmitCheckedRequest)
+      val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -91,10 +91,10 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when marking answers as come-back-later" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedFailsAndWarningsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.action(appId)(fakeSubmitComebackLaterRequest)
+      val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -102,9 +102,9 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     "return bad request when marking answers as anything that we don't understand" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(appId)(brokenRequest)
+      val result = controller.action(applicationId)(brokenRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -112,9 +112,9 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     "return bad request when sending an empty submit-action" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(appId)(fakeRequest)
+      val result = controller.action(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

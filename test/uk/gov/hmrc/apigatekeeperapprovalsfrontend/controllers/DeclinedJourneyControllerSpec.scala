@@ -45,9 +45,9 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
     
-      val result = controller.provideReasonsPage(appId)(fakeRequest)
+      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }

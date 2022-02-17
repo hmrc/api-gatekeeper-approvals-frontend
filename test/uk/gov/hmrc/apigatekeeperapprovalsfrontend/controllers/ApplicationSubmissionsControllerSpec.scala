@@ -48,9 +48,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -59,7 +59,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -67,19 +67,19 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
   }
@@ -88,21 +88,21 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(appId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
-      val result = controller.whichPage(appId)(fakeRequest)
+      val result = controller.whichPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/reviews")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/reviews")
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
 
-      val result = controller.whichPage(appId)(fakeRequest)
+      val result = controller.whichPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${appId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
     }
 
     "redirect to Gatekeeper when no submission found" in new Setup {
@@ -110,9 +110,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
-      val result = controller.whichPage(appId)(fakeRequest)
+      val result = controller.whichPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${appId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
     }
   }
 }

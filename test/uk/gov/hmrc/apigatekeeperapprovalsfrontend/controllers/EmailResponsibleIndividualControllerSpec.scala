@@ -51,7 +51,7 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
@@ -63,7 +63,7 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -73,7 +73,7 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -83,10 +83,10 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when marking URLs as checked" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateEmailedResponsibleIndividualStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.action(appId)(fakeSubmitCheckedRequest)
+      val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -94,10 +94,10 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateEmailedResponsibleIndividualStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.action(appId)(fakeSubmitComebackLaterRequest)
+      val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -105,9 +105,9 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
     "return bad request when sending an empty submit-action" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(appId)(fakeRequest)
+      val result = controller.action(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

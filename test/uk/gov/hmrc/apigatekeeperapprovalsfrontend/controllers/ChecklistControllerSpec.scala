@@ -49,10 +49,10 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.checklistPage(appId)(fakeRequest)
+      val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -61,7 +61,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checklistPage(appId)(fakeRequest)
+      val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -69,19 +69,19 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.checklistPage(appId)(fakeRequest)
+      val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val result = controller.checklistPage(appId)(fakeRequest)
+      val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val result = controller.checklistPage(appId)(fakeRequest)
+      val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
   }
@@ -92,11 +92,11 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checklistAction(appId)(fakeRequestWithAction)
+      val result = controller.checklistAction(applicationId)(fakeRequestWithAction)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/confirm-decision")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/confirm-decision")
     }
 
     "return 200 and send to submissions page if Save and Come Back Later button is clicked" in new Setup {
@@ -104,11 +104,11 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checklistAction(appId)(fakeRequestWithAction)
+      val result = controller.checklistAction(applicationId)(fakeRequestWithAction)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/reviews")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/reviews")
     }
 
     "return 400 if bad submission action is received" in new Setup {
@@ -116,9 +116,9 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checklistAction(appId)(fakeRequestWithAction)
+      val result = controller.checklistAction(applicationId)(fakeRequestWithAction)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

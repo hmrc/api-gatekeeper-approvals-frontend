@@ -16,18 +16,16 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
-class SubmittedAnswersControllerSpec extends AbstractControllerSpec with SubmissionsTestData {
+class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup {
-    override val appId = applicationId
-
     val submittedAnswersPage = app.injector.instanceOf[SubmittedAnswersPage]
 
     val controller = new SubmittedAnswersController(
@@ -46,7 +44,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec with Submiss
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -55,7 +53,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec with Submiss
     "return 400 when given a submission index that doesn't exist" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.page(applicationId, 1)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
@@ -65,7 +63,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec with Submiss
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(appId, 0)(fakeRequest)
+      val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }

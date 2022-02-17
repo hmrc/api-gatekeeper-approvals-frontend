@@ -45,14 +45,24 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
   }
 
   "GET /" should {
-    "return 200" in new Setup {
+    "return 200 when marked submission is found" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
     
-      val result = controller.page(appId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
+    }
+
+    "return 404 when no marked submission is found" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+
+      val result = controller.page(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.NOT_FOUND
     }
   }
 }
