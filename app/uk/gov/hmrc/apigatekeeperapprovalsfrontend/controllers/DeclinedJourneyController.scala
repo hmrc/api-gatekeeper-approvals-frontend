@@ -73,7 +73,7 @@ class DeclinedJourneyController @Inject()(
   def provideReasonsAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
       submissionService.decline(applicationId, request.name.get, form.reasons).map( _ match {
-        case Right(app) => Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name)))
+        case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
         case Left(err) => {
           logger.warn(s"Decline application failed due to: $err")
           BadRequest(errorHandler.badRequestTemplate)
@@ -88,4 +88,7 @@ class DeclinedJourneyController @Inject()(
     DeclinedJourneyController.provideReasonsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
+  def declinedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name))))
+  }
 }

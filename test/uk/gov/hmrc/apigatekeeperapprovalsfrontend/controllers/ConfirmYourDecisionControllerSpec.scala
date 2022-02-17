@@ -44,7 +44,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       )
   }
 
-  "GET /" should {
+  "confirmYourDecision page" should {
     "return 200 when marked submission is found" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -63,6 +63,34 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
+    }
+  }
+
+  "confirmYourDecision action" should {
+    "redirect to correct page when grant decision is decline" in new Setup {
+      val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "decline")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+    
+      val result = controller.action(applicationId)(fakeDeclineRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId).url
+    }
+
+    "return redirect back to page when grant decision is something we don't understand" in new Setup {
+      val brokenDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "bobbins")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.action(applicationId)(brokenDeclineRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId).url
     }
   }
 }
