@@ -21,15 +21,13 @@ import play.api.http.Status._
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication}
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 
-class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions {
+class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions{
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port" -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
@@ -46,13 +44,8 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
 
   private val applicationId = ApplicationId("applicationId")
 
-  trait Setup {
+  trait Setup extends ApplicationTestData{
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
-
-    def applicationResponse(appId: ApplicationId, appName: String = "My Application") = new Application(
-      appId,
-      appName
-    )
 
     implicit val hc = HeaderCarrier()
   }
@@ -67,7 +60,7 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
         .willReturn(
             aResponse()
             .withStatus(OK)
-            .withJsonBody(applicationResponse(applicationId, appName))
+            .withJsonBody(anApplication(id = applicationId, name = appName))
         )
       )
       

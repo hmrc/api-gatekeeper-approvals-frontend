@@ -21,13 +21,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup {
-    implicit val appConfig = app.injector.instanceOf[AppConfig]
     val appChecklistPage = app.injector.instanceOf[ChecklistPage]
 
     val controller = new ChecklistController(
@@ -88,37 +86,31 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
   "POST /" should {
     "return 200 and send to checks completed page if Checks Completed button is clicked" in new Setup {
-      val fakeRequestWithAction = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checklistAction(applicationId)(fakeRequestWithAction)
+      val result = controller.checklistAction(applicationId)(fakeSubmitCheckedRequest)
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/confirm-decision")
     }
 
     "return 200 and send to submissions page if Save and Come Back Later button is clicked" in new Setup {
-      val fakeRequestWithAction = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checklistAction(applicationId)(fakeRequestWithAction)
+      val result = controller.checklistAction(applicationId)(fakeSubmitComebackLaterRequest)
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/reviews")
     }
 
     "return 400 if bad submission action is received" in new Setup {
-      val fakeRequestWithAction = fakeRequest.withFormUrlEncodedBody("submit-action" -> "nope")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checklistAction(applicationId)(fakeRequestWithAction)
+      val result = controller.checklistAction(applicationId)(brokenRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

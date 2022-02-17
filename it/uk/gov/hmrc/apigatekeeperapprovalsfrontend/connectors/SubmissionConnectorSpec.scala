@@ -21,8 +21,7 @@ import play.api.http.Status._
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication}
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
@@ -30,12 +29,10 @@ import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnect
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.DeclinedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
 
-class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
+class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData{
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port" -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
@@ -58,11 +55,6 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
     val requestedBy = "bob@blockbusters.com"
     val reason = "reason"
     implicit val hc = HeaderCarrier()
-
-    def applicationResponse(appId: ApplicationId, appName: String = "My Application") = new Application(
-      appId,
-      appName
-    )
   }
   
   "fetch latest submission by id" should {
@@ -143,7 +135,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
         .willReturn(
             aResponse()
             .withStatus(OK)
-            .withJsonBody(applicationResponse(applicationId))
+            .withJsonBody(anApplication(id = applicationId))
         )
       )
       
@@ -164,7 +156,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
         .willReturn(
             aResponse()
             .withStatus(OK)
-            .withJsonBody(applicationResponse(applicationId))
+            .withJsonBody(anApplication(id = applicationId))
         )
       )
       

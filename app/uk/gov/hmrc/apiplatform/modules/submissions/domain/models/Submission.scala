@@ -51,7 +51,8 @@ case class QuestionIdsOfInterest(
     termsAndConditionsUrlId: QuestionId,
     organisationUrlId: QuestionId,
     responsibleIndividualNameId: QuestionId,
-    responsibleIndividualEmailId: QuestionId
+    responsibleIndividualEmailId: QuestionId,
+    identifyYourOrganisationId: QuestionId
 )
 
 object Submission {
@@ -239,7 +240,7 @@ case class Submission(
 
   def findQuestion(questionId: QuestionId): Option[Question] = allQuestions.find(q => q.id == questionId)
 
-  def findQuestionnaireContaining(questionId: QuestionId): Option[Questionnaire] = 
+  def findQuestionnaireContaining(questionId: QuestionId): Option[Questionnaire] =
     allQuestionnaires.find(qn => 
       qn.questions.exists(qi => 
         qi.question.id == questionId

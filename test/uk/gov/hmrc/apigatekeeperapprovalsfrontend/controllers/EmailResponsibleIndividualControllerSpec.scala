@@ -30,6 +30,7 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule {
     val page = app.injector.instanceOf[EmailResponsibleIndividualPage]
+
     val controller = new EmailResponsibleIndividualController(
       strideAuthConfig,
       AuthConnectorMock.aMock,

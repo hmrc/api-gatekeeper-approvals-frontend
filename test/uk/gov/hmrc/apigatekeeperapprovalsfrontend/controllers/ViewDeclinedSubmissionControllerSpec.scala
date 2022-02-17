@@ -21,11 +21,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
 
 class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup with ApplicationTestData{
+
     val viewDeclinedSubmissionPage = app.injector.instanceOf[ViewDeclinedSubmissionPage]
 
     val controller = new ViewDeclinedSubmissionController(
@@ -41,7 +43,6 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
   }
 
   "GET /" should {
-
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

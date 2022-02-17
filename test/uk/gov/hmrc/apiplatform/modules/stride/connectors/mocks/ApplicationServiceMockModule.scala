@@ -22,19 +22,26 @@ import org.mockito.ArgumentMatchersSugar
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
-trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
   trait BaseApplicationServiceMock {
     def aMock: ApplicationService
 
     object FetchByApplicationId {
       def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(new Application(applicationId, "app name"))
+        val response = Some(anApplication(id = applicationId))
         when(aMock.fetchByApplicationId(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
       def thenNotFound() = {
         when(aMock.fetchByApplicationId(*[ApplicationId])(*)).thenReturn(successful(None))
+      }
+    }
+
+    object FetchLinkedSubordinateApplicationByApplicationId {
+      def thenReturn(subordinateApplicationId: ApplicationId) = {
+        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
+          .thenReturn(successful(Some(anApplication(id = subordinateApplicationId))))
       }
     }
   }

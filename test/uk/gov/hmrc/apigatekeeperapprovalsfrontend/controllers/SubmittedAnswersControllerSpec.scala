@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import play.api.http.Status
 import play.api.test.Helpers._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 
 class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
