@@ -16,47 +16,19 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import play.api.test.FakeRequest
+
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
 
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 
-class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
-  val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-  val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-  val mcc = app.injector.instanceOf[MessagesControllerComponents]
-  val page = app.injector.instanceOf[CheckUrlsPage]
-  val errorHandler = app.injector.instanceOf[ErrorHandler]
-
-  override def fakeApplication() =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
+class CheckUrlsControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
+  trait Setup extends AbstractSetup {
+    val page = app.injector.instanceOf[CheckUrlsPage]
+    
     val controller = new CheckUrlsController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -69,14 +41,10 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
       SubmissionReviewServiceMock.aMock
     )
 
-    val appId = ApplicationId.random
-    val application = Application(appId, "app name")
   }
 
   "checkUrlsPage" should {
     "return 200" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
@@ -87,8 +55,6 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
     }
 
     "return 404" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
@@ -101,39 +67,28 @@ class CheckUrlsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite wit
 
   "checkUrlsAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "checked")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkUrlsAction(appId)(fakeRequest)
+      val result = controller.checkUrlsAction(appId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "come-back-later")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkUrlsAction(appId)(fakeRequest)
+      val result = controller.checkUrlsAction(appId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)

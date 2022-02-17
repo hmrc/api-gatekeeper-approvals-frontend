@@ -16,41 +16,17 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import play.api.test.FakeRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
 
-class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
-  override def fakeApplication() =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
+class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule {
-    val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-    val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-    val mcc = app.injector.instanceOf[MessagesControllerComponents]
+  trait Setup extends AbstractSetup {
     val viewDeclinedSubmissionPage = app.injector.instanceOf[ViewDeclinedSubmissionPage]
-    val errorHandler = app.injector.instanceOf[ErrorHandler]
 
     val controller = new ViewDeclinedSubmissionController(
       strideAuthConfig,
@@ -67,10 +43,6 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
   "GET /" should {
 
     "return 200" in new Setup {
-      val appId = ApplicationId.random
-      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
@@ -80,10 +52,6 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
-      val appId = ApplicationId.random
-      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, declinedSubmission)
@@ -93,10 +61,6 @@ class ViewDeclinedSubmissionControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "return 400 when given a submission that isn't declined" in new Setup {
-      val appId = ApplicationId.random
-      val fakeRequest = FakeRequest("GET", "/").withCSRFToken
-      val application = Application(appId, "app name")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, submittedSubmission)

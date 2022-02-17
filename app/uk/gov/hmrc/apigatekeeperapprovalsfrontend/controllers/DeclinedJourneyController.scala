@@ -22,7 +22,6 @@ import scala.concurrent.Future.successful
 
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
@@ -67,7 +66,7 @@ class DeclinedJourneyController @Inject()(
 
   import DeclinedJourneyController._
 
-  def provideReasonsPage(applicationId: ApplicationId): mvc.Action[mvc.AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(applicationId, request.application.name))))
   }
 

@@ -16,53 +16,20 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.http.Status
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.inject.guice.GuiceApplicationBuilder
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId,Application}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+
+import play.api.http.Status
+import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 
 
-class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
-  override def fakeApplication() =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
-
-  private val fakeRequest = FakeRequest("GET", "/")
-
-  trait Setup 
-      extends AuthConnectorMockModule
-      with ApplicationActionServiceMockModule 
-      with SubmissionServiceMockModule
+class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
+  trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule {
         
-    implicit val appConfig = app.injector.instanceOf[AppConfig]
-
-    val config = app.injector.instanceOf[GatekeeperConfig]
-    val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-    val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-    val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val page = app.injector.instanceOf[ApplicationSubmissionsPage]
-    val errorHandler = app.injector.instanceOf[ErrorHandler]
 
     val controller = new ApplicationSubmissionsController(
       config,
@@ -79,10 +46,6 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
   "page" should {
     "return 200" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
@@ -92,11 +55,6 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "return 404 if no marked application is found" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
@@ -106,10 +64,6 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "return 404 if no application is found" in new Setup {
-      val appId = ApplicationId.random
-
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound()
 
@@ -119,14 +73,12 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
     "return 403 for InsufficientEnrolments" in new Setup {
       AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
-      val appId = ApplicationId.random
       val result = controller.page(appId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
-      val appId = ApplicationId.random
       val result = controller.page(appId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
@@ -134,10 +86,6 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
 
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(appId)
@@ -148,10 +96,6 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(appId)
@@ -162,10 +106,6 @@ class ApplicationSubmissionsControllerSpec extends AsyncHmrcSpec with GuiceOneAp
     }
 
     "redirect to Gatekeeper when no submission found" in new Setup {
-      val appId = ApplicationId.random
-      val application = Application(appId, "app name")
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()

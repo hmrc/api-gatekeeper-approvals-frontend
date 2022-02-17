@@ -51,7 +51,10 @@ trait ApplicationActionBuilders {
         import cats.implicits._
 
         applicationActionService.process(applicationId, request)
-        .toRight(NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi)))).value
+        .toRight( {
+          println("Oh dear")
+          NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi)))
+        }).value
       }
     }
   }

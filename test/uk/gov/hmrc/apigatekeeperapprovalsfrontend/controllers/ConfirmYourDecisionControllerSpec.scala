@@ -21,43 +21,38 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
 
-class ProductionAccessControllerSpec extends AbstractControllerSpec {
-
+class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
+  
   trait Setup extends AbstractSetup {
-    val productionAccessPage = app.injector.instanceOf[ProductionAccessPage]
-
-    val controller = new ProductionAccessController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
-      mcc,
-      productionAccessPage,
-      errorHandler,
-      ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock
-    )
+    val confirmYourDecisionPage = app.injector.instanceOf[ConfirmYourDecisionPage]
+    val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
+    val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
+  
+    val controller = new ConfirmYourDecisionController(
+        strideAuthConfig,
+        AuthConnectorMock.aMock,
+        forbiddenHandler,
+        mcc,
+        errorHandler,
+        ApplicationActionServiceMock.aMock,
+        SubmissionServiceMock.aMock,
+        confirmYourDecisionPage,
+        applicationApprovedPage,
+        applicationDeclinedPage
+      )
   }
 
   "GET /" should {
-    
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, grantedSubmission)
-
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+    
       val result = controller.page(appId)(fakeRequest)
+
       status(result) shouldBe Status.OK
-    }
-
-    "return 400 when given a submission that isn't granted" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(appId, submittedSubmission)
-
-      val result = controller.page(appId)(fakeRequest)
-      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 }

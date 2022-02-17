@@ -16,49 +16,20 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import play.api.test.FakeRequest
+
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WithCSRFAddToken
-
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.EmailResponsibleIndividualPage
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
-  val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-  val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-  val mcc = app.injector.instanceOf[MessagesControllerComponents]
-  val page = app.injector.instanceOf[EmailResponsibleIndividualPage]
-  val errorHandler = app.injector.instanceOf[ErrorHandler]
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.EmailResponsibleIndividualPage
 
-  override def fakeApplication() =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
-  
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule {
+class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
+
+  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule {
+    val page = app.injector.instanceOf[EmailResponsibleIndividualPage]
     val controller = new EmailResponsibleIndividualController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -70,15 +41,10 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
       SubmissionServiceMock.aMock,
       SubmissionReviewServiceMock.aMock
     )
-
-    val appId = ApplicationId.random
-    val application = Application(appId, "app name")
   }
 
   "emailResponsibleIndividualPage" should {
     "return 200" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       
       AuthConnectorMock.Authorise.thenReturn()
@@ -91,8 +57,6 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
     }
 
     "return 404 if the submission is not submitted" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       val mySubmission = MarkedSubmission(answeredSubmission, markedAnswers)
 
       AuthConnectorMock.Authorise.thenReturn()
@@ -105,8 +69,6 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
     }
 
     "return 404 if not found" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
@@ -119,39 +81,28 @@ class EmailResponsibleIndividualControllerSpec extends AsyncHmrcSpec with GuiceO
 
   "emailResponsibleIndividualAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "checked")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.UpdateEmailedResponsibleIndividualStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.action(appId)(fakeRequest)
+      val result = controller.action(appId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "come-back-later")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
       SubmissionReviewServiceMock.UpdateEmailedResponsibleIndividualStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.action(appId)(fakeRequest)
+      val result = controller.action(appId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)

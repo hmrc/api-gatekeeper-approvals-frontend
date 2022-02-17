@@ -73,6 +73,7 @@ class ConfirmYourDecisionController @Inject()(
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")              => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
+      // TODO
       // case Some("grant-with-warnings")  => successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
       // case Some("grant")                => successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
       case _                            => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
