@@ -30,6 +30,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckUrlsController {  
   case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String], privacyPolicyUrl: Option[String], termsAndConditionsUrl: Option[String]) {
@@ -45,12 +46,12 @@ class CheckUrlsController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  checkUrlsPage: CheckUrlsPage,
+  submissionReviewService: SubmissionReviewService,
   errorHandler: ErrorHandler,
+  checkUrlsPage: CheckUrlsPage,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  val submissionService: SubmissionService
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps
@@ -72,5 +73,5 @@ class CheckUrlsController @Inject()(
   }
 
   def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] = 
-    updateReviewAction("checkUrlsAction", submissionReviewService.updateCheckedUrlsStatus _)(applicationId)
+    updateActionStatus(SubmissionReview.Action.CheckUrls)(applicationId)
 }

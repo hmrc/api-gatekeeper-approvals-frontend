@@ -33,7 +33,6 @@ import scala.concurrent.Future.successful
 import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Granted
 
-
 object ProductionAccessController {
   case class ViewModel(
     appName: String,
@@ -50,11 +49,11 @@ class ProductionAccessController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  productionAccessPage: ProductionAccessPage,
   errorHandler: ErrorHandler,
+  productionAccessPage: ProductionAccessPage,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import ProductionAccessController._
 

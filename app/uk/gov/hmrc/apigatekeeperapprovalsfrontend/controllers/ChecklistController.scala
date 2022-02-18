@@ -22,13 +22,9 @@ import scala.concurrent.ExecutionContext
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -39,15 +35,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewServi
 
 object ChecklistController {
   
-  case class ChecklistItemStatuses(
-    failsAndWarnings: SubmissionReview.Status,
-    email: SubmissionReview.Status,
-    company: SubmissionReview.Status,
-    urls: SubmissionReview.Status,
-    sandboxTesting: SubmissionReview.Status,
-    passed: SubmissionReview.Status
-  )
-  case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
+  case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status])
 }
 
 @Singleton
@@ -56,24 +44,13 @@ class ChecklistController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
+  submissionReviewService: SubmissionReviewService,
+  errorHandler: ErrorHandler,
   checklistPage: ChecklistPage,
-  val errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions {
+  val submissionService: SubmissionService
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   import ChecklistController._
-
-  private def buildChecklistItemStatuses(review: SubmissionReview, markedSubmission: MarkedSubmission): ChecklistItemStatuses = {
-    ChecklistItemStatuses(
-      failsAndWarnings = review.checkedFailsAndWarnings,
-      email = review.emailedResponsibleIndividual,
-      company = review.checkedCompanyRegistration,
-      urls  = review.checkedUrls,
-      sandboxTesting = review.checkedForSandboxTesting,
-      passed = review.checkedPassedAnswers
-    )
-  }
 
   def checklistPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       val appName = request.application.name
@@ -81,9 +58,8 @@ class ChecklistController @Inject()(
       val hasWarnings = request.markedSubmission.isWarn
 
       for {
-        review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index)
-        itemStatuses = buildChecklistItemStatuses(review, request.markedSubmission)
-      } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, itemStatuses)))
+        review <- submissionReviewService.findOrCreateReview(request.application, request.submission.id, request.submission.latestInstance.index)
+      } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, review.requiredActions)))
   }
 
   def checklistAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>

@@ -29,6 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckSandboxController {
   case class ViewModel(
@@ -49,12 +50,12 @@ class CheckSandboxController @Inject()(
   mcc: MessagesControllerComponents,
   checkSandboxPage: CheckSandboxPage,
   errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService,
-  applicationService: ApplicationService,
-  subscriptionService: SubscriptionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  val applicationService: ApplicationService,
+  val subscriptionService: SubscriptionService
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
   def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     for {
       linkedSubordinateApplication <- applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId)
@@ -72,5 +73,5 @@ class CheckSandboxController @Inject()(
   }
 
   def checkSandboxAction(applicationId: ApplicationId): Action[AnyContent] =
-    updateReviewAction("checkSandboxAction", submissionReviewService.updateCheckedForSandboxTestingStatus _)(applicationId)
+    updateActionStatus(SubmissionReview.Action.CheckSandboxTesting)(applicationId)
 }

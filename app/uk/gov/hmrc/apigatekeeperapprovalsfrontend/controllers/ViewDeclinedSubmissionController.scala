@@ -32,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import scala.concurrent.Future.successful
 import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
 
 object ViewDeclinedSubmissionController {
@@ -53,9 +54,10 @@ class ViewDeclinedSubmissionController @Inject()(
   mcc: MessagesControllerComponents,
   viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
   errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import ViewDeclinedSubmissionController._
 
