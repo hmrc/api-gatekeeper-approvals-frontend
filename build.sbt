@@ -38,7 +38,8 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
-    Test / unmanagedSourceDirectories += (baseDirectory.value / "test-common")
+    Test / unmanagedSourceDirectories += (baseDirectory.value / "test-common"),
+    inConfig(Test)(BloopDefaults.configSettings)
   )
   .settings(
     IntegrationTest / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaTest, "-eT")),
