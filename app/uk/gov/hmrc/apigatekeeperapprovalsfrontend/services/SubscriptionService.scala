@@ -40,4 +40,7 @@ class SubscriptionService @Inject()(
     ).getOrElseF(successful(Set[ApiDefinition]()))
   }
 
+  def hasMtdSubscriptions(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Boolean] = {
+    fetchSubscriptionsByApplicationId(applicationId).map(_.exists(_.isMtd))
+  }
 }

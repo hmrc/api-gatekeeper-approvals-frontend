@@ -1,0 +1,48 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("checkfraud.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">@model.appName</span>
+
+  <h1 class="govuk-heading-l">        
+    @{messages("checkfraud.title")}
+  </h1>
+
+  <p class="govuk-body">
+    @{messages("checkfraud.description")}
+  </p>
+
+  <p class="govuk-body">
+    @play.twirl.api.HtmlFormat.raw(messages("checkfraud.approvalsboard", "<a class='govuk-link govuk-link--no-visited-state' href='https://jira.tools.tax.service.gov.uk/secure/RapidBoard.jspa?rapidView=4526&projectKey=CMQAA'>", "</a>"))
+  </p>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudAction(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+
+    <div class="govuk-button-group">
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkfraud.checked")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkfraud.checklater")}</button>
+    </div>
+  }
+}

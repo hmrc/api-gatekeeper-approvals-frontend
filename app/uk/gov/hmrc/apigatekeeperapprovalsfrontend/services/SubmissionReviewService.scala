@@ -53,6 +53,8 @@ class SubmissionReviewService @Inject()(
   def updateCheckedCompanyRegistrationStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedCompanyRegistration = newStatus)) _
 
   def updateCheckedForSandboxTestingStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedForSandboxTesting = newStatus)) _
-  
+
+  def updateCheckedForFraudStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedForFraud = newStatus)) _
+
   def updateCheckedPassedAnswersStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedPassedAnswers = newStatus)) _
 }

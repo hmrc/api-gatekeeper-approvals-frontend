@@ -31,6 +31,7 @@ checklist.checkapplication.linktext.email = Email the responsible individual
 checklist.checkapplication.linktext.company = Check company registration
 checklist.checkapplication.linktext.urls = Check that all URLs work
 checklist.checkapplication.linktext.sandbox = Check for evidence of testing in sandbox
+checklist.checkapplication.linktext.fraud = Check fraud prevention data
 
 checklist.checkpassed.heading = Check answers that passed
 checklist.checkpassed.linktext = Answers that passed
@@ -100,6 +101,13 @@ checksandbox.label.clientid = Sandbox client ID
 checksandbox.label.apisubs = API subscriptions
 checksandbox.sandboxchecked = Sandbox testing checked
 checksandbox.checksandboxlater = Check again later
+
+checkfraud.title = Check fraud prevention data
+checkfraud.pagetitle = HMRC API Gatekeeper - Check fraud prevention data
+checkfraud.description = The Customer Insights Platform (CIP) Metadata Quality team check that fraud prevention data is submitted correctly.
+checkfraud.approvalsboard = You need to check the {0} application approvals board {1}
+checkfraud.checked = Fraud prevention data checked
+checkfraud.checklater = Check again later
 
 applicationapproved.pagetitle = HMRC API Gatekeeper - Application Granted
 applicationapproved.title = Application Granted

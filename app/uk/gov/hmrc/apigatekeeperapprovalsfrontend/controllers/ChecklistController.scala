@@ -45,6 +45,7 @@ object ChecklistController {
     company: SubmissionReview.Status,
     urls: SubmissionReview.Status,
     sandboxTesting: SubmissionReview.Status,
+    fraud: SubmissionReview.Status,
     passed: SubmissionReview.Status
   )
   case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, itemStatuses: ChecklistItemStatuses)
@@ -71,6 +72,7 @@ class ChecklistController @Inject()(
       company = review.checkedCompanyRegistration,
       urls  = review.checkedUrls,
       sandboxTesting = review.checkedForSandboxTesting,
+      fraud = review.checkedForFraud,
       passed = review.checkedPassedAnswers
     )
   }
