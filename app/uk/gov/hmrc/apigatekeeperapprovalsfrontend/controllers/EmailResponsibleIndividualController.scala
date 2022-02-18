@@ -57,9 +57,10 @@ class EmailResponsibleIndividualController @Inject()(
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val ori = ResponsibleIndividualExtractor(request.submission)
 
+
     // Should only be uplifting and checking Standard apps
     (request.application.access, ori) match {
-      case (std: Standard, Some(ri)) if(request.submission.status.isSubmitted) => 
+      case (std: Standard, Some(ri)) if(request.submission.status.isSubmitted) =>
         successful(
           Ok(
             emailResponsibleIndividualPage(
@@ -72,6 +73,7 @@ class EmailResponsibleIndividualController @Inject()(
             )
           )
         )
+
       case _ => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }

@@ -29,20 +29,21 @@
     @helper.CSRF.formField
 
     <span class="govuk-caption-l">@model.appName</span>
-    <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="reasons">
-        Note all the reasons the request is declined
+    <h1 class="govuk-label-wrapper">
+      <label class="govuk-label govuk-label--l" for="reasons">
+        @{messages("providedeclinereasons.title")}
       </label>
     </h1>
     <div id="reasons-hint" class="govuk-hint">
-      The reasons are saved on Gatekeeper. <a href="#" class="govuk-link govuk-link--no-visited-state">Use guidance on Confluence to help</a>.
+      @{messages("providedeclinereasons.note.1")} <a href="#" class="govuk-link govuk-link--no-visited-state">@{messages("providedeclinereasons.confluence.url")}</a>.
     </div>
     <div id="reasons-hint" class="govuk-hint">
-      Include all the issues you have identified working through the checklist.
+      @{messages("providedeclinereasons.note.2")}
     </div>
     <textarea class="govuk-textarea" id="reasons" name="reasons" rows="5" aria-describedby="reasons-hint">@form.data.get("reasons")</textarea>
 
     <button class="govuk-button" data-module="govuk-button">
-      Save and continue
+      @{messages("providedeclinereasons.button.continue")}
     </button>
   }
 }

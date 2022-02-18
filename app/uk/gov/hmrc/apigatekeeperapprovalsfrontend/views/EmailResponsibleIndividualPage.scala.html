@@ -33,7 +33,7 @@
   <dl class="govuk-summary-list govuk-!-margin-bottom-6">
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        Name
+        @{messages("emailresponsibleindividual.label.name")}
       </dt>
       <dd class="govuk-summary-list__value">
         @{model.responsibleIndividual.fullName}
@@ -41,7 +41,7 @@
     </div>
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        Email address
+        @{messages("emailresponsibleindividual.label.emailaddress")}
       </dt>
       <dd class="govuk-summary-list__value">
         <p class="govuk-body">@{model.responsibleIndividual.emailAddress}</p>
@@ -49,26 +49,26 @@
     </div>
   </dl>
 
-  <p class="govuk-body">Copy the content and email the responsible individual.
+  <p class="govuk-body">@{messages("emailresponsibleindividual.text.copythecontent")}
     </p>
 
   <div class="text-area-highlight govuk-!-padding-6 govuk-!-margin-bottom-6">
-    <p class="govuk-body">Dear @{model.responsibleIndividual.fullName}
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.dear", model.responsibleIndividual.fullName)}
       </p>
 
-    <p class="govuk-body">You have been made responsible for @{model.appName} on the HMRC Developer Hub.
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.youhavebeenmaderesponsiblefor", model.appName)}
       </p>
 
-    <p class="govuk-body">Click on the link to verify that you are responsible for @{model.appName}.
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.clickonthelinktoverify", model.appName)}
       </p>
 
     <p class="govuk-body"><a href="#" class="govuk-link govuk-link--no-visited-state">@{model.verificationLink}</a>
       </p>
 
-    <p class="govuk-body">As the person responsible for @{model.appName}, you must make sure that your software conforms to our <a href="https://developer-hub-prototype.herokuapp.com/v50/vat_mtd_commercial_software/terms_of_use/index" class="govuk-link govuk-link--no-visited-state">terms of use</a>.
+    <p class="govuk-body">@{messages("emailresponsibleindividual.responsibleperson", model.appName)} <a href="https://developer-hub-prototype.herokuapp.com/v50/vat_mtd_commercial_software/terms_of_use/index" class="govuk-link govuk-link--no-visited-state">@{messages("emailresponsibleindividual.termsofuse")}</a>.
       </p>
 
-    <p class="govuk-body">Contact the person who requested credentials for @{model.appName} if you think there has been a mistake or you do not want to verify.
+    <p class="govuk-body">@{messages("emailresponsibleindividual.contacttheperson", model.appName)} 
       </p>
   </div>
 

@@ -47,6 +47,8 @@ confirmyourdecision.grantlabel = Grant production access
 confirmyourdecision.grantwithwarningslabel = Grant production access and email with warnings
 confirmyourdecision.declinelabel = Decline the request
 confirmyourdecision.continue = Continue
+confirmyourdecision.checkguidance = Check the guidance on Confluence
+confirmyourdecision.escalate = You can escalate the request to a senior colleague if you need to.
 
 answersthatfailed.failsonly.title = Answers with fails
 answersthatfailed.warnsonly.title = Answers with warnings
@@ -99,19 +101,17 @@ checksandbox.label.apisubs = API subscriptions
 checksandbox.sandboxchecked = Sandbox testing checked
 checksandbox.checksandboxlater = Check again later
 
-checkscompleted.pagetitle = HMRC API Gatekeeper - Checks Completed
-checkscompleted.title = Checks Completed
-checkscompleted.checkspassed = Checks Passed
-checkscompleted.checksfailed = Checks Failed
-
 applicationapproved.pagetitle = HMRC API Gatekeeper - Application Granted
 applicationapproved.title = Application Granted
 applicationapproved.text = The Application has been granted and is now in a state of Pending Requester Verification
 applicationapproved.productionaccessgranted = Production access granted
+applicationapproved.checkanother = Check another production credentials request.
 
 applicationdeclined.pagetitle = HMRC API Gatekeeper - Application Declined
 applicationdeclined.title = Application Declined
 applicationdeclined.text = The Application has been declined and has been put back in a state of Testing
+applicationdeclined.youhavedeclinedthisrequest = You have declined this request
+applicationdeclined.checkanotherrequest = Check another production credentials request
 
 applicationsubmissions.pagetitle = HMRC API Gatekeeper - Application Submissions
 applicationsubmissions.title = Request for production credentials
@@ -135,6 +135,15 @@ emailresponsibleindividual.pagetitle = HMRC API Gatekeeper - Email the responsib
 emailresponsibleindividual.title = Email the responsible individual
 emailresponsibleindividual.continue = Continue
 emailresponsibleindividual.sendemaillater = Send email later
+emailresponsibleindividual.label.name = Name
+emailresponsibleindividual.label.emailaddress = Email address
+emailresponsibleindividual.text.copythecontent = Copy the content and email the responsible individual.
+emailresponsibleindividual.text.dear = Dear {0}
+emailresponsibleindividual.text.youhavebeenmaderesponsiblefor = You have been made responsible for {0} on the HMRC Developer Hub.
+emailresponsibleindividual.text.clickonthelinktoverify = Click on the link to verify that you are responsible for {0}.
+emailresponsibleindividual.contacttheperson = Contact the person who requested credentials for {0} if you think there has been a mistake or you do not want to verify.
+emailresponsibleindividual.responsibleperson = As the person responsible for {0} you must make sure that your software conforms to our
+emailresponsibleindividual.termsofuse = terms of use
 
 submittedanswers.pagetitle = HMRC API Gatekeeper - Submitted answers
 submittedanswers.title = Submitted answers
@@ -146,4 +155,10 @@ productionaccess.requestedby = Requested by
 productionaccess.date = Date
 productionaccess.submittedanswers = All submitted answers
 productionaccess.checkanswers = Check answers
+
+providedeclinereasons.title = Note all the reasons the request is declined
+providedeclinereasons.note.1 = The reasons are saved on Gatekeeper.
+providedeclinereasons.confluence.url = Use guidance on Confluence to help
+providedeclinereasons.note.2 = Include all the issues you have identified working through the checklist.
+providedeclinereasons.button.continue = Save and continue
 
