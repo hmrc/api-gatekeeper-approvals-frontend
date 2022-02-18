@@ -36,11 +36,11 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      page,
       errorHandler,
+      SubmissionReviewServiceMock.aMock,
+      page,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock
+      SubmissionServiceMock.aMock
     )
   }
 
@@ -85,7 +85,7 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateEmailedResponsibleIndividualStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.EmailResponsibleIndividual)))
 
       val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
@@ -96,7 +96,7 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateEmailedResponsibleIndividualStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.EmailResponsibleIndividual)))
 
       val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 

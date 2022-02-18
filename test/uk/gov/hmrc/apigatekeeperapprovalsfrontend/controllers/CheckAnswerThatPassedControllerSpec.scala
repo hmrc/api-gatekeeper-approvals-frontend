@@ -35,11 +35,11 @@ class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      page,
       errorHandler,
+      SubmissionReviewServiceMock.aMock,
+      page,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock
+      SubmissionServiceMock.aMock
     )
   }
 
@@ -80,7 +80,7 @@ class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedPassedAnswersStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.CheckPassedAnswers)))
 
       val result = controller.checkAnswersThatPassedAction(applicationId)(fakeSubmitCheckedRequest)
 
@@ -91,7 +91,7 @@ class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedPassedAnswersStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.CheckPassedAnswers)))
 
       val result = controller.checkAnswersThatPassedAction(applicationId)(fakeSubmitComebackLaterRequest)
 

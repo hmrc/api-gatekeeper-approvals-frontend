@@ -37,6 +37,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
       mcc,
       viewDeclinedSubmissionPage,
       errorHandler,
+      SubmissionReviewServiceMock.aMock,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )

@@ -33,11 +33,11 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      page,
+      SubmissionReviewServiceMock.aMock,
       errorHandler,
+      page,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock
+      SubmissionServiceMock.aMock
     )
 
   }
@@ -69,7 +69,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.CheckUrls)))
 
       val result = controller.checkUrlsAction(applicationId)(fakeSubmitCheckedRequest)
 
@@ -80,7 +80,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedUrlsStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.CheckUrls)))
 
       val result = controller.checkUrlsAction(applicationId)(fakeSubmitComebackLaterRequest)
 

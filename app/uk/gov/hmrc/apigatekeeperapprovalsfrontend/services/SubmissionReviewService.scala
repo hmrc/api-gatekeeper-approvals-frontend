@@ -25,14 +25,13 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Action
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
 import cats.data.OptionT
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
 class SubmissionReviewService @Inject()(
   repo: SubmissionReviewRepo
 )(implicit val ec: ExecutionContext) {
 
-  def findOrCreateReview(application: Application, submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
+  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
     def createANewReview = {
       // TODO - some logic to only add the necessary items
       val newSubmissionReview =SubmissionReview(submissionId, instanceIndex, 
