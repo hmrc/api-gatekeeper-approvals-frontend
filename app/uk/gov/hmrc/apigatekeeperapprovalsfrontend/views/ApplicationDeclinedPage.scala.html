@@ -30,7 +30,7 @@
       <div class="govuk-grid-column-three-quarters">
         <div class="govuk-panel govuk-panel--confirmation">
           <h1 class="govuk-panel__title">
-            You have declined this request
+            @{messages("applicationdeclined.pagetitle")}
           </h1>
           <div class="govuk-panel__body">
             @model.appName
@@ -39,7 +39,7 @@
         <br>
 
         <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="../../index-results">Check another production credentials request.</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="../../index-results">@{messages("applicationdeclined.checkanotherrequest")}.</a>
         </p>
       </div>
     </div>
