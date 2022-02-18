@@ -31,7 +31,7 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
   implicit val ec: ExecutionContext
 ) {
 
-  def fetchLatestSubmission(appId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = submissionConnector.fetchLatestSubmission(appId)
+  def fetchLatestSubmission(appId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = submissionConnector.fetchLatestSubmission(appId)
 
   def fetchLatestMarkedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     submissionConnector.fetchLatestMarkedSubmission(applicationId)

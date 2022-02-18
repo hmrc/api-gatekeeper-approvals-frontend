@@ -36,9 +36,9 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "fetchLatestSubmission" should {
     "successfully fetch latest submission" in new Setup {
-      when(mockSubmissionsConnector.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(Some(extendedSubmission)))
+      when(mockSubmissionsConnector.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(Some(aSubmission)))
       val result = await(underTest.fetchLatestSubmission(applicationId))
-      result shouldBe Some(extendedSubmission)
+      result shouldBe Some(aSubmission)
     }
   }
 

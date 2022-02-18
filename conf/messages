@@ -41,6 +41,13 @@ checklist.checkother.linktext = Other answers
 checklist.completed = Checklist completed
 checklist.save = Save and come back later
 
+confirmyourdecision.pagetitle = HMRC API Gatekeeper - Confirm your decision based on your review
+confirmyourdecision.title = Confirm your decision based on your review
+confirmyourdecision.grantlabel = Grant production access
+confirmyourdecision.grantwithwarningslabel = Grant production access and email with warnings
+confirmyourdecision.declinelabel = Decline the request
+confirmyourdecision.continue = Continue
+
 answersthatfailed.failsonly.title = Answers with fails
 answersthatfailed.warnsonly.title = Answers with warnings
 answersthatfailed.failsandwarns.title = Answers with fails and warnings
@@ -100,6 +107,7 @@ checkscompleted.checksfailed = Checks Failed
 applicationapproved.pagetitle = HMRC API Gatekeeper - Application Granted
 applicationapproved.title = Application Granted
 applicationapproved.text = The Application has been granted and is now in a state of Pending Requester Verification
+applicationapproved.productionaccessgranted = Production access granted
 
 applicationdeclined.pagetitle = HMRC API Gatekeeper - Application Declined
 applicationdeclined.title = Application Declined

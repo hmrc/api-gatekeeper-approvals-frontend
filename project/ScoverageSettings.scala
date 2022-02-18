@@ -15,7 +15,8 @@ object ScoverageSettings {
       "com\\.kenshoo\\.play\\.metrics\\.*",
       ".*definition.*",
       ".*BuildInfo.*",
-      ".*javascript"
+      ".*javascript",
+      """uk\.gov\.hmrc\.apiplatform\.modules\.common\..*""",
     ).mkString(";")
   )
 }

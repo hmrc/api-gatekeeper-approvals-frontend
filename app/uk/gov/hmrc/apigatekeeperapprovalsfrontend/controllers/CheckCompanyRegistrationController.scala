@@ -57,7 +57,7 @@ class CheckCompanyRegistrationController @Inject()(
     
     (request.application.access, companyDetails) match {
       // Should only be uplifting and checking Standard apps
-      case (std: Standard, Some(details)) if(request.submission.isSubmitted) =>  
+      case (std: Standard, Some(details)) if(request.submission.status.isSubmitted) =>  
         successful(
           Ok(
             checkCompanyRegistrationPage(

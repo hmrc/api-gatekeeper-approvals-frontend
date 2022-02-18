@@ -16,52 +16,27 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.MessagesControllerComponents
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.{ApplicationActionServiceMockModule, ApplicationServiceMockModule, AuthConnectorMockModule}
-import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
-
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
-
-class CheckSandboxControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
-  override def fakeApplication() =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
-
+class CheckSandboxControllerSpec extends AbstractControllerSpec with SubmissionsTestData {
   trait Setup
-      extends AuthConnectorMockModule
-      with ApplicationActionServiceMockModule
-      with SubmissionServiceMockModule
-      with SubmissionReviewServiceMockModule
-      with ApplicationTestData
+      extends AbstractSetup
       with ApplicationServiceMockModule
-      with SubscriptionServiceMockModule {
+      with SubmissionReviewServiceMockModule
+      with SubscriptionServiceMockModule
+      with ApplicationTestData {
         
-    implicit val appConfig = app.injector.instanceOf[AppConfig]
-
-    val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-    val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-    val mcc = app.injector.instanceOf[MessagesControllerComponents]
     val checkSandboxPage = app.injector.instanceOf[CheckSandboxPage]
-    val errorHandler = app.injector.instanceOf[ErrorHandler]
 
-    val appId = ApplicationId.random
-    val application = anApplication(id = appId)
     val submissionReview = SubmissionReview(markedSubmission.submission.id, 0)
 
     val controller = new CheckSandboxController(
@@ -81,58 +56,49 @@ class CheckSandboxControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite 
 
   "GET /" should {
     "return 200" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
       val subordinateApplicationId = ApplicationId.random
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.FetchLinkedSubordinateApplicationByApplicationId.thenReturn(subordinateApplicationId)
       SubscriptionServiceMock.FetchSubscriptionsByApplicationId.thenReturn(("serviceName1", "name1"), ("serviceName2", "name2"))
 
-      val result = controller.checkSandboxPage(appId)(fakeRequest)
+      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return 404 if no application is found" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenNotFound
 
-      val result = controller.checkSandboxPage(appId)(fakeRequest)
+      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }
 
   "POST /" should {
     "update checked status and redirect to checklist page when Checked button is clicked" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-        .withFormUrlEncodedBody("submit-action" -> "checked")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedForSandboxTestingStatus.thenReturn(submissionReview)
 
-      val result = controller.checkSandboxAction(appId)(fakeRequest)
+      val result = controller.checkSandboxAction(applicationId)(fakeSubmitCheckedRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/checklist")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/checklist")
     }
 
     "update checked status and redirect to checklist page when Come Back Later button is clicked" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-        .withFormUrlEncodedBody("submit-action" -> "come-back-later")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedForSandboxTestingStatus.thenReturn(submissionReview)
 
-      val result = controller.checkSandboxAction(appId)(fakeRequest)
+      val result = controller.checkSandboxAction(applicationId)(fakeSubmitComebackLaterRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${appId.value}/checklist")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/checklist")
     }
   }
 

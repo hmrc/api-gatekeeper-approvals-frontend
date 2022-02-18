@@ -20,16 +20,17 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.NoAnswer
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AcknowledgedAnswer
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
   trait Setup extends SubmissionsTestData {
-    val submissionWithAnswers = submission.setLatestAnswers(sampleAnswersToQuestions)
-    val submissionWithAnswersExceptForOrgDetails = submission.setLatestAnswers(sampleAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id)
-    val submissionWithNonDisplayableDevPracticesAnswers = submission.setLatestAnswers(sampleAnswersToQuestions + 
+    val submissionWithAnswers = Submission.updateLatestAnswersTo(sampleAnswersToQuestions)(aSubmission)
+    val submissionWithAnswersExceptForOrgDetails = Submission.updateLatestAnswersTo(sampleAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id)(aSubmission)
+    val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(sampleAnswersToQuestions + 
       (DevelopmentPractices.question1.id -> NoAnswer) + 
       (DevelopmentPractices.question2.id -> AcknowledgedAnswer) + 
       (DevelopmentPractices.question3.id -> NoAnswer)
-    )
+    )(aSubmission)
   }
 
   "SubmissionQuestionsAndAnswers" should {
@@ -37,9 +38,9 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
       val result = SubmissionQuestionsAndAnswers(submissionWithAnswers, 0)
       
       result.length shouldBe 3
-      result.find(_.heading == "Customers authorising your software").get.questionsAndAnswers.length shouldBe 3
-      result.find(_.heading == "Organisation details").get.questionsAndAnswers.length shouldBe 5
-      result.find(_.heading == "Development practices").get.questionsAndAnswers.length shouldBe 3
+      result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 3
+      result.find(_.heading == "Organisation details").value.questionsAndAnswers.length shouldBe 5
+      result.find(_.heading == "Development practices").value.questionsAndAnswers.length shouldBe 3
     }
 
     "extract questions and answers omitting groups that have no questions" in new Setup {      

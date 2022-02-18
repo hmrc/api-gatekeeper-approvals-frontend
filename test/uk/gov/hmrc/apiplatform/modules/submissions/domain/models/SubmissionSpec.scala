@@ -18,66 +18,30 @@ package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData._
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
-class SubmissionSpec extends AnyWordSpec with Matchers {
-    private def extendedSubmissionWithStates(states: QuestionnaireState*) = {
-        
-        val questionnaireProgress = states.zipWithIndex map {
-            case(state, index) => QuestionnaireId(s"q$index") -> QuestionnaireProgress(state, List())
-        } toMap
-
-        ExtendedSubmission(submission, questionnaireProgress)
-    }
-
-    "empty questionnaire is complete" in {
-        extendedSubmissionWithStates().isCompleted shouldBe true
-    }
-
-    "questionnaire with single Completed question is complete" in {
-        extendedSubmissionWithStates(QuestionnaireState.Completed).isCompleted shouldBe true
-    }
-
-    "questionnaire with single NotApplicable question is complete" in {
-        extendedSubmissionWithStates(QuestionnaireState.NotApplicable).isCompleted shouldBe true
-    }
-
-    "questionnaire with single InProgress question is incomplete" in {
-        extendedSubmissionWithStates(QuestionnaireState.InProgress).isCompleted shouldBe false
-    }
-
-    "questionnaire with single NotStarted question is incomplete" in {
-        extendedSubmissionWithStates(QuestionnaireState.NotStarted).isCompleted shouldBe false
-    }
-
-    "questionnaire with multiple Completed/NotApplicable questions is complete" in {
-        extendedSubmissionWithStates(QuestionnaireState.Completed, QuestionnaireState.NotApplicable, QuestionnaireState.Completed, QuestionnaireState.NotApplicable).isCompleted shouldBe true
-    }
-
-    "questionnaire with one InProgress question among many is incomplete" in {
-        extendedSubmissionWithStates(QuestionnaireState.Completed, QuestionnaireState.NotApplicable, QuestionnaireState.Completed, QuestionnaireState.InProgress, QuestionnaireState.NotApplicable).isCompleted shouldBe false
-    }
-
+class SubmissionSpec extends AnyWordSpec with Matchers with SubmissionsTestData {
+    
     "submission questionIdsOfInterest app name" in {
-        submission.setLatestAnswers(sampleAnswersToQuestions).latestInstance.answersToQuestions(submission.questionIdsOfInterest.applicationNameId) shouldBe TextAnswer("name of software")
+        Submission.updateLatestAnswersTo(sampleAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe TextAnswer("name of software")
     }
 
     "submission instance state history" in {
-        submission.latestInstance.statusHistory.head.isOpenToAnswers shouldBe true
-        submission.latestInstance.isOpenToAnswers shouldBe true
-        submission.isOpenToAnswers shouldBe true
+        aSubmission.latestInstance.statusHistory.head.isOpenToAnswers shouldBe true
+        aSubmission.latestInstance.isOpenToAnswers shouldBe true
+        aSubmission.status.isOpenToAnswers shouldBe true
     }
 
     "submission instance is in progress" in {
-        submission.latestInstance.isOpenToAnswers shouldBe true
+        aSubmission.latestInstance.isOpenToAnswers shouldBe true
     }
     
     "submission is in progress" in {
-        submission.isOpenToAnswers shouldBe true
+        aSubmission.status.isOpenToAnswers shouldBe true
     }
 
     "submission findQuestionnaireContaining" in {
-        submission.findQuestionnaireContaining(submission.questionIdsOfInterest.applicationNameId) shouldBe Some(CustomersAuthorisingYourSoftware.questionnaire)
+        aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe Some(CustomersAuthorisingYourSoftware.questionnaire)
     }
 
     "submission setLatestAnswers" in {
@@ -85,6 +49,6 @@ class SubmissionSpec extends AnyWordSpec with Matchers {
             (OrganisationDetails.question1.id -> TextAnswer("new web site"))
         )
 
-        submission.setLatestAnswers(newAnswersToQuestions).latestInstance.answersToQuestions(OrganisationDetails.question1.id) shouldBe TextAnswer("new web site")
+        Submission.updateLatestAnswersTo(newAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(OrganisationDetails.question1.id) shouldBe TextAnswer("new web site")
     }
 }

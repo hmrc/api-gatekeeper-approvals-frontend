@@ -26,9 +26,15 @@ POST       /applications/:id/checklist/check-sandbox                 uk.gov.hmrc
 GET        /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.page(id: ApplicationId)
 POST       /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.action(id: ApplicationId)
 
-GET        /applications/:id/checks-completed                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecksCompletedController.checksCompletedPage(id: ApplicationId)
-POST       /applications/:id/checks-completed                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecksCompletedController.checksCompletedAction(id: ApplicationId)
- 
+GET        /applications/:id/confirm-decision/granted                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.grantedPage(id: ApplicationId)
+
+GET        /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.page(id: ApplicationId)
+POST       /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.action(id: ApplicationId)
+
+GET        /applications/:id/confirm-decision/provide-reasons        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.provideReasonsPage(id: ApplicationId)
+POST       /applications/:id/confirm-decision/provide-reasons        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.provideReasonsAction(id: ApplicationId)
+GET        /applications/:id/confirm-decision/declined               uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.declinedPage(id: ApplicationId)
+
 GET        /applications/:id/view-declined/:index                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ViewDeclinedSubmissionController.page(id: ApplicationId, index: Int)
 GET        /applications/:id/production-access                       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ProductionAccessController.page(id: ApplicationId)
  

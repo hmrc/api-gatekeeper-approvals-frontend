@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.ActualAnswer
 object ResponsibleIndividualExtractor {
   def apply(submission: Submission): Option[ResponsibleIndividual] = {
     import cats.implicits._
-    import cats.Applicative
+    import cats.Apply
 
     def extractTextAnswer(a: ActualAnswer): Option[String] = a match {
       case TextAnswer(ta) => Some(ta)
@@ -35,6 +35,6 @@ object ResponsibleIndividualExtractor {
       submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualNameId) flatMap extractTextAnswer
 
     val email = submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualEmailId) flatMap extractTextAnswer
-    Applicative[Option].map2(name, email)(ResponsibleIndividual.apply)
+    Apply[Option].map2(name, email)(ResponsibleIndividual.apply)
   }
 }

@@ -16,40 +16,20 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.AuthConnectorMockModule
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationActionServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
-import play.api.test.FakeRequest
+
 import play.api.http.Status
 import play.api.test.Helpers._
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken {
-  val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
-  val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-  val mcc = app.injector.instanceOf[MessagesControllerComponents]
-  val page = app.injector.instanceOf[CheckAnswersThatPassedPage]
-  val errorHandler = app.injector.instanceOf[ErrorHandler]
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 
-  override def fakeApplication() =
-    new GuiceApplicationBuilder()
-      .configure(
-        "metrics.jvm"     -> false,
-        "metrics.enabled" -> false
-      )
-      .build()
+class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AuthConnectorMockModule with ApplicationActionServiceMockModule with SubmissionServiceMockModule with SubmissionReviewServiceMockModule with ApplicationTestData{
+  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule {
+    val page = app.injector.instanceOf[CheckAnswersThatPassedPage]
+
     val controller = new CheckAnswersThatPassedController(
       strideAuthConfig,
       AuthConnectorMock.aMock,
@@ -61,44 +41,35 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
       SubmissionServiceMock.aMock,
       SubmissionReviewServiceMock.aMock
     )
-
-    val appId = ApplicationId.random
-    val application = anApplication(id = appId)
   }
 
   "checkAnswersThatPassedPage" should {
     "return 200" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkAnswersThatPassedPage(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
 
     "return 200 if unknown questions exist" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
-      val result = controller.checkAnswersThatPassedPage(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
     }
 
     "return 404" in new Setup {
-      val fakeRequest = FakeRequest().withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkAnswersThatPassedPage(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -106,58 +77,43 @@ class CheckAnswerThatPassedControllerSpec extends AsyncHmrcSpec with GuiceOneApp
 
   "checkAnswersThatPassedAction" should {
     "redirect to correct page when marking answers as checked" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "checked")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedPassedAnswersStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkAnswersThatPassedAction(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedAction(applicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
 
     "redirect to correct page when marking answers as come-back-later" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "come-back-later")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateCheckedPassedAnswersStatus.thenReturn(SubmissionReview(submissionId, 0))
 
-      val result = controller.checkAnswersThatPassedAction(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedAction(applicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
 
     "return bad request when marking answers as anything that we don't understand" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-                          .withFormUrlEncodedBody("submit-action" -> "bobbins")
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkAnswersThatPassedAction(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedAction(applicationId)(brokenRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      val fakeRequest = FakeRequest()
-                          .withCSRFToken
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(appId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkAnswersThatPassedAction(appId)(fakeRequest)
+      val result = controller.checkAnswersThatPassedAction(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

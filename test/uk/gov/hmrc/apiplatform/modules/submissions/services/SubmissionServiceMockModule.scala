@@ -24,7 +24,7 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import cats.data.NonEmptyList
+import uk.gov.hmrc.time.DateTimeUtils
 
 trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData {
   trait BaseSubmissionServiceMock {
@@ -41,13 +41,20 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnIncludingAnUnknownQuestion(applicationId: ApplicationId) = {
-        val response = Some(MarkedSubmission(submissionWithUnknownQuestion, Map.empty, markedAnswers))
+        val answersIncludingUnknownQuestion = aSubmission.latestInstance.answersToQuestions ++ Map(QuestionId.random -> TextAnswer("not there"))
+        val submissionWithUnknownQuestion = aSubmission.answeringWith(answersIncludingUnknownQuestion)
+
+        val response = Some(MarkedSubmission(submissionWithUnknownQuestion, markedAnswers))
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnWith(applicationId: ApplicationId, submission: Submission) = {
-        val response = Some(MarkedSubmission(submission, Map.empty, markedAnswers))
+        val response = Some(MarkedSubmission(submission, markedAnswers))
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenReturnWith(applicationId: ApplicationId, submission: MarkedSubmission) = {
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(Some(submission)))
       }
 
       def thenNotFound() = {
@@ -57,14 +64,13 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
     object FetchLatestSubmission {
       def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(extendedSubmission)
+        val response = Some(aSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
-        val updatedInstance = submission.latestInstance.copy(statusHistory = Submission.Status.Submitted(DateTime.now, "user") :: submission.latestInstance.statusHistory)
-        val submittedSubmission = submission.copy(instances = NonEmptyList(updatedInstance, submission.instances.tail))
-        val response = Some(ExtendedSubmission(submittedSubmission, initialProgress))
+        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true)) andThen Submission.submit(DateTime.now, "user"))(aSubmission)
+        val response = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
