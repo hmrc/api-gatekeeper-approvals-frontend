@@ -53,6 +53,10 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
+      def thenReturnWith(applicationId: ApplicationId, submission: MarkedSubmission) = {
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(Some(submission)))
+      }
+
       def thenNotFound() = {
         when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
       }

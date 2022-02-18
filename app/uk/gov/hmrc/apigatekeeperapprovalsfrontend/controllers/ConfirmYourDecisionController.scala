@@ -67,7 +67,10 @@ class ConfirmYourDecisionController @Inject()(
   import ConfirmYourDecisionController._
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
+    if(request.markedSubmission.isFail) 
+      successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
+    else
+      successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
   }
 
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 

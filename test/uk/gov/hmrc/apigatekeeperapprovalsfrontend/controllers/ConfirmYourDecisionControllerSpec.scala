@@ -48,11 +48,21 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "return 200 when marked submission is found" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
     
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
+    }
+
+    "redirect directly to failure page when marked submission has fails" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+    
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
     }
 
     "return 404 when no marked submission is found" in new Setup {

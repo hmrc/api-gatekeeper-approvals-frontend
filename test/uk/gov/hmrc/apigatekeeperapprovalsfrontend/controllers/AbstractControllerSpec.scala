@@ -56,8 +56,8 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     
     val fakeRequest = FakeRequest().withCSRFToken
 
-    val fakeSubmitCheckedRequest = FakeRequest().withCSRFToken.withFormUrlEncodedBody("submit-action" -> "checked")
-    val fakeSubmitComebackLaterRequest = FakeRequest().withCSRFToken.withFormUrlEncodedBody("submit-action" -> "come-back-later")
-    val brokenRequest = FakeRequest().withCSRFToken.withFormUrlEncodedBody("submit-action" -> "bobbins")
+    val fakeSubmitCheckedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")
+    val fakeSubmitComebackLaterRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")
+    val brokenRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "bobbins")
   }
 }
