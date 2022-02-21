@@ -26,19 +26,98 @@ object SubmissionReview {
     case object InProgress extends Status
     case object Completed extends Status
   }
+
+  sealed trait Action
+
+  object Action {
+    case object CheckWarnings extends Action
+    case object CheckFailsAndWarnings extends Action
+    case object EmailResponsibleIndividual extends Action
+    case object CheckApplicationName extends Action
+    case object CheckCompanyRegistration extends Action
+    case object CheckUrls extends Action
+    case object CheckSandboxTesting extends Action
+    case object CheckFraudPreventionData extends Action
+    case object ArrangedDemo extends Action
+    case object CheckPassedAnswers extends Action
+
+    def fromText(text: String): Option[Action] = {
+      import cats.implicits._
+      text match {
+        case "CheckWarnings"              => CheckWarnings.some
+        case "CheckFailsAndWarnings"      => CheckFailsAndWarnings.some
+        case "EmailResponsibleIndividual" => EmailResponsibleIndividual.some
+        case "CheckApplicationName"       => CheckApplicationName.some
+        case "CheckCompanyRegistration"   => CheckCompanyRegistration.some
+        case "CheckUrls"                  => CheckUrls.some
+        case "CheckSandboxTesting"        => CheckSandboxTesting.some
+        case "CheckFraudPreventionData"   => CheckFraudPreventionData.some
+        case "ArrangedDemo"               => ArrangedDemo.some
+        case "CheckPassedAnswers"         => CheckPassedAnswers.some
+        case _                            => None
+      }
+    }
+
+    def toText(action: Action) = action match {
+        case CheckWarnings              => "CheckWarnings"
+        case CheckFailsAndWarnings      => "CheckFailsAndWarnings"
+        case EmailResponsibleIndividual => "EmailResponsibleIndividual"
+        case CheckApplicationName       => "CheckApplicationName"
+        case CheckCompanyRegistration   => "CheckCompanyRegistration"
+        case CheckUrls                  => "CheckUrls"
+        case CheckSandboxTesting        => "CheckSandboxTesting"
+        case CheckFraudPreventionData   => "CheckFraudPreventionData"
+        case ArrangedDemo               => "ArrangedDemo"
+        case CheckPassedAnswers         => "CheckPassedAnswers"
+    }
+  }
+
+  private def apply(
+    submissionId: Submission.Id,
+    instanceIndex: Int,
+    requiredActions: List[Action]
+  ): SubmissionReview =
+    SubmissionReview(submissionId, instanceIndex, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+
+  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): SubmissionReview = {
+    val alternativeActions: List[Action] = 
+      (isSuccessful, hasWarnings) match {
+        case (true, true)   => List(Action.CheckWarnings)
+        case (true, false)  => List.empty
+        case (false, _)     => List(Action.CheckFailsAndWarnings)
+      }
+
+    // TODO - logic to include or exclude this
+    val fraudAction = List(Action.CheckFraudPreventionData)
+
+    val fixedActions: List[Action] =
+      List(
+        Action.EmailResponsibleIndividual, 
+        Action.CheckApplicationName,
+        Action.CheckCompanyRegistration,
+        Action.CheckUrls,
+        Action.CheckSandboxTesting,
+        Action.ArrangedDemo,
+        Action.CheckPassedAnswers
+      )
+
+    SubmissionReview(
+      submissionId,
+      instanceIndex, 
+      alternativeActions ++ fraudAction ++ fixedActions
+    )
+  }
+
+  val updateReviewActionStatus : (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) => review => {
+    require(review.requiredActions.keySet.contains(action))
+    review.copy(requiredActions = review.requiredActions + (action -> newStatus))
+  }
 }
 
-import SubmissionReview.Status
-
-case class SubmissionReview(
+case class SubmissionReview private(
   submissionId: Submission.Id,
   instanceIndex: Int,
-  checkedFailsAndWarnings: Status = SubmissionReview.Status.NotStarted,
-  emailedResponsibleIndividual: Status = SubmissionReview.Status.NotStarted,
-  checkedUrls: Status = SubmissionReview.Status.NotStarted,
-  checkedCompanyRegistration: Status = SubmissionReview.Status.NotStarted,
-  checkedForSandboxTesting: Status = SubmissionReview.Status.NotStarted,
-  checkedPassedAnswers: Status = SubmissionReview.Status.NotStarted
+  requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
-  lazy val isCompleted = List(checkedFailsAndWarnings, emailedResponsibleIndividual, checkedUrls, checkedCompanyRegistration, checkedForSandboxTesting, checkedPassedAnswers).forall(s => s == Status.Completed)
+  lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty
 }

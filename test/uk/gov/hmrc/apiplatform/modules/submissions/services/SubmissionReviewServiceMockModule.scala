@@ -23,8 +23,8 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import scala.concurrent.Future
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
   trait BaseSubmissionReviewServiceMock {
@@ -32,42 +32,17 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
 
     object FindOrCreateReview {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(review))
+        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex), *, *)).thenReturn(successful(review))
       }
     }
 
-    object UpdateCheckedFailsAndWarningsStatus {
+    object UpdateActionStatus {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateCheckedFailsAndWarningsStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedFailsAndWarnings = status))))
+        when(aMock.updateActionStatus(*, *)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
       } 
-    }
- 
-    object UpdateCheckedPassedAnswersStatus {
-      def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateCheckedPassedAnswersStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedPassedAnswers = status))))
-      } 
-    }
 
-    object UpdateCheckedUrlsStatus {
-      def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateCheckedUrlsStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedUrls = status))))
-      } 
-    }
-    
-    object UpdateEmailedResponsibleIndividualStatus {
-      def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateEmailedResponsibleIndividualStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, emailedResponsibleIndividual = status))))
-      }
-    }
-    object UpdateCheckedForSandboxTestingStatus {
-      def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateCheckedForSandboxTestingStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i))))
-      }
-    }
-
-    object UpdateCheckedCompanyRegistrationStatus {
-      def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateCheckedCompanyRegistrationStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, checkedCompanyRegistration = status))))
+      def thenReturn(action: SubmissionReview.Action, status: SubmissionReview.Status, review: SubmissionReview) = {
+        when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*[Submission.Id], *)).thenReturn(Future.successful(Some(review.copy(requiredActions = review.requiredActions + (action -> status)))))
       } 
     }
   }

@@ -32,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import cats.data.NonEmptyList
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckAnswersThatPassedController {  
   case class AnswerDetails(question: String, answer: String)
@@ -45,12 +46,12 @@ class CheckAnswersThatPassedController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  checkAnswersThatPassedPage: CheckAnswersThatPassedPage,
   errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService,
+  checkAnswersThatPassedPage: CheckAnswersThatPassedPage,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  val submissionService: SubmissionService
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
 
   import CheckAnswersThatPassedController._
 
@@ -91,5 +92,5 @@ class CheckAnswersThatPassedController @Inject()(
   }
 
   
-  def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatPassedAction", submissionReviewService.updateCheckedPassedAnswersStatus _)(applicationId)
+  def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckPassedAnswers)(applicationId)
 }

@@ -38,9 +38,9 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       mcc,
       page,
       errorHandler,
+      SubmissionReviewServiceMock.aMock,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock
+      SubmissionServiceMock.aMock
     )
   }
 
@@ -83,7 +83,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedCompanyRegistrationStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true,true))
 
       val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
@@ -95,7 +95,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedCompanyRegistrationStatus.thenReturn(SubmissionReview(submissionId, 0))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true,true))
 
       val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 

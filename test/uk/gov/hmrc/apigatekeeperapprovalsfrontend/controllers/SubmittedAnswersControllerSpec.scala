@@ -32,8 +32,8 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      submittedAnswersPage,
       errorHandler,
+      submittedAnswersPage,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )
