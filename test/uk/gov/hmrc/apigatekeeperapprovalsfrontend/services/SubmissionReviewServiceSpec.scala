@@ -29,13 +29,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
   trait Setup extends SubmissionReviewRepoMockModule with SubmissionsTestData with ApplicationTestData {
     val underTest = new SubmissionReviewService(SubmissionReviewRepoMock.aMock)
 
-    val review = SubmissionReview(aSubmission.id, 0, 
-      List(
-        SubmissionReview.Action.EmailResponsibleIndividual, 
-        SubmissionReview.Action.CheckFailsAndWarnings,
-        SubmissionReview.Action.CheckSandboxTesting,
-        SubmissionReview.Action.CheckUrls,
-        SubmissionReview.Action.CheckPassedAnswers))
+    val review = SubmissionReview(aSubmission.id, 0, true, true)
 
     implicit val hc = HeaderCarrier()
   }
@@ -43,7 +37,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
   "findOrCreateReview" should {
     "return the existing review if one is already in the database" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)
-      val result = await(underTest.findOrCreateReview(review.submissionId, review.instanceIndex))
+      val result = await(underTest.findOrCreateReview(review.submissionId, review.instanceIndex, true, true))
       result shouldBe review
       SubmissionReviewRepoMock.Create.verifyNotCalled
     }
@@ -51,7 +45,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
     "create a new review if one does not exist in the database" in new Setup {
       SubmissionReviewRepoMock.Find.thenFindNone(review.submissionId, review.instanceIndex)
       SubmissionReviewRepoMock.Create.thenReturn(review)
-      val result = await(underTest.findOrCreateReview(review.submissionId, review.instanceIndex))
+      val result = await(underTest.findOrCreateReview(review.submissionId, review.instanceIndex, true, true))
       result shouldBe review
       SubmissionReviewRepoMock.Create.verifyCalled
     }
@@ -59,48 +53,61 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
   "updateCheckedFailsAndWarningsStatus" should {
     "set correct status in SubmissionReview for checkedFailsAndWarnings" in new Setup {
-      SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(requiredActions = review.requiredActions + (SubmissionReview.Action.CheckFailsAndWarnings -> SubmissionReview.Status.InProgress))
-      SubmissionReviewRepoMock.Update.thenReturn()
+      val hasFailsReview = SubmissionReview(aSubmission.id, 0, false, true)
 
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
-      result shouldBe Some(updatedReview)
+      SubmissionReviewRepoMock.Find.thenReturn(hasFailsReview)
+      SubmissionReviewRepoMock.Update.thenReturn()
+      
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings, SubmissionReview.Status.InProgress)(hasFailsReview.submissionId, hasFailsReview.instanceIndex))
+      
+      result.value.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings) shouldBe SubmissionReview.Status.InProgress
     }
 
     "set correct status in SubmissionReview for emailedResponsibleIndividual" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(requiredActions = review.requiredActions + (SubmissionReview.Action.EmailResponsibleIndividual -> SubmissionReview.Status.InProgress))
       SubmissionReviewRepoMock.Update.thenReturn()
-
+      
       val result = await(underTest.updateActionStatus(SubmissionReview.Action.EmailResponsibleIndividual, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
-      result shouldBe Some(updatedReview)
+      
+      result.value.requiredActions(SubmissionReview.Action.EmailResponsibleIndividual) shouldBe SubmissionReview.Status.InProgress
     }
-
+    
     "set correct status in SubmissionReview for checkedUrls" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(requiredActions = review.requiredActions + (SubmissionReview.Action.CheckUrls -> SubmissionReview.Status.InProgress))
       SubmissionReviewRepoMock.Update.thenReturn()
-
+      
       val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckUrls, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
-      result shouldBe Some(updatedReview)
+
+      result.value.requiredActions(SubmissionReview.Action.CheckUrls) shouldBe SubmissionReview.Status.InProgress
     }
 
     "set correct status in SubmissionReview for checkedForSandboxTesting" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(requiredActions = review.requiredActions + (SubmissionReview.Action.CheckSandboxTesting -> SubmissionReview.Status.InProgress))
       SubmissionReviewRepoMock.Update.thenReturn()
 
       val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckSandboxTesting, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
-      result shouldBe Some(updatedReview)
+
+      result.value.requiredActions(SubmissionReview.Action.CheckSandboxTesting) shouldBe SubmissionReview.Status.InProgress
+    }
+    
+    "set correct status in SubmissionReview for checkedPassedAnswers" in new Setup {
+      val passedReview = SubmissionReview(aSubmission.id, 0, true,false)
+      SubmissionReviewRepoMock.Find.thenReturn(passedReview)    
+      SubmissionReviewRepoMock.Update.thenReturn()
+      
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckPassedAnswers, SubmissionReview.Status.InProgress)(passedReview.submissionId, passedReview.instanceIndex))
+
+      result.value.requiredActions(SubmissionReview.Action.CheckPassedAnswers) shouldBe SubmissionReview.Status.InProgress
     }
 
-    "set correct status in SubmissionReview for checkedPassedAnswers" in new Setup {
+    
+    "set correct status in SubmissionReview for checkedOtherAnswers" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(review)    
-      val updatedReview = review.copy(requiredActions = review.requiredActions + (SubmissionReview.Action.CheckPassedAnswers -> SubmissionReview.Status.InProgress))
       SubmissionReviewRepoMock.Update.thenReturn()
+      
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckOtherAnswers, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
 
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckPassedAnswers, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
-      result shouldBe Some(updatedReview)
+      result.value.requiredActions(SubmissionReview.Action.CheckOtherAnswers) shouldBe SubmissionReview.Status.InProgress
     }
   }
 }

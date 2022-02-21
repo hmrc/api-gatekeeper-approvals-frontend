@@ -37,7 +37,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
         
     val checkSandboxPage = app.injector.instanceOf[CheckSandboxPage]
 
-    val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, List(SubmissionReview.Action.CheckSandboxTesting))
+    val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true,true)
 
     val controller = new CheckSandboxController(
       strideAuthConfig,

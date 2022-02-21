@@ -22,7 +22,6 @@ import scala.concurrent.Future
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Action
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
 import cats.data.OptionT
 
@@ -31,21 +30,10 @@ class SubmissionReviewService @Inject()(
   repo: SubmissionReviewRepo
 )(implicit val ec: ExecutionContext) {
 
-  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
+  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): Future[SubmissionReview] = {
     def createANewReview = {
-      // TODO - some logic to only add the necessary items
-      val newSubmissionReview =SubmissionReview(submissionId, instanceIndex, 
-        List(
-          Action.CheckFailsAndWarnings, 
-          Action.EmailResponsibleIndividual, 
-          Action.CheckApplicationName,
-          Action.CheckCompanyRegistration,
-          Action.CheckUrls,
-          Action.CheckSandboxTesting,
-          Action.CheckFraudPreventionData,
-          Action.ArrangedDemo,
-          Action.CheckPassedAnswers))
-      repo.create(newSubmissionReview)
+      
+      repo.create(SubmissionReview(submissionId, instanceIndex, isSuccessful, hasWarnings))
     }
 
     repo.find(submissionId, instanceIndex)

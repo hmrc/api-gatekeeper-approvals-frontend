@@ -30,6 +30,7 @@ object SubmissionReview {
   sealed trait Action
 
   object Action {
+    case object CheckWarnings extends Action
     case object CheckFailsAndWarnings extends Action
     case object EmailResponsibleIndividual extends Action
     case object CheckApplicationName extends Action
@@ -39,10 +40,12 @@ object SubmissionReview {
     case object CheckFraudPreventionData extends Action
     case object ArrangedDemo extends Action
     case object CheckPassedAnswers extends Action
+    case object CheckOtherAnswers extends Action
 
     def fromText(text: String): Option[Action] = {
       import cats.implicits._
       text match {
+        case "CheckWarnings"              => CheckWarnings.some
         case "CheckFailsAndWarnings"      => CheckFailsAndWarnings.some
         case "EmailResponsibleIndividual" => EmailResponsibleIndividual.some
         case "CheckApplicationName"       => CheckApplicationName.some
@@ -52,11 +55,13 @@ object SubmissionReview {
         case "CheckFraudPreventionData"   => CheckFraudPreventionData.some
         case "ArrangedDemo"               => ArrangedDemo.some
         case "CheckPassedAnswers"         => CheckPassedAnswers.some
+        case "CheckOtherAnswers"          => CheckOtherAnswers.some
         case _                            => None
       }
     }
 
     def toText(action: Action) = action match {
+        case CheckWarnings              => "CheckWarnings"
         case CheckFailsAndWarnings      => "CheckFailsAndWarnings"
         case EmailResponsibleIndividual => "EmailResponsibleIndividual"
         case CheckApplicationName       => "CheckApplicationName"
@@ -66,15 +71,44 @@ object SubmissionReview {
         case CheckFraudPreventionData   => "CheckFraudPreventionData"
         case ArrangedDemo               => "ArrangedDemo"
         case CheckPassedAnswers         => "CheckPassedAnswers"
+        case CheckOtherAnswers          => "CheckOtherAnswers"
     }
   }
 
-  def apply(
+  private def apply(
     submissionId: Submission.Id,
     instanceIndex: Int,
     requiredActions: List[Action]
   ): SubmissionReview =
     SubmissionReview(submissionId, instanceIndex, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+
+  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): SubmissionReview = {
+    val alternativeActions: List[Action] = 
+      (isSuccessful, hasWarnings) match {
+        case (true, true)   => List(Action.CheckWarnings, Action.CheckOtherAnswers)
+        case (true, false)  => List(Action.CheckPassedAnswers)
+        case (false, _)     => List(Action.CheckFailsAndWarnings, Action.CheckOtherAnswers)
+      }
+
+    // TODO - logic to include or exclude this
+    val fraudAction = List(Action.CheckFraudPreventionData)
+
+    val fixedActions: List[Action] =
+      List(
+        Action.EmailResponsibleIndividual, 
+        Action.CheckApplicationName,
+        Action.CheckCompanyRegistration,
+        Action.CheckUrls,
+        Action.CheckSandboxTesting,
+        Action.ArrangedDemo
+      )
+
+    SubmissionReview(
+      submissionId,
+      instanceIndex, 
+      alternativeActions ++ fraudAction ++ fixedActions
+    )
+  }
 
   val updateReviewActionStatus : (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) => review => {
     require(review.requiredActions.keySet.contains(action))
@@ -82,7 +116,7 @@ object SubmissionReview {
   }
 }
 
-case class SubmissionReview(
+case class SubmissionReview private(
   submissionId: Submission.Id,
   instanceIndex: Int,
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]

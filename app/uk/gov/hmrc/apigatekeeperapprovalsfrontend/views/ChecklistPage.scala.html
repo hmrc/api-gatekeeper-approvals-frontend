@@ -91,23 +91,22 @@
 
     <ol class="govuk-list govuk-list--number">
         @{
-            if(model.isSuccessful) {
-                if (model.hasWarnings) {
-                    checklistTable(
-                        "checklist.checkwarnings.heading", 
-                        List(
-                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings))
-                        )
-                    )
-                }
-            } else {
-                checklistTable(
-                    "checklist.checkfailed.heading", 
-                    List(
-                        ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings))
-                    )
-                )
-            } 
+            if(model.requiredActions.contains(SubmissionReview.Action.CheckWarnings)) {
+              checklistTable(
+                  "checklist.checkwarnings.heading", 
+                  List(
+                      ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckWarnings))
+                  )
+              )
+            }
+            if(model.requiredActions.contains(SubmissionReview.Action.CheckFailsAndWarnings)) {
+              checklistTable(
+                  "checklist.checkfailed.heading", 
+                  List(
+                      ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings))
+                  )
+              )
+            }
         }
 
         @checklistTable(
@@ -121,20 +120,21 @@
         )
 
         @{
-            if (model.isSuccessful && !model.hasWarnings) {
-                checklistTable(
-                    "checklist.checkother.heading", 
-                    List(
-                        ("checklist.checkother.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckPassedAnswers))
-                    )
+            if(model.requiredActions.contains(SubmissionReview.Action.CheckPassedAnswers)) {
+              checklistTable(
+                "checklist.checkother.heading", 
+                List(
+                  ("checklist.checkother.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckPassedAnswers))
                 )
-            } else {
-                checklistTable(
-                    "checklist.checkpassed.heading", 
-                    List(
-                        ("checklist.checkpassed.linktext", "checkother", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckPassedAnswers))
-                    )
+              )
+            }
+            else if(model.requiredActions.contains(SubmissionReview.Action.CheckOtherAnswers)) {
+              checklistTable(
+                "checklist.checkpassed.heading", 
+                List(
+                  ("checklist.checkpassed.linktext", "checkother", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckOtherAnswers))
                 )
+              )
             }
         }
     </ol>

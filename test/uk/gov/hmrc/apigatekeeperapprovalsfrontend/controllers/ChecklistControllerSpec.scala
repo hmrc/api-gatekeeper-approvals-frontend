@@ -43,7 +43,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, List(SubmissionReview.Action.CheckCompanyRegistration))
+      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true,false)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

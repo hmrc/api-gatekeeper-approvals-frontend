@@ -58,7 +58,7 @@ class ChecklistController @Inject()(
       val hasWarnings = request.markedSubmission.isWarn
 
       for {
-        review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index)
+        review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, isSuccessful: Boolean, hasWarnings: Boolean)
       } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, review.requiredActions)))
   }
 

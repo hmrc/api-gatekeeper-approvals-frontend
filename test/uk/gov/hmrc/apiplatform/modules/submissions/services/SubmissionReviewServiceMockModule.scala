@@ -24,6 +24,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import scala.concurrent.Future
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
   trait BaseSubmissionReviewServiceMock {
@@ -31,17 +32,17 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
 
     object FindOrCreateReview {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(review))
+        when(aMock.findOrCreateReview(eqTo(review.submissionId), eqTo(review.instanceIndex), *, *)).thenReturn(successful(review))
       }
     }
 
     object UpdateActionStatus {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateActionStatus(*, *)(*, *)).thenReturn(Future.successful(Some(review)))
+        when(aMock.updateActionStatus(*, *)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
       } 
 
       def thenReturn(action: SubmissionReview.Action, status: SubmissionReview.Status, review: SubmissionReview) = {
-        when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*, *)).thenReturn(Future.successful(Some(review.copy(requiredActions = review.requiredActions + (action -> status)))))
+        when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*[Submission.Id], *)).thenReturn(Future.successful(Some(review.copy(requiredActions = review.requiredActions + (action -> status)))))
       } 
     }
   }
