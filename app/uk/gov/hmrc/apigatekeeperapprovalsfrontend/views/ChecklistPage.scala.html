@@ -25,7 +25,7 @@
 
 @appBreadcrumb = @{Some(ApplicationBreadcrumbData(model.applicationId, model.appName))}
 
-@checklistTable(headingKey: String, itemStatuses: List[(String, String, String, SubmissionReview.Status)]) = {
+@checklistTable(headingKey: String, itemActions: List[(String, String, String, SubmissionReview.Action)]) = {
     <li>
         <h2 class="govuk-heading-m">@{messages(headingKey)}</h2>
 
@@ -41,7 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for((linkTextKey, linkId, uri, status) <- itemStatuses) {
+                @for((linkTextKey, linkId, uri, status) <- itemActions.collect {case ia if model.requiredActions.contains(ia._4) => (ia._1, ia._2, ia._3, model.requiredActions(ia._4))}) {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
                             <a id="@linkId" href="@uri" class="govuk-link govuk-link--no-visited-state">@{messages(linkTextKey)}</a>
@@ -95,7 +95,7 @@
               checklistTable(
                   "checklist.checkwarnings.heading", 
                   List(
-                      ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckWarnings))
+                      ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, SubmissionReview.Action.CheckWarnings)
                   )
               )
             }
@@ -103,7 +103,7 @@
               checklistTable(
                   "checklist.checkfailed.heading", 
                   List(
-                      ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings))
+                      ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, SubmissionReview.Action.CheckFailsAndWarnings)
                   )
               )
             }
@@ -112,11 +112,11 @@
         @checklistTable(
             "checklist.checkapplication.heading", 
             List(
-                ("checklist.checkapplication.linktext.email", "checkemail", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.EmailResponsibleIndividualController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.EmailResponsibleIndividual)),
-                ("checklist.checkapplication.linktext.company", "checkcompany", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckCompanyRegistration)),
-                ("checklist.checkapplication.linktext.urls", "checkurls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckUrls)),
-                ("checklist.checkapplication.linktext.sandbox", "checksandbox", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckSandboxController.checkSandboxPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckSandboxTesting)),
-                ("checklist.checkapplication.linktext.fraud", "checkfraud", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFraudPreventionData))
+                ("checklist.checkapplication.linktext.email", "checkemail", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.EmailResponsibleIndividualController.page(model.applicationId).url, SubmissionReview.Action.EmailResponsibleIndividual),
+                ("checklist.checkapplication.linktext.company", "checkcompany", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.page(model.applicationId).url, SubmissionReview.Action.CheckCompanyRegistration),
+                ("checklist.checkapplication.linktext.urls", "checkurls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, SubmissionReview.Action.CheckUrls),
+                ("checklist.checkapplication.linktext.sandbox", "checksandbox", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckSandboxController.checkSandboxPage(model.applicationId).url, SubmissionReview.Action.CheckSandboxTesting),
+                ("checklist.checkapplication.linktext.fraud", "checkfraud", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudPage(model.applicationId).url, SubmissionReview.Action.CheckFraudPreventionData)
             )
         )
 
@@ -125,7 +125,7 @@
                 checklistTable(
                     "checklist.checkpassed.heading", 
                     List(
-                        ("checklist.checkpassed.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckPassedAnswers))
+                        ("checklist.checkpassed.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, SubmissionReview.Action.CheckPassedAnswers)
                     )
                 )
             }
