@@ -29,31 +29,29 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
   trait Setup extends SubmissionReviewRepoMockModule with SubmissionsTestData with ApplicationTestData {
     val underTest = new SubmissionReviewService(SubmissionReviewRepoMock.aMock)
 
-    val review = SubmissionReview(aSubmission.id, 0, true, true)
-
     implicit val hc = HeaderCarrier()
   }
 
   "findOrCreateReview" should {
     "return the existing review if one is already in the database" in new Setup {
-      SubmissionReviewRepoMock.Find.thenReturn(review)
-      val result = await(underTest.findOrCreateReview(review.submissionId, review.instanceIndex, true, true))
-      result shouldBe review
+      SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
+      val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true))
+      result shouldBe submissionReview
       SubmissionReviewRepoMock.Create.verifyNotCalled
     }
 
     "create a new review if one does not exist in the database" in new Setup {
-      SubmissionReviewRepoMock.Find.thenFindNone(review.submissionId, review.instanceIndex)
-      SubmissionReviewRepoMock.Create.thenReturn(review)
-      val result = await(underTest.findOrCreateReview(review.submissionId, review.instanceIndex, true, true))
-      result shouldBe review
+      SubmissionReviewRepoMock.Find.thenFindNone(submissionReview.submissionId, submissionReview.instanceIndex)
+      SubmissionReviewRepoMock.Create.thenReturn(submissionReview)
+      val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true))
+      result shouldBe submissionReview
       SubmissionReviewRepoMock.Create.verifyCalled
     }
   }
 
   "updateCheckedFailsAndWarningsStatus" should {
     "set correct status in SubmissionReview for checkedFailsAndWarnings" in new Setup {
-      val hasFailsReview = SubmissionReview(aSubmission.id, 0, false, true)
+      val hasFailsReview = SubmissionReview(aSubmission.id, 0, false, true, true)
 
       SubmissionReviewRepoMock.Find.thenReturn(hasFailsReview)
       SubmissionReviewRepoMock.Update.thenReturn()
@@ -64,34 +62,34 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
     }
 
     "set correct status in SubmissionReview for emailedResponsibleIndividual" in new Setup {
-      SubmissionReviewRepoMock.Find.thenReturn(review)    
+      SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
       SubmissionReviewRepoMock.Update.thenReturn()
       
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.EmailResponsibleIndividual, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.EmailResponsibleIndividual, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
       
       result.value.requiredActions(SubmissionReview.Action.EmailResponsibleIndividual) shouldBe SubmissionReview.Status.InProgress
     }
     
     "set correct status in SubmissionReview for checkedUrls" in new Setup {
-      SubmissionReviewRepoMock.Find.thenReturn(review)    
+      SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
       SubmissionReviewRepoMock.Update.thenReturn()
       
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckUrls, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckUrls, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
 
       result.value.requiredActions(SubmissionReview.Action.CheckUrls) shouldBe SubmissionReview.Status.InProgress
     }
 
     "set correct status in SubmissionReview for checkedForSandboxTesting" in new Setup {
-      SubmissionReviewRepoMock.Find.thenReturn(review)    
+      SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckSandboxTesting, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckSandboxTesting, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
 
       result.value.requiredActions(SubmissionReview.Action.CheckSandboxTesting) shouldBe SubmissionReview.Status.InProgress
     }
     
     "set correct status in SubmissionReview for checkedPassedAnswers" in new Setup {
-      val passedReview = SubmissionReview(aSubmission.id, 0, true,false)
+      val passedReview = SubmissionReview(aSubmission.id, 0, true,false, true)
       SubmissionReviewRepoMock.Find.thenReturn(passedReview)    
       SubmissionReviewRepoMock.Update.thenReturn()
       

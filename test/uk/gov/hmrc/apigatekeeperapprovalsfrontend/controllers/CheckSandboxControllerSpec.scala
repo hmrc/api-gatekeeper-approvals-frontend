@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
@@ -36,8 +36,6 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       with ApplicationTestData {
         
     val checkSandboxPage = app.injector.instanceOf[CheckSandboxPage]
-
-    val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true,true)
 
     val controller = new CheckSandboxController(
       strideAuthConfig,

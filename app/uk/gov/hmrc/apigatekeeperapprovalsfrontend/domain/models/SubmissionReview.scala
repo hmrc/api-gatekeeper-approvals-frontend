@@ -79,7 +79,7 @@ object SubmissionReview {
   ): SubmissionReview =
     SubmissionReview(submissionId, instanceIndex, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
-  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): SubmissionReview = {
+  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
       (isSuccessful, hasWarnings) match {
         case (true, true)   => List(Action.CheckWarnings)
@@ -87,8 +87,7 @@ object SubmissionReview {
         case (false, _)     => List(Action.CheckFailsAndWarnings)
       }
 
-    // TODO - logic to include or exclude this
-    val fraudAction = List(Action.CheckFraudPreventionData)
+    val fraudAction = if (requiresFraudCheck) List(Action.CheckFraudPreventionData) else List()
 
     val fixedActions: List[Action] =
       List(

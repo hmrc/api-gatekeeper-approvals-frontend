@@ -22,7 +22,6 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
 
 class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
@@ -80,7 +79,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, false, true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
@@ -91,7 +90,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, false, true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 

@@ -17,15 +17,13 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import play.api.http.Status
 import play.api.test.Helpers._
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup with SubscriptionServiceMockModule {
     val appChecklistPage = app.injector.instanceOf[ChecklistPage]
 
     val controller = new ChecklistController(
@@ -37,18 +35,18 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       errorHandler,
       appChecklistPage,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock
+      SubmissionServiceMock.aMock,
+      SubscriptionServiceMock.aMock
     )
   }
 
   "GET /" should {
     "return 200" in new Setup {
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true,false)
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
+      SubscriptionServiceMock.HasMtdSubscriptions.thenReturn(true)
 
       val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK

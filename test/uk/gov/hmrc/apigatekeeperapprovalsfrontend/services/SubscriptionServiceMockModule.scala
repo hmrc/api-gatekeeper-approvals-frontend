@@ -32,6 +32,12 @@ trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSu
         when(aMock.fetchSubscriptionsByApplicationId(*[ApplicationId])(*)).thenReturn(successful(definitions))
       }
     }
+
+    object HasMtdSubscriptions {
+      def thenReturn(hasMtdSubscriptions: Boolean) = {
+        when(aMock.hasMtdSubscriptions(*[ApplicationId])(*)).thenReturn(successful(hasMtdSubscriptions))
+      }
+    }
   }
 
   object SubscriptionServiceMock extends BaseSubscriptionServiceMock {

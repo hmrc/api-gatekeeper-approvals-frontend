@@ -18,7 +18,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -68,7 +67,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkFraudAction(applicationId)(fakeSubmitCheckedRequest)
 
@@ -80,7 +79,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkFraudAction(applicationId)(fakeSubmitComebackLaterRequest)
 

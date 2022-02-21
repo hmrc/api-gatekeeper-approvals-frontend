@@ -22,7 +22,6 @@ import play.api.test.Helpers._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 
@@ -83,7 +82,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true,true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
@@ -95,7 +94,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true,true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 
