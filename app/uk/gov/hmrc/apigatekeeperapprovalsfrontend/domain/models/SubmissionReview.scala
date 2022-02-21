@@ -38,7 +38,8 @@ case class SubmissionReview(
   checkedUrls: Status = SubmissionReview.Status.NotStarted,
   checkedCompanyRegistration: Status = SubmissionReview.Status.NotStarted,
   checkedForSandboxTesting: Status = SubmissionReview.Status.NotStarted,
-  checkedPassedAnswers: Status = SubmissionReview.Status.NotStarted
+  checkedPassedAnswers: Status = SubmissionReview.Status.NotStarted,
+  declineReasons: String = ""
 ) {
   lazy val isCompleted = List(checkedFailsAndWarnings, emailedResponsibleIndividual, checkedUrls, checkedCompanyRegistration, checkedForSandboxTesting, checkedPassedAnswers).forall(s => s == Status.Completed)
 }

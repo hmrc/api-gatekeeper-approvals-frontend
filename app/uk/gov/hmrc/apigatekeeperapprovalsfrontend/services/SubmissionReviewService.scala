@@ -33,7 +33,10 @@ class SubmissionReviewService @Inject()(
   type UpdateFn = (SubmissionReview) => SubmissionReview
 
   def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
-    def createANewReview = repo.create(SubmissionReview(submissionId, instanceIndex))
+    def createANewReview = repo.create(
+      SubmissionReview(submissionId, instanceIndex)
+    )
+
     repo.find(submissionId, instanceIndex)
       .flatMap( _.fold(createANewReview)(r => successful(r)))
   }
@@ -55,4 +58,6 @@ class SubmissionReviewService @Inject()(
   def updateCheckedForSandboxTestingStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedForSandboxTesting = newStatus)) _
   
   def updateCheckedPassedAnswersStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedPassedAnswers = newStatus)) _
+
+  def updateDeclineReasons(reasons: String) = updateReview(_.copy(declineReasons = reasons)) _
 }

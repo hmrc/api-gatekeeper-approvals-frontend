@@ -33,6 +33,8 @@ POST       /applications/:id/confirm-decision                        uk.gov.hmrc
 
 GET        /applications/:id/confirm-decision/provide-reasons        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.provideReasonsPage(id: ApplicationId)
 POST       /applications/:id/confirm-decision/provide-reasons        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.provideReasonsAction(id: ApplicationId)
+GET        /applications/:id/confirm-decision/emails                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.emailAddressesPage(id: ApplicationId)
+POST       /applications/:id/confirm-decision/emails                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.emailAddressesAction(id: ApplicationId)
 GET        /applications/:id/confirm-decision/declined               uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.declinedPage(id: ApplicationId)
 
 GET        /applications/:id/view-declined/:index                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ViewDeclinedSubmissionController.page(id: ApplicationId, index: Int)
