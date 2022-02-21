@@ -34,7 +34,7 @@ abstract class AbstractApplicationController(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  val errorHandler: ErrorHandler,
+  val errorHandler: ErrorHandler
 )(implicit override val ec: ExecutionContext)
     extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)
     with ApplicationActions

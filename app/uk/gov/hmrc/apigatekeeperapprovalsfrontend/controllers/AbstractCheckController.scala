@@ -36,7 +36,7 @@ abstract class AbstractCheckController(
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
+  submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
 
   type Fn = (SubmissionReview.Status) => (Submission.Id, Int) => Future[Option[SubmissionReview]]
