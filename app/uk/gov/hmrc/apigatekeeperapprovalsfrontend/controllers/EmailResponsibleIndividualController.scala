@@ -31,6 +31,7 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ResponsibleIndividualExtractor
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 case class ResponsibleIndividual(fullName: String, emailAddress: String)
 
@@ -45,12 +46,12 @@ class EmailResponsibleIndividualController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  emailResponsibleIndividualPage: EmailResponsibleIndividualPage,
   errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService,
+  emailResponsibleIndividualPage: EmailResponsibleIndividualPage,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  val submissionService: SubmissionService
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
 
   import EmailResponsibleIndividualController._
 
@@ -79,6 +80,6 @@ class EmailResponsibleIndividualController @Inject()(
   }
 
   def action(applicationId: ApplicationId): Action[AnyContent] = 
-    updateReviewAction("emailResponsibleIndividualAction", submissionReviewService.updateEmailedResponsibleIndividualStatus _)(applicationId)
+    updateActionStatus(SubmissionReview.Action.EmailResponsibleIndividual)(applicationId)
 
 }

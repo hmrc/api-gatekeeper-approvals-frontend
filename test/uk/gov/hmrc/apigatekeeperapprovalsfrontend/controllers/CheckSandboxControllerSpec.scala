@@ -37,7 +37,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
         
     val checkSandboxPage = app.injector.instanceOf[CheckSandboxPage]
 
-    val submissionReview = SubmissionReview(markedSubmission.submission.id, 0)
+    val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true,true)
 
     val controller = new CheckSandboxController(
       strideAuthConfig,
@@ -46,9 +46,9 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       mcc,
       checkSandboxPage,
       errorHandler,
+      SubmissionReviewServiceMock.aMock,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      SubmissionReviewServiceMock.aMock,
       ApplicationServiceMock.aMock,
       SubscriptionServiceMock.aMock
     )
@@ -86,7 +86,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedForSandboxTestingStatus.thenReturn(submissionReview)
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkSandboxAction(applicationId)(fakeSubmitCheckedRequest)
       status(result) shouldBe Status.SEE_OTHER
@@ -97,7 +97,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateCheckedForSandboxTestingStatus.thenReturn(submissionReview)
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkSandboxAction(applicationId)(fakeSubmitComebackLaterRequest)
       status(result) shouldBe Status.SEE_OTHER

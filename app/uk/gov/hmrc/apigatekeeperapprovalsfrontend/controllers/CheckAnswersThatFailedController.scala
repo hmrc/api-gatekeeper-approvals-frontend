@@ -33,6 +33,7 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import play.api.mvc._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -50,13 +51,13 @@ class CheckAnswersThatFailedController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
   errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService,
+  checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
+  val submissionService: SubmissionService
 
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
   
   import CheckAnswersThatFailedController._
 
@@ -95,5 +96,5 @@ class CheckAnswersThatFailedController @Inject()(
     )
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = updateReviewAction("checkAnswersThatFailedAction", submissionReviewService.updateCheckedFailsAndWarningsStatus _)(applicationId)
+  def action(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings)(applicationId)
 }

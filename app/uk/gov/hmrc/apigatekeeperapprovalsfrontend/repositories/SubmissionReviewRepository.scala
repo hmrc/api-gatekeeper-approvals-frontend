@@ -29,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 class SubmissionReviewRepo @Inject()(mongo: MongoComponent)(implicit ec: ExecutionContext
 ) extends PlayMongoRepository[SubmissionReview](
   mongoComponent = mongo,
-  collectionName = "submission-review",
+  collectionName = "submissionReview",
   domainFormat   = submissionReviewFormat,
   indexes        = Seq(
     IndexModel(Indexes.ascending("submissionId", "instanceIndex"),IndexOptions().unique(true))

@@ -30,31 +30,24 @@ class SubmissionReviewService @Inject()(
   repo: SubmissionReviewRepo
 )(implicit val ec: ExecutionContext) {
 
-  type UpdateFn = (SubmissionReview) => SubmissionReview
+  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): Future[SubmissionReview] = {
+    def createANewReview = {
+      
+      repo.create(SubmissionReview(submissionId, instanceIndex, isSuccessful, hasWarnings))
+    }
 
-  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int): Future[SubmissionReview] = {
-    def createANewReview = repo.create(SubmissionReview(submissionId, instanceIndex))
     repo.find(submissionId, instanceIndex)
       .flatMap( _.fold(createANewReview)(r => successful(r)))
   }
 
-  private def updateReview(fn: UpdateFn)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
-    OptionT(repo.find(submissionId, instanceIndex))
-    .semiflatMap(sr => repo.update(fn(sr)))
+  def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    (
+      for {
+        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview      = SubmissionReview.updateReviewActionStatus(action, newStatus)(originalReview)
+        _                 <- OptionT.liftF(repo.update(changedReview))
+      } yield changedReview
+    )
     .value
   }
-
-  def updateCheckedFailsAndWarningsStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedFailsAndWarnings = newStatus)) _
-
-  def updateEmailedResponsibleIndividualStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(emailedResponsibleIndividual = newStatus)) _
-
-  def updateCheckedUrlsStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedUrls = newStatus)) _
-
-  def updateCheckedCompanyRegistrationStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedCompanyRegistration = newStatus)) _
-
-  def updateCheckedForSandboxTestingStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedForSandboxTesting = newStatus)) _
-
-  def updateCheckedForFraudStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedForFraud = newStatus)) _
-
-  def updateCheckedPassedAnswersStatus(newStatus: SubmissionReview.Status) = updateReview(_.copy(checkedPassedAnswers = newStatus)) _
 }
