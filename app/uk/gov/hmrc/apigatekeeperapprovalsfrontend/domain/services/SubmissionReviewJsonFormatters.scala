@@ -38,30 +38,6 @@ trait SubmissionReviewJsonFormatters {
     .and[Status.Completed.type]("completed")
     .format
 
-  implicit val Action = Json.format[Status.Completed.type]
-// 
-  // implicit val actionCheckFailsAndWarningsFormat  = Json.format[Action.CheckFailsAndWarnings.type]
-  // implicit val actionEmailResponsibleIndividual   = Json.format[Action.EmailResponsibleIndividual.type]
-  // implicit val actionCheckApplicationName         = Json.format[Action.CheckApplicationName.type]
-  // implicit val actionCheckCompanyRegistration     = Json.format[Action.CheckCompanyRegistration.type]
-  // implicit val actionCheckUrls                    = Json.format[Action.CheckUrls.type]
-  // implicit val actionCheckSandboxTesting          = Json.format[Action.CheckSandboxTesting.type]
-  // implicit val actionCheckFraudPreventionData     = Json.format[Action.CheckFraudPreventionData.type]
-  // implicit val actionArrangedDemo                 = Json.format[Action.ArrangedDemo.type]
-  // implicit val actionCheckPassedAnswers           = Json.format[Action.CheckPassedAnswers.type]
-// 
-  // implicit val actionJsonFormat = Union.from[Action]("Action")
-    // .and[Action.CheckFailsAndWarnings.type]("checkFailsAndWarnings")
-    // .and[Action.EmailResponsibleIndividual.type]("emailResponsibleIndividual")
-    // .and[Action.CheckApplicationName.type]("checkApplicationName")
-    // .and[Action.CheckCompanyRegistration.type]("checkCompanyRegistration")
-    // .and[Action.CheckUrls.type]("checkUrls")
-    // .and[Action.CheckSandboxTesting.type]("checkSandboxTesting")
-    // .and[Action.CheckFraudPreventionData.type]("checkFraudPreventionData")
-    // .and[Action.ArrangedDemo.type]("arrangedDemo")
-    // .and[Action.CheckPassedAnswers.type]("checkPassedAnswers")
-    // .format
-
   implicit val actionKeyReads: KeyReads[Action] = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
   implicit val actionKeyWrites: KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
   

@@ -85,7 +85,6 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      // SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.EmailResponsibleIndividual)))
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, true))
 
       val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
@@ -97,7 +96,6 @@ class EmailResponsibleIndividualControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      // SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, List(SubmissionReview.Action.EmailResponsibleIndividual)))
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, true))
 
       val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
