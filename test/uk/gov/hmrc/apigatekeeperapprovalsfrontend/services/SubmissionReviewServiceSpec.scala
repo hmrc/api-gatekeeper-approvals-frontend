@@ -99,15 +99,5 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
       result.value.requiredActions(SubmissionReview.Action.CheckPassedAnswers) shouldBe SubmissionReview.Status.InProgress
     }
-
-    
-    "set correct status in SubmissionReview for checkedOtherAnswers" in new Setup {
-      SubmissionReviewRepoMock.Find.thenReturn(review)    
-      SubmissionReviewRepoMock.Update.thenReturn()
-      
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckOtherAnswers, SubmissionReview.Status.InProgress)(review.submissionId, review.instanceIndex))
-
-      result.value.requiredActions(SubmissionReview.Action.CheckOtherAnswers) shouldBe SubmissionReview.Status.InProgress
-    }
   }
 }

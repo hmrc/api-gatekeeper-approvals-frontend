@@ -40,7 +40,6 @@ object SubmissionReview {
     case object CheckFraudPreventionData extends Action
     case object ArrangedDemo extends Action
     case object CheckPassedAnswers extends Action
-    case object CheckOtherAnswers extends Action
 
     def fromText(text: String): Option[Action] = {
       import cats.implicits._
@@ -55,7 +54,6 @@ object SubmissionReview {
         case "CheckFraudPreventionData"   => CheckFraudPreventionData.some
         case "ArrangedDemo"               => ArrangedDemo.some
         case "CheckPassedAnswers"         => CheckPassedAnswers.some
-        case "CheckOtherAnswers"          => CheckOtherAnswers.some
         case _                            => None
       }
     }
@@ -71,7 +69,6 @@ object SubmissionReview {
         case CheckFraudPreventionData   => "CheckFraudPreventionData"
         case ArrangedDemo               => "ArrangedDemo"
         case CheckPassedAnswers         => "CheckPassedAnswers"
-        case CheckOtherAnswers          => "CheckOtherAnswers"
     }
   }
 
@@ -85,9 +82,9 @@ object SubmissionReview {
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
       (isSuccessful, hasWarnings) match {
-        case (true, true)   => List(Action.CheckWarnings, Action.CheckOtherAnswers)
-        case (true, false)  => List(Action.CheckPassedAnswers)
-        case (false, _)     => List(Action.CheckFailsAndWarnings, Action.CheckOtherAnswers)
+        case (true, true)   => List(Action.CheckWarnings)
+        case (true, false)  => List.empty
+        case (false, _)     => List(Action.CheckFailsAndWarnings)
       }
 
     // TODO - logic to include or exclude this
@@ -100,7 +97,8 @@ object SubmissionReview {
         Action.CheckCompanyRegistration,
         Action.CheckUrls,
         Action.CheckSandboxTesting,
-        Action.ArrangedDemo
+        Action.ArrangedDemo,
+        Action.CheckPassedAnswers
       )
 
     SubmissionReview(

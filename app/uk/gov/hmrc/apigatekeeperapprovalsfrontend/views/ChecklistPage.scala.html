@@ -121,20 +121,12 @@
 
         @{
             if(model.requiredActions.contains(SubmissionReview.Action.CheckPassedAnswers)) {
-              checklistTable(
-                "checklist.checkother.heading", 
-                List(
-                  ("checklist.checkother.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckPassedAnswers))
+                checklistTable(
+                    "checklist.checkother.heading", 
+                    List(
+                        ("checklist.checkother.linktext", "checkpassed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckPassedAnswers))
+                    )
                 )
-              )
-            }
-            else if(model.requiredActions.contains(SubmissionReview.Action.CheckOtherAnswers)) {
-              checklistTable(
-                "checklist.checkpassed.heading", 
-                List(
-                  ("checklist.checkpassed.linktext", "checkother", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckOtherAnswers))
-                )
-              )
             }
         }
     </ol>
