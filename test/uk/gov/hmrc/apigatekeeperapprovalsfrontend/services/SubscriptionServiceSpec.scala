@@ -28,20 +28,26 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
   trait Setup extends ApmConnectorMockModule {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId = ApplicationId.random
+    val context1 = "context1"
+    val context2 = "context2"
+    val context3 = "context3"
+    val context4 = "context4"
+    val apiDefinition1 = ApiDefinition("serviceName1", "name1", Array("NO_MTD_HERE"))
+    val apiDefinition2 = ApiDefinition("serviceName2", "name2", Array("CATEGORY_MTD"))
+    val apiDefinition3 = ApiDefinition("serviceName3", "name3", Array("CATEGORY_X"))
+
     val service = new SubscriptionService(ApmConnectorMock.aMock)
   }
 
   "fetchSubscriptionsByApplicationId" should {
     "return correct apis for application" in new Setup {
-      val apiDefinition1 = ApiDefinition("serviceName1", "name1")
-      val apiDefinition2 = ApiDefinition("serviceName2", "name2")
       ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier("context1", "v1"), ApiIdentifier("context2", "v2"), ApiIdentifier("context3", "v3")
+        ApiIdentifier(context1, "v1"), ApiIdentifier(context2, "v2"), ApiIdentifier(context3, "v3")
       )
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
-        "context1" -> apiDefinition1,
-        "context2" -> apiDefinition2,
-        "context4" -> ApiDefinition("serviceName4", "name4")
+        context1 -> apiDefinition1,
+        context2 -> apiDefinition2,
+        context4 -> ApiDefinition("serviceName4", "name4", Array("CATEGORY_1"))
       ))
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))
       result shouldBe Set(apiDefinition1, apiDefinition2)
@@ -55,11 +61,39 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
 
     "return empty set if no subscribable apis are found" in new Setup {
       ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier("context1", "v1"), ApiIdentifier("context2", "v2"), ApiIdentifier("context3", "v3")
+        ApiIdentifier(context1, "v1"), ApiIdentifier(context2, "v2"), ApiIdentifier(context3, "v3")
       )
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturnNothing
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))
       result shouldBe Set()
+    }
+  }
+
+  "hasMtdSubscriptions" should {
+    "return True when an MTD subscription is present" in new Setup {
+      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
+        ApiIdentifier(context1, "v1"), ApiIdentifier(context2, "v2"), ApiIdentifier(context3, "v3")
+      )
+      ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
+        context1 -> apiDefinition1,
+        context2 -> apiDefinition2,
+        context3 -> apiDefinition3
+      ))
+      val result = await(service.hasMtdSubscriptions(applicationId))
+      result shouldBe true
+    }
+
+    "return False when an MTD subscription is not present" in new Setup {
+      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
+        ApiIdentifier(context1, "v1"), ApiIdentifier(context3, "v3")
+      )
+      ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
+        context1 -> apiDefinition1,
+        context2 -> apiDefinition2,
+        context3 -> apiDefinition3
+      ))
+      val result = await(service.hasMtdSubscriptions(applicationId))
+      result shouldBe false
     }
   }
 }

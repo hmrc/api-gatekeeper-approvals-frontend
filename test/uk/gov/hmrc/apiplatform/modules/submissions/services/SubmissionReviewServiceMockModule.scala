@@ -59,9 +59,16 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
         when(aMock.updateEmailedResponsibleIndividualStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i, emailedResponsibleIndividual = status))))
       }
     }
+
     object UpdateCheckedForSandboxTestingStatus {
       def thenReturn(review: SubmissionReview) = {
         when(aMock.updateCheckedForSandboxTestingStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i))))
+      }
+    }
+
+    object UpdateCheckedFraudStatus {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.updateCheckedForFraudStatus(*)).thenAnswer( (status: SubmissionReview.Status) => (id: Submission.Id, i: Int) => Future.successful(Some(review.copy(submissionId = id, instanceIndex = i))))
       }
     }
 

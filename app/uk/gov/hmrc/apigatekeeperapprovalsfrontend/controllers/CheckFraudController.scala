@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Standard}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService, SubscriptionService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
@@ -47,7 +47,7 @@ class CheckFraudController @Inject()(
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId))))
+      successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId))))
   }
 
   def checkFraudAction(applicationId: ApplicationId): Action[AnyContent] =
