@@ -31,6 +31,7 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.CompanyDetailsExtractor
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 case class CompanyRegistrationDetails(registrationType: String, registrationValue: Option[String])
 
@@ -48,10 +49,10 @@ class CheckCompanyRegistrationController @Inject()(
   mcc: MessagesControllerComponents,
   checkCompanyRegistrationPage: CheckCompanyRegistrationPage,
   errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  val submissionService: SubmissionService
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val companyDetails = CompanyDetailsExtractor(request.submission)    
     
@@ -74,5 +75,5 @@ class CheckCompanyRegistrationController @Inject()(
   }
 
   def action(applicationId: ApplicationId): Action[AnyContent] = 
-    updateReviewAction("checkCompanyRegistrationAction", submissionReviewService.updateCheckedCompanyRegistrationStatus _)(applicationId)
+    updateActionStatus(SubmissionReview.Action.CheckCompanyRegistration)(applicationId)
 }

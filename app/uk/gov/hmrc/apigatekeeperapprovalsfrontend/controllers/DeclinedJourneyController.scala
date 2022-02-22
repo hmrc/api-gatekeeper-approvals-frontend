@@ -23,15 +23,12 @@ import scala.concurrent.Future.successful
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
@@ -57,7 +54,7 @@ class DeclinedJourneyController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  val errorHandler: ErrorHandler,
+  errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   applicationDeclinedPage: ApplicationDeclinedPage,
@@ -65,9 +62,7 @@ class DeclinedJourneyController @Inject()(
   adminsToEmailPage: AdminsToEmailPage,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext)
-  extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)
-    with ApplicationActions
-    with ApplicationLogger {
+  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
 
   import DeclinedJourneyController._
 
@@ -105,7 +100,7 @@ class DeclinedJourneyController @Inject()(
 
   def emailAddressesAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     for {
-      review <- submissionReviewService.findOrCreateReview(request.submission.id, 0)
+      review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, !request.markedSubmission.isFail, request.markedSubmission.isWarn)
       result <- submissionService.decline(applicationId, request.name.get, review.declineReasons)
     } yield result match {
       case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))

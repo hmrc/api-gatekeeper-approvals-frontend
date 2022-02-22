@@ -33,8 +33,8 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.aMock,
       forbiddenHandler,
       mcc,
-      productionAccessPage,
       errorHandler,
+      productionAccessPage,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )

@@ -50,11 +50,11 @@ class SubmittedAnswersController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  submittedAnswersPage: SubmittedAnswersPage,
   errorHandler: ErrorHandler,
+  submittedAnswersPage: SubmittedAnswersPage,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   
   import SubmittedAnswersController._
 

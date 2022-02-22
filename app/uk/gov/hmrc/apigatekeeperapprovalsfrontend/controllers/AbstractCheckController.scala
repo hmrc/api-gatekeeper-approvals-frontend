@@ -22,16 +22,12 @@ import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandl
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
-import org.joda.time.DateTime
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
 
 abstract class AbstractCheckController(
@@ -39,37 +35,34 @@ abstract class AbstractCheckController(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  val errorHandler: ErrorHandler
-)(implicit override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc) with ApplicationActions with EitherTHelper[Result] with ApplicationLogger {
+  errorHandler: ErrorHandler,
+  submissionReviewService: SubmissionReviewService
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
 
   type Fn = (SubmissionReview.Status) => (Submission.Id, Int) => Future[Option[SubmissionReview]]
 
-  def logBadRequest(location: String)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[_]): Result = {
-    logger.error(s"$location : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
+  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[_]): Result = {
+    val description = SubmissionReview.Action.toText(reviewAction)
+    logger.error(s"$description : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
     BadRequest(errorHandler.badRequestTemplate)
   }
 
-  def actionAsStatus(action: String): Option[SubmissionReview.Status] = action match {
+  def deriveStatusFromAction(formAction: String): Option[SubmissionReview.Status] = formAction match {
     case "checked"          => Some(SubmissionReview.Status.Completed)
     case "come-back-later"  => Some(SubmissionReview.Status.InProgress)
     case _                  => None
   }
 
-  def updateReviewAction(location: String, updateSubmissionReview: Fn)(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def updateActionStatus(reviewAction: SubmissionReview.Action)(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
-    val log = logBadRequest(location) _
+    val log = logBadRequest(reviewAction) _
 
     (
       for {
-        action <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
-        status <- fromOption(actionAsStatus(action), log("Invalid submit-action found in request"))
-        _      <- fromOptionF(updateSubmissionReview(status)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+        formAction   <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
+        newStatus    <- fromOption(deriveStatusFromAction(formAction), log("Invalid submit-action found in request"))
+        _            <- fromOptionF(submissionReviewService.updateActionStatus(reviewAction, newStatus)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
       } yield ok
     ).fold(identity(_), identity(_))
   }
-
-  implicit class TimestampSyntax(datetime: DateTime) {
-    def asText = datetime.toString("dd MMMM yyyy")
-  }
-
 }
