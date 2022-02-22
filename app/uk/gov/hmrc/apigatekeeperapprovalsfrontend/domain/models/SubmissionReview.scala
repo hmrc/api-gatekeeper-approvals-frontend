@@ -121,7 +121,7 @@ object SubmissionReview {
 case class SubmissionReview private(
   submissionId: Submission.Id,
   instanceIndex: Int,
-  declineReasons: String = "",
+  declineReasons: String,
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty

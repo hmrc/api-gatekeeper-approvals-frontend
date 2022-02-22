@@ -17,7 +17,13 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ClientId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
 
 trait ApplicationTestData {
-  def anApplication(id: ApplicationId = ApplicationId.random, clientId: ClientId = ClientId.random, name: String = "app name") = Application(id, clientId, name)
+  def anApplication(
+    id: ApplicationId = ApplicationId.random,
+    clientId: ClientId = ClientId.random,
+    name: String = "app name",
+    collaborators: Set[Collaborator] = Set.empty
+  ) = Application(id, clientId, name, collaborators)
 }
