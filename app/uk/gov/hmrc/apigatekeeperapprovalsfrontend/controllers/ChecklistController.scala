@@ -26,6 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionRequiresFraudCheck
 import uk.gov.hmrc.apiplatform.modules.submissions.services._
 
 import scala.concurrent.Future.successful
@@ -45,8 +46,7 @@ class ChecklistController @Inject()(
   errorHandler: ErrorHandler,
   checklistPage: ChecklistPage,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  subscriptionService: SubscriptionService
+  val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   import ChecklistController._
 
@@ -54,9 +54,9 @@ class ChecklistController @Inject()(
       val appName = request.application.name
       val isSuccessful = ! request.markedSubmission.isFail
       val hasWarnings = request.markedSubmission.isWarn
+      val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
 
       for {
-        requiresFraudCheck <- subscriptionService.hasMtdSubscriptions(applicationId)
         review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, isSuccessful, hasWarnings, requiresFraudCheck)
       } yield Ok(checklistPage(ViewModel(applicationId, appName, isSuccessful, hasWarnings, review.requiredActions)))
   }
