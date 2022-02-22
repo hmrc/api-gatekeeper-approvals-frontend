@@ -35,8 +35,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       errorHandler,
       appChecklistPage,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock,
-      SubscriptionServiceMock.aMock
+      SubmissionServiceMock.aMock
     )
   }
 
@@ -46,7 +45,6 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
-      SubscriptionServiceMock.HasMtdSubscriptions.thenReturn(true)
 
       val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK

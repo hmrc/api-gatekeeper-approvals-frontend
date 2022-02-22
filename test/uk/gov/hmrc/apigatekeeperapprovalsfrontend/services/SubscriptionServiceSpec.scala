@@ -69,31 +69,4 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
     }
   }
 
-  "hasMtdSubscriptions" should {
-    "return True when an MTD subscription is present" in new Setup {
-      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier(context1, "v1"), ApiIdentifier(context2, "v2"), ApiIdentifier(context3, "v3")
-      )
-      ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
-        context1 -> apiDefinition1,
-        context2 -> apiDefinition2,
-        context3 -> apiDefinition3
-      ))
-      val result = await(service.hasMtdSubscriptions(applicationId))
-      result shouldBe true
-    }
-
-    "return False when an MTD subscription is not present" in new Setup {
-      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier(context1, "v1"), ApiIdentifier(context3, "v3")
-      )
-      ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
-        context1 -> apiDefinition1,
-        context2 -> apiDefinition2,
-        context3 -> apiDefinition3
-      ))
-      val result = await(service.hasMtdSubscriptions(applicationId))
-      result shouldBe false
-    }
-  }
 }
