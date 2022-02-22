@@ -22,11 +22,14 @@ import play.api.http.Status
 import play.api.test.Helpers._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationDeclinedPage, ProvideReasonsForDecliningPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.AdminsToEmailPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup {
     val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
     val provideReasonsForDecliningPage = app.injector.instanceOf[ProvideReasonsForDecliningPage]
+    val adminsToEmailPage = app.injector.instanceOf[AdminsToEmailPage]
   
     val controller = new DeclinedJourneyController(
         strideAuthConfig,
@@ -37,11 +40,13 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
         ApplicationActionServiceMock.aMock,
         SubmissionServiceMock.aMock,
         applicationDeclinedPage,
-        provideReasonsForDecliningPage
+        provideReasonsForDecliningPage,
+        adminsToEmailPage,
+        SubmissionReviewServiceMock.aMock
       )
   }
 
-  "application declined provide reasons page" should {
+  "provide reasons page" should {
     "return 200" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -63,28 +68,29 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
     }
   }
 
-  "application declined provide reasons action" should {
-    "go to next page when valid form and decline works" in new Setup {
+  "provide reasons action" should {
+    "go to the email admins page when valid form with decline reasons is submitted" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
+      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true, false)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionServiceMock.Decline.thenReturn(applicationId, application)
+      SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturn(submissionReview)
     
       val result = controller.provideReasonsAction(applicationId)(fakeDeclineRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId).url
     }
 
-    "return bad request when valid form and decline fails" in new Setup {
+    "return bad request when valid form and persisting decline reasons fails" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionServiceMock.Decline.thenReturnError(applicationId)
+      SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturnError()
     
       val result = controller.provideReasonsAction(applicationId)(fakeDeclineRequest)
 
@@ -99,6 +105,59 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.provideReasonsAction(applicationId)(brokenFormRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
+  "admins to email page" should {
+    "return 200" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+    
+      val result = controller.emailAddressesPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+
+    "return 404 when no marked submission is found" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+
+      val result = controller.emailAddressesPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.NOT_FOUND
+    }
+  }
+
+  "admins to email action" should {
+    "go to the application declined page" in new Setup {
+      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true, false)
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
+      SubmissionServiceMock.Decline.thenReturn(applicationId, application)
+    
+      val result = controller.emailAddressesAction(applicationId)(fakeRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId).url
+    }
+    
+    "return 404 when the decline fails" in new Setup {
+      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true, false)
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
+      SubmissionServiceMock.Decline.thenReturnError(applicationId)
+    
+      val result = controller.emailAddressesAction(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

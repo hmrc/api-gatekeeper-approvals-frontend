@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ClientId}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
+case class Collaborator(emailAddress: String, role: CollaboratorRole, userId: UserId)
 
-trait ApplicationTestData {
-  def anApplication(
-    id: ApplicationId = ApplicationId.random,
-    clientId: ClientId = ClientId.random,
-    name: String = "app name",
-    collaborators: Set[Collaborator] = Set.empty
-  ) = Application(id, clientId, name, collaborators)
+object Collaborator {
+  import play.api.libs.json.Json
+
+  implicit val format = Json.format[Collaborator]
+}
+
+case class AddCollaborator(emailAddress: String, role: CollaboratorRole)
+
+object AddCollaborator {
+  import play.api.libs.json.Json
+
+  implicit val format = Json.format[AddCollaborator]
 }

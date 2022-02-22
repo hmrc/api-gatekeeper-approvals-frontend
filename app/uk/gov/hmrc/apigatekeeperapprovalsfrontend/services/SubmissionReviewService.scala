@@ -40,6 +40,17 @@ class SubmissionReviewService @Inject()(
       .flatMap( _.fold(createANewReview)(r => successful(r)))
   }
 
+  def updateDeclineReasons(reasons: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    (
+      for {
+        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview      = SubmissionReview.updateDeclineReasons(reasons)(originalReview)
+        _                 <- OptionT.liftF(repo.update(changedReview))
+      } yield changedReview
+    )
+    .value
+  }
+
   def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {

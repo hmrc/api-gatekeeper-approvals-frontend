@@ -32,9 +32,12 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.CollaboratorRole
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
 
 object DeclinedJourneyController {
-  case class ViewModel(applicationId: ApplicationId, appName: String)
+  case class ViewModel(applicationId: ApplicationId, appName: String, adminsToEmail: Set[Collaborator] = Set.empty)
 
   case class ProvideReasonsForm(reasons: String)
 
@@ -55,7 +58,9 @@ class DeclinedJourneyController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   applicationDeclinedPage: ApplicationDeclinedPage,
-  provideReasonsForDecliningPage: ProvideReasonsForDecliningPage
+  provideReasonsForDecliningPage: ProvideReasonsForDecliningPage,
+  adminsToEmailPage: AdminsToEmailPage,
+  submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext)
   extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
 
@@ -67,13 +72,13 @@ class DeclinedJourneyController @Inject()(
 
   def provideReasonsAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
-      submissionService.decline(applicationId, request.name.get, form.reasons).map( _ match {
-        case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
-        case Left(err) => {
-          logger.warn(s"Decline application failed due to: $err")
+      submissionReviewService.updateDeclineReasons(form.reasons)(request.submission.id, request.submission.latestInstance.index).map {
+        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId))
+        case None => {
+          logger.warn("Persisting decline reasons failed")
           BadRequest(errorHandler.badRequestTemplate)
         }
-      })
+      }
     }
 
     def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
@@ -85,5 +90,24 @@ class DeclinedJourneyController @Inject()(
 
   def declinedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name))))
+  }
+
+  def emailAddressesPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    val adminsToEmail = request.application.collaborators.filter(_.role.is(CollaboratorRole.ADMINISTRATOR))
+    
+    successful(Ok(adminsToEmailPage(ViewModel(applicationId, request.application.name, adminsToEmail))))
+  }
+
+  def emailAddressesAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    for {
+      review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, !request.markedSubmission.isFail, request.markedSubmission.isWarn)
+      result <- submissionService.decline(applicationId, request.name.get, review.declineReasons)
+    } yield result match {
+      case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
+      case Left(err) => {
+        logger.warn(s"Decline application failed due to: $err")
+        BadRequest(errorHandler.badRequestTemplate)
+      }
+    }
   }
 }

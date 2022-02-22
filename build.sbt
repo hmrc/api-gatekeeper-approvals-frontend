@@ -1,4 +1,8 @@
 import bloop.integrations.sbt.BloopDefaults
+import com.typesafe.sbt.digest.Import._
+import com.typesafe.sbt.uglify.Import._
+import net.ground5hark.sbt.concat.Import._
+
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
@@ -11,6 +15,23 @@ lazy val microservice = Project(appName, file("."))
     scalaVersion                     := "2.12.12",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     pipelineStages in Assets := Seq(gzip)
+  )
+  .settings(
+    Concat.groups := Seq(
+      "javascripts/apis-app.js" -> group(
+        (baseDirectory.value / "app" / "assets" / "javascripts") ** "*.js"
+      )
+    ),
+    uglifyCompressOptions := Seq(
+      "unused=false",
+      "dead_code=true"
+    ),
+    includeFilter in uglify := GlobFilter("apis-*.js"),
+    pipelineStages := Seq(digest),
+    pipelineStages in Assets := Seq(
+      concat,
+      uglify
+    )
   )
   .settings(
     TwirlKeys.templateImports ++= Seq(

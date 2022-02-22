@@ -1,0 +1,54 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController.{ProvideReasonsForm, ViewModel}
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("applicationdeclined.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  <span class="govuk-caption-l">@model.appName</span>
+  <label class="govuk-label govuk-label--l" for="more-detail">
+    @{messages("adminstoemail.heading")}
+  </label>
+  @defining(model.adminsToEmail.map(_.emailAddress).mkString("; ")) { emails =>
+    <div class="govuk-button-group">
+      <button id="admin-emails" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-4" data-module="govuk-button" onclick="copyToClipboard('@emails');">
+        @{messages("adminstoemail.button.copyemailaddresses")}
+      </button>
+    </div>
+  }
+
+  <ul class="govuk-list">
+    @for(collaborator <- model.adminsToEmail) {
+      <li>@{collaborator.emailAddress}</li>
+    }
+  </ul>
+
+  <p class="govuk-body">@{messages("adminstoemail.text.decline")}</p>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesAction(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+    <button class="govuk-button govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-module="govuk-button">
+      @{messages("adminstoemail.button.decline")}
+    </button>
+  }
+}

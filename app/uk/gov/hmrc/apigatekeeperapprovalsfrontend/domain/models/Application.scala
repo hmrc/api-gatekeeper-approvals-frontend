@@ -71,7 +71,7 @@ case class Application(
   name: String,
   // deployedTo: String,
   // description: Option[String] = None,
-  // collaborators: Set[Collaborator],
+  collaborators: Set[Collaborator],
   // createdOn: DateTime,
   // lastAccess: Option[DateTime],
   // grantLength: Int,

@@ -77,7 +77,7 @@ object SubmissionReview {
     instanceIndex: Int,
     requiredActions: List[Action]
   ): SubmissionReview =
-    SubmissionReview(submissionId, instanceIndex, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+    SubmissionReview(submissionId, instanceIndex, "", requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
@@ -108,6 +108,10 @@ object SubmissionReview {
     )
   }
 
+  val updateDeclineReasons: String => SubmissionReview => SubmissionReview = reasons => review => {
+    review.copy(declineReasons = reasons)
+  }
+
   val updateReviewActionStatus : (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) => review => {
     require(review.requiredActions.keySet.contains(action))
     review.copy(requiredActions = review.requiredActions + (action -> newStatus))
@@ -117,6 +121,7 @@ object SubmissionReview {
 case class SubmissionReview private(
   submissionId: Submission.Id,
   instanceIndex: Int,
+  declineReasons: String,
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty

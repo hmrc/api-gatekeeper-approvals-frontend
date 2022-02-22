@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.helpers
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ClientId}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
+object FormKeys {
+  val firstnameField = "firstname"
 
-trait ApplicationTestData {
-  def anApplication(
-    id: ApplicationId = ApplicationId.random,
-    clientId: ClientId = ClientId.random,
-    name: String = "app name",
-    collaborators: Set[Collaborator] = Set.empty
-  ) = Application(id, clientId, name, collaborators)
+  val declineReasonsRequiredKey = "declinereasons.error.required.field"
+  
+  val declineReasonsRequiredGlobalKey = "declinereasons.error.required.global"
+
+  val formKeysMap = Map(
+    declineReasonsRequiredKey -> declineReasonsRequiredGlobalKey
+  )
+
+  val globalKeys = formKeysMap.values.toSeq
+
+  val globalToField = Map(
+    declineReasonsRequiredGlobalKey -> firstnameField,
+  )
 }

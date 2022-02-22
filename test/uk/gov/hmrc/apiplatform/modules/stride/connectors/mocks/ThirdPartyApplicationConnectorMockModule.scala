@@ -29,7 +29,7 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
 
     object FetchApplicationById {
       def thenReturn() = {
-        when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) => successful(Some(Application(appId, ClientId.random, "app name"))))
+        when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) => successful(Some(Application(appId, ClientId.random, "app name", Set.empty))))
       }
     }
   }
