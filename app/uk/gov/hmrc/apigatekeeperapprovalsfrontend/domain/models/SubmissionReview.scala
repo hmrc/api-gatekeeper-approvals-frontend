@@ -30,7 +30,6 @@ object SubmissionReview {
   sealed trait Action
 
   object Action {
-    case object CheckWarnings extends Action
     case object CheckFailsAndWarnings extends Action
     case object EmailResponsibleIndividual extends Action
     case object CheckApplicationName extends Action
@@ -44,7 +43,6 @@ object SubmissionReview {
     def fromText(text: String): Option[Action] = {
       import cats.implicits._
       text match {
-        case "CheckWarnings"              => CheckWarnings.some
         case "CheckFailsAndWarnings"      => CheckFailsAndWarnings.some
         case "EmailResponsibleIndividual" => EmailResponsibleIndividual.some
         case "CheckApplicationName"       => CheckApplicationName.some
@@ -59,7 +57,6 @@ object SubmissionReview {
     }
 
     def toText(action: Action) = action match {
-        case CheckWarnings              => "CheckWarnings"
         case CheckFailsAndWarnings      => "CheckFailsAndWarnings"
         case EmailResponsibleIndividual => "EmailResponsibleIndividual"
         case CheckApplicationName       => "CheckApplicationName"
@@ -77,14 +74,13 @@ object SubmissionReview {
     instanceIndex: Int,
     requiredActions: List[Action]
   ): SubmissionReview =
-    SubmissionReview(submissionId, instanceIndex, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+    SubmissionReview(submissionId, instanceIndex, "", requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
       (isSuccessful, hasWarnings) match {
-        case (true, true)   => List(Action.CheckWarnings)
         case (true, false)  => List.empty
-        case (false, _)     => List(Action.CheckFailsAndWarnings)
+        case (_, _)         => List(Action.CheckFailsAndWarnings)
       }
 
     val fraudAction = if (requiresFraudCheck) List(Action.CheckFraudPreventionData) else List()
@@ -107,6 +103,10 @@ object SubmissionReview {
     )
   }
 
+  val updateDeclineReasons: String => SubmissionReview => SubmissionReview = reasons => review => {
+    review.copy(declineReasons = reasons)
+  }
+
   val updateReviewActionStatus : (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) => review => {
     require(review.requiredActions.keySet.contains(action))
     review.copy(requiredActions = review.requiredActions + (action -> newStatus))
@@ -116,6 +116,7 @@ object SubmissionReview {
 case class SubmissionReview private(
   submissionId: Submission.Id,
   instanceIndex: Int,
+  declineReasons: String,
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty

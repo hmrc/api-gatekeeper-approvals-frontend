@@ -91,21 +91,22 @@
 
     <ol class="govuk-list govuk-list--number">
         @{
-            if(model.requiredActions.contains(SubmissionReview.Action.CheckWarnings)) {
-              checklistTable(
-                  "checklist.checkwarnings.heading", 
-                  List(
-                      ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, SubmissionReview.Action.CheckWarnings)
-                  )
-              )
-            }
-            if(model.requiredActions.contains(SubmissionReview.Action.CheckFailsAndWarnings)) {
-              checklistTable(
-                  "checklist.checkfailed.heading", 
-                  List(
-                      ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, SubmissionReview.Action.CheckFailsAndWarnings)
-                  )
-              )
+            if(model.isSuccessful) {
+                if (model.hasWarnings) {
+                    checklistTable(
+                        "checklist.checkwarnings.heading", 
+                        List(
+                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, SubmissionReview.Action.CheckFailsAndWarnings)
+                        )
+                    )
+                }
+            } else {
+                checklistTable(
+                    "checklist.checkfailed.heading", 
+                    List(
+                        ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, SubmissionReview.Action.CheckFailsAndWarnings)
+                    )
+                )
             }
         }
 
@@ -113,6 +114,7 @@
             "checklist.checkapplication.heading", 
             List(
                 ("checklist.checkapplication.linktext.email", "checkemail", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.EmailResponsibleIndividualController.page(model.applicationId).url, SubmissionReview.Action.EmailResponsibleIndividual),
+                ("checklist.checkapplication.linktext.name", "checkname", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckApplicationNameController.page(model.applicationId).url, SubmissionReview.Action.CheckApplicationName),
                 ("checklist.checkapplication.linktext.company", "checkcompany", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.page(model.applicationId).url, SubmissionReview.Action.CheckCompanyRegistration),
                 ("checklist.checkapplication.linktext.urls", "checkurls", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(model.applicationId).url, SubmissionReview.Action.CheckUrls),
                 ("checklist.checkapplication.linktext.sandbox", "checksandbox", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckSandboxController.checkSandboxPage(model.applicationId).url, SubmissionReview.Action.CheckSandboxTesting),

@@ -69,14 +69,13 @@ object Submission {
 
   val create: (
     String,
-      Submission.Id,
-      ApplicationId,
-      DateTime,
-      NonEmptyList[GroupOfQuestionnaires],
-      QuestionIdsOfInterest,
-      AskWhen.Context
-    ) => Submission = (requestedBy, id, applicationId, timestamp, groups, questionIdsOfInterest, context) => {
-
+    Submission.Id,
+    ApplicationId,
+    DateTime,
+    NonEmptyList[GroupOfQuestionnaires],
+    QuestionIdsOfInterest,
+    AskWhen.Context
+  ) => Submission = (requestedBy, id, applicationId, timestamp, groups, questionIdsOfInterest, context) => {
     val initialStatus = Submission.Status.Created(timestamp, requestedBy)
     val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
     Submission(id, applicationId, timestamp, groups, questionIdsOfInterest, initialInstances, context)
@@ -231,14 +230,14 @@ object Submission {
 }
 
 case class Submission(
-                       id: Submission.Id,
-                       applicationId: ApplicationId,
-                       startedOn: DateTime,
-                       groups: NonEmptyList[GroupOfQuestionnaires],
-                       questionIdsOfInterest: QuestionIdsOfInterest,
-                       instances: NonEmptyList[Submission.Instance],
-                       context: AskWhen.Context
-                     ) {
+  id: Submission.Id,
+  applicationId: ApplicationId,
+  startedOn: DateTime,
+  groups: NonEmptyList[GroupOfQuestionnaires],
+  questionIdsOfInterest: QuestionIdsOfInterest,
+  instances: NonEmptyList[Submission.Instance],
+  context: AskWhen.Context
+) {
   lazy val allQuestionnaires: NonEmptyList[Questionnaire] = groups.flatMap(g => g.links)
 
   lazy val allQuestions: NonEmptyList[Question] = allQuestionnaires.flatMap(l => l.questions.map(_.question))

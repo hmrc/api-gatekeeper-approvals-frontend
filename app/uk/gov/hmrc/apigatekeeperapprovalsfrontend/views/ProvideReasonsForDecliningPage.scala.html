@@ -24,6 +24,8 @@
 
 @layout(pageTitle = Some(messages("applicationdeclined.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  @ErrorSummary(form)
   
   @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsAction(model.applicationId), 'class -> "form") {
     @helper.CSRF.formField
@@ -40,7 +42,7 @@
     <div id="reasons-hint" class="govuk-hint">
       @{messages("providedeclinereasons.note.2")}
     </div>
-    <textarea class="govuk-textarea" id="reasons" name="reasons" rows="5" aria-describedby="reasons-hint">@form.data.get("reasons")</textarea>
+    <textarea class="govuk-textarea @if(form.errors("reasons").nonEmpty) {govuk-textarea--error}" id="reasons" name="reasons" rows="5" aria-describedby="reasons-hint">@form.data.get("reasons")</textarea>
 
     <button class="govuk-button" data-module="govuk-button">
       @{messages("providedeclinereasons.button.continue")}

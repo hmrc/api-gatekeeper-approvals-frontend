@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ClientId}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
+import java.util.UUID
 
-trait ApplicationTestData {
-  def anApplication(
-    id: ApplicationId = ApplicationId.random,
-    clientId: ClientId = ClientId.random,
-    name: String = "app name",
-    collaborators: Set[Collaborator] = Set.empty
-  ) = Application(id, clientId, name, collaborators)
+case class UserId(value: UUID) extends AnyVal {
+  def asText = value.toString
+}
+
+object UserId {
+  import play.api.libs.json.Json
+  implicit val developerIdFormat = Json.valueFormat[UserId]
+
+  def random: UserId = UserId(UUID.randomUUID())
 }

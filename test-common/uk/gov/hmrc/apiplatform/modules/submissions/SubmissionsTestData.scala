@@ -85,10 +85,11 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
 
   val submissionId = Submission.Id.random
   val applicationId = ApplicationId.random
-  val standardContext:AskWhen.Context = Map(
+  val standardContext: AskWhen.Context = Map(
     AskWhen.Context.Keys.IN_HOUSE_SOFTWARE -> "No",
     AskWhen.Context.Keys.VAT_OR_ITSA -> "No"
   )
+
   val now = DateTimeUtils.now
 
   val aSubmission = Submission.create("bob@example.com", submissionId, applicationId, now, testGroups, testQuestionIdsOfInterest, standardContext)

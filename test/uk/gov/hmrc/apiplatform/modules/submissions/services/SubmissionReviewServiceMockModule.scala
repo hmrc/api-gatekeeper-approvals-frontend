@@ -45,6 +45,16 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
         when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*[Submission.Id], *)).thenReturn(Future.successful(Some(review.copy(requiredActions = review.requiredActions + (action -> status)))))
       } 
     }
+
+    object UpdateDeclineReasons {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.updateDeclineReasons(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
+      }
+      
+      def thenReturnError() = {
+        when(aMock.updateDeclineReasons(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
+      }
+    }
   }
 
   object SubmissionReviewServiceMock extends BaseSubmissionReviewServiceMock {
