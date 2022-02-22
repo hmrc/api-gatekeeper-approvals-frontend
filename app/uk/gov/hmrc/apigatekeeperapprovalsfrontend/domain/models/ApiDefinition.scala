@@ -21,6 +21,4 @@ object ApiDefinition {
   implicit val apiDefinitionReads = Json.reads[ApiDefinition]
 }
 
-case class ApiDefinition(serviceName: String, name: String, categories: Array[String]) {
-  lazy val isMtd = categories.exists(_.endsWith("_MTD"))
-}
+case class ApiDefinition(serviceName: String, name: String)

@@ -47,14 +47,14 @@ case class QuestionnaireProgress(state: QuestionnaireState, questionsToAsk: List
 
 
 case class QuestionIdsOfInterest(
-                                  applicationNameId: QuestionId,
-                                  privacyPolicyUrlId: QuestionId,
-                                  termsAndConditionsUrlId: QuestionId,
-                                  organisationUrlId: QuestionId,
-                                  responsibleIndividualNameId: QuestionId,
-                                  responsibleIndividualEmailId: QuestionId,
-                                  identifyYourOrganisationId: QuestionId
-                                )
+    applicationNameId: QuestionId,
+    privacyPolicyUrlId: QuestionId,
+    termsAndConditionsUrlId: QuestionId,
+    organisationUrlId: QuestionId,
+    responsibleIndividualNameId: QuestionId,
+    responsibleIndividualEmailId: QuestionId,
+    identifyYourOrganisationId: QuestionId
+)
 
 object Submission {
   type AnswersToQuestions = Map[QuestionId, ActualAnswer]
@@ -166,36 +166,36 @@ object Submission {
 
   object Status {
     case class Declined(
-                         timestamp: DateTime,
-                         name: String,
-                         reasons: String
-                       ) extends Status
+      timestamp: DateTime,
+      name: String,
+      reasons: String
+    ) extends Status
 
     case class Granted(
-                        timestamp: DateTime,
-                        name: String
-                      ) extends Status
+      timestamp: DateTime,
+      name: String
+    ) extends Status
 
     case class GrantedWithWarnings(
-                                    timestamp: DateTime,
-                                    name: String,
-                                    warnings: String
-                                  ) extends Status
+      timestamp: DateTime,
+      name: String,
+      warnings: String
+    ) extends Status
 
     case class Submitted(
-                          timestamp: DateTime,
-                          requestedBy: String
-                        ) extends Status
+      timestamp: DateTime,
+      requestedBy: String
+    ) extends Status
 
     case class Answering(
-                          timestamp: DateTime,
-                          completed: Boolean
-                        ) extends Status
+      timestamp: DateTime,
+      completed: Boolean
+    ) extends Status
 
     case class Created(
-                        timestamp: DateTime,
-                        requestedBy: String
-                      ) extends Status
+      timestamp: DateTime,
+      requestedBy: String
+    ) extends Status
 
     def isLegalTransition(from: Submission.Status, to: Submission.Status): Boolean = (from, to) match {
       case (c: Created, a: Answering)               => true
@@ -211,10 +211,10 @@ object Submission {
   }
 
   case class Instance(
-                       index: Int,
-                       answersToQuestions: Submission.AnswersToQuestions,
-                       statusHistory: NonEmptyList[Submission.Status]
-                     ) {
+    index: Int,
+    answersToQuestions: Submission.AnswersToQuestions,
+    statusHistory: NonEmptyList[Submission.Status]
+  ) {
     lazy val status: Status = statusHistory.head
 
     lazy val isOpenToAnswers = status.isOpenToAnswers
@@ -257,14 +257,14 @@ case class Submission(
 }
 
 case class ExtendedSubmission(
-                             submission: Submission,
-                             questionnaireProgress: Map[QuestionnaireId, QuestionnaireProgress]
-                           )
+  submission: Submission,
+  questionnaireProgress: Map[QuestionnaireId, QuestionnaireProgress]
+)
 
 case class MarkedSubmission(
-                             submission: Submission,
-                             markedAnswers: Map[QuestionId, Mark]
-                           ) {
+  submission: Submission,
+  markedAnswers: Map[QuestionId, Mark]
+) {
   lazy val isFail = markedAnswers.values.toList.contains(Fail) | markedAnswers.values.filter(_ == Warn).size >= 4
   lazy val isWarn = markedAnswers.values.toList.contains(Warn)
   lazy val isPass = !isWarn && !isFail
