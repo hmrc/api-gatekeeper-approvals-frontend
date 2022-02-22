@@ -91,23 +91,23 @@
 
     <ol class="govuk-list govuk-list--number">
         @{
-            if(model.requiredActions.contains(SubmissionReview.Action.CheckFailsAndWarnings)) {
+            if(model.isSuccessful) {
+                if (model.hasWarnings) {
+                    checklistTable(
+                        "checklist.checkwarnings.heading", 
+                        List(
+                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings))
+                        )
+                    )
+                }
+            } else {
                 checklistTable(
                     "checklist.checkfailed.heading", 
                     List(
                         ("checklist.checkfailed.linktext", "checkfailed", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings))
                     )
                 )
-            } else {
-                if(model.requiredActions.contains(SubmissionReview.Action.CheckWarnings)) {
-                    checklistTable(
-                        "checklist.checkwarnings.heading", 
-                        List(
-                            ("checklist.checkwarnings.linktext", "checkwarnings", uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(model.applicationId).url, model.requiredActions(SubmissionReview.Action.CheckWarnings))
-                        )
-                    )
-                }    
-            }
+            } 
         }
 
         @checklistTable(
