@@ -30,6 +30,6 @@ object FormKeys {
   val globalKeys = formKeysMap.values.toSeq
 
   val globalToField = Map(
-    declineReasonsRequiredGlobalKey -> firstnameField,
+    declineReasonsRequiredGlobalKey -> firstnameField
   )
 }
