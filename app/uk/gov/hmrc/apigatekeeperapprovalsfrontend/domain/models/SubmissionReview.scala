@@ -30,7 +30,6 @@ object SubmissionReview {
   sealed trait Action
 
   object Action {
-    case object CheckWarnings extends Action
     case object CheckFailsAndWarnings extends Action
     case object EmailResponsibleIndividual extends Action
     case object CheckApplicationName extends Action
@@ -44,7 +43,6 @@ object SubmissionReview {
     def fromText(text: String): Option[Action] = {
       import cats.implicits._
       text match {
-        case "CheckWarnings"              => CheckWarnings.some
         case "CheckFailsAndWarnings"      => CheckFailsAndWarnings.some
         case "EmailResponsibleIndividual" => EmailResponsibleIndividual.some
         case "CheckApplicationName"       => CheckApplicationName.some
@@ -59,7 +57,6 @@ object SubmissionReview {
     }
 
     def toText(action: Action) = action match {
-        case CheckWarnings              => "CheckWarnings"
         case CheckFailsAndWarnings      => "CheckFailsAndWarnings"
         case EmailResponsibleIndividual => "EmailResponsibleIndividual"
         case CheckApplicationName       => "CheckApplicationName"
@@ -82,9 +79,8 @@ object SubmissionReview {
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
       (isSuccessful, hasWarnings) match {
-        case (true, true)   => List(Action.CheckWarnings)
         case (true, false)  => List.empty
-        case (false, _)     => List(Action.CheckFailsAndWarnings)
+        case (_, _)         => List(Action.CheckFailsAndWarnings)
       }
 
     // TODO - logic to include or exclude this
