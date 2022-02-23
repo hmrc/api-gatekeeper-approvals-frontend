@@ -20,7 +20,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 
 class CheckUrlsControllerSpec extends AbstractControllerSpec {
@@ -69,7 +68,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true,true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkUrlsAction(applicationId)(fakeSubmitCheckedRequest)
 
@@ -80,7 +79,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, true))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkUrlsAction(applicationId)(fakeSubmitComebackLaterRequest)
 

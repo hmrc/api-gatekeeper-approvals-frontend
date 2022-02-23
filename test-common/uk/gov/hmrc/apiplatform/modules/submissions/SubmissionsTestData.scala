@@ -22,7 +22,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen.Context
 import cats.data.NonEmptyList
 import scala.util.Random
 import org.joda.time.DateTime
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
 
 trait StatusTestDataHelper {
   implicit class StatusHistorySyntax(submission: Submission) {
@@ -107,6 +107,8 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
 
   val gatekeeperUserName = "gatekeeperUserName"
   val reasons = "some reasons"
+
+  val submissionReview = SubmissionReview(submissionId, 0, true, true, true)
 
   val createdSubmission = aSubmission
   val answeringSubmission = createdSubmission.answeringWith(partialAnswersToQuestions)
@@ -279,10 +281,21 @@ trait MarkedSubmissionsTestData extends SubmissionsTestData with AnsweringQuesti
   val markedSubmission = MarkedSubmission(submittedSubmission, markedAnswers)
 
   val passMarkedSubmission = markAsPass()(createdSubmission)
+  val failMarkedSubmission = markedSubmission
+  val warnMarkedSubmission = markAsWarn()(createdSubmission, 3)
 
   def markAsPass(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
     val answers = answersForGroups(Pass)(submission.groups)
     val marks = answers.map { case (q,a) => q -> Pass }
+
+    val newSubmission = createdSubmission.hasCompletelyAnsweredWith(answers).submitted
+
+    MarkedSubmission(newSubmission, marks)
+  }
+
+  def markAsWarn(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
+    val answers = answersForGroups(Warn)(submission.groups)
+    val marks = answers.take(warnCount).map { case (q,_) => q -> Warn } ++ answers.drop(warnCount).map { case (q,_) => q -> Pass }
 
     val newSubmission = createdSubmission.hasCompletelyAnsweredWith(answers).submitted
 

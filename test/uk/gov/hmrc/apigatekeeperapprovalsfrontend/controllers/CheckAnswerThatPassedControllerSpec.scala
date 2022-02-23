@@ -21,8 +21,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 
 class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
@@ -80,7 +78,7 @@ class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, false))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkAnswersThatPassedAction(applicationId)(fakeSubmitCheckedRequest)
 
@@ -91,7 +89,7 @@ class CheckAnswerThatPassedControllerSpec extends AbstractControllerSpec {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(SubmissionReview(submissionId, 0, true, false))
+      SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
       val result = controller.checkAnswersThatPassedAction(applicationId)(fakeSubmitComebackLaterRequest)
 

@@ -19,7 +19,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
-
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
@@ -27,7 +26,6 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
@@ -35,6 +33,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.CollaboratorRole
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionRequiresFraudCheck
 
 object DeclinedJourneyController {
   case class ViewModel(applicationId: ApplicationId, appName: String, adminsToEmail: Set[Collaborator] = Set.empty)
@@ -99,8 +98,9 @@ class DeclinedJourneyController @Inject()(
   }
 
   def emailAddressesAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
     for {
-      review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, !request.markedSubmission.isFail, request.markedSubmission.isWarn)
+      review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, !request.markedSubmission.isFail, request.markedSubmission.isWarn, requiresFraudCheck)
       result <- submissionService.decline(applicationId, request.name.get, review.declineReasons)
     } yield result match {
       case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))

@@ -39,5 +39,4 @@ class SubscriptionService @Inject()(
       } yield applicationSubscriptions
     ).getOrElseF(successful(Set[ApiDefinition]()))
   }
-
 }
