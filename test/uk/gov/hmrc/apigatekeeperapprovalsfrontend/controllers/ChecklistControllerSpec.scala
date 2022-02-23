@@ -45,13 +45,13 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false) = {
+    def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false, requiresDemo: Boolean = false) = {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
 
       val markedSubmissionWithContext = markedSubmission.copy(submission = markedSubmission.submission.copy(context = if (requiresFraudCheck) vatContext else simpleContext))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithContext)
-      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(SubmissionReview(submissionId, 0, true, true, requiresFraudCheck))
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(SubmissionReview(submissionId, 0, true, true, requiresFraudCheck, requiresDemo))
     }
   }
 
@@ -91,8 +91,8 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkpassed.heading"
       )
     }
-    "should display the correct check application items if fraud check not required" in new Setup {
-      setupForSuccessWith(passMarkedSubmission, false)
+    "should display the correct check application items if fraud check and demo not required" in new Setup {
+      setupForSuccessWith(passMarkedSubmission, false, false)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
 
@@ -105,8 +105,8 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkapplication.linktext.sandbox"
       )
     }
-    "should display the correct check application items if fraud check is required" in new Setup {
-      setupForSuccessWith(passMarkedSubmission, true)
+    "should display the correct check application items if fraud check and demo are required" in new Setup {
+      setupForSuccessWith(passMarkedSubmission, true, true)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
 
@@ -117,7 +117,8 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkapplication.linktext.company",
         "checklist.checkapplication.linktext.urls",
         "checklist.checkapplication.linktext.sandbox",
-        "checklist.checkapplication.linktext.fraud"
+        "checklist.checkapplication.linktext.fraud",
+        "checklist.checkapplication.linktext.demo"
       )
     }
   }

@@ -33,6 +33,7 @@ checklist.checkapplication.linktext.company = Check company registration
 checklist.checkapplication.linktext.urls = Check that all URLs work
 checklist.checkapplication.linktext.sandbox = Check for evidence of testing in sandbox
 checklist.checkapplication.linktext.fraud = Check fraud prevention data
+checklist.checkapplication.linktext.demo = Arrange a demo
 
 checklist.checkpassed.heading = Check answers that passed
 checklist.checkpassed.linktext = Answers that passed

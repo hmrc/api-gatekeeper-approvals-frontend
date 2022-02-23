@@ -76,7 +76,7 @@ object SubmissionReview {
   ): SubmissionReview =
     SubmissionReview(submissionId, instanceIndex, "", requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
-  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean): SubmissionReview = {
+  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
       (isSuccessful, hasWarnings) match {
         case (true, false)  => List.empty
@@ -84,6 +84,7 @@ object SubmissionReview {
       }
 
     val fraudAction = if (requiresFraudCheck) List(Action.CheckFraudPreventionData) else List()
+    val demoAction = if (requiresDemo) List(Action.ArrangedDemo) else List()
 
     val fixedActions: List[Action] =
       List(
@@ -92,14 +93,13 @@ object SubmissionReview {
         Action.CheckCompanyRegistration,
         Action.CheckUrls,
         Action.CheckSandboxTesting,
-        Action.ArrangedDemo,
         Action.CheckPassedAnswers
       )
 
     SubmissionReview(
       submissionId,
       instanceIndex, 
-      alternativeActions ++ fraudAction ++ fixedActions
+      alternativeActions ++ fraudAction ++ demoAction ++ fixedActions
     )
   }
 
