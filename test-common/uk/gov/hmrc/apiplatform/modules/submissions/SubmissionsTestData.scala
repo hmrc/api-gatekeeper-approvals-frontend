@@ -108,7 +108,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
   val gatekeeperUserName = "gatekeeperUserName"
   val reasons = "some reasons"
 
-  val submissionReview = SubmissionReview(submissionId, 0, true, true, true)
+  val submissionReview = SubmissionReview(submissionId, 0, true, true, true, true)
 
   val createdSubmission = aSubmission
   val answeringSubmission = createdSubmission.answeringWith(partialAnswersToQuestions)

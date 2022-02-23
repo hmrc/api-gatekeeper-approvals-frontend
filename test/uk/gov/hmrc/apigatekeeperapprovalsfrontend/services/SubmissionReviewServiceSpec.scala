@@ -35,7 +35,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
   "findOrCreateReview" should {
     "return the existing review if one is already in the database" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
-      val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true))
+      val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true, true))
       result shouldBe submissionReview
       SubmissionReviewRepoMock.Create.verifyNotCalled
     }
@@ -43,7 +43,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
     "create a new review if one does not exist in the database" in new Setup {
       SubmissionReviewRepoMock.Find.thenFindNone(submissionReview.submissionId, submissionReview.instanceIndex)
       SubmissionReviewRepoMock.Create.thenReturn(submissionReview)
-      val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true))
+      val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true, true))
       result shouldBe submissionReview
       SubmissionReviewRepoMock.Create.verifyCalled
     }
@@ -51,7 +51,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
   "updateCheckedFailsAndWarningsStatus" should {
     "set correct status in SubmissionReview for checkedFailsAndWarnings" in new Setup {
-      val hasFailsReview = SubmissionReview(aSubmission.id, 0, false, true, true)
+      val hasFailsReview = SubmissionReview(aSubmission.id, 0, false, true, true, true)
 
       SubmissionReviewRepoMock.Find.thenReturn(hasFailsReview)
       SubmissionReviewRepoMock.Update.thenReturn()
@@ -89,7 +89,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
     }
     
     "set correct status in SubmissionReview for checkedPassedAnswers" in new Setup {
-      val passedReview = SubmissionReview(aSubmission.id, 0, true,false, true)
+      val passedReview = SubmissionReview(aSubmission.id, 0, true, false, true, true)
       SubmissionReviewRepoMock.Find.thenReturn(passedReview)    
       SubmissionReviewRepoMock.Update.thenReturn()
       

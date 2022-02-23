@@ -33,6 +33,7 @@ checklist.checkapplication.linktext.company = Check company registration
 checklist.checkapplication.linktext.urls = Check that all URLs work
 checklist.checkapplication.linktext.sandbox = Check for evidence of testing in sandbox
 checklist.checkapplication.linktext.fraud = Check fraud prevention data
+checklist.checkapplication.linktext.demo = Arrange a demo
 
 checklist.checkpassed.heading = Check answers that passed
 checklist.checkpassed.linktext = Answers that passed
@@ -93,6 +94,14 @@ checkapplicationame.title = Check application name
 checkapplicationame.pagetitle = HMRC API Gatekeeper - Check application name
 checkapplicationame.checked = Application name checked
 checkapplicationame.checklater = Check again later
+
+arrangedemo.title = Arrange a demo
+arrangedemo.pagetitle = HMRC API Gatekeeper - Arrange a demo
+arrangedemo.text = Contact the person requesting credentials and arrange a demo.
+arrangedemo.linktext = Use the demo checklist to help.
+arrangedemo.email = Email address
+arrangedemo.checked = Demo complete
+arrangedemo.checklater = Complete later
 
 checksandbox.title = Check for evidence of testing in sandbox
 checksandbox.pagetitle = HMRC API Gatekeeper - Check Sandbox

@@ -26,7 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionRequiresFraudCheck
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresFraudCheck, SubmissionRequiresDemo}
 import uk.gov.hmrc.apiplatform.modules.submissions.services._
 
 import scala.concurrent.Future.successful
@@ -74,6 +74,7 @@ class ChecklistController @Inject()(
       val isSuccessful = ! request.markedSubmission.isFail
       val hasWarnings = request.markedSubmission.isWarn
       val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
+      val requiresDemo = SubmissionRequiresDemo(request.submission)
       val automaticChecksResult = AutomaticChecksResult(isSuccessful, hasWarnings)
       val topMsgId = automaticChecksResult match {
         case PASSED_WITHOUT_WARNINGS => "checklist.requestpassed"
@@ -82,7 +83,7 @@ class ChecklistController @Inject()(
       }
 
       for {
-        review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, isSuccessful, hasWarnings, requiresFraudCheck)
+        review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, isSuccessful, hasWarnings, requiresFraudCheck, requiresDemo)
       } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, buildChecklistSections(applicationId, review.requiredActions, automaticChecksResult))))
   }
 
@@ -119,8 +120,9 @@ class ChecklistController @Inject()(
     val checkUrlsItem = buildCheckUrlsItem(applicationId, requiredActions)
     val checkSandboxItem = buildCheckSandboxTestingItem(applicationId, requiredActions)
     val checkFraudItem = buildCheckFraudItem(applicationId, requiredActions)
+    val arrangeDemoItem = buildArrangeDemoItem(applicationId, requiredActions)
 
-    val checklistItems = emailResponsibleIndividualItem ++ checkApplicationNameItem ++ checkCompanyRegistrationItem ++ checkUrlsItem ++ checkSandboxItem ++ checkFraudItem
+    val checklistItems = emailResponsibleIndividualItem ++ checkApplicationNameItem ++ checkCompanyRegistrationItem ++ checkUrlsItem ++ checkSandboxItem ++ checkFraudItem ++ arrangeDemoItem
     ChecklistSection("checklist.checkapplication.heading", checklistItems.toList)
   }
 
@@ -186,6 +188,13 @@ class ChecklistController @Inject()(
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudPage(_).url,
     "checkfraud",
     SubmissionReview.Action.CheckFraudPreventionData
+  ) _
+
+  private def buildArrangeDemoItem = buildChecklistItemIfActionIsRequired(
+    "checklist.checkapplication.linktext.demo",
+    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ArrangeDemoController.page(_).url,
+    "checkfraud",
+    SubmissionReview.Action.ArrangedDemo
   ) _
 
   private def buildAnswersThatPassedItem = buildChecklistItemIfActionIsRequired(

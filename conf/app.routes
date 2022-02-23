@@ -26,6 +26,9 @@ POST       /applications/:id/checklist/check-company                 uk.gov.hmrc
 GET        /applications/:id/checklist/check-sandbox                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.checkSandboxPage(id: ApplicationId)
 POST       /applications/:id/checklist/check-sandbox                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.checkSandboxAction(id: ApplicationId)
 
+GET        /applications/:id/checklist/arrange-demo                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ArrangeDemoController.page(id: ApplicationId)
+POST       /applications/:id/checklist/arrange-demo                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ArrangeDemoController.action(id: ApplicationId)
+
 GET        /applications/:id/checklist/check-application-name        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckApplicationNameController.page(id: ApplicationId)
 POST       /applications/:id/checklist/check-application-name        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckApplicationNameController.action(id: ApplicationId)
 

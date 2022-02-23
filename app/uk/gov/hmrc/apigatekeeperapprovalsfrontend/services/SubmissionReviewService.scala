@@ -30,10 +30,10 @@ class SubmissionReviewService @Inject()(
   repo: SubmissionReviewRepo
 )(implicit val ec: ExecutionContext) {
 
-  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean): Future[SubmissionReview] = {
+  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): Future[SubmissionReview] = {
     def createANewReview = {
       
-      repo.create(SubmissionReview(submissionId, instanceIndex, isSuccessful, hasWarnings, requiresFraudCheck))
+      repo.create(SubmissionReview(submissionId, instanceIndex, isSuccessful, hasWarnings, requiresFraudCheck, requiresDemo))
     }
 
     repo.find(submissionId, instanceIndex)
