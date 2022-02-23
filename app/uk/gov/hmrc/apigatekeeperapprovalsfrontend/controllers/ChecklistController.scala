@@ -37,7 +37,6 @@ object ChecklistController {
   }
   case class ChecklistItem(labelMsgId: String, url: String, uid: String, status: SubmissionReview.Status)
   case class ViewModel(applicationId: ApplicationId, appName: String, topMsgId: String, sections: List[ChecklistSection])
-//  case class ViewModel(applicationId: ApplicationId, appName: String, isSuccessful: Boolean, hasWarnings: Boolean, requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status])
 }
 
 @Singleton

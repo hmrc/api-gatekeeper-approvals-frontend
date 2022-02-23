@@ -25,7 +25,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistControlle
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{MarkedSubmission, Submission}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup with SubscriptionServiceMockModule {

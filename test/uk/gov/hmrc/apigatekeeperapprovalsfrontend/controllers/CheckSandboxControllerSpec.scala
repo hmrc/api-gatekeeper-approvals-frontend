@@ -62,8 +62,8 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.FetchLinkedSubordinateApplicationByApplicationId.thenReturn(subordinateApplicationId)
       SubscriptionServiceMock.FetchSubscriptionsByApplicationId.thenReturn(
-        ("serviceName1", "name1", Array("CATEGORY_1")),
-        ("serviceName2", "name2", Array("CATEGORY_2"))
+        ("serviceName1", "name1"),
+        ("serviceName2", "name2")
       )
 
       val result = controller.checkSandboxPage(applicationId)(fakeRequest)
