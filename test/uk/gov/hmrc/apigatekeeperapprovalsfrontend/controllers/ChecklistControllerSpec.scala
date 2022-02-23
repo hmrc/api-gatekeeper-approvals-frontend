@@ -16,15 +16,22 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import org.mockito.captor.ArgCaptor
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.ViewModel
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{MarkedSubmission, Submission}
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup with SubscriptionServiceMockModule {
-    val appChecklistPage = app.injector.instanceOf[ChecklistPage]
+    val appChecklistPage = mock[ChecklistPage]
+    when(appChecklistPage.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
+    val viewModelCaptor = ArgCaptor[ViewModel]
 
     val controller = new ChecklistController(
       strideAuthConfig,
@@ -37,6 +44,82 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )
+
+    def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false) = {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+
+      val markedSubmissionWithContext = markedSubmission.copy(submission = markedSubmission.submission.copy(context = if (requiresFraudCheck) vatContext else simpleContext))
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithContext)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(SubmissionReview(submissionId, 0, true, true, requiresFraudCheck))
+    }
+  }
+
+  "Checklist Page" should {
+    "should display check warnings section if submission passed with warnings" in new Setup {
+      setupForSuccessWith(warnMarkedSubmission)
+
+      await(controller.checklistPage(applicationId)(fakeRequest))
+
+      verify(appChecklistPage).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.sections.map(_.titleMsgId) shouldBe List(
+        "checklist.checkwarnings.heading",
+        "checklist.checkapplication.heading",
+        "checklist.checkpassed.heading"
+      )
+    }
+    "should display check failures section if submission failed" in new Setup {
+      setupForSuccessWith(failMarkedSubmission)
+
+      await(controller.checklistPage(applicationId)(fakeRequest))
+
+      verify(appChecklistPage).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.sections.map(_.titleMsgId) shouldBe List(
+        "checklist.checkfailed.heading",
+        "checklist.checkapplication.heading",
+        "checklist.checkpassed.heading"
+      )
+    }
+    "should not display check failures/warnings section if submission passed without warnings" in new Setup {
+      setupForSuccessWith(passMarkedSubmission)
+
+      await(controller.checklistPage(applicationId)(fakeRequest))
+
+      verify(appChecklistPage).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.sections.map(_.titleMsgId) shouldBe List(
+        "checklist.checkapplication.heading",
+        "checklist.checkpassed.heading"
+      )
+    }
+    "should display the correct check application items if fraud check not required" in new Setup {
+      setupForSuccessWith(passMarkedSubmission, false)
+
+      await(controller.checklistPage(applicationId)(fakeRequest))
+
+      verify(appChecklistPage).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.sections(0).items.map(_.labelMsgId) shouldBe List(
+        "checklist.checkapplication.linktext.email",
+        "checklist.checkapplication.linktext.name",
+        "checklist.checkapplication.linktext.company",
+        "checklist.checkapplication.linktext.urls",
+        "checklist.checkapplication.linktext.sandbox"
+      )
+    }
+    "should display the correct check application items if fraud check is required" in new Setup {
+      setupForSuccessWith(passMarkedSubmission, true)
+
+      await(controller.checklistPage(applicationId)(fakeRequest))
+
+      verify(appChecklistPage).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.sections(0).items.map(_.labelMsgId) shouldBe List(
+        "checklist.checkapplication.linktext.email",
+        "checklist.checkapplication.linktext.name",
+        "checklist.checkapplication.linktext.company",
+        "checklist.checkapplication.linktext.urls",
+        "checklist.checkapplication.linktext.sandbox",
+        "checklist.checkapplication.linktext.fraud"
+      )
+    }
   }
 
   "GET /" should {
@@ -72,12 +155,12 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
-    
+
     "return 303 for SessionRecordNotFound" in new Setup {
       AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
       val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-    }  
+    }
   }
 
   "POST /" should {
