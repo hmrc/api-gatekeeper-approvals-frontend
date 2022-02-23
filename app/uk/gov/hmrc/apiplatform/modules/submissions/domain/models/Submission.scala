@@ -63,7 +63,7 @@ object Submission {
 
   object Id {
     implicit val format = play.api.libs.json.Json.valueFormat[Id]
-    
+
     def random: Id = Id(UUID.randomUUID().toString())
   }
 
@@ -80,19 +80,19 @@ object Submission {
     val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
     Submission(id, applicationId, timestamp, groups, questionIdsOfInterest, initialInstances, context)
   }
-  
+
   val addInstance: (Submission.AnswersToQuestions, Submission.Status) => Submission => Submission = (answers, status) => s => {
     val newInstance = Submission.Instance(s.latestInstance.index+1, answers, NonEmptyList.of(status))
     s.copy(instances = newInstance :: s.instances)
   }
-  
+
   val changeLatestInstance: (Submission.Instance => Submission.Instance) => Submission => Submission = delta => s => {
     s.copy(instances = NonEmptyList(delta(s.instances.head), s.instances.tail))
   }
 
   val addStatusHistory: (Submission.Status) => Submission => Submission = newStatus => s => {
     require(Submission.Status.isLegalTransition(s.status, newStatus))
-    
+
     val currentHistory = s.latestInstance.statusHistory
 
     // Do not ADD if going from answering to answering - instead replace
@@ -108,7 +108,7 @@ object Submission {
   val decline: (DateTime, String, String) => Submission => Submission = (timestamp, name, reasons) => {
     val addDeclinedStatus = addStatusHistory(Status.Declined(timestamp, name, reasons))
     val addNewlyAnsweringInstance: Submission => Submission = (s) => addInstance(s.latestInstance.answersToQuestions, Status.Answering(timestamp, true))(s)
-    
+
     addDeclinedStatus andThen addNewlyAnsweringInstance
   }
 
@@ -120,42 +120,42 @@ object Submission {
 
   val submit: (DateTime, String) => Submission => Submission = (timestamp, requestedBy) => addStatusHistory(Status.Submitted(timestamp, requestedBy))
 
-  
+
   sealed trait Status {
     def timestamp: DateTime
-    
+
     def isOpenToAnswers = isCreated || isAnswering
-    
+
     def canBeMarked = isAnsweredCompletely || isSubmitted || isDeclined || isGranted || isGrantedWithWarnings
 
     def isAnsweredCompletely = this match {
       case Submission.Status.Answering(_, completed) => completed
-      case _                                         => false      
+      case _                                         => false
     }
 
     def isCreated = this match {
       case _ : Submission.Status.Created => true
-      case _ => false      
+      case _ => false
     }
 
     def isAnswering = this match {
       case _ : Submission.Status.Answering => true
-      case _ => false      
+      case _ => false
     }
-    
+
     def isSubmitted = this match {
       case _ : Submission.Status.Submitted => true
-      case _ => false      
+      case _ => false
     }
 
     def isGranted = this match {
       case _ : Submission.Status.Granted => true
-      case _ => false      
+      case _ => false
     }
 
     def isGrantedWithWarnings = this match {
       case _ : Submission.Status.GrantedWithWarnings => true
-      case _ => false          
+      case _ => false
     }
 
     def isDeclined = this match {
@@ -170,7 +170,7 @@ object Submission {
       name: String,
       reasons: String
     ) extends Status
-    
+
     case class Granted(
       timestamp: DateTime,
       name: String
@@ -244,9 +244,9 @@ case class Submission(
 
   def findQuestion(questionId: QuestionId): Option[Question] = allQuestions.find(q => q.id == questionId)
 
-  def findQuestionnaireContaining(questionId: QuestionId): Option[Questionnaire] = 
-    allQuestionnaires.find(qn => 
-      qn.questions.exists(qi => 
+  def findQuestionnaireContaining(questionId: QuestionId): Option[Questionnaire] =
+    allQuestionnaires.find(qn =>
+      qn.questions.exists(qi =>
         qi.question.id == questionId
       )
     )
@@ -255,7 +255,6 @@ case class Submission(
 
   lazy val status: Submission.Status = latestInstance.statusHistory.head
 }
-
 
 case class ExtendedSubmission(
   submission: Submission,

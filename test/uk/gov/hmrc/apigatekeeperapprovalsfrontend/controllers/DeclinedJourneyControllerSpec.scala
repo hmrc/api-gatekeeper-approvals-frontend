@@ -23,7 +23,6 @@ import play.api.test.Helpers._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationDeclinedPage, ProvideReasonsForDecliningPage}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.AdminsToEmailPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup {
@@ -71,7 +70,6 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
   "provide reasons action" should {
     "go to the email admins page when valid form with decline reasons is submitted" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true, false)
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -134,8 +132,6 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
 
   "admins to email action" should {
     "go to the application declined page" in new Setup {
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true, false)
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -149,8 +145,6 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec {
     }
     
     "return 404 when the decline fails" in new Setup {
-      val submissionReview = SubmissionReview(markedSubmission.submission.id, 0, true, false)
-
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)

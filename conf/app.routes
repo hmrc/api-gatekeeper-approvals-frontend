@@ -17,6 +17,9 @@ POST       /applications/:id/checklist/answers-that-passed           uk.gov.hmrc
 GET        /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
 POST       /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
 
+GET        /applications/:id/checklist/check-fraud                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController.checkFraudPage(id: ApplicationId)
+POST       /applications/:id/checklist/check-fraud                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController.checkFraudAction(id: ApplicationId)
+
 GET        /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.page(id: ApplicationId)
 POST       /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.action(id: ApplicationId)
 
