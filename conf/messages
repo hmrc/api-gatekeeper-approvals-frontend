@@ -93,6 +93,14 @@ checkapplicationame.pagetitle = HMRC API Gatekeeper - Check application name
 checkapplicationame.checked = Application name checked
 checkapplicationame.checklater = Check again later
 
+arrangedemo.title = Arrange a demo
+arrangedemo.pagetitle = HMRC API Gatekeeper - Arrange a demo
+arrangedemo.text = Contact the person requesting credentials and arrange a demo.
+arrangedemo.linktext = Use the demo checklist to help.
+arrangedemo.email = Email address
+arrangedemo.checked = Demo complete
+arrangedemo.checklater = Complete later
+
 checksandbox.title = Check for evidence of testing in sandbox
 checksandbox.pagetitle = HMRC API Gatekeeper - Check Sandbox
 checksandbox.requirement1 = The software must make calls in sandbox to all APIs they want to subscribe to in production.
