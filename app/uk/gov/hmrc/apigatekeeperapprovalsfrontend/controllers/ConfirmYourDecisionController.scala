@@ -20,8 +20,6 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.data.Form
-import play.api.data.Forms._
 import play.api.mvc.{MessagesControllerComponents, _}
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
@@ -35,14 +33,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprove
 
 object ConfirmYourDecisionController {
   case class ViewModel(applicationId: ApplicationId, appName: String)
-
-  case class DeclineForm(reasons: String)
-
-  val declineForm: Form[DeclineForm] = Form(
-    mapping(
-      "reasons" -> nonEmptyText
-    )(DeclineForm.apply)(DeclineForm.unapply)
-  )
 }
 
 @Singleton
@@ -56,7 +46,8 @@ class ConfirmYourDecisionController @Inject()(
   val submissionService: SubmissionService,
   confirmYourDecisionPage: ConfirmYourDecisionPage,
   val applicationApprovedPage: ApplicationApprovedPage,
-  val applicationDeclinedPage: ApplicationDeclinedPage
+  val applicationDeclinedPage: ApplicationDeclinedPage//,
+  // provideWarningsForGrantingPage: ProvideWarningsForGrantingPage
 )(implicit override val ec: ExecutionContext) 
     extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
       
@@ -72,14 +63,9 @@ class ConfirmYourDecisionController @Inject()(
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")              => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
-      // TODO
-      // case Some("grant-with-warnings")  => successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
+      case Some("grant-with-warnings")  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
       // case Some("grant")                => successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
       case _                            => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
     }
-  }
-
-  def grantedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
   }
 }
