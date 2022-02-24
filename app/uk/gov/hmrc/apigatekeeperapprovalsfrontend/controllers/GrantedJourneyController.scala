@@ -30,13 +30,12 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProvideWarningsForGrantingPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage}
+import cats.data.EitherT
 
 object GrantedJourneyController {
-  case class ViewModel(applicationId: ApplicationId, appName: String)
+  case class ViewModel(appName: String, applicationId: ApplicationId)
 
   case class ProvideWarningsForm(warnings: String)
 
@@ -58,34 +57,41 @@ class GrantedJourneyController @Inject()(
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService,
   provideWarningsForGrantingPage: ProvideWarningsForGrantingPage,
-  val applicationApprovedPage: ApplicationApprovedPage
+  applicationApprovedPage: ApplicationApprovedPage
 )(implicit override val ec: ExecutionContext)
   extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   import GrantedJourneyController._
 
   def provideWarningsPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(provideWarningsForGrantingPage(provideWarningsForm, ViewModel(applicationId, request.application.name))))
+    successful(Ok(provideWarningsForGrantingPage(provideWarningsForm, ViewModel(request.application.name, applicationId))))
   }
 
   def provideWarningsAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     def handleValidForm(form: ProvideWarningsForm) = {
-      submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
-        case None => {
-          logger.warn("Persisting decline reasons failed")
-          BadRequest(errorHandler.badRequestTemplate)
+      (
+        for {
+          review      <- EitherT.fromOptionF(submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
+          application <- EitherT(submissionService.grant(applicationId, request.name.get))
+        } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
+      )
+      .value
+      .map {
+        case Right(value) => value
+        case Left(err) => {
+          logger.warn(s"Error granting access: $err")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
         }
       }
     }
 
     def handleInvalidForm(form: Form[ProvideWarningsForm]) = {
-      successful(BadRequest(provideWarningsForGrantingPage(form, ViewModel(applicationId, request.application.name))))
+      successful(BadRequest(provideWarningsForGrantingPage(form, ViewModel(request.application.name, applicationId))))
     }
 
     GrantedJourneyController.provideWarningsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
   def grantedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(applicationId, request.application.name))))
+    successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId))))
   }
 }

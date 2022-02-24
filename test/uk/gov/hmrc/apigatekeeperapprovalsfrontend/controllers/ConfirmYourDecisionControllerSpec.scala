@@ -38,9 +38,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
         errorHandler,
         ApplicationActionServiceMock.aMock,
         SubmissionServiceMock.aMock,
-        confirmYourDecisionPage,
-        applicationApprovedPage,
-        applicationDeclinedPage
+        confirmYourDecisionPage
       )
   }
 
@@ -63,6 +61,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId).url
     }
 
     "return 404 when no marked submission is found" in new Setup {
@@ -88,6 +87,20 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId).url
+    }
+
+    "redirect to correct page when grant decision is grant without warnings" in new Setup {
+      val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
+
+      val result = controller.action(applicationId)(fakeDeclineRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url
     }
 
     "return redirect back to page when grant decision is something we don't understand" in new Setup {

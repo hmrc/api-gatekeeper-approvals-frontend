@@ -17,8 +17,8 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
+import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc.{MessagesControllerComponents, _}
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
@@ -27,9 +27,10 @@ import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandl
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmYourDecisionPage
 
 object ConfirmYourDecisionController {
   case class ViewModel(applicationId: ApplicationId, appName: String)
@@ -44,28 +45,38 @@ class ConfirmYourDecisionController @Inject()(
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
-  confirmYourDecisionPage: ConfirmYourDecisionPage,
-  val applicationApprovedPage: ApplicationApprovedPage,
-  val applicationDeclinedPage: ApplicationDeclinedPage//,
-  // provideWarningsForGrantingPage: ProvideWarningsForGrantingPage
+  confirmYourDecisionPage: ConfirmYourDecisionPage
 )(implicit override val ec: ExecutionContext) 
     extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
       
   import ConfirmYourDecisionController._
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     if(request.markedSubmission.isFail) 
       successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
     else
       successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
+  def action(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")              => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
       case Some("grant-with-warnings")  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
-      // case Some("grant")                => successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
+      case Some("grant")                => grantAccess(applicationId)
       case _                            => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
+    }
+  }
+
+  private def grantAccess(applicationId: ApplicationId)(implicit request: MarkedSubmissionApplicationRequest[AnyContent]) = {
+    submissionService.grant(applicationId, request.name.get)
+    .map {
+      _ match {
+        case Right(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
+        case Left(err) => {
+          logger.warn(s"Error granting access: $err")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
+        }
+      }
     }
   }
 }
