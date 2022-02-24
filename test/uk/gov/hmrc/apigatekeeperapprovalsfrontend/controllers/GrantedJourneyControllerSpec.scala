@@ -35,8 +35,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
         applicationApprovedPage,
         errorHandler,
         ApplicationActionServiceMock.aMock,
-        SubmissionServiceMock.aMock,
-        SubmissionReviewServiceMock.aMock
+        SubmissionServiceMock.aMock
       )
   }
 

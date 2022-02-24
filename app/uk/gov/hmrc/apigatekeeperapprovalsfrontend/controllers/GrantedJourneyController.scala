@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
@@ -43,9 +43,8 @@ class GrantedJourneyController @Inject()(
   applicationApprovedPage: ApplicationApprovedPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
+  val submissionService: SubmissionService
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
   def grantedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
       successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId))))
   }
