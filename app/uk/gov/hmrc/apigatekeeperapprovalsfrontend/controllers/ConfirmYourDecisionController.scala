@@ -17,9 +17,8 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
-
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{MessagesControllerComponents, _}
@@ -27,11 +26,11 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationDeclinedPage, ConfirmYourDecisionPage}
 
 object ConfirmYourDecisionController {
   case class ViewModel(applicationId: ApplicationId, appName: String)
@@ -55,7 +54,6 @@ class ConfirmYourDecisionController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   confirmYourDecisionPage: ConfirmYourDecisionPage,
-  val applicationApprovedPage: ApplicationApprovedPage,
   val applicationDeclinedPage: ApplicationDeclinedPage
 )(implicit override val ec: ExecutionContext) 
     extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
@@ -72,14 +70,17 @@ class ConfirmYourDecisionController @Inject()(
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")              => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
-      // TODO
+      case Some("grant")                => grantAccess(applicationId)
       // case Some("grant-with-warnings")  => successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
-      // case Some("grant")                => successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
+
       case _                            => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
     }
   }
 
-  def grantedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(applicationApprovedPage(ViewModel(applicationId, request.application.name))))
+  private def grantAccess(applicationId: ApplicationId)(implicit request: MarkedSubmissionApplicationRequest[AnyContent]): Future[Result] = {
+    for {
+      _ <- submissionService.grant(applicationId, request.name.get)
+    } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
   }
+
 }

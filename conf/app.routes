@@ -35,7 +35,7 @@ POST       /applications/:id/checklist/check-application-name        uk.gov.hmrc
 GET        /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.page(id: ApplicationId)
 POST       /applications/:id/checklist/email-responsible-individual  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.EmailResponsibleIndividualController.action(id: ApplicationId)
 
-GET        /applications/:id/confirm-decision/granted                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.grantedPage(id: ApplicationId)
+GET        /applications/:id/confirm-decision/granted                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.grantedPage(id: ApplicationId)
 
 GET        /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.page(id: ApplicationId)
 POST       /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.action(id: ApplicationId)
