@@ -73,7 +73,7 @@ class ConfirmYourDecisionController @Inject()(
       _ match {
         case Right(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
         case Left(err) => {
-          logger.warn(s"Error granting access: $err")
+          logger.warn(s"Error granting access for application $applicationId: $err")
           InternalServerError(errorHandler.internalServerErrorTemplate)
         }
       }

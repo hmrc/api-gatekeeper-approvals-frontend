@@ -79,7 +79,7 @@ class GrantedJourneyController @Inject()(
       .map {
         case Right(value) => value
         case Left(err) => {
-          logger.warn(s"Error granting access: $err")
+          logger.warn(s"Error granting access for application $applicationId: $err")
           InternalServerError(errorHandler.internalServerErrorTemplate)
         }
       }
