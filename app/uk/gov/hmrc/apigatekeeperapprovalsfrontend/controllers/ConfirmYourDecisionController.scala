@@ -17,8 +17,8 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
-import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc.{MessagesControllerComponents, _}
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
