@@ -43,6 +43,12 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
     } yield app
   }
 
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    for {
+      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings)
+    } yield app
+  }
+
   def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
       app <- submissionConnector.decline(applicationId, requestedBy, reason)

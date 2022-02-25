@@ -72,7 +72,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
-      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
+      SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
 
       val result = controller.provideWarningsAction(applicationId)(grantWithWarningsRequest)
 
@@ -85,7 +85,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
-      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
+      SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
 
       val result = controller.provideWarningsAction(applicationId)(fakeRequest)
 

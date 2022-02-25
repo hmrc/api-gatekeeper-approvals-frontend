@@ -33,7 +33,7 @@ import play.api.libs.json.Json
 object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
 
-  case class GrantedRequest(gatekeeperUserName: String)
+  case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None)
   implicit val writesApprovedRequest = Json.writes[GrantedRequest]
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
@@ -80,6 +80,16 @@ class SubmissionsConnector @Inject() (
 
     metrics.record(api) {
       http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy))
+      .map(_.leftMap(failed(_)))
+    }
+  }
+
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, warnings.some))
       .map(_.leftMap(failed(_)))
     }
   }
