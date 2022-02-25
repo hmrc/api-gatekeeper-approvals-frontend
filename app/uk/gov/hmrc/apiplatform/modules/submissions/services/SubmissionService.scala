@@ -17,13 +17,13 @@
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import scala.concurrent.{ExecutionContext, Future}
+
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 
 @Singleton
 class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
@@ -40,6 +40,12 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
   def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
       app <- submissionConnector.grant(applicationId, requestedBy)
+    } yield app
+  }
+
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+    for {
+      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings)
     } yield app
   }
 

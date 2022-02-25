@@ -17,21 +17,21 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future.successful
+
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import scala.concurrent.Future.successful
-import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Granted
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
 
 object ProductionAccessController {
   case class ViewModel(
@@ -64,6 +64,8 @@ class ProductionAccessController @Inject()(
 
     (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
       case (Granted(_, _), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
+        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, instance.index))))
+      case (GrantedWithWarnings(_, _, _), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
         successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, instance.index))))
       case _ => 
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")

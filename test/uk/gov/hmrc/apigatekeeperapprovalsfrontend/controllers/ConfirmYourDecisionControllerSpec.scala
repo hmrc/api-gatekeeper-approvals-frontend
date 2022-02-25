@@ -38,8 +38,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
         errorHandler,
         ApplicationActionServiceMock.aMock,
         SubmissionServiceMock.aMock,
-        confirmYourDecisionPage,
-        applicationDeclinedPage
+        confirmYourDecisionPage
       )
   }
 

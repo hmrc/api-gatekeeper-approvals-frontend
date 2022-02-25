@@ -1,0 +1,51 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.{ProvideWarningsForm, ViewModel}
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
+
+@(form: Form[ProvideWarningsForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("applicationgrantedwithwarnings.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  @ErrorSummary(form)
+  
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsAction(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+
+    <span class="govuk-caption-l">@model.appName</span>
+    <h1 class="govuk-label-wrapper">
+      <label class="govuk-label govuk-label--l" for="warnings">
+        @{messages("applicationgrantedwithwarnings.title")}
+      </label>
+    </h1>
+    <div id="warnings-hint" class="govuk-hint">
+      @{messages("applicationgrantedwithwarnings.note.1")} <a href="#" class="govuk-link govuk-link--no-visited-state">@{messages("applicationgrantedwithwarnings.confluence")}</a>.
+    </div>
+    <div id="warnings-hint" class="govuk-hint">
+      @{messages("applicationgrantedwithwarnings.note.2")}
+    </div>
+    <textarea class="govuk-textarea @if(form.errors("warnings").nonEmpty) {govuk-textarea--error}" id="warnings" name="warnings" rows="5" aria-describedby="warnings-hint">@form.data.get("warnings")</textarea>
+
+    <button class="govuk-button" data-module="govuk-button">
+      @{messages("applicationgrantedwithwarnings.button.continue")}
+    </button>
+  }
+}

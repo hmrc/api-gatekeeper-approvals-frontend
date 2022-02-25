@@ -16,22 +16,35 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationApprovedPage
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future.successful
+
+import cats.data.EitherT
+
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future.successful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage}
 
 object GrantedJourneyController {
   case class ViewModel(appName: String, applicationId: ApplicationId)
+
+  case class ProvideWarningsForm(warnings: String)
+
+  val provideWarningsForm: Form[ProvideWarningsForm] = Form(
+    mapping(
+      "warnings" -> nonEmptyText
+    )(ProvideWarningsForm.apply)(ProvideWarningsForm.unapply)
+  )
 }
 
 @Singleton
@@ -40,13 +53,46 @@ class GrantedJourneyController @Inject()(
   authConnector: AuthConnector,
   forbiddenHandler: ForbiddenHandler,
   mcc: MessagesControllerComponents,
-  applicationApprovedPage: ApplicationApprovedPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
-  def grantedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-      successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId))))
+  val submissionService: SubmissionService,
+  submissionReviewService: SubmissionReviewService,
+  provideWarningsForGrantingPage: ProvideWarningsForGrantingPage,
+  applicationApprovedPage: ApplicationApprovedPage
+)(implicit override val ec: ExecutionContext)
+  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  import GrantedJourneyController._
+
+  def provideWarningsPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(provideWarningsForGrantingPage(provideWarningsForm, ViewModel(request.application.name, applicationId))))
   }
 
+  def provideWarningsAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
+    def handleValidForm(form: ProvideWarningsForm) = {
+      (
+        for {
+          review      <- EitherT.fromOptionF(submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
+          application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings))
+        } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
+      )
+      .value
+      .map {
+        case Right(value) => value
+        case Left(err) => {
+          logger.warn(s"Error granting access for application $applicationId: $err")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
+        }
+      }
+    }
+
+    def handleInvalidForm(form: Form[ProvideWarningsForm]) = {
+      successful(BadRequest(provideWarningsForGrantingPage(form, ViewModel(request.application.name, applicationId))))
+    }
+
+    GrantedJourneyController.provideWarningsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+  }
+
+  def grantedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId))))
+  }
 }
