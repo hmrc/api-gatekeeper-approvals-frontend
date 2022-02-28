@@ -130,14 +130,14 @@ applicationapproved.checkanother = Check another production credentials request.
 applicationgrantedwithwarnings.pagetitle = HMRC API Gatekeeper - Application Granted With Warnings
 applicationgrantedwithwarnings.title = Add warnings to Gatekeeper before you grant production access
 applicationgrantedwithwarnings.note.1 = The warnings are saved on Gatekeeper.
-applicationgrantedwithwarnings.confluence = Use guidance on Confluence to help (opens in a new tab)
+applicationgrantedwithwarnings.confluence = Use guidance on Confluence to help
 applicationgrantedwithwarnings.note.2 = Include all the issues you have identified working through the checklist.
 applicationgrantedwithwarnings.button.continue = Save and continue
 
 providedeclinereasons.pagetitle = HMRC API Gatekeeper - Application Declined
 providedeclinereasons.title = Note all the reasons the request is declined
 providedeclinereasons.note.1 = The reasons are saved on Gatekeeper.
-providedeclinereasons.confluence.url = Use guidance on Confluence to help (opens in a new tab)
+providedeclinereasons.confluence.url = Use guidance on Confluence to help
 providedeclinereasons.note.2 = Include all the issues you have identified working through the checklist.
 providedeclinereasons.button.continue = Save and continue
 
