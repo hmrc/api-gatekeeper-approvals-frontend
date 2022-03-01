@@ -193,7 +193,7 @@ class ChecklistController @Inject()(
   private def buildArrangeDemoItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.demo",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ArrangeDemoController.page(_).url,
-    "checkfraud",
+    "arrangedemo",
     SubmissionReview.Action.ArrangedDemo
   ) _
 
