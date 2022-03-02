@@ -35,7 +35,7 @@ import play.api.mvc._
 
 object ApplicationSubmissionsController {
 
-  case class CurrentSubmittedInstanceDetails(timestamp: String)
+  case class CurrentSubmittedInstanceDetails(requesterEmail: String, timestamp: String)
 
   case class DeclinedInstanceDetails(timestamp: String, index: Int)
 
@@ -94,14 +94,14 @@ class ApplicationSubmissionsController @Inject()(
     val latestInstanceStatus = latestInstance.statusHistory.head
     val currentSubmission = 
       if(latestInstanceStatus.isSubmitted)
-        Some(CurrentSubmittedInstanceDetails(latestInstanceStatus.timestamp.asText))
+        Some(CurrentSubmittedInstanceDetails("tp@do.com", latestInstanceStatus.timestamp.asText))
       else
         None
 
     val declinedSubmissions =
       request.markedSubmission.submission.instances.filter(i => i.statusHistory.head.isDeclined)
       .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.asText, i.index))
-      
+
     val grantedInstance =
       if(latestInstanceStatus.isGranted || latestInstanceStatus.isGrantedWithWarnings)
         Some(GrantedInstanceDetails(latestInstanceStatus.timestamp.asText))

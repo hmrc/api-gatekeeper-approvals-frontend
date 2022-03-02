@@ -150,6 +150,13 @@ applicationdeclined.checkanotherrequest = Check another production credentials r
 applicationsubmissions.pagetitle = HMRC API Gatekeeper - Application Submissions
 applicationsubmissions.title = Request for production credentials
 applicationsubmissions.alttitle = Production application
+applicationsubmissions.checkrequest = Check the request
+applicationsubmissions.requestedby = Requested by
+applicationsubmissions.requesteddate = Requested date
+applicationsubmissions.productionaccessgranted = Production access granted
+applicationsubmissions.previouslydeclined = Previously declined
+applicationsubmissions.check = Check
+
 applicationsubmissions.requestcreds = Request for credentials
 applicationsubmissions.declinedrequests = Declined requests for credentials
 applicationsubmissions.appdetails = Application details
