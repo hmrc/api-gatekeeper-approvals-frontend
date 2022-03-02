@@ -40,7 +40,9 @@ object ViewDeclinedSubmissionController {
     appName: String,
     applicationId: ApplicationId,
     submitterEmail: String,
-    submittedOn: String,
+    submittedDate: String,
+    declinedName: String,
+    declinedDate: String,
     reasons: String,
     index: Int
   )
@@ -70,8 +72,8 @@ class ViewDeclinedSubmissionController @Inject()(
     )(
       instance => {
         (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-          case (Declined(_, _, reasons), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, reasons, instance.index))))
+          case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
+            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, declinedName, declinedTimestamp.asText, reasons, instance.index))))
           case _ => 
             logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
             successful(BadRequest(errorHandler.badRequestTemplate(request)))

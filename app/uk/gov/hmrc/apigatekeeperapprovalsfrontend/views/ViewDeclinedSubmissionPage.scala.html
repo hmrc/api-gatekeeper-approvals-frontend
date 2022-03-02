@@ -29,13 +29,10 @@
   <h1 class="govuk-heading-l">
     @{messages("viewdeclinedsubmissions.pageheading")}
   </h1>
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-    @{messages("viewdeclinedsubmissions.submittedby")}
-  </h2>
   <dl class="govuk-summary-list govuk-!-margin-bottom-7">
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        @{messages("viewdeclinedsubmissions.emailaddress")}
+        @{messages("viewdeclinedsubmissions.submitteremail")}
       </dt>
       <dd class="govuk-summary-list__value">
         <p class="govuk-body">@model.submitterEmail</p>
@@ -43,10 +40,26 @@
     </div>
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">
-        @{messages("viewdeclinedsubmissions.date")}
+        @{messages("viewdeclinedsubmissions.submitteddate")}
       </dt>
       <dd class="govuk-summary-list__value">
-        <p class="govuk-body">@model.submittedOn</p>
+        <p class="govuk-body">@model.submittedDate</p>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("viewdeclinedsubmissions.declinedname")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        <p class="govuk-body">@model.declinedName</p>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("viewdeclinedsubmissions.declineddate")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        <p class="govuk-body">@model.declinedDate</p>
       </dd>
     </div>
   </dl>
