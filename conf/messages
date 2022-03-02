@@ -158,9 +158,10 @@ applicationsubmissions.productionaccess = Production access
 
 viewdeclinedsubmissions.pagetitle = HMRC API Gatekeeper - Declined request
 viewdeclinedsubmissions.pageheading = Declined request
-viewdeclinedsubmissions.submittedby = Submitted by
-viewdeclinedsubmissions.emailaddress = Email address
-viewdeclinedsubmissions.date = Date
+viewdeclinedsubmissions.submitteremail = Requested by
+viewdeclinedsubmissions.submitteddate = Requested date
+viewdeclinedsubmissions.declinedname = Declined by
+viewdeclinedsubmissions.declineddate = Declined date
 viewdeclinedsubmissions.declinedreason = Reasons the request was declined
 viewdeclinedsubmissions.submittedanswers = All submitted answers
 viewdeclinedsubmissions.checkanswers = Check answers
