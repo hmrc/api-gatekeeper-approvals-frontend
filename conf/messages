@@ -187,9 +187,12 @@ submittedanswers.continue = Continue
 productionaccess.pagetitle = HMRC API Gatekeeper - Production Access
 productionaccess.pageheading = Production Access
 productionaccess.requestedby = Requested by
-productionaccess.date = Date
+productionaccess.date = Requested date
 productionaccess.submittedanswers = All submitted answers
 productionaccess.checkanswers = Check answers
+productionaccess.granted.name = Access granted by
+productionaccess.granted.date = Access granted date
+productionaccess.granted.warnings = Access was granted with warnings
 
 adminstoemail.heading = Copy email addresses and email the team admins
 adminstoemail.button.copyemailaddresses = Copy email addresses to clipboard
