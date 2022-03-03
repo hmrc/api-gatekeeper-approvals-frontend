@@ -38,7 +38,10 @@ object ProductionAccessController {
     appName: String,
     applicationId: ApplicationId,
     submitterEmail: String,
-    submittedOn: String,
+    submittedDate: String,
+    grantedName: String,
+    grantedDate: String,
+    warnings: Option[String],
     index: Int
   )
 }
@@ -63,10 +66,10 @@ class ProductionAccessController @Inject()(
     val instance = request.markedSubmission.submission.latestInstance
 
     (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-      case (Granted(_, _), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, instance.index))))
-      case (GrantedWithWarnings(_, _, _), Some(Submission.Status.Submitted(timestamp, requestedBy))) => 
-        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, timestamp.asText, instance.index))))
+      case (Granted(grantedTimestamp, grantedName), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
+        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, None, instance.index))))
+      case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
+        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, Some(warnings), instance.index))))
       case _ => 
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
         successful(BadRequest(errorHandler.badRequestTemplate(request)))

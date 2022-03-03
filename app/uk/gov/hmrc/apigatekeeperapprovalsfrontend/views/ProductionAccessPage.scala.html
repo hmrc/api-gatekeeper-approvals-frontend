@@ -43,10 +43,35 @@
         @{messages("productionaccess.date")}
       </dt>
       <dd class="govuk-summary-list__value">
-        <p class="govuk-body">@model.submittedOn</p>
+        <p class="govuk-body">@model.submittedDate</p>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("productionaccess.granted.name")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        <p class="govuk-body">@model.grantedName</p>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("productionaccess.granted.date")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        <p class="govuk-body">@model.grantedDate</p>
       </dd>
     </div>
   </dl>
+
+  @if(model.warnings.isDefined) {
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+      @{messages("productionaccess.granted.warnings")}
+    </h2>
+    <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
+      <p class="govuk-body">@model.warnings</p>
+    </div>
+  }
 
   <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
     @{messages("productionaccess.submittedanswers")}
