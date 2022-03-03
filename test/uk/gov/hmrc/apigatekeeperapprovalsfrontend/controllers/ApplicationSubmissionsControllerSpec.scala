@@ -16,20 +16,27 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import cats.data.NonEmptyList
+import org.joda.time.{DateTime, Days}
+import org.mockito.captor.ArgCaptor
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.{CurrentSubmittedInstanceDetails, DeclinedInstanceDetails, GrantedInstanceDetails, ViewModel}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.{Declined, Granted, Submitted}
 
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule {
         
-    val page = app.injector.instanceOf[ApplicationSubmissionsPage]
+    val page = mock[ApplicationSubmissionsPage]
+    when(page.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
+    val viewModelCaptor = ArgCaptor[ViewModel]
 
     val controller = new ApplicationSubmissionsController(
       config,
@@ -42,16 +49,66 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
     )
+
+    val requesterEmail = "test@example.com"
+    val submittedTimestamp = DateTime.now()
+    val declinedTimestamp = DateTime.now().minus(Days.days(5))
+    val grantedTimestamp = DateTime.now().minus(Days.days(7))
+    def markedSubmissionWithStatusHistoryOf(statuses: Submission.Status*) = {
+      val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
+      markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
+    }
   }
 
   "page" should {
-    "return 200" in new Setup {
+    "return 200 when submitted app with no previous declines" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
+
+      verify(page).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, submittedTimestamp.toString("dd MMMM yyyy")))
+      viewModelCaptor.value.declinedInstances shouldBe List()
+      viewModelCaptor.value.grantedInstance shouldBe None
+    }
+
+    "return 200 when no current submission but with previous declines" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
+        Declined(declinedTimestamp, requesterEmail, "reasons")
+      ))
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      verify(page).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.currentSubmission shouldBe None
+      viewModelCaptor.value.grantedInstance shouldBe None
+        viewModelCaptor.value.declinedInstances shouldBe List(
+        DeclinedInstanceDetails(declinedTimestamp.toString("dd MMMM yyyy"), 0)
+      )
+    }
+
+    "return 200 when submission has been granted" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
+        Granted(grantedTimestamp, requesterEmail)
+      ))
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      verify(page).apply(viewModelCaptor)(*, *)
+      viewModelCaptor.value.currentSubmission shouldBe None
+      viewModelCaptor.value.declinedInstances shouldBe List()
+      viewModelCaptor.value.grantedInstance shouldBe Some(
+        GrantedInstanceDetails(grantedTimestamp.toString("dd MMMM yyyy"))
+      )
     }
 
     "return 404 if no marked application is found" in new Setup {
