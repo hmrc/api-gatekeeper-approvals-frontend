@@ -147,8 +147,8 @@ applicationdeclined.text = The Application has been declined and has been put ba
 applicationdeclined.youhavedeclinedthisrequest = You have declined this request
 applicationdeclined.checkanotherrequest = Check another production credentials request
 
-applicationsubmissions.pagetitle = HMRC API Gatekeeper - Application Submissions
-applicationsubmissions.title = Request for production credentials
+applicationsubmissions.pagetitle = HMRC API Gatekeeper - Request for production credentials
+applicationsubmissions.title = Request for production access
 applicationsubmissions.alttitle = Production application
 applicationsubmissions.checkrequest = Check the request
 applicationsubmissions.requestedby = Requested by
