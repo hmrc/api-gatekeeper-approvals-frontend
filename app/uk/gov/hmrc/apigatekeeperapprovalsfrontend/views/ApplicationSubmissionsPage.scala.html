@@ -38,7 +38,7 @@
   @if(model.grantedInstance.isDefined) {
     <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@{messages("applicationsubmissions.appdetails")}</h2>
     <p class="govuk-body">
-      <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
+      <a href="@{model.applicationDetailsUrl}" class="govuk-link reviewOrManageApp">@{messages("applicationsubmissions.reviewormanage")}</a>
     </p>
 
     <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-top-7 govuk-!-margin-bottom-1">
@@ -46,11 +46,11 @@
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key govuk-!-width-one-half">@{messages("applicationsubmissions.productionaccessgranted")}</dt>
         <dd class="govuk-summary-list__value">
-          <p class="govuk-body">@{model.grantedInstance.get.timestamp}</p>
+          <p id="grantedTimestamp" class="govuk-body">@{model.grantedInstance.get.timestamp}</p>
         </dd>
         <dd class="govuk-summary-list__actions">
           <p class="govuk-body govuk-!-margin-bottom-2">
-            <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@{messages("applicationsubmissions.check")}</a>
+            <a id="checkGrantedLink" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@{messages("applicationsubmissions.check")}</a>
           </p>
         </dd>
       </div>
@@ -58,45 +58,49 @@
   } else {
     @if(model.currentSubmission.nonEmpty) {
       <p class="govuk-body">
-        <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">
+        <a id="checkRequest" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">
         @{messages("applicationsubmissions.checkrequest")}
         </a>
       </p>
     }
 
-    <dl class="govuk-summary-list">
     @if(model.currentSubmission.nonEmpty) {
+      <dl class="govuk-summary-list govuk-!-margin-bottom-0">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requestedby")}</dt>
-        <dd class="govuk-summary-list__value">@{model.currentSubmission.get.requesterEmail}</dd>
+        <dd id="requesterEmail" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.requesterEmail}</p></dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requesteddate")}</dt>
-        <dd class="govuk-summary-list__value">@{model.currentSubmission.get.timestamp}</dd>
+        <dd id="requestedTimestamp" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.timestamp}</p></dd>
       </div>
+      </dl>
     }
     @if(model.declinedInstances.nonEmpty) {
+      <dl class="govuk-summary-list govuk-!-margin-bottom-0">
+
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.previouslydeclined")}</dt>
         <dd class="govuk-summary-list__value">
         @for(instance <- model.declinedInstances) {
-          <p class="govuk-body">@{instance.timestamp}</p>
+          <p class="govuk-body declinedTimestamp">@{instance.timestamp}</p>
         }
         </dd>
         <dd class="govuk-summary-list__actions">
         @for(instance <- model.declinedInstances) {
           <p class="govuk-body govuk-!-margin-bottom-2">
-            <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, instance.index)}" class="govuk-link govuk-link--no-visited-state">@{messages("applicationsubmissions.check")}</a>
+            <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, instance.index)}" class="govuk-link govuk-link--no-visited-state checkDeclinedLink">@{messages("applicationsubmissions.check")}</a>
           </p>
         }
         </dd>
       </div>
+      </dl>
     }
-    </dl>
 
-    <h2 class="govuk-heading-s govuk-!-margin-bottom-1">@{messages("applicationsubmissions.appdetails")}</h2>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-5">@{messages("applicationsubmissions.appdetails")}</h2>
     <p class="govuk-body">
-      <a href="@{model.applicationDetailsUrl}" class="govuk-link">@{messages("applicationsubmissions.reviewormanage")}</a>
+      <a href="@{model.applicationDetailsUrl}" class="govuk-link reviewOrManageApp">@{messages("applicationsubmissions.reviewormanage")}</a>
     </p>
   }
 

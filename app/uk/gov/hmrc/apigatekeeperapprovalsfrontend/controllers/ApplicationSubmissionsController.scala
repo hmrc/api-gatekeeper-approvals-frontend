@@ -21,7 +21,8 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{GatekeeperConfig, ErrorHandler}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
+
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
@@ -31,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import scala.concurrent.Future.successful
 import play.api.mvc._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
 
 
 object ApplicationSubmissionsController {
@@ -92,11 +94,10 @@ class ApplicationSubmissionsController @Inject()(
 
     val latestInstance = request.markedSubmission.submission.latestInstance
     val latestInstanceStatus = latestInstance.statusHistory.head
-    val currentSubmission = 
-      if(latestInstanceStatus.isSubmitted)
-        Some(CurrentSubmittedInstanceDetails("tp@do.com", latestInstanceStatus.timestamp.asText))
-      else
-        None
+    val currentSubmission = latestInstanceStatus match {
+        case status: Submitted => Some(CurrentSubmittedInstanceDetails(status.requestedBy, status.timestamp.asText))
+        case _ => None
+      }
 
     val declinedSubmissions =
       request.markedSubmission.submission.instances.filter(i => i.statusHistory.head.isDeclined)
