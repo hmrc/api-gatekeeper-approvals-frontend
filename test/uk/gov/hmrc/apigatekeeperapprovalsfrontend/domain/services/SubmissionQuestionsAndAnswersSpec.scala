@@ -38,7 +38,7 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
       val result = SubmissionQuestionsAndAnswers(submissionWithAnswers, 0)
       
       result.length shouldBe 3
-      result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 3
+      result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 5
       result.find(_.heading == "Organisation details").value.questionsAndAnswers.length shouldBe 5
       result.find(_.heading == "Development practices").value.questionsAndAnswers.length shouldBe 3
     }
