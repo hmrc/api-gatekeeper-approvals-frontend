@@ -49,8 +49,15 @@
     </div>
   </dl>
 
-  <p class="govuk-body">@{messages("emailresponsibleindividual.text.copythecontent")}
-    </p>
+  <h2 class="govuk-heading-m">@{messages("emailresponsibleindividual.text.whattodoheading")}</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>@{messages("emailresponsibleindividual.text.whattodo1")}</li>
+    <li>@{messages("emailresponsibleindividual.text.whattodo2")}</li>
+    <li>@{messages("emailresponsibleindividual.text.whattodo3")}</li>
+  </ol>
+
+  <p class="govuk-body">@{messages("emailresponsibleindividual.text.whattodofooter")}</p>
 
   <div class="text-area-highlight govuk-!-padding-6 govuk-!-margin-bottom-6">
     <p class="govuk-body">@{messages("emailresponsibleindividual.text.dear", model.responsibleIndividual.fullName)}
@@ -59,16 +66,16 @@
     <p class="govuk-body">@{messages("emailresponsibleindividual.text.youhavebeenmaderesponsiblefor", model.appName)}
       </p>
 
-    <p class="govuk-body">@{messages("emailresponsibleindividual.text.clickonthelinktoverify", model.appName)}
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.youhave10daystoreply", model.appName)}
       </p>
 
-    <p class="govuk-body"><a href="#" class="govuk-link govuk-link--no-visited-state">@{model.verificationLink}</a>
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.youwillneedtorerequest")}
       </p>
 
-    <p class="govuk-body">@{messages("emailresponsibleindividual.responsibleperson", model.appName)} <a href="https://developer-hub-prototype.herokuapp.com/v50/vat_mtd_commercial_software/terms_of_use/index" class="govuk-link govuk-link--no-visited-state">@{messages("emailresponsibleindividual.termsofuse")}</a>.
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.responsibleperson", model.appName)} <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/terms-of-use" class="govuk-link govuk-link--no-visited-state">@{messages("emailresponsibleindividual.text.termsofuse")}</a>.
       </p>
 
-    <p class="govuk-body">@{messages("emailresponsibleindividual.contacttheperson", model.appName)} 
+    <p class="govuk-body">@{messages("emailresponsibleindividual.text.contacttheperson", model.appName)} 
       </p>
   </div>
 
@@ -76,8 +83,8 @@
   @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("emailresponsibleindividual.continue")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("emailresponsibleindividual.sendemaillater")}</button>
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("emailresponsibleindividual.sent")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("emailresponsibleindividual.sendlater")}</button>
     </div>
 
   } 

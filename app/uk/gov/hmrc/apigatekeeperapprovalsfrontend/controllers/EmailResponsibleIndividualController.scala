@@ -36,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 case class ResponsibleIndividual(fullName: String, emailAddress: String)
 
 object EmailResponsibleIndividualController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: ResponsibleIndividual, verificationLink: String) {
+  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: ResponsibleIndividual) {
   }
 }
 
@@ -68,8 +68,7 @@ class EmailResponsibleIndividualController @Inject()(
               ViewModel(
                 request.application.name,
                 applicationId,
-                ResponsibleIndividual(ri.fullName, ri.emailAddress),
-                "http://somedevhub/link"
+                ResponsibleIndividual(ri.fullName, ri.emailAddress)
               )
             )
           )
