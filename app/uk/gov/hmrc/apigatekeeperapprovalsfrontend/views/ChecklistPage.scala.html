@@ -40,10 +40,10 @@
         </strong>
     </div>
 
-    <ol class="gaf-checklist govuk-list govuk-list--number">
+    <ol class="govuk-!-font-weight-bold govuk-!-font-size-24 govuk-list govuk-list--number">
         @for(section <- model.sections) {
             <li>
-                <h2 class="gaf-checklist govuk-heading-m">@{messages(section.titleMsgId)}</h2>
+                <h2 class="govuk-!-margin-bottom-0 govuk-heading-m">@{messages(section.titleMsgId)}</h2>
 
                 <table class="govuk-table">
                     <thead class="govuk-table__head">
