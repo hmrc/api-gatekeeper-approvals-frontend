@@ -1,4 +1,4 @@
-ol li::marker {
+ol.gaf-checklist li::marker {
   font-weight: bold;
   font-size: 1.5rem;
 }
@@ -7,7 +7,7 @@ ol li::marker {
   text-align: right;
 }
 
-.govuk-heading-m {
+.gaf-checklist {
   margin-bottom: 0;
 }
 
