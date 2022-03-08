@@ -32,11 +32,15 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
-object CheckUrlsController {  
+object CheckUrlsController {
   case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String], privacyPolicyUrl: Option[String], termsAndConditionsUrl: Option[String]) {
     lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
-    lazy val hasPrivacyPolicyUrl: Boolean = privacyPolicyUrl.isDefined
-    lazy val hasTermsAndConditionsUrl: Boolean = termsAndConditionsUrl.isDefined
+
+    lazy val privacyPolicyInDesktop = privacyPolicyUrl.exists(_ == "desktop")
+    lazy val hasPrivacyPolicyUrl    = privacyPolicyUrl.exists(_ != "desktop")
+
+    lazy val termsAndConditionsInDesktop = termsAndConditionsUrl.exists(_ == "desktop")
+    lazy val hasTermsAndConditionsUrl    = termsAndConditionsUrl.exists(_ != "desktop")
   }
 }
 

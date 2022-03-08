@@ -47,12 +47,14 @@
       </tr>
       <tr class="govuk-table__row ">
         <td class="govuk-table__cell">
-          @{messages("checkurls.privacypolicyurl")}
+          @{messages("checkurls.privacypolicy")}
         </td>
         <td class="govuk-table__cell">
           @{
             if (model.hasPrivacyPolicyUrl) {
               <a href={model.privacyPolicyUrl.get} target="_blank">{model.privacyPolicyUrl.get}</a>
+            } else if (model.privacyPolicyInDesktop) {
+              {messages("checkurls.indesktop")}
             } else {
               {messages("checkurls.nourl")}
             }
@@ -61,12 +63,14 @@
       </tr>
       <tr class="govuk-table__row ">
         <td class="govuk-table__cell">
-          @{messages("checkurls.termsandconditionsurl")}
+          @{messages("checkurls.termsandconditions")}
         </td>
         <td class="govuk-table__cell">
           @{
             if (model.hasTermsAndConditionsUrl) {
               <a href={model.termsAndConditionsUrl.get} target="_blank">{model.termsAndConditionsUrl.get}</a>
+            } else if (model.termsAndConditionsInDesktop) {
+              {messages("checkurls.indesktop")}
             } else {
               {messages("checkurls.nourl")}
             }
@@ -75,6 +79,21 @@
       </tr>
     </tbody>
   </table>
+
+  @if(model.privacyPolicyInDesktop || model.termsAndConditionsInDesktop) {
+  <p class="govuk-body">
+    @messages("checkurls.contactrequester")
+    @if(model.privacyPolicyInDesktop) {
+      @if(model.termsAndConditionsInDesktop) {
+        @messages("checkurls.contactrequester.both")
+      } else {
+        @messages("checkurls.contactrequester.privacypolicy")
+      }
+    } else {
+      @messages("checkurls.contactrequester.termsandconditions")
+    }
+  </p>
+  }
 
   @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsAction(model.applicationId), 'class -> "form") {
     @helper.CSRF.formField

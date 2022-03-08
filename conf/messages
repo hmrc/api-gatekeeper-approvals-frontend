@@ -78,12 +78,17 @@ answersthatpassed.completed = Answers checked
 
 checkurls.title = Check that all URLs work
 checkurls.pagetitle = HMRC API Gatekeeper - Check URLs
-checkurls.organisationurl = Organisation URL
-checkurls.privacypolicyurl = Privacy policy URL
-checkurls.termsandconditionsurl = Terms and conditions URL
+checkurls.organisationurl = Organisation
+checkurls.privacypolicy = Privacy policy
+checkurls.termsandconditions = Terms and conditions
 checkurls.urlschecked = URLs checked
 checkurls.checkurlslater = Check URLs later
+checkurls.indesktop = In desktop software
 checkurls.nourl = None
+checkurls.contactrequester = Contact the requester and ask for evidence of the
+checkurls.contactrequester.privacypolicy = privacy policy.
+checkurls.contactrequester.termsandconditions = terms and conditions.
+checkurls.contactrequester.both = privacy policy and terms and conditions.
 
 checkcompanyregistration.title = Check company registration
 checkcompanyregistration.pagetitle = HMRC API Gatekeeper - Check company registration
