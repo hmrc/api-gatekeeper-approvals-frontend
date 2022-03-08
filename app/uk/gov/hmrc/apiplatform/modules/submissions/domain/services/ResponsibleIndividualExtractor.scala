@@ -17,9 +17,9 @@
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.services
 
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ResponsibleIndividual
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TextAnswer
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.ActualAnswer
+import uk.gov.hmrc.thirdpartyapplication.domain.models.ResponsibleIndividual
 
 object ResponsibleIndividualExtractor {
   def apply(submission: Submission): Option[ResponsibleIndividual] = {
