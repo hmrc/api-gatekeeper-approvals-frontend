@@ -15,10 +15,11 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.DeclinedJourneyController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-@this(layout: Layout, breadcrumbs: Breadcrumbs)
+@this(layout: Layout, breadcrumbs: Breadcrumbs, config: GatekeeperConfig)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
@@ -39,7 +40,7 @@
         <br>
 
         <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="../../index-results">@{messages("applicationdeclined.checkanotherrequest")}.</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="@{config.applicationsPageUri}">@{messages("applicationdeclined.checkanotherrequest")}.</a>
         </p>
       </div>
     </div>
