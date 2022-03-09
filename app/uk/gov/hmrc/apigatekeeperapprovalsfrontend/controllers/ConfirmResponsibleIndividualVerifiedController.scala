@@ -35,7 +35,10 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import org.joda.time.DateTime
 
 object ConfirmResponsibleIndividualVerifiedController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId, errors: Option[String] = None) {
+  case class ViewModel1(appName: String, applicationId: ApplicationId, verified: Option[Boolean], errors: Option[String] = None) {
+  }
+
+  case class ViewModel2(appName: String, applicationId: ApplicationId, errors: Option[String] = None) {
   }
 }
 
@@ -57,23 +60,32 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
 
   def page1(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
-//    val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
-//    val submissionReview = fromOption(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
+    def getVerified(submissionReview: SubmissionReview): Option[Boolean] = {
+      submissionReview.verifiedByDetails.fold(Option.empty[Boolean])(vbd => Some(vbd.verified))
+    } 
+
+    def gotoPage1() = {
+      val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
+      (
+        for {
+          submissionReview <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
+        } yield Ok(
+                confirmResponsibleIndividualVerified1Page(
+                  ViewModel1(
+                    request.application.name,
+                    applicationId,
+                    getVerified(submissionReview)
+                  )
+                )
+        )
+      ).fold(identity(_), identity(_))  
+    }
 
     // Should only be uplifting and checking Standard apps
     (request.application.access) match {
       case (std: Standard) if(request.submission.status.isSubmitted) =>
-        successful(
-          Ok(
-            confirmResponsibleIndividualVerified1Page(
-              ViewModel(
-                request.application.name,
-                applicationId
-              )
-            )
-          )
-        )
-
+        gotoPage1()
+ 
       case _ => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }
@@ -86,7 +98,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
         successful(
           Ok(
             confirmResponsibleIndividualVerified2Page(
-              ViewModel(
+              ViewModel2(
                 request.application.name,
                 applicationId
               )
@@ -111,7 +123,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
     val checklist = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
     val failed = (msg: String) => {
-      BadRequest(confirmResponsibleIndividualVerified1Page(ViewModel(request.application.name, applicationId, Some(msg))))
+      BadRequest(confirmResponsibleIndividualVerified1Page(ViewModel1(request.application.name, applicationId, None, Some(msg))))
     }
 
     def saveAndContinue() = {

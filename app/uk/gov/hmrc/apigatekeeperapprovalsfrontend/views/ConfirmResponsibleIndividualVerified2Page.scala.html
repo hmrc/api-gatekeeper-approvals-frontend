@@ -19,7 +19,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel2)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = Some(messages("confirmresponsibleindividualverified2.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>

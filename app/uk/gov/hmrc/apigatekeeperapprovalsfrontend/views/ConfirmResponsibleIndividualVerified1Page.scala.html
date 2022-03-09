@@ -19,7 +19,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel1)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = Some(messages("confirmresponsibleindividualverified1.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
@@ -54,13 +54,13 @@
   <div class="govuk-form-group">
     <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="verify-answer-yes" name="verify-answer" type="radio" value="yes">
+        <input class="govuk-radios__input" id="verify-answer-yes" name="verify-answer" type="radio" value="yes" @if(model.verified == true) { checked="checked" }>
         <label class="govuk-label govuk-radios__label" for="verify-answer">
           @{messages("confirmresponsibleindividualverified1.label.yes")}
         </label>
       </div>
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="verify-answer-no" name="verify-answer" type="radio" value="no">
+        <input class="govuk-radios__input" id="verify-answer-no" name="verify-answer" type="radio" value="no" @if(model.verified == false) { checked="checked" }>
         <label class="govuk-label govuk-radios__label" for="verify-answer-2">
           @{messages("confirmresponsibleindividualverified1.label.no")}
         </label>
