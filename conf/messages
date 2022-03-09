@@ -209,6 +209,7 @@ confirmresponsibleindividualverified1.later = I will do this later
 
 confirmresponsibleindividualverified2.pagetitle = HMRC API Gatekeeper - Verification date
 confirmresponsibleindividualverified2.title = When did the responsible individual verify?
+confirmresponsibleindividualverified2.label.problem = There is a problem
 confirmresponsibleindividualverified2.label.hint = For example, 27 3 2022.
 confirmresponsibleindividualverified2.label.day = Day
 confirmresponsibleindividualverified2.label.month = Month
