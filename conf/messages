@@ -195,6 +195,7 @@ emailresponsibleindividual.sendlater = I will do this later
 
 confirmresponsibleindividualverified1.pagetitle = HMRC API Gatekeeper - Responsible individual verified?
 confirmresponsibleindividualverified1.title = Has the responsible individual verified?
+confirmresponsibleindividualverified1.label.problem = There is a problem
 confirmresponsibleindividualverified1.label.hint = The responsible individual must reply in 10 days and verify that they are responsible for their application.
 confirmresponsibleindividualverified1.label.yes = Yes
 confirmresponsibleindividualverified1.label.no = No

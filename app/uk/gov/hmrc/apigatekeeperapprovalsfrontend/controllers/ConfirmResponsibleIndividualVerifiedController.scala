@@ -31,13 +31,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmResponsibleI
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ResponsibleIndividualExtractor
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.thirdpartyapplication.domain
 import org.joda.time.DateTime
 
 object ConfirmResponsibleIndividualVerifiedController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId) {
+  case class ViewModel(appName: String, applicationId: ApplicationId, errors: Option[String] = None) {
   }
 }
 
@@ -59,6 +57,8 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
 
   def page1(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
+//    val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
+//    val submissionReview = fromOption(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
 
     // Should only be uplifting and checking Standard apps
     (request.application.access) match {
@@ -108,33 +108,39 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
         Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.page2(applicationId))
       else
         Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
+    val checklist = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
+    val failed = (msg: String) => {
+      BadRequest(confirmResponsibleIndividualVerified1Page(ViewModel(request.application.name, applicationId, Some(msg))))
+    }
+
+    def saveAndContinue() = {
+      (
+        for {
+          verifyAnswer      <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("verify-answer").flatMap(_.headOption), failed("Please provide an answer to the question"))
+          verifiedByDetails =  getVerifiedByDetails(verifyAnswer)
+          _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+          _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+        } yield success(verifiedByDetails)
+      ).fold(identity(_), identity(_))
+    }
+
+    def comeBackLater() = {
+      (
+        for {
+          _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.InProgress)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+        } yield checklist
+      ).fold(identity(_), identity(_))
+    }
 
     val formValues = request.body.asFormUrlEncoded.get.filterNot(_._1 == "csrfToken")
     val submitAction = formValues.get("submit-action").flatMap(_.headOption)
-    val answer = formValues.get("verify-answer").flatMap(_.headOption)
 
-    import cats.implicits._
-    import cats.instances.future.catsStdInstancesForFuture
-
-    def validateAnswers(submitAction: Option[String], answer: Option[String]): Either[String, Option[String]] = (submitAction, answer) match {
-      case (Some("checked"), None) => Either.left("save action requires values")
-      case (Some("checked"), Some(ans)) => Either.right(Some(ans))
-      case (Some("come-back-later"), _) => Either.right(None)
-      case (None, _) => Either.left("Bad request - no action")
-      case (Some(_), _) => Either.left("Bad request - no such action")
+    submitAction match {
+      case Some("checked")         => saveAndContinue
+      case Some("come-back-later") => comeBackLater
+      case _                       => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.page1(applicationId)))
     }
-
-    (
-      for {
-        formAction        <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
-        verifyAnswer      <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("verify-answer").flatMap(_.headOption), log("No verify-answer found in request"))
-        verifiedByDetails =  getVerifiedByDetails(verifyAnswer)
-        newStatus         <- fromOption(deriveStatusFromAction(formAction), log("Invalid submit-action found in request"))
-        _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
-        _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, newStatus)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
-      } yield success(verifiedByDetails)
-    ).fold(identity(_), identity(_))
   }
 
   private def getVerifiedByDetails(verified: Boolean, dateVerifiedDay: String, dateVerifiedMonth: String, dateVerifiedYear: String) = {

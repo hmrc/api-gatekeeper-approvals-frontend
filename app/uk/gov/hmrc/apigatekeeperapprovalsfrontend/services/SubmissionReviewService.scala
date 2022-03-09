@@ -40,6 +40,10 @@ class SubmissionReviewService @Inject()(
       .flatMap( _.fold(createANewReview)(r => successful(r)))
   }
 
+  def findReview(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    repo.find(submissionId, instanceIndex)
+  }
+
   def updateDeclineReasons(reasons: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
