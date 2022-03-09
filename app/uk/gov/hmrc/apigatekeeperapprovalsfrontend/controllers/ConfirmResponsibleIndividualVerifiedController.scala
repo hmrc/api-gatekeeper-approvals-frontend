@@ -177,13 +177,13 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       ).fold(identity(_), identity(_))
     }
 
-    val formValues = request.body.asFormUrlEncoded.get.filterNot(_._1 == "csrfToken")
+    val formValues = request.body.asFormUrlEncoded.getOrElse(Map.empty).filterNot(_._1 == "csrfToken")
     val submitAction = formValues.get("submit-action").flatMap(_.headOption)
 
     submitAction match {
       case Some("checked")         => saveAndContinue
       case Some("come-back-later") => comeBackLater
-      case _                       => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.page1(applicationId)))
+      case _                       => successful(log("No submit-action"))
     }
   }
 
@@ -226,13 +226,13 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       ).fold(identity(_), identity(_))
     }
 
-    val formValues = request.body.asFormUrlEncoded.get.filterNot(_._1 == "csrfToken")
+    val formValues = request.body.asFormUrlEncoded.getOrElse(Map.empty).filterNot(_._1 == "csrfToken")
     val submitAction = formValues.get("submit-action").flatMap(_.headOption)
 
     submitAction match {
       case Some("checked")         => saveAndContinue
       case Some("come-back-later") => comeBackLater
-      case _                       => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.page1(applicationId)))
+      case _                       => successful(log("No submit-action"))
     }
   }
 }
