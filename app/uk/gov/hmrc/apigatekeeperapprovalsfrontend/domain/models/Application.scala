@@ -86,7 +86,19 @@ case class Application(
   // blocked: Boolean = false,
   // trusted: Boolean = false,
   // ipAllowlist: IpAllowlist = IpAllowlist()
-)
+) {
+
+  lazy val privacyPolicyInDesktop = access match {
+    case Standard(_, _, privacyPolicyUrl, _) => privacyPolicyUrl.exists(_ == "desktop")
+    case _ => false
+  }
+
+  lazy val termsAndConditionsInDesktop = access match {
+    case Standard(_, termsAndConditionsUrl, _, _) => termsAndConditionsUrl.exists(_ == "desktop")
+    case _ => false
+  }
+
+}
 
 object Application {
   import play.api.libs.json.Json

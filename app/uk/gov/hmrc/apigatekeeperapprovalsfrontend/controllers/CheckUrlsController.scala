@@ -17,8 +17,9 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, Standard, SubmissionReview}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
@@ -27,20 +28,19 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
+
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckUrlsController {
-  case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String], privacyPolicyUrl: Option[String], termsAndConditionsUrl: Option[String]) {
+  case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String],
+                       privacyPolicyUrl: Option[String], privacyPolicyInDesktop: Boolean,
+                       termsAndConditionsUrl: Option[String], termsAndConditionsInDesktop: Boolean) {
     lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
 
-    lazy val privacyPolicyInDesktop = privacyPolicyUrl.exists(_ == "desktop")
-    lazy val hasPrivacyPolicyUrl    = privacyPolicyUrl.exists(_ != "desktop")
+    lazy val hasPrivacyPolicyUrl = privacyPolicyUrl.isDefined && !privacyPolicyInDesktop
 
-    lazy val termsAndConditionsInDesktop = termsAndConditionsUrl.exists(_ == "desktop")
-    lazy val hasTermsAndConditionsUrl    = termsAndConditionsUrl.exists(_ != "desktop")
+    lazy val hasTermsAndConditionsUrl = termsAndConditionsUrl.isDefined && !termsAndConditionsInDesktop
   }
 }
 
@@ -66,8 +66,10 @@ class CheckUrlsController @Inject()(
               CheckUrlsController.ViewModel(
                 request.application.name, applicationId,
                 std.organisationUrl, 
-                std.privacyPolicyUrl, 
-                std.termsAndConditionsUrl
+                std.privacyPolicyUrl,
+                request.application.privacyPolicyInDesktop,
+                std.termsAndConditionsUrl,
+                request.application.termsAndConditionsInDesktop
               )
             )
           )
