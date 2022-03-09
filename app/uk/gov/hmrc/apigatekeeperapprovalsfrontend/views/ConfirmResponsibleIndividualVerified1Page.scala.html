@@ -54,13 +54,13 @@
   <div class="govuk-form-group">
     <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="verify-answer-yes" name="verify-answer" type="radio" value="yes" @if(model.verified == true) { checked="checked" }>
+        <input class="govuk-radios__input" id="verify-answer-yes" name="verify-answer" type="radio" value="yes" @if(model.verified == Some(true)) { checked="checked" }>
         <label class="govuk-label govuk-radios__label" for="verify-answer">
           @{messages("confirmresponsibleindividualverified1.label.yes")}
         </label>
       </div>
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="verify-answer-no" name="verify-answer" type="radio" value="no" @if(model.verified == false) { checked="checked" }>
+        <input class="govuk-radios__input" id="verify-answer-no" name="verify-answer" type="radio" value="no" @if(model.verified == Some(false)) { checked="checked" }>
         <label class="govuk-label govuk-radios__label" for="verify-answer-2">
           @{messages("confirmresponsibleindividualverified1.label.no")}
         </label>
