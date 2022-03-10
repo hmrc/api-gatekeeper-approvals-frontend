@@ -48,13 +48,13 @@ object ConfirmResponsibleIndividualVerifiedController {
     )(HasVerifiedForm.apply)(HasVerifiedForm.unapply)
   )
 
-  case class VerifiedDateForm(day: String, month: String, year: String)
+  case class VerifiedDateForm(day: Int, month: Int, year: Int)
 
   val verifiedDateForm: Form[VerifiedDateForm] = Form(
     mapping(
-      "day" -> nonEmptyText,
-      "month" -> nonEmptyText,
-      "year" -> nonEmptyText
+      "day" -> number,
+      "month" -> number,
+      "year" -> number
     )(VerifiedDateForm.apply)(VerifiedDateForm.unapply)
   )
 }
@@ -118,9 +118,9 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       if (existingTimestamp.isDefined)
         verifiedDateForm.fill(
           VerifiedDateForm(
-            String.valueOf(existingTimestamp.get.getDayOfMonth()), 
-            String.valueOf(existingTimestamp.get.getMonthOfYear()), 
-            String.valueOf(existingTimestamp.get.getYear())
+            existingTimestamp.get.getDayOfMonth(), 
+            existingTimestamp.get.getMonthOfYear(), 
+            existingTimestamp.get.getYear()
           )
         )
       else
@@ -183,8 +183,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       (
         for {
           submissionReview  <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
-          verifyAnswer      =  form.verified
-          verifiedByDetails =  getVerifiedByDetails(verifyAnswer, submissionReview)
+          verifiedByDetails =  getVerifiedByDetails(form.verified, submissionReview)
           _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
           _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
         } yield success(verifiedByDetails)
@@ -205,7 +204,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
     }
   }
 
-  private def getVerifiedByDetails(verified: Boolean, dateVerifiedDay: String, dateVerifiedMonth: String, dateVerifiedYear: String): Option[SubmissionReview.VerifiedByDetails] = {
+  private def getVerifiedByDetails(verified: Boolean, dateVerifiedDay: Int, dateVerifiedMonth: Int, dateVerifiedYear: Int): Option[SubmissionReview.VerifiedByDetails] = {
     val dateAsString = dateVerifiedYear + "-" + dateVerifiedMonth + "-" + dateVerifiedDay + "T00:00:00.000Z"
     try {
       val timestamp: DateTime = DateTime.parse(dateAsString)
@@ -218,7 +217,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
   def action2(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
     val checklist = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
-    val failed = (msg: String, day: String, month: String, year: String) => {
+    val failed = (msg: String, day: Int, month: Int, year: Int) => {
       BadRequest(confirmResponsibleIndividualVerified2Page(verifiedDateForm.fill(VerifiedDateForm(day, month, year)).withError("Date", "Invalid date"), ViewModel(request.application.name, applicationId)))
     }
 
@@ -226,10 +225,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       (
         for {
           submissionReview  <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
-          dateVerifiedDay   =  form.day
-          dateVerifiedMonth =  form.month
-          dateVerifiedYear  =  form.year
-          verifiedByDetails <- fromOption(getVerifiedByDetails(true, dateVerifiedDay, dateVerifiedMonth, dateVerifiedYear), failed("Invalid date", dateVerifiedDay, dateVerifiedMonth, dateVerifiedYear))
+          verifiedByDetails <- fromOption(getVerifiedByDetails(true, form.day, form.month, form.year), failed("Invalid date", form.day, form.month, form.year))
           _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
           _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
         } yield checklist
