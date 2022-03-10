@@ -127,7 +127,7 @@ class ConfirmResponsibleIndividualVerifiedControllerSpec extends AbstractControl
     "redirect to checklist page when selected 'not verified'" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       val mySubmissionReview = SubmissionReview(mySubmission.submission.id, mySubmission.submission.latestInstance.index, true, true, true, true)
-      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "verify-answer" -> "no")
+      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "verified" -> "no")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -145,7 +145,7 @@ class ConfirmResponsibleIndividualVerifiedControllerSpec extends AbstractControl
     "redirect to page 2 when selected 'is verified'" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       val mySubmissionReview = SubmissionReview(mySubmission.submission.id, mySubmission.submission.latestInstance.index, true, true, true, true)
-      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "verify-answer" -> "yes")
+      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "verified" -> "yes")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -202,7 +202,7 @@ class ConfirmResponsibleIndividualVerifiedControllerSpec extends AbstractControl
     "redirect to checklist page when date entered" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       val mySubmissionReview = SubmissionReview(mySubmission.submission.id, mySubmission.submission.latestInstance.index, true, true, true, true)
-      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "date-verified-day" -> "21", "date-verified-month" -> "11", "date-verified-year" -> "2022")
+      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "day" -> "21", "month" -> "11", "year" -> "2022")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -235,7 +235,7 @@ class ConfirmResponsibleIndividualVerifiedControllerSpec extends AbstractControl
     "bad request when invalid date entered" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       val mySubmissionReview = SubmissionReview(mySubmission.submission.id, mySubmission.submission.latestInstance.index, true, true, true, true)
-      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "date-verified-day" -> "31", "date-verified-month" -> "02", "date-verified-year" -> "2022")
+      val fakeNotVerifiedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked", "day" -> "31", "month" -> "02", "year" -> "2022")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

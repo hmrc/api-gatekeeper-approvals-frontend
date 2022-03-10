@@ -33,13 +33,30 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import org.joda.time.DateTime
+import play.api.data.Form
+import play.api.data.Forms._
 
 object ConfirmResponsibleIndividualVerifiedController {  
-  case class ViewModel1(appName: String, applicationId: ApplicationId, verified: Option[Boolean], errors: Option[String] = None) {
+  case class ViewModel(appName: String, applicationId: ApplicationId) {
   }
 
-  case class ViewModel2(appName: String, applicationId: ApplicationId, day: Option[String], month: Option[String], year: Option[String], errors: Option[String] = None) {
-  }
+  case class HasVerifiedForm(verified: String)
+
+  val hasVerifiedForm: Form[HasVerifiedForm] = Form(
+    mapping(
+      "verified" -> nonEmptyText
+    )(HasVerifiedForm.apply)(HasVerifiedForm.unapply)
+  )
+
+  case class VerifiedDateForm(day: String, month: String, year: String)
+
+  val verifiedDateForm: Form[VerifiedDateForm] = Form(
+    mapping(
+      "day" -> nonEmptyText,
+      "month" -> nonEmptyText,
+      "year" -> nonEmptyText
+    )(VerifiedDateForm.apply)(VerifiedDateForm.unapply)
+  )
 }
 
 @Singleton
@@ -60,21 +77,25 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
 
   def page1(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
-    def getVerified(submissionReview: SubmissionReview): Option[Boolean] = {
-      submissionReview.verifiedByDetails.fold(Option.empty[Boolean])(vbd => Some(vbd.verified))
+    def getHasVerifiedForm(submissionReview: SubmissionReview) = {
+      val existingVerifyValue = submissionReview.verifiedByDetails.fold(Option.empty[String])(vbd => if(vbd.verified) Some("yes") else Some("no"))
+      if (existingVerifyValue.isDefined)
+        hasVerifiedForm.fill(HasVerifiedForm(existingVerifyValue.get))
+      else
+        hasVerifiedForm
     } 
 
     def gotoPage1() = {
       val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
       (
         for {
-          submissionReview <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
-        } yield Ok(
+          submissionReview    <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
+           } yield Ok(
                 confirmResponsibleIndividualVerified1Page(
-                  ViewModel1(
+                  getHasVerifiedForm(submissionReview),
+                  ViewModel(
                     request.application.name,
-                    applicationId,
-                    getVerified(submissionReview)
+                    applicationId
                   )
                 )
         )
@@ -92,21 +113,19 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
 
   def page2(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
 
-    def getVerifiedTimestamp(submissionReview: SubmissionReview): Option[DateTime] = {
-      submissionReview.verifiedByDetails.fold(Option.empty[DateTime])(vbd => vbd.timestamp.fold(Option.empty[DateTime])(tim => Some(tim)))
-    } 
-
-    def getVerifiedDay(submissionReview: SubmissionReview): Option[String] = {
-      getVerifiedTimestamp(submissionReview).fold(Option.empty[String])(tim => Some(String.valueOf(tim.getDayOfMonth())))
-    } 
-
-    def getVerifiedMonth(submissionReview: SubmissionReview): Option[String] = {
-      getVerifiedTimestamp(submissionReview).fold(Option.empty[String])(tim => Some(String.valueOf(tim.getMonthOfYear())))
-    } 
-
-    def getVerifiedYear(submissionReview: SubmissionReview): Option[String] = {
-      getVerifiedTimestamp(submissionReview).fold(Option.empty[String])(tim => Some(String.valueOf(tim.getYear())))
-    } 
+    def getVerifiedDateForm(submissionReview: SubmissionReview) = {
+      val existingTimestamp = submissionReview.verifiedByDetails.fold(Option.empty[DateTime])(vbd => vbd.timestamp.fold(Option.empty[DateTime])(tim => Some(tim)))
+      if (existingTimestamp.isDefined)
+        verifiedDateForm.fill(
+          VerifiedDateForm(
+            String.valueOf(existingTimestamp.get.getDayOfMonth()), 
+            String.valueOf(existingTimestamp.get.getMonthOfYear()), 
+            String.valueOf(existingTimestamp.get.getYear())
+          )
+        )
+      else
+        verifiedDateForm
+    }
 
     def gotoPage2() = {
       val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
@@ -115,12 +134,10 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
           submissionReview <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
         } yield Ok(
                 confirmResponsibleIndividualVerified2Page(
-                  ViewModel2(
+                  getVerifiedDateForm(submissionReview),
+                  ViewModel(
                     request.application.name,
-                    applicationId,
-                    getVerifiedDay(submissionReview),
-                    getVerifiedMonth(submissionReview),
-                    getVerifiedYear(submissionReview)
+                    applicationId
                   )
                 )
         )
@@ -153,21 +170,6 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
         Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val checklist = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
-    val failed = (msg: String) => {
-      BadRequest(confirmResponsibleIndividualVerified1Page(ViewModel1(request.application.name, applicationId, None, Some(msg))))
-    }
-
-    def saveAndContinue() = {
-      (
-        for {
-          submissionReview  <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
-          verifyAnswer      <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("verify-answer").flatMap(_.headOption), failed("Please provide an answer to the question"))
-          verifiedByDetails =  getVerifiedByDetails(verifyAnswer, submissionReview)
-          _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
-          _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
-        } yield success(verifiedByDetails)
-      ).fold(identity(_), identity(_))
-    }
 
     def comeBackLater() = {
       (
@@ -177,11 +179,27 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       ).fold(identity(_), identity(_))
     }
 
+    def handleValidForm(form: ConfirmResponsibleIndividualVerifiedController.HasVerifiedForm) = {
+      (
+        for {
+          submissionReview  <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
+          verifyAnswer      =  form.verified
+          verifiedByDetails =  getVerifiedByDetails(verifyAnswer, submissionReview)
+          _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+          _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+        } yield success(verifiedByDetails)
+      ).fold(identity(_), identity(_))
+    }
+
+    def handleInvalidForm(form: Form[HasVerifiedForm]) = {
+      successful(BadRequest(confirmResponsibleIndividualVerified1Page(form, ViewModel(request.application.name, applicationId))))
+    }
+
     val formValues = request.body.asFormUrlEncoded.getOrElse(Map.empty).filterNot(_._1 == "csrfToken")
     val submitAction = formValues.get("submit-action").flatMap(_.headOption)
 
     submitAction match {
-      case Some("checked")         => saveAndContinue
+      case Some("checked")         => ConfirmResponsibleIndividualVerifiedController.hasVerifiedForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
       case Some("come-back-later") => comeBackLater
       case _                       => successful(log("No submit-action"))
     }
@@ -201,16 +219,16 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
     val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
     val checklist = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val failed = (msg: String, day: String, month: String, year: String) => {
-      BadRequest(confirmResponsibleIndividualVerified2Page(ViewModel2(request.application.name, applicationId, Some(day), Some(month), Some(year), Some(msg))))
+      BadRequest(confirmResponsibleIndividualVerified2Page(verifiedDateForm.fill(VerifiedDateForm(day, month, year)).withError("Date", "Invalid date"), ViewModel(request.application.name, applicationId)))
     }
-    
-    def saveAndContinue() = {
+
+    def handleValidForm(form: ConfirmResponsibleIndividualVerifiedController.VerifiedDateForm) = {
       (
         for {
           submissionReview  <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), log("No submission review found"))
-          dateVerifiedDay   <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("date-verified-day").flatMap(_.headOption), log("No date-verified-day found in request"))
-          dateVerifiedMonth <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("date-verified-month").flatMap(_.headOption), log("No date-verified-month found in request"))
-          dateVerifiedYear  <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("date-verified-year").flatMap(_.headOption), log("No date-verified-year found in request"))
+          dateVerifiedDay   =  form.day
+          dateVerifiedMonth =  form.month
+          dateVerifiedYear  =  form.year
           verifiedByDetails <- fromOption(getVerifiedByDetails(true, dateVerifiedDay, dateVerifiedMonth, dateVerifiedYear), failed("Invalid date", dateVerifiedDay, dateVerifiedMonth, dateVerifiedYear))
           _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
           _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
@@ -226,11 +244,15 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       ).fold(identity(_), identity(_))
     }
 
+    def handleInvalidForm(form: Form[VerifiedDateForm]) = {
+      successful(BadRequest(confirmResponsibleIndividualVerified2Page(form, ViewModel(request.application.name, applicationId))))
+    }
+
     val formValues = request.body.asFormUrlEncoded.getOrElse(Map.empty).filterNot(_._1 == "csrfToken")
     val submitAction = formValues.get("submit-action").flatMap(_.headOption)
 
     submitAction match {
-      case Some("checked")         => saveAndContinue
+      case Some("checked")         => ConfirmResponsibleIndividualVerifiedController.verifiedDateForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
       case Some("come-back-later") => comeBackLater
       case _                       => successful(log("No submit-action"))
     }

@@ -19,7 +19,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: ViewModel2)(implicit request: Request[_], messages: Messages)
+@(form: Form[VerifiedDateForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = Some(messages("confirmresponsibleindividualverified2.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
@@ -29,20 +29,7 @@
     @{messages("confirmresponsibleindividualverified2.title")}
   </h1>
 
-  @if(model.errors.nonEmpty) {
-    <div id="error-summary-display" class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 id="error-summary-title" class="govuk-error-summary__title">
-        @{messages("confirmresponsibleindividualverified2.label.problem")}
-      </h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          <li>
-            <a href="">@{model.errors.get}</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  }
+  @ErrorSummary(form)
 
   <div id="verify-date-hint" class="govuk-hint">
     @{messages("confirmresponsibleindividualverified2.label.hint")}
@@ -57,7 +44,7 @@
         <label class="govuk-label govuk-date-input__label" for="date-verified-day">
           @{messages("confirmresponsibleindividualverified2.label.day")}
         </label>
-        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="date-verified-day" name="date-verified-day" type="text" pattern="[0-9]*" inputmode="numeric" value="@if(model.day.nonEmpty){@model.day}">
+        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="date-verified-day" name="day" type="text" pattern="[0-9]*" inputmode="numeric" value="@form.data.get("day")">
       </div>
     </div>
     <div class="govuk-date-input__item">
@@ -65,7 +52,7 @@
         <label class="govuk-label govuk-date-input__label" for="date-verified-month">
           @{messages("confirmresponsibleindividualverified2.label.month")}
         </label>
-        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="date-verified-month" name="date-verified-month" type="text" pattern="[0-9]*" inputmode="numeric" value="@if(model.month.nonEmpty){@model.month}">
+        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="date-verified-month" name="month" type="text" pattern="[0-9]*" inputmode="numeric" value="@form.data.get("month")">
       </div>
     </div>
     <div class="govuk-date-input__item">
@@ -73,7 +60,7 @@
         <label class="govuk-label govuk-date-input__label" for="date-verified-year">
           @{messages("confirmresponsibleindividualverified2.label.year")}
         </label>
-        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="date-verified-year" name="date-verified-year" type="text" pattern="[0-9]*" inputmode="numeric" value="@if(model.year.nonEmpty){@model.year}">
+        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="date-verified-year" name="year" type="text" pattern="[0-9]*" inputmode="numeric" value="@form.data.get("year")">
       </div>
     </div>
   </div>
