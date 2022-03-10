@@ -198,12 +198,12 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
   }
 
   def action2(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(SubmissionReview.Action.ConfirmResponsibleIndividualVerified) _
     val checklist = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val failed = (msg: String, day: String, month: String, year: String) => {
       BadRequest(confirmResponsibleIndividualVerified2Page(ViewModel2(request.application.name, applicationId, Some(day), Some(month), Some(year), Some(msg))))
     }
+    
     def saveAndContinue() = {
       (
         for {
@@ -214,7 +214,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
           verifiedByDetails <- fromOption(getVerifiedByDetails(true, dateVerifiedDay, dateVerifiedMonth, dateVerifiedYear), failed("Invalid date", dateVerifiedDay, dateVerifiedMonth, dateVerifiedYear))
           _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
           _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
-        } yield ok
+        } yield checklist
       ).fold(identity(_), identity(_))
     }
 
