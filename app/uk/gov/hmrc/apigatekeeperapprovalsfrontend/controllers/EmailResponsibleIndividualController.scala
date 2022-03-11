@@ -32,11 +32,10 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ResponsibleIndividualExtractor
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-
-case class ResponsibleIndividual(fullName: String, emailAddress: String)
+import uk.gov.hmrc.thirdpartyapplication.domain
 
 object EmailResponsibleIndividualController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: ResponsibleIndividual) {
+  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: domain.models.ResponsibleIndividual) {
   }
 }
 
@@ -68,7 +67,7 @@ class EmailResponsibleIndividualController @Inject()(
               ViewModel(
                 request.application.name,
                 applicationId,
-                ResponsibleIndividual(ri.fullName, ri.emailAddress)
+                domain.models.ResponsibleIndividual(ri.fullName, ri.emailAddress)
               )
             )
           )

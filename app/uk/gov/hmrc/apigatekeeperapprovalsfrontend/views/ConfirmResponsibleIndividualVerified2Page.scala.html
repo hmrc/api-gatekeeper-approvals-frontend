@@ -1,0 +1,74 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmResponsibleIndividualVerifiedController._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(form: Form[VerifiedDateForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("confirmresponsibleindividualverified2.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">@{model.appName}</span>
+
+  <h1 class="govuk-heading-l">        
+    @{messages("confirmresponsibleindividualverified2.title")}
+  </h1>
+
+  @ErrorSummary(form)
+
+  <div id="verify-date-hint" class="govuk-hint">
+    @{messages("confirmresponsibleindividualverified2.label.hint")}
+  </div>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.action2(model.applicationId), 'class -> "form") {
+  @helper.CSRF.formField
+  
+  <div class="govuk-date-input" id="date-verified">
+    <div class="govuk-date-input__item">
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-date-input__label" for="date-verified-day">
+          @{messages("confirmresponsibleindividualverified2.label.day")}
+        </label>
+        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="date-verified-day" name="day" type="text" pattern="[0-9]*" inputmode="numeric" value="@form.data.get("day")">
+      </div>
+    </div>
+    <div class="govuk-date-input__item">
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-date-input__label" for="date-verified-month">
+          @{messages("confirmresponsibleindividualverified2.label.month")}
+        </label>
+        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="date-verified-month" name="month" type="text" pattern="[0-9]*" inputmode="numeric" value="@form.data.get("month")">
+      </div>
+    </div>
+    <div class="govuk-date-input__item">
+      <div class="govuk-form-group">
+        <label class="govuk-label govuk-date-input__label" for="date-verified-year">
+          @{messages("confirmresponsibleindividualverified2.label.year")}
+        </label>
+        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="date-verified-year" name="year" type="text" pattern="[0-9]*" inputmode="numeric" value="@form.data.get("year")">
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-button-group">
+    <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("confirmresponsibleindividualverified2.save")}</button>
+    <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("confirmresponsibleindividualverified2.later")}</button>
+  </div>
+
+  } 
+}

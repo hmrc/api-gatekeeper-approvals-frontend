@@ -115,6 +115,7 @@ class ChecklistController @Inject()(
 
   private def buildCheckApplicationSection(applicationId: ApplicationId, requiredActions: RequiredActions): ChecklistSection = {
     val emailResponsibleIndividualItem = buildEmailResponsibleIndividualItem(applicationId, requiredActions)
+    val confirmResponsibleIndividualVerifiedItem = buildConfirmResponsibleIndividualVerifiedItem(applicationId, requiredActions)
     val checkApplicationNameItem = buildCheckApplicationNameItem(applicationId, requiredActions)
     val checkCompanyRegistrationItem = buildCheckCompanyRegistrationItem(applicationId, requiredActions)
     val checkUrlsItem = buildCheckUrlsItem(applicationId, requiredActions)
@@ -122,7 +123,7 @@ class ChecklistController @Inject()(
     val checkFraudItem = buildCheckFraudItem(applicationId, requiredActions)
     val arrangeDemoItem = buildArrangeDemoItem(applicationId, requiredActions)
 
-    val checklistItems = emailResponsibleIndividualItem ++ checkApplicationNameItem ++ checkCompanyRegistrationItem ++ checkUrlsItem ++ checkSandboxItem ++ checkFraudItem ++ arrangeDemoItem
+    val checklistItems = emailResponsibleIndividualItem ++ confirmResponsibleIndividualVerifiedItem ++ checkApplicationNameItem ++ checkCompanyRegistrationItem ++ checkUrlsItem ++ checkSandboxItem ++ checkFraudItem ++ arrangeDemoItem
     ChecklistSection("checklist.checkapplication.heading", checklistItems.toList)
   }
 
@@ -153,6 +154,13 @@ class ChecklistController @Inject()(
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.EmailResponsibleIndividualController.page(_).url,
     "checkemail",
     SubmissionReview.Action.EmailResponsibleIndividual
+  ) _
+
+  private def buildConfirmResponsibleIndividualVerifiedItem = buildChecklistItemIfActionIsRequired(
+    "checklist.checkapplication.linktext.confirmverified",
+    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.page1(_).url,
+    "confirmverified",
+    SubmissionReview.Action.ConfirmResponsibleIndividualVerified
   ) _
 
   private def buildCheckApplicationNameItem = buildChecklistItemIfActionIsRequired(

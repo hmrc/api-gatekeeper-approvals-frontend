@@ -1,0 +1,64 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmResponsibleIndividualVerifiedController._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(form: Form[HasVerifiedForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("confirmresponsibleindividualverified1.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">@{model.appName}</span>
+
+  <h1 class="govuk-heading-l">        
+    @{messages("confirmresponsibleindividualverified1.title")}
+  </h1>
+
+  @ErrorSummary(form)
+
+  <div id="verify-answer-hint" class="govuk-hint">
+    @{messages("confirmresponsibleindividualverified1.label.hint")}
+  </div>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmResponsibleIndividualVerifiedController.action1(model.applicationId), 'class -> "form") {
+  @helper.CSRF.formField
+  
+  <div class="govuk-form-group">
+    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="verify-answer-yes" name="verified" type="radio" value="yes" @if(form.data.get("verified") == Some("yes")) { checked="checked" }>
+        <label class="govuk-label govuk-radios__label" for="verify-answer">
+          @{messages("confirmresponsibleindividualverified1.label.yes")}
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="verify-answer-no" name="verified" type="radio" value="no" @if(form.data.get("verified") == Some("no")) { checked="checked" }>
+        <label class="govuk-label govuk-radios__label" for="verify-answer-2">
+          @{messages("confirmresponsibleindividualverified1.label.no")}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-button-group">
+    <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("confirmresponsibleindividualverified1.save")}</button>
+    <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("confirmresponsibleindividualverified1.later")}</button>
+  </div>
+
+  } 
+}

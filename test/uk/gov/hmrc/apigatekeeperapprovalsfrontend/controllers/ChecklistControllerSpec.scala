@@ -99,6 +99,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       verify(appChecklistPage).apply(viewModelCaptor)(*, *)
       viewModelCaptor.value.sections(0).items.map(_.labelMsgId) shouldBe List(
         "checklist.checkapplication.linktext.email",
+        "checklist.checkapplication.linktext.confirmverified",
         "checklist.checkapplication.linktext.name",
         "checklist.checkapplication.linktext.company",
         "checklist.checkapplication.linktext.urls",
@@ -113,6 +114,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       verify(appChecklistPage).apply(viewModelCaptor)(*, *)
       viewModelCaptor.value.sections(0).items.map(_.labelMsgId) shouldBe List(
         "checklist.checkapplication.linktext.email",
+        "checklist.checkapplication.linktext.confirmverified",
         "checklist.checkapplication.linktext.name",
         "checklist.checkapplication.linktext.company",
         "checklist.checkapplication.linktext.urls",

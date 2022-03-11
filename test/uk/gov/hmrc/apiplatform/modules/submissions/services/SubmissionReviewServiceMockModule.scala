@@ -36,6 +36,12 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
       }
     }
 
+    object FindReview {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.findReview(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(Some(review)))
+      }
+    }
+
     object UpdateActionStatus {
       def thenReturn(review: SubmissionReview) = {
         when(aMock.updateActionStatus(*, *)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
@@ -63,6 +69,12 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
       
       def thenReturnError() = {
         when(aMock.updateGrantWarnings(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
+      }
+    }
+
+    object UpdateVerifiedByDetails {
+      def thenReturn(review: SubmissionReview) = {
+        when(aMock.updateVerifiedByDetails(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
       }
     }
   }

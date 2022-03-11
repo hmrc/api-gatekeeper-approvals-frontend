@@ -49,6 +49,14 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
     }
   }
 
+  "findReview" should {
+    "return the existing review if one is already in the database" in new Setup {
+      SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
+      val result = await(underTest.findReview(submissionReview.submissionId, submissionReview.instanceIndex))
+      result shouldBe Some(submissionReview)
+    }
+  }
+
   "updateCheckedFailsAndWarningsStatus" should {
     "set correct status in SubmissionReview for checkedFailsAndWarnings" in new Setup {
       val hasFailsReview = SubmissionReview(aSubmission.id, 0, false, true, true, true)

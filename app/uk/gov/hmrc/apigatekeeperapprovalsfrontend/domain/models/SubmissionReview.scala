@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import org.joda.time.DateTime
 
 object SubmissionReview {
   sealed trait Status
@@ -32,6 +33,7 @@ object SubmissionReview {
   object Action {
     case object CheckFailsAndWarnings extends Action
     case object EmailResponsibleIndividual extends Action
+    case object ConfirmResponsibleIndividualVerified extends Action
     case object CheckApplicationName extends Action
     case object CheckCompanyRegistration extends Action
     case object CheckUrls extends Action
@@ -43,29 +45,31 @@ object SubmissionReview {
     def fromText(text: String): Option[Action] = {
       import cats.implicits._
       text match {
-        case "CheckFailsAndWarnings"      => CheckFailsAndWarnings.some
-        case "EmailResponsibleIndividual" => EmailResponsibleIndividual.some
-        case "CheckApplicationName"       => CheckApplicationName.some
-        case "CheckCompanyRegistration"   => CheckCompanyRegistration.some
-        case "CheckUrls"                  => CheckUrls.some
-        case "CheckSandboxTesting"        => CheckSandboxTesting.some
-        case "CheckFraudPreventionData"   => CheckFraudPreventionData.some
-        case "ArrangedDemo"               => ArrangedDemo.some
-        case "CheckPassedAnswers"         => CheckPassedAnswers.some
-        case _                            => None
+        case "CheckFailsAndWarnings"                => CheckFailsAndWarnings.some
+        case "EmailResponsibleIndividual"           => EmailResponsibleIndividual.some
+        case "ConfirmResponsibleIndividualVerified" => ConfirmResponsibleIndividualVerified.some
+        case "CheckApplicationName"                 => CheckApplicationName.some
+        case "CheckCompanyRegistration"             => CheckCompanyRegistration.some
+        case "CheckUrls"                            => CheckUrls.some
+        case "CheckSandboxTesting"                  => CheckSandboxTesting.some
+        case "CheckFraudPreventionData"             => CheckFraudPreventionData.some
+        case "ArrangedDemo"                         => ArrangedDemo.some
+        case "CheckPassedAnswers"                   => CheckPassedAnswers.some
+        case _                                      => None
       }
     }
 
     def toText(action: Action) = action match {
-        case CheckFailsAndWarnings      => "CheckFailsAndWarnings"
-        case EmailResponsibleIndividual => "EmailResponsibleIndividual"
-        case CheckApplicationName       => "CheckApplicationName"
-        case CheckCompanyRegistration   => "CheckCompanyRegistration"
-        case CheckUrls                  => "CheckUrls"
-        case CheckSandboxTesting        => "CheckSandboxTesting"
-        case CheckFraudPreventionData   => "CheckFraudPreventionData"
-        case ArrangedDemo               => "ArrangedDemo"
-        case CheckPassedAnswers         => "CheckPassedAnswers"
+        case CheckFailsAndWarnings                => "CheckFailsAndWarnings"
+        case EmailResponsibleIndividual           => "EmailResponsibleIndividual"
+        case ConfirmResponsibleIndividualVerified => "ConfirmResponsibleIndividualVerified"
+        case CheckApplicationName                 => "CheckApplicationName"
+        case CheckCompanyRegistration             => "CheckCompanyRegistration"
+        case CheckUrls                            => "CheckUrls"
+        case CheckSandboxTesting                  => "CheckSandboxTesting"
+        case CheckFraudPreventionData             => "CheckFraudPreventionData"
+        case ArrangedDemo                         => "ArrangedDemo"
+        case CheckPassedAnswers                   => "CheckPassedAnswers"
     }
   }
 
@@ -74,7 +78,7 @@ object SubmissionReview {
     instanceIndex: Int,
     requiredActions: List[Action]
   ): SubmissionReview =
-    SubmissionReview(submissionId, instanceIndex, "", "", requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+    SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
@@ -89,6 +93,7 @@ object SubmissionReview {
     val fixedActions: List[Action] =
       List(
         Action.EmailResponsibleIndividual, 
+        Action.ConfirmResponsibleIndividualVerified,
         Action.CheckApplicationName,
         Action.CheckCompanyRegistration,
         Action.CheckUrls,
@@ -115,6 +120,15 @@ object SubmissionReview {
     require(review.requiredActions.keySet.contains(action))
     review.copy(requiredActions = review.requiredActions + (action -> newStatus))
   }
+
+  case class VerifiedByDetails(
+    verified: Boolean,
+    timestamp: Option[DateTime] = None
+  )
+
+  val updateVerifiedByDetails: SubmissionReview.VerifiedByDetails => SubmissionReview => SubmissionReview = verified => review => {
+    review.copy(verifiedByDetails = Some(verified))
+  }
 }
 
 case class SubmissionReview private(
@@ -122,6 +136,7 @@ case class SubmissionReview private(
   instanceIndex: Int,
   declineReasons: String,
   grantWarnings: String,
+  verifiedByDetails: Option[SubmissionReview.VerifiedByDetails],
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty

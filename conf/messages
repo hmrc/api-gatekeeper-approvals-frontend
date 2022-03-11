@@ -28,6 +28,7 @@ checklist.checkfailed.linktext = Check fails and warnings
 
 checklist.checkapplication.heading = Check application
 checklist.checkapplication.linktext.email = Email the responsible individual
+checklist.checkapplication.linktext.confirmverified = Confirm if the responsible individual verified
 checklist.checkapplication.linktext.name = Check application name
 checklist.checkapplication.linktext.company = Check company registration
 checklist.checkapplication.linktext.urls = Check that all URLs work
@@ -196,6 +197,25 @@ emailresponsibleindividual.text.termsofuse = terms of use
 emailresponsibleindividual.text.contacttheperson = Contact the person who requested credentials for {0} if you think there has been a mistake or you do not want to verify.
 emailresponsibleindividual.sent = Email sent
 emailresponsibleindividual.sendlater = I will do this later
+
+confirmresponsibleindividualverified1.pagetitle = HMRC API Gatekeeper - Responsible individual verified?
+confirmresponsibleindividualverified1.title = Has the responsible individual verified?
+confirmresponsibleindividualverified1.label.problem = There is a problem
+confirmresponsibleindividualverified1.label.hint = The responsible individual must reply in 10 days and verify that they are responsible for their application.
+confirmresponsibleindividualverified1.label.yes = Yes
+confirmresponsibleindividualverified1.label.no = No
+confirmresponsibleindividualverified1.save = Save and continue
+confirmresponsibleindividualverified1.later = I will do this later
+
+confirmresponsibleindividualverified2.pagetitle = HMRC API Gatekeeper - Verification date
+confirmresponsibleindividualverified2.title = When did the responsible individual verify?
+confirmresponsibleindividualverified2.label.problem = There is a problem
+confirmresponsibleindividualverified2.label.hint = For example, 27 3 2022.
+confirmresponsibleindividualverified2.label.day = Day
+confirmresponsibleindividualverified2.label.month = Month
+confirmresponsibleindividualverified2.label.year = Year
+confirmresponsibleindividualverified2.save = Save and continue
+confirmresponsibleindividualverified2.later = I will do this later
 
 submittedanswers.pagetitle = HMRC API Gatekeeper - Submitted answers
 submittedanswers.title = Submitted answers
