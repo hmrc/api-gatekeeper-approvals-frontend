@@ -37,8 +37,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 
 object ConfirmResponsibleIndividualVerifiedController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId) {
-  }
+  case class ViewModel(appName: String, applicationId: ApplicationId)
 
   case class HasVerifiedForm(verified: String)
 
@@ -52,9 +51,9 @@ object ConfirmResponsibleIndividualVerifiedController {
 
   val verifiedDateForm: Form[VerifiedDateForm] = Form(
     mapping(
-      "day" -> number,
-      "month" -> number,
-      "year" -> number
+      "day" -> number(min = 1, max = 31),
+      "month" -> number(min = 1, max = 12),
+      "year" -> number(min = 2000, max = 2200)
     )(VerifiedDateForm.apply)(VerifiedDateForm.unapply)
   )
 }
