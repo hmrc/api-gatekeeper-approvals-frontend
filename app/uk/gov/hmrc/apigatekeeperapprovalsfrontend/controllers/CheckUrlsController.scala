@@ -64,7 +64,8 @@ class CheckUrlsController @Inject()(
           Ok(
             checkUrlsPage(
               CheckUrlsController.ViewModel(
-                request.application.name, applicationId,
+                request.application.name,
+                applicationId,
                 std.organisationUrl, 
                 std.privacyPolicyUrl,
                 request.application.privacyPolicyInDesktop,

@@ -31,8 +31,7 @@ object ResponsibleIndividualExtractor {
       case _ => None
     }
 
-    val name = 
-      submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualNameId) flatMap extractTextAnswer
+    val name = submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualNameId) flatMap extractTextAnswer
 
     val email = submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualEmailId) flatMap extractTextAnswer
     Apply[Option].map2(name, email)(ResponsibleIndividual.apply)

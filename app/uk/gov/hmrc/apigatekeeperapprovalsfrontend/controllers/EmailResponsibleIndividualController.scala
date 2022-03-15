@@ -67,7 +67,7 @@ class EmailResponsibleIndividualController @Inject()(
               ViewModel(
                 request.application.name,
                 applicationId,
-                domain.models.ResponsibleIndividual(ri.fullName, ri.emailAddress)
+                ResponsibleIndividual(ri.fullName, ri.emailAddress)
               )
             )
           )
