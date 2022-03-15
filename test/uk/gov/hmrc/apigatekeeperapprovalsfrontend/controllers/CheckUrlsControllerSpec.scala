@@ -21,6 +21,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ImportantSubmissionData
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.TermsAndConditionsLocation
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.PrivacyPolicyLocation
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
 
 class CheckUrlsControllerSpec extends AbstractControllerSpec {
   
@@ -39,12 +44,60 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
+    val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
+    val appWithImportantData = anApplication(applicationId).copy(access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))))
+
+    def appWithData(privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocation.InDesktopSoftware, termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocation.InDesktopSoftware) = {
+      anApplication(applicationId).copy(access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, termsAndConditionsLocation, privacyPolicyLocation, List.empty))))
+    }
   }
 
   "checkUrlsPage" should {
-    "return 200" in new Setup {
+    
+    "return 200 for both privacy policy and t&c in desktop" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationActionServiceMock.Process.thenReturn(appWithData())
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+    }
+
+    
+    "return 200 for both privacy policy and t&c with URLs" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl"), TermsAndConditionsLocation.Url("aurl")))
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+    }
+
+    "return 200 for only privacy policy in desktop" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl")))
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+    }
+    
+    "return 200 for only terms and conditions in desktop" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocation.Url("aurl")))
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+    }
+
+    "return 200 for both being NoneProvided" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.NoneProvided,  TermsAndConditionsLocation.NoneProvided))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)
@@ -66,7 +119,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
   "checkUrlsAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
@@ -77,7 +130,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
@@ -88,7 +141,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     "return bad request when sending an empty submit-action" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkUrlsAction(applicationId)(fakeRequest)

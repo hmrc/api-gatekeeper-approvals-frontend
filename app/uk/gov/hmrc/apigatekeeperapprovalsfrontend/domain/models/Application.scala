@@ -79,26 +79,14 @@ case class Application(
   // redirectUris: List[String] = List.empty,
   // termsAndConditionsUrl: Option[String] = None,
   // privacyPolicyUrl: Option[String] = None,
-  access: Access = Standard(List.empty, None, None),
+  access: Access = Standard(List.empty, None),
   state: ApplicationState = ApplicationState(name = State.TESTING)
   // rateLimitTier: RateLimitTier = BRONZE,
   // checkInformation: Option[CheckInformation] = None,
   // blocked: Boolean = false,
   // trusted: Boolean = false,
   // ipAllowlist: IpAllowlist = IpAllowlist()
-) {
-
-  lazy val privacyPolicyInDesktop = access match {
-    case Standard(_, _, privacyPolicyUrl, _) => privacyPolicyUrl.exists(_ == "desktop")
-    case _ => false
-  }
-
-  lazy val termsAndConditionsInDesktop = access match {
-    case Standard(_, termsAndConditionsUrl, _, _) => termsAndConditionsUrl.exists(_ == "desktop")
-    case _ => false
-  }
-
-}
+)
 
 object Application {
   import play.api.libs.json.Json

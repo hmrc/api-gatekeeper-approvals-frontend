@@ -14,8 +14,7 @@ lazy val microservice = Project(appName, file("."))
     majorVersion                     := 0,
     scalaVersion                     := "2.12.12",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
-    pipelineStages in Assets         := Seq(gzip),
-    scalacOptions                    := scalacOptions.value.filter(o => o != "-encoding" && o != "utf8"  && o != "utf-8")
+    pipelineStages in Assets         := Seq(gzip)
   )
   .settings(
     Concat.groups := Seq(

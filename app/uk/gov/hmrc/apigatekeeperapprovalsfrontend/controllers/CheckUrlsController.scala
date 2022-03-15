@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, Standard, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import scala.concurrent.ExecutionContext
@@ -34,13 +34,9 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewServi
 
 object CheckUrlsController {
   case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String],
-                       privacyPolicyUrl: Option[String], privacyPolicyInDesktop: Boolean,
-                       termsAndConditionsUrl: Option[String], termsAndConditionsInDesktop: Boolean) {
+                       privacyPolicyLocation: PrivacyPolicyLocation,
+                       termsAndConditionsLocation:TermsAndConditionsLocation) {
     lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
-
-    lazy val hasPrivacyPolicyUrl = privacyPolicyUrl.isDefined && !privacyPolicyInDesktop
-
-    lazy val hasTermsAndConditionsUrl = termsAndConditionsUrl.isDefined && !termsAndConditionsInDesktop
   }
 }
 
@@ -58,19 +54,17 @@ class CheckUrlsController @Inject()(
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
-      // Should only be uplifting and checking Standard apps
-      case std: Standard => 
+      // Should only be uplifting and checking Standard apps having gone thru uplift
+      case std@ Standard(_, Some(importantSubmissionData)) => 
         successful(
           Ok(
             checkUrlsPage(
               CheckUrlsController.ViewModel(
                 request.application.name,
                 applicationId,
-                std.organisationUrl, 
-                std.privacyPolicyUrl,
-                request.application.privacyPolicyInDesktop,
-                std.termsAndConditionsUrl,
-                request.application.termsAndConditionsInDesktop
+                importantSubmissionData.organisationUrl, 
+                importantSubmissionData.privacyPolicyLocation,
+                importantSubmissionData.termsAndConditionsLocation
               )
             )
           )
