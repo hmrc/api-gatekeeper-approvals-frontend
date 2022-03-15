@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.domain.services
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TextAnswer
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.ActualAnswer
-import uk.gov.hmrc.thirdpartyapplication.domain.models.ResponsibleIndividual
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
 
 object ResponsibleIndividualExtractor {
   def apply(submission: Submission): Option[ResponsibleIndividual] = {
@@ -31,8 +31,7 @@ object ResponsibleIndividualExtractor {
       case _ => None
     }
 
-    val name = 
-      submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualNameId) flatMap extractTextAnswer
+    val name = submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualNameId) flatMap extractTextAnswer
 
     val email = submission.latestInstance.answersToQuestions.get(submission.questionIdsOfInterest.responsibleIndividualEmailId) flatMap extractTextAnswer
     Apply[Option].map2(name, email)(ResponsibleIndividual.apply)

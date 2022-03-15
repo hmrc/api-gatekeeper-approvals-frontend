@@ -16,11 +16,15 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import play.api.libs.json._
+import org.joda.time.{DateTime, DateTimeZone}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
-final case class ResponsibleIndividual(fullName: String, emailAddress: String)
+case class TermsOfUseAcceptance(responsibleIndividual: ResponsibleIndividual, dateTime: DateTime, submissionId: Submission.Id, version: String)
 
-object ResponsibleIndividual {
-  import play.api.libs.json.{Format, Json}
+object TermsOfUseAcceptance {
+  import JodaWrites.JodaDateTimeWrites
+  implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
 
-  implicit val format: Format[ResponsibleIndividual] = Json.format[ResponsibleIndividual]
+  implicit val format = Json.format[TermsOfUseAcceptance]
 }

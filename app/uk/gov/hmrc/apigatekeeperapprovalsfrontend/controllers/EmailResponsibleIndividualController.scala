@@ -28,14 +28,12 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.EmailResponsibleIndividualPage
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ResponsibleIndividualExtractor
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.thirdpartyapplication.domain
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
 object EmailResponsibleIndividualController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: domain.models.ResponsibleIndividual) {
+  case class ViewModel(appName: String, applicationId: ApplicationId, responsibleIndividual: ResponsibleIndividual) {
   }
 }
 
@@ -67,7 +65,7 @@ class EmailResponsibleIndividualController @Inject()(
               ViewModel(
                 request.application.name,
                 applicationId,
-                domain.models.ResponsibleIndividual(ri.fullName, ri.emailAddress)
+                ri
               )
             )
           )
