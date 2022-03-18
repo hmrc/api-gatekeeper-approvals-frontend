@@ -23,7 +23,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.ActualAnswer
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TextAnswer
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Questionnaire
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.QuestionId
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Question
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.AnswersToQuestions
 
 object CompanyDetailsExtractor {
@@ -47,13 +47,13 @@ object CompanyDetailsExtractor {
       case _ => None
     }
 
-    def questionsToAsk(questionnaire: Questionnaire, context: AskWhen.Context, answersToQuestions: AnswersToQuestions): List[QuestionId] = {
+    def questionsToAsk(questionnaire: Questionnaire, context: AskWhen.Context, answersToQuestions: AnswersToQuestions): List[Question.Id] = {
       questionnaire.questions.collect {
         case (qi) if AskWhen.shouldAsk(context, answersToQuestions)(qi.askWhen) => qi.question.id
       }
     }
 
-    def getRegistrationValue(registrationTypeQuestionId: QuestionId): Option[String] = {
+    def getRegistrationValue(registrationTypeQuestionId: Question.Id): Option[String] = {
       // Get the answer to the next question for the value of the VAT number, UTR, etc.
       // Note that the question is dependent upon your previous answer (i.e. you'll be asked for a 
       // VAT number if you answered the 'Identify your Organisation' question 'VAT registration number')

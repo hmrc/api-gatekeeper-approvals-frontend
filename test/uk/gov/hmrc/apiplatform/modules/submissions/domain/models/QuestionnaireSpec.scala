@@ -29,7 +29,7 @@ class QuestionnaireSpec extends AsyncHmrcSpec {
     }
 
     "fail to find question by id when given a question id that does not exist in the questionnire" in new Setup {
-      DevelopmentPractices.questionnaire.hasQuestion(QuestionId("bobbins")) shouldBe false
+      DevelopmentPractices.questionnaire.hasQuestion(Question.Id("bobbins")) shouldBe false
     }
   }
 }
