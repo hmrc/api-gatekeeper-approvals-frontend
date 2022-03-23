@@ -17,9 +17,10 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, ResponsibleIndividual, Standard, SubmissionReview, TermsOfUseAcceptance}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
@@ -28,13 +29,14 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmResponsibleIndividualVerified1Page
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmResponsibleIndividualVerified2Page
+
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import org.joda.time.DateTime
 import play.api.data.Form
 import play.api.data.Forms._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
 
 object ConfirmResponsibleIndividualVerifiedController {  
   case class ViewModel(appName: String, applicationId: ApplicationId)
@@ -69,7 +71,8 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
   confirmResponsibleIndividualVerified1Page: ConfirmResponsibleIndividualVerified1Page,
   confirmResponsibleIndividualVerified2Page: ConfirmResponsibleIndividualVerified2Page,
   val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
+  val submissionService: SubmissionService,
+  thirdPartyApplicationConnector: ThirdPartyApplicationConnector
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
 
   import ConfirmResponsibleIndividualVerifiedController._
@@ -220,6 +223,32 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       BadRequest(confirmResponsibleIndividualVerified2Page(verifiedDateForm.fill(VerifiedDateForm(day, month, year)).withError("Date", "Invalid date"), ViewModel(request.application.name, applicationId)))
     }
 
+    def addTermsOfUseAcceptance(verifiedByDetails: SubmissionReview.VerifiedByDetails): Future[Option[Unit]] = {
+      request.application.access match {
+        case access: Standard => {
+          access.importantSubmissionData match {
+            case Some(isd) => {
+              val responsibleIndividual = isd.responsibleIndividual
+              val responsibleIndividualName = responsibleIndividual.fullName
+              val responsibleIndividualEmail = responsibleIndividual.emailAddress
+              verifiedByDetails.timestamp match {
+                case Some(ts) => {
+                  val acceptanceDate = ts
+                  val submissionId = request.submission.id
+                  val termsOfUseVersion = "2.0" //TODO!!
+                  val addTermsOfUseAcceptanceRequest = AddTermsOfUseAcceptanceRequest(responsibleIndividualName, responsibleIndividualEmail, acceptanceDate, submissionId, termsOfUseVersion)
+                  thirdPartyApplicationConnector.addTermsOfUseAcceptance(request.application.id, addTermsOfUseAcceptanceRequest).map(_ => Some(Unit))
+                }
+                case None => Future.successful(None)
+              }
+            }
+            case None => Future.successful(None)
+          }
+        }
+        case _ => Future.successful(None)
+      }
+    }
+
     def handleValidForm(form: ConfirmResponsibleIndividualVerifiedController.VerifiedDateForm) = {
       (
         for {
@@ -227,6 +256,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
           verifiedByDetails <- fromOption(getVerifiedByDetails(true, form.day, form.month, form.year), failed("Invalid date", form.day, form.month, form.year))
           _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
           _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+          _                 <- fromOptionF(addTermsOfUseAcceptance(verifiedByDetails), log("nope"))
         } yield checklist
       ).fold(identity(_), identity(_))
     }

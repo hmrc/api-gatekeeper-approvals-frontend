@@ -16,15 +16,19 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
+import play.api.http.Status.NOT_FOUND
+import play.api.mvc.Result
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector.ErrorOrUnit
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, TermsOfUseAcceptance}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 object ThirdPartyApplicationConnector {
+  type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
   case class Config(serviceBaseUrl: String)
 }
 
@@ -36,9 +40,9 @@ class ThirdPartyApplicationConnector @Inject()(
 )(implicit val ec: ExecutionContext) {
 
   val serviceBaseUrl = config.serviceBaseUrl
-
   val api = API("third-party-application")
-  
+
+
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
@@ -48,4 +52,11 @@ class ThirdPartyApplicationConnector @Inject()(
     }
   }
 
+  def addTermsOfUseAcceptance(id: ApplicationId, addTermsOfUseAcceptanceRequest: AddTermsOfUseAcceptanceRequest)(implicit hc: HeaderCarrier) = {
+    import uk.gov.hmrc.http.HttpReads.Implicits._
+
+    metrics.record(api) {
+      httpClient.POST[AddTermsOfUseAcceptanceRequest, HttpResponse](s"$serviceBaseUrl/application/${id.value}/terms-of-use-acceptance", addTermsOfUseAcceptanceRequest)
+    }
+  }
 }
