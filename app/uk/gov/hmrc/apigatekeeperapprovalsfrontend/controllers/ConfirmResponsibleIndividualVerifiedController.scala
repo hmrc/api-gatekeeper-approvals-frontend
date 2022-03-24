@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import cats.data.EitherT
+
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, ResponsibleIndividual, Standard, SubmissionReview, TermsOfUseAcceptance}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ResponsibleIndividual, Standard, SubmissionReview, TermsOfUseAcceptance}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,6 +39,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 object ConfirmResponsibleIndividualVerifiedController {  
   case class ViewModel(appName: String, applicationId: ApplicationId)
@@ -223,29 +226,64 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
       BadRequest(confirmResponsibleIndividualVerified2Page(verifiedDateForm.fill(VerifiedDateForm(day, month, year)).withError("Date", "Invalid date"), ViewModel(request.application.name, applicationId)))
     }
 
+
+//    def addTermsOfUseAcceptance(verifiedByDetails: SubmissionReview.VerifiedByDetails): EitherT[Future, String, Unit] = {
+//      def maybeStandardAccess(application: Application) = application.access match {
+//        case stdAccess: Standard => Some(stdAccess)
+//        case _ => None
+//      }
+//
+//      val termsOfUseVersion = "2.0" //TODO!!
+//      val maybeAddTermsOfUseAcceptanceRequest = for {
+//        standardAccess <- maybeStandardAccess(request.application)
+//        importantSubmissionData <- standardAccess.importantSubmissionData
+//        acceptanceDate <- verifiedByDetails.timestamp
+//      } yield AddTermsOfUseAcceptanceRequest(
+//        importantSubmissionData.responsibleIndividual.fullName,
+//        importantSubmissionData.responsibleIndividual.emailAddress,
+//        acceptanceDate,
+//        request.submission.id,
+//        termsOfUseVersion
+//      )
+//
+//      maybeAddTermsOfUseAcceptanceRequest match {
+//        case Some(addTermsOfUseAcceptanceRequest) => {
+//          EitherT(thirdPartyApplicationConnector.addTermsOfUseAcceptance(request.application.id, addTermsOfUseAcceptanceRequest).map(_ match {
+//            case err: UpstreamErrorResponse => Left(err.message)
+//            case _ => Right()
+//          }))
+//        }
+//        case None => EitherT.leftT("Missing application data")
+//      }
+//    }
+
     def addTermsOfUseAcceptance(verifiedByDetails: SubmissionReview.VerifiedByDetails): Future[Option[Unit]] = {
-      request.application.access match {
-        case access: Standard => {
-          access.importantSubmissionData match {
-            case Some(isd) => {
-              val responsibleIndividual = isd.responsibleIndividual
-              val responsibleIndividualName = responsibleIndividual.fullName
-              val responsibleIndividualEmail = responsibleIndividual.emailAddress
-              verifiedByDetails.timestamp match {
-                case Some(ts) => {
-                  val acceptanceDate = ts
-                  val submissionId = request.submission.id
-                  val termsOfUseVersion = "2.0" //TODO!!
-                  val addTermsOfUseAcceptanceRequest = AddTermsOfUseAcceptanceRequest(responsibleIndividualName, responsibleIndividualEmail, acceptanceDate, submissionId, termsOfUseVersion)
-                  thirdPartyApplicationConnector.addTermsOfUseAcceptance(request.application.id, addTermsOfUseAcceptanceRequest).map(_ => Some(Unit))
-                }
-                case None => Future.successful(None)
-              }
-            }
-            case None => Future.successful(None)
+      def maybeStandardAccess(application: Application) = application.access match {
+        case stdAccess: Standard => Some(stdAccess)
+        case _ => None
+      }
+
+      val termsOfUseVersion = "2.0" //TODO!!
+      val maybeAddTermsOfUseAcceptanceRequest = for {
+        standardAccess <- maybeStandardAccess(request.application)
+        importantSubmissionData <- standardAccess.importantSubmissionData
+        acceptanceDate <- verifiedByDetails.timestamp
+      } yield AddTermsOfUseAcceptanceRequest(
+        importantSubmissionData.responsibleIndividual.fullName,
+        importantSubmissionData.responsibleIndividual.emailAddress,
+        acceptanceDate,
+        request.submission.id,
+        termsOfUseVersion
+      )
+
+      maybeAddTermsOfUseAcceptanceRequest match {
+        case Some(addTermsOfUseAcceptanceRequest) => thirdPartyApplicationConnector.addTermsOfUseAcceptance(request.application.id, addTermsOfUseAcceptanceRequest).map(
+          _ match {
+            case Left(_) => None
+            case _ => Some()
           }
-        }
-        case _ => Future.successful(None)
+        )
+        case None => Future.successful(None)
       }
     }
 
@@ -256,7 +294,7 @@ class ConfirmResponsibleIndividualVerifiedController @Inject()(
           verifiedByDetails <- fromOption(getVerifiedByDetails(true, form.day, form.month, form.year), failed("Invalid date", form.day, form.month, form.year))
           _                 <- fromOptionF(submissionReviewService.updateVerifiedByDetails(verifiedByDetails)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
           _                 <- fromOptionF(submissionReviewService.updateActionStatus(SubmissionReview.Action.ConfirmResponsibleIndividualVerified, SubmissionReview.Status.Completed)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
-          _                 <- fromOptionF(addTermsOfUseAcceptance(verifiedByDetails), log("nope"))
+          _                 <- fromOptionF(addTermsOfUseAcceptance(verifiedByDetails), log("Missing"))
         } yield checklist
       ).fold(identity(_), identity(_))
     }

@@ -22,7 +22,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 object AddTermsOfUseAcceptanceRequest {
   import play.api.libs.json.Json
-  import JodaWrites.JodaDateTimeNumberWrites
 
   implicit val uctWrite = JodaWrites.JodaDateTimeNumberWrites
 

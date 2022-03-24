@@ -56,7 +56,7 @@ class ThirdPartyApplicationConnector @Inject()(
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.POST[AddTermsOfUseAcceptanceRequest, HttpResponse](s"$serviceBaseUrl/application/${id.value}/terms-of-use-acceptance", addTermsOfUseAcceptanceRequest)
+      httpClient.POST[AddTermsOfUseAcceptanceRequest, ErrorOrUnit](s"$serviceBaseUrl/application/${id.value}/terms-of-use-acceptance", addTermsOfUseAcceptanceRequest)
     }
   }
 }
