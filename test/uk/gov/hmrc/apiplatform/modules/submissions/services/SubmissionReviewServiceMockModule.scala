@@ -21,12 +21,12 @@ import org.mockito.ArgumentMatchersSugar
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import scala.concurrent.Future
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
-trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
+trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionReviewTestData {
   trait BaseSubmissionReviewServiceMock {
     def aMock: SubmissionReviewService
 

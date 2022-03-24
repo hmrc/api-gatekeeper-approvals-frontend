@@ -23,7 +23,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 class SubmissionSpec extends AnyWordSpec with Matchers with SubmissionsTestData {
     
     "submission questionIdsOfInterest app name" in {
-        Submission.updateLatestAnswersTo(sampleAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe TextAnswer("name of software")
+        Submission.updateLatestAnswersTo(completeAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe TextAnswer("name of software")
     }
 
     "submission instance state history" in {
