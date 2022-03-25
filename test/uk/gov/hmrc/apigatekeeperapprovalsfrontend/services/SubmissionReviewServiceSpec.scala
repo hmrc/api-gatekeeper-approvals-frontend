@@ -19,14 +19,14 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepoMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
 class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
-  trait Setup extends SubmissionReviewRepoMockModule with SubmissionsTestData with ApplicationTestData {
+  trait Setup extends SubmissionReviewRepoMockModule with SubmissionReviewTestData with ApplicationTestData {
     val underTest = new SubmissionReviewService(SubmissionReviewRepoMock.aMock)
 
     implicit val hc = HeaderCarrier()

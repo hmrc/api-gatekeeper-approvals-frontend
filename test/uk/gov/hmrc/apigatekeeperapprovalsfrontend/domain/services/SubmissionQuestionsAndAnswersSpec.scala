@@ -24,9 +24,9 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
   trait Setup extends SubmissionsTestData {
-    val submissionWithAnswers = Submission.updateLatestAnswersTo(sampleAnswersToQuestions)(aSubmission)
-    val submissionWithAnswersExceptForOrgDetails = Submission.updateLatestAnswersTo(sampleAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id)(aSubmission)
-    val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(sampleAnswersToQuestions + 
+    val submissionWithAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions)(aSubmission)
+    val submissionWithAnswersExceptForOrgDetails = Submission.updateLatestAnswersTo(completeAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id)(aSubmission)
+    val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions + 
       (DevelopmentPractices.question1.id -> NoAnswer) + 
       (DevelopmentPractices.question2.id -> AcknowledgedAnswer) + 
       (DevelopmentPractices.question3.id -> NoAnswer)
