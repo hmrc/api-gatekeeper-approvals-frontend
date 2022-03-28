@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
+import com.github.nscala_time.time.Imports.DateTime
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status._
 import play.api.Configuration
@@ -24,8 +25,11 @@ import play.api.{Application => PlayApplication}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import play.api.Mode
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import uk.gov.hmrc.http.UpstreamErrorResponse.Upstream5xxResponse
 
 class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions{
   private val appConfig = Configuration(
@@ -83,6 +87,39 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
       val result = await(connector.fetchApplicationById(applicationId))
 
       result shouldBe empty
+    }
+  }
+
+  "add terms of use acceptance" should {
+    val url = s"/application/${applicationId.value}/terms-of-use-acceptance"
+    val request = AddTermsOfUseAcceptanceRequest("bob", "bob@example.com", DateTime.now, Submission.Id.random, "2.0")
+
+    "return nothing on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(request)
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+      val result = await(connector.addTermsOfUseAcceptance(applicationId, request))
+
+      result shouldBe Right()
+    }
+
+    "return error on failure" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(request)
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+      val result = await(connector.addTermsOfUseAcceptance(applicationId, request))
+
+      result.left.get.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
 }

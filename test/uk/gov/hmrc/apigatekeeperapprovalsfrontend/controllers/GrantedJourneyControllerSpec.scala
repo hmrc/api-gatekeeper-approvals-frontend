@@ -17,14 +17,13 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import play.api.test.Helpers._
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage}
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
 
 class GrantedJourneyControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup with ApplicationServiceMockModule {
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val provideWarningsForGrantingPage = app.injector.instanceOf[ProvideWarningsForGrantingPage]
 
@@ -38,7 +37,8 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
         SubmissionServiceMock.aMock,
         SubmissionReviewServiceMock.aMock,
         provideWarningsForGrantingPage,
-        applicationApprovedPage
+        applicationApprovedPage,
+        ApplicationServiceMock.aMock
       )
   }
 
@@ -73,6 +73,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
       SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
+      ApplicationServiceMock.AddTermsOfUseAcceptance.succeeds()
 
       val result = controller.provideWarningsAction(applicationId)(grantWithWarningsRequest)
 

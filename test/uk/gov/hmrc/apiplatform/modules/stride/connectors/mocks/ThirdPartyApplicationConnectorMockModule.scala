@@ -19,9 +19,11 @@ package uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ClientId}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
   trait BaseThirdPartyApplicationConnectorMock {
@@ -30,6 +32,15 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
     object FetchApplicationById {
       def thenReturn() = {
         when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) => successful(Some(Application(appId, ClientId.random, "app name", Set.empty))))
+      }
+    }
+
+    object AddTermsOfUseAcceptance {
+      def succeeds() = {
+        when(aMock.addTermsOfUseAcceptance(* [ApplicationId], * [AddTermsOfUseAcceptanceRequest])(*)).thenReturn(successful(Right()))
+      }
+      def failsWith(statusCode: Int, errorMsg: String) = {
+        when(aMock.addTermsOfUseAcceptance(* [ApplicationId], * [AddTermsOfUseAcceptanceRequest])(*)).thenReturn(successful(Left(UpstreamErrorResponse(errorMsg, statusCode))))
       }
     }
   }
