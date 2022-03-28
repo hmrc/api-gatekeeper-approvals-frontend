@@ -46,8 +46,14 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     )
     val standardAccess = Standard(importantSubmissionData = Some(importantSubmissionData))
     val application = anApplication().copy(access = standardAccess)
+
     val verifiedByDetails = VerifiedByDetails(true, Some(DateTime.now))
     val submissionReview = SubmissionReview.updateVerifiedByDetails(verifiedByDetails)(SubmissionReview(Submission.Id.random, 0, true, false, false, false))
+
+    val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
+    val standardAccessWithoutTOUAgreement = Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
+    val applicationWithoutTOUAgreement = anApplication().copy(access = standardAccessWithoutTOUAgreement)
+    val submissionReviewWithoutTOUAgreement = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
   }
 
   "fetchByApplicationId" should {
@@ -76,7 +82,15 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       result shouldBe Right()
     }
 
-    "returns error message if fails" in new Setup {
+    "returns nothing if ToU not agreed" in new Setup {
+      ThirdPartyApplicationConnectorMock.AddTermsOfUseAcceptance.succeeds()
+
+      val result = await(service.addTermsOfUseAcceptance(applicationWithoutTOUAgreement, submissionReviewWithoutTOUAgreement))
+
+      result shouldBe Right()
+    }
+
+    "returns error message if TPA call fails" in new Setup {
       val errorMsg = "fail"
       ThirdPartyApplicationConnectorMock.AddTermsOfUseAcceptance.failsWith(INTERNAL_SERVER_ERROR, errorMsg)
 

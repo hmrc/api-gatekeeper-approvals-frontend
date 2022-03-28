@@ -23,6 +23,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, Thir
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, Standard, SubmissionReview}
 
+import scala.concurrent.Future.successful
+
 @Singleton
 class ApplicationService @Inject()(
   thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
@@ -64,7 +66,7 @@ class ApplicationService @Inject()(
           case Right(_) => Right()
         })
       }
-      case None => Future.successful(Left("Missing application data"))
+      case None => successful(Right()) // ToU agreement not mandatory before granting prod creds
     }
   }
 }
