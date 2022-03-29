@@ -45,7 +45,6 @@ class ApplicationService @Inject()(
       case _ => None
     }
 
-    val termsOfUseVersion = "2.0" //TODO remove as part of APIS-5709
     val maybeAddTermsOfUseAcceptanceRequest = for {
       standardAccess <- maybeStandardAccess(application)
       importantSubmissionData <- standardAccess.importantSubmissionData
@@ -55,8 +54,7 @@ class ApplicationService @Inject()(
       importantSubmissionData.responsibleIndividual.fullName,
       importantSubmissionData.responsibleIndividual.emailAddress,
       acceptanceDate,
-      submissionReview.submissionId,
-      termsOfUseVersion
+      submissionReview.submissionId
     )
 
     maybeAddTermsOfUseAcceptanceRequest match {

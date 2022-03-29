@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import play.api.http.Status.NOT_FOUND
-import play.api.mvc.Result
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector.ErrorOrUnit
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, TermsOfUseAcceptance}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 object ThirdPartyApplicationConnector {

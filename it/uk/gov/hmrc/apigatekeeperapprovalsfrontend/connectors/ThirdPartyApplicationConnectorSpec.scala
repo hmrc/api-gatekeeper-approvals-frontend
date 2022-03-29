@@ -92,7 +92,7 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
 
   "add terms of use acceptance" should {
     val url = s"/application/${applicationId.value}/terms-of-use-acceptance"
-    val request = AddTermsOfUseAcceptanceRequest("bob", "bob@example.com", DateTime.now, Submission.Id.random, "2.0")
+    val request = AddTermsOfUseAcceptanceRequest("bob", "bob@example.com", DateTime.now, Submission.Id.random)
 
     "return nothing on success" in new Setup {
       stubFor(

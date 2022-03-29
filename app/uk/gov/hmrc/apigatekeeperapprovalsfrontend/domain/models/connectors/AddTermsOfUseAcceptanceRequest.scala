@@ -28,4 +28,4 @@ object AddTermsOfUseAcceptanceRequest {
   implicit val writesAddTermsOfUseAcceptanceRequest = Json.writes[AddTermsOfUseAcceptanceRequest]
 }
 
-case class AddTermsOfUseAcceptanceRequest(name: String, emailAddress: String, acceptanceDate: DateTime, submissionId: Submission.Id, version: String)
+case class AddTermsOfUseAcceptanceRequest(name: String, emailAddress: String, acceptanceDate: DateTime, submissionId: Submission.Id)
