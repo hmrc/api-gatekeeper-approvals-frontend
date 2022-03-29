@@ -17,15 +17,15 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import play.api.http.Status
 import play.api.test.Helpers._
-
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
+import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
 
 class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup with ApplicationServiceMockModule {
     val confirmYourDecisionPage = app.injector.instanceOf[ConfirmYourDecisionPage]
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
@@ -38,7 +38,9 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
         errorHandler,
         ApplicationActionServiceMock.aMock,
         SubmissionServiceMock.aMock,
-        confirmYourDecisionPage
+        confirmYourDecisionPage,
+        ApplicationServiceMock.aMock,
+        SubmissionReviewServiceMock.aMock
       )
   }
 
@@ -96,6 +98,8 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
+      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
+      ApplicationServiceMock.AddTermsOfUseAcceptance.succeeds()
 
       val result = controller.action(applicationId)(fakeDeclineRequest)
 

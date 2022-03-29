@@ -21,7 +21,7 @@ import org.mockito.ArgumentMatchersSugar
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
 trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
@@ -42,6 +42,12 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
       def thenReturn(subordinateApplicationId: ApplicationId) = {
         when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
           .thenReturn(successful(Some(anApplication(id = subordinateApplicationId))))
+      }
+    }
+
+    object AddTermsOfUseAcceptance {
+      def succeeds() = {
+        when(aMock.addTermsOfUseAcceptance(* [Application], * [SubmissionReview])(*)).thenReturn(successful(Right()))
       }
     }
   }

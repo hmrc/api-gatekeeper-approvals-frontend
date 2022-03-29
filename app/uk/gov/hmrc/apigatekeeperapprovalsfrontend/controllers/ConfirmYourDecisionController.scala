@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import cats.data.EitherT
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
@@ -25,11 +27,10 @@ import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
 import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmYourDecisionPage
 
 object ConfirmYourDecisionController {
@@ -45,7 +46,9 @@ class ConfirmYourDecisionController @Inject()(
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
-  confirmYourDecisionPage: ConfirmYourDecisionPage
+  confirmYourDecisionPage: ConfirmYourDecisionPage,
+  applicationService: ApplicationService,
+  submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) 
     extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
       
@@ -68,15 +71,13 @@ class ConfirmYourDecisionController @Inject()(
   }
 
   private def grantAccess(applicationId: ApplicationId)(implicit request: MarkedSubmissionApplicationRequest[AnyContent]) = {
-    submissionService.grant(applicationId, request.name.get)
-    .map {
-      _ match {
-        case Right(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
-        case Left(err) => {
-          logger.warn(s"Error granting access for application $applicationId: $err")
-          InternalServerError(errorHandler.internalServerErrorTemplate)
-        }
-      }
-    }
+    (
+      for {
+        application <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(InternalServerError(_))
+        review      <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
+        _           <- EitherT(applicationService.addTermsOfUseAcceptance(application, review)).leftMap(InternalServerError(_))
+      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
+    ).fold(identity(_), identity(_))
   }
+
 }
