@@ -47,7 +47,7 @@ object ApplicationState {
 }
 
 sealed trait State extends EnumEntry {
-  def isApproved: Boolean = this == State.PRODUCTION
+  def isApproved: Boolean = this == State.PRODUCTION || this == State.PRE_PRODUCTION
 
   def isPendingApproval: Boolean = (this == State.PENDING_REQUESTER_VERIFICATION
                           || this == State.PENDING_GATEKEEPER_APPROVAL)
@@ -61,6 +61,7 @@ object State extends PlayEnum[State] {
   final case object TESTING                         extends State
   final case object PENDING_GATEKEEPER_APPROVAL     extends State
   final case object PENDING_REQUESTER_VERIFICATION  extends State
+  final case object PRE_PRODUCTION                  extends State
   final case object PRODUCTION                      extends State
 }
 
