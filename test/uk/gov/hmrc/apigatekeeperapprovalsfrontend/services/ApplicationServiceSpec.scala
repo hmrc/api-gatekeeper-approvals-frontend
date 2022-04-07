@@ -79,7 +79,7 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
 
       val result = await(service.addTermsOfUseAcceptance(application, submissionReview))
 
-      result shouldBe Right()
+      result shouldBe Right(())
     }
 
     "returns nothing if ToU not agreed" in new Setup {
@@ -87,7 +87,7 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
 
       val result = await(service.addTermsOfUseAcceptance(applicationWithoutTOUAgreement, submissionReviewWithoutTOUAgreement))
 
-      result shouldBe Right()
+      result shouldBe Right(())
     }
 
     "returns error message if TPA call fails" in new Setup {

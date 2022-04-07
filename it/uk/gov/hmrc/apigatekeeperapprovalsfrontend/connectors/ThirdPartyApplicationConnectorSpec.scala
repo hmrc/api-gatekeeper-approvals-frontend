@@ -25,11 +25,10 @@ import play.api.{Application => PlayApplication}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.http.UpstreamErrorResponse.Upstream5xxResponse
 
 class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions{
   private val appConfig = Configuration(
@@ -105,7 +104,7 @@ class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec wi
       )
       val result = await(connector.addTermsOfUseAcceptance(applicationId, request))
 
-      result shouldBe Right()
+      result shouldBe Right(())
     }
 
     "return error on failure" in new Setup {

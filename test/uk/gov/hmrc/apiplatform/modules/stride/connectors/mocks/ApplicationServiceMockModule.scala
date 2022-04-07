@@ -47,7 +47,7 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
 
     object AddTermsOfUseAcceptance {
       def succeeds() = {
-        when(aMock.addTermsOfUseAcceptance(* [Application], * [SubmissionReview])(*)).thenReturn(successful(Right()))
+        when(aMock.addTermsOfUseAcceptance(* [Application], * [SubmissionReview])(*)).thenReturn(successful(Right(())))
       }
     }
   }

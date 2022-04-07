@@ -70,7 +70,7 @@ class GrantedJourneyController @Inject()(
       (
         for {
           review      <- EitherT.fromOptionF(submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
-          application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings))
+          application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings, review.verifiedByDetails.flatMap(_.timestamp)))
           _           <- EitherT(applicationService.addTermsOfUseAcceptance(application, review))
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
       )
