@@ -95,6 +95,15 @@ checkcompanyregistration.title = Check company registration
 checkcompanyregistration.pagetitle = HMRC API Gatekeeper - Check company registration
 checkcompanyregistration.checked = Company registration checked
 checkcompanyregistration.checklater = Check company registration later
+checkcompanyregistration.continue = Continue
+checkcompanyregistration.inukwithregnum.text1 = Company registration number
+checkcompanyregistration.inuknoregnum.text1 = UK organisation with no evidence of official registration
+checkcompanyregistration.inuknoregnum.text2 = Organisations in the UK must provide evidence of official registration.
+checkcompanyregistration.inuknoregnum.text3 = Not having evidence of official registration in the UK is a fail.
+checkcompanyregistration.outsideuk.text1 = Organisation is outside the UK
+checkcompanyregistration.outsideuk.text2 = Email the requester and ask for evidence of official registration in their country.
+checkcompanyregistration.evidencechecked = Evidence checked
+checkcompanyregistration.comebacktothis = I will come back to this
 
 checkapplicationame.title = Check application name
 checkapplicationame.pagetitle = HMRC API Gatekeeper - Check application name

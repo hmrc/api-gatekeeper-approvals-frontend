@@ -21,27 +21,64 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(messages("checkcompanyregistration.pagetitle")), beforeContent = Some(backbreadcrumb())) {
-  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
-  <span class="govuk-caption-l">@model.appName</span>
+@renderInUKWithCompanyRegistrationNumber = {
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">@{messages("checkcompanyregistration.inukwithregnum.text1")}</p>
 
-  <h1 class="govuk-heading-l">        
-    @{messages("checkcompanyregistration.title")}
-  </h1>
+  <p class="govuk-body govuk-!-margin-bottom-6">@{model.registrationValue.get}</p>
+  
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
 
+    <div class="govuk-button-group">
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
+    </div>
+  }
+}
+
+@renderInUKWithNoCompanyRegistrationNumber = {
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-6">@{messages("checkcompanyregistration.inuknoregnum.text1")}</p>
+
+  <p class="govuk-body govuk-!-margin-bottom-6">@{messages("checkcompanyregistration.inuknoregnum.text2")}</p>
+    
+  <p class="govuk-body govuk-!-margin-bottom-6">@{messages("checkcompanyregistration.inuknoregnum.text3")}</p>
+  
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+
+    <div class="govuk-button-group">
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.continue")}</button>
+    </div>
+  }
+}
+
+@renderOutsideUK = {
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-6">@{messages("checkcompanyregistration.outsideuk.text1")}</p>
+
+  <p class="govuk-body govuk-!-margin-bottom-6">@{messages("checkcompanyregistration.outsideuk.text2")}</p>
+  
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+
+    <div class="govuk-button-group">
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.evidencechecked")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.comebacktothis")}</button>
+    </div>
+  }
+}
+
+@renderDefault = {
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
     @{model.registrationType}
   </p>
-  @{
-    if (model.hasRegistrationDetails) {
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        {model.registrationValue.get}
-      </p>
-    } else {
-      <p class="govuk-body govuk-!-margin-bottom-6">
-      </p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    @{
+      model.registrationValue match {
+        case Some(value) => value
+        case _           =>
+      }
     }
-  }
+  </p>
 
   @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
     @helper.CSRF.formField
@@ -50,5 +87,23 @@
       <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
       <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
     </div>
+  }
+}
+
+@layout(pageTitle = Some(messages("checkcompanyregistration.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">@model.appName</span>
+
+  <h1 class="govuk-heading-l">        
+    @{messages("checkcompanyregistration.title")}
+  </h1>
+
+  @{
+    model.registrationType match {
+      case "My organisation is outside the UK and doesn't have any of these"                               => renderOutsideUK
+      case "My organisation is in the UK and doesn't have any of these" if (model.hasRegistrationDetails)  => renderInUKWithCompanyRegistrationNumber
+      case "My organisation is in the UK and doesn't have any of these" if (!model.hasRegistrationDetails) => renderInUKWithNoCompanyRegistrationNumber
+      case _                                                                                               => renderDefault
+    }
   }
 }
