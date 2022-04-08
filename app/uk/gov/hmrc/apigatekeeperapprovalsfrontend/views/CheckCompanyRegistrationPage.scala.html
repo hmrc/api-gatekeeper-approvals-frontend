@@ -72,8 +72,11 @@
     @{model.registrationType}
   </p>
   <p class="govuk-body govuk-!-margin-bottom-6">
-    @if(model.hasRegistrationDetails) {
-        @{model.registrationValue.get}
+    @{
+      model.registrationValue match {
+        case Some(value) => value
+        case _           =>
+      }
     }
   </p>
 
