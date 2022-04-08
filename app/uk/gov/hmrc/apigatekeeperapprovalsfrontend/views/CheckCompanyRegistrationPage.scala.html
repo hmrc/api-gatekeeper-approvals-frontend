@@ -67,6 +67,26 @@
   }
 }
 
+@renderDefault = {
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
+    @{model.registrationType}
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    @if(model.hasRegistrationDetails) {
+        @{model.registrationValue.get}
+    }
+  </p>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+
+    <div class="govuk-button-group">
+      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
+      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
+    </div>
+  }
+}
+
 @layout(pageTitle = Some(messages("checkcompanyregistration.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
@@ -75,40 +95,12 @@
     @{messages("checkcompanyregistration.title")}
   </h1>
 
-  @if(model.registrationType == "My organisation is outside the UK and doesn't have any of these") {
-    @renderOutsideUK
-  } else {
-    @if(model.registrationType == "My organisation is in the UK and doesn't have any of these") {
-      @if(model.hasRegistrationDetails) {
-        @renderInUKWithCompanyRegistrationNumber
-      } else {
-        @renderInUKWithNoCompanyRegistrationNumber
-      }
-    } else {
-
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
-        @{model.registrationType}
-      </p>
-      @{
-        if (model.hasRegistrationDetails) {
-          <p class="govuk-body govuk-!-margin-bottom-6">
-            {model.registrationValue.get}
-          </p>
-        } else {
-          <p class="govuk-body govuk-!-margin-bottom-6">
-          </p>
-        }
-      }
-    
-      @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.action(model.applicationId), 'class -> "form") {
-        @helper.CSRF.formField
-    
-        <div class="govuk-button-group">
-          <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
-          <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
-        </div>
-      }
-    
+  @{
+    model.registrationType match {
+      case "My organisation is outside the UK and doesn't have any of these"                               => renderOutsideUK
+      case "My organisation is in the UK and doesn't have any of these" if (model.hasRegistrationDetails)  => renderInUKWithCompanyRegistrationNumber
+      case "My organisation is in the UK and doesn't have any of these" if (!model.hasRegistrationDetails) => renderInUKWithNoCompanyRegistrationNumber
+      case _                                                                                               => renderDefault
     }
   }
 }
