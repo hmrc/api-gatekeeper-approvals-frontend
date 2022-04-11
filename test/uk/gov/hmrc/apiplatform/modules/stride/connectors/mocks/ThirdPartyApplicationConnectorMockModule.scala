@@ -37,7 +37,7 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
 
     object AddTermsOfUseAcceptance {
       def succeeds() = {
-        when(aMock.addTermsOfUseAcceptance(* [ApplicationId], * [AddTermsOfUseAcceptanceRequest])(*)).thenReturn(successful(Right()))
+        when(aMock.addTermsOfUseAcceptance(* [ApplicationId], * [AddTermsOfUseAcceptanceRequest])(*)).thenReturn(successful(Right(())))
       }
       def failsWith(statusCode: Int, errorMsg: String) = {
         when(aMock.addTermsOfUseAcceptance(* [ApplicationId], * [AddTermsOfUseAcceptanceRequest])(*)).thenReturn(successful(Left(UpstreamErrorResponse(errorMsg, statusCode))))

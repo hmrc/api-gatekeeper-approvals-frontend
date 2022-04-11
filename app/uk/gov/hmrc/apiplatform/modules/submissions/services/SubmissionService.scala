@@ -24,6 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import org.joda.time.DateTime
 
 @Singleton
 class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
@@ -37,21 +38,21 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
     submissionConnector.fetchLatestMarkedSubmission(applicationId)
   }
 
-  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grant(applicationId: ApplicationId, requestedBy: String, responsibleIndividualVerificationDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
-      app <- submissionConnector.grant(applicationId, requestedBy)
+      app <- submissionConnector.grant(applicationId, requestedBy, responsibleIndividualVerificationDate)
     } yield app
   }
 
-  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, responsibleIndividualVerifiedDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
-      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings)
+      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings, responsibleIndividualVerifiedDate)
     } yield app
   }
 
-  def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def decline(applicationId: ApplicationId, requestedBy: String, reason: String, responsibleIndividualVerifiedDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
-      app <- submissionConnector.decline(applicationId, requestedBy, reason)
+      app <- submissionConnector.decline(applicationId, requestedBy, reason, responsibleIndividualVerifiedDate)
     } yield app
   }
 }

@@ -61,10 +61,10 @@ class ApplicationService @Inject()(
       case Some(request) => {
         thirdPartyApplicationConnector.addTermsOfUseAcceptance(application.id, request).map(_ match {
           case Left(upstreamErrorResponse: UpstreamErrorResponse) => Left(upstreamErrorResponse.message)
-          case Right(_) => Right()
+          case Right(_) => Right(())
         })
       }
-      case None => successful(Right()) // ToU agreement not mandatory before granting prod creds
+      case None => successful(Right(())) // ToU agreement not mandatory before granting prod creds
     }
   }
 }

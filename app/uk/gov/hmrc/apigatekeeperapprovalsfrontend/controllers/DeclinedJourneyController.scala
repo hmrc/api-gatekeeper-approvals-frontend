@@ -102,7 +102,7 @@ class DeclinedJourneyController @Inject()(
     val requiresDemo = SubmissionRequiresDemo(request.submission)
     for {
       review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, !request.markedSubmission.isFail, request.markedSubmission.isWarn, requiresFraudCheck, requiresDemo)
-      result <- submissionService.decline(applicationId, request.name.get, review.declineReasons)
+      result <- submissionService.decline(applicationId, request.name.get, review.declineReasons, review.verifiedByDetails.flatMap(_.timestamp))
     } yield result match {
       case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
       case Left(err) => {

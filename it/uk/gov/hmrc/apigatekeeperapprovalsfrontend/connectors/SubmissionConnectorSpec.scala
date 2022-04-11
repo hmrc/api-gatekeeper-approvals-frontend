@@ -31,6 +31,8 @@ import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnect
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
+import org.joda.time.DateTime
+import cats.implicits._
 
 class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData{
   private val appConfig = Configuration(
@@ -55,6 +57,8 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
     val requestedBy = "bob@blockbusters.com"
     val reason = "reason"
     implicit val hc = HeaderCarrier()
+
+    val responsibleIndividualVerificationDate = DateTime.now
   }
   
   "fetch latest submission by id" should {
@@ -131,7 +135,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
     "return an application on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
-        .withJsonRequestBody(GrantedRequest(requestedBy))
+        .withJsonRequestBody(GrantedRequest(requestedBy, None, responsibleIndividualVerificationDate.some))
         .willReturn(
             aResponse()
             .withStatus(OK)
@@ -139,7 +143,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
         )
       )
       
-      val result = await(connector.grant(applicationId, requestedBy))
+      val result = await(connector.grant(applicationId, requestedBy, responsibleIndividualVerificationDate.some))
 
       result shouldBe 'Right
       result.right.get.id shouldBe applicationId
@@ -152,7 +156,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
     "return an application on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
-        .withJsonRequestBody(DeclinedRequest(requestedBy, reason))
+        .withJsonRequestBody(DeclinedRequest(requestedBy, reason, responsibleIndividualVerificationDate.some))
         .willReturn(
             aResponse()
             .withStatus(OK)
@@ -160,7 +164,7 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
         )
       )
       
-      val result = await(connector.decline(applicationId, requestedBy, reason))
+      val result = await(connector.decline(applicationId, requestedBy, reason, responsibleIndividualVerificationDate.some))
 
       result shouldBe 'Right
       result.right.get.id shouldBe applicationId
