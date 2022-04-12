@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedByForGrantingPage}
 
 object GrantedJourneyController {
   case class ViewModel(appName: String, applicationId: ApplicationId)
@@ -41,6 +41,15 @@ object GrantedJourneyController {
     mapping(
       "warnings" -> nonEmptyText
     )(ProvideWarningsForm.apply)(ProvideWarningsForm.unapply)
+  )
+
+  case class ProvideEscalatedByForm(firstName: String, lastName: String)
+
+  val provideEscalatedByForm: Form[ProvideEscalatedByForm] = Form(
+    mapping(
+      "first-name" -> nonEmptyText,
+      "last-name" -> nonEmptyText
+    )(ProvideEscalatedByForm.apply)(ProvideEscalatedByForm.unapply)
   )
 }
 
@@ -55,6 +64,7 @@ class GrantedJourneyController @Inject()(
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService,
   provideWarningsForGrantingPage: ProvideWarningsForGrantingPage,
+  provideEscalatedByForGrantingPage: ProvideEscalatedByForGrantingPage,
   applicationApprovedPage: ApplicationApprovedPage,
   applicationService: ApplicationService
 )(implicit override val ec: ExecutionContext)
@@ -89,6 +99,34 @@ class GrantedJourneyController @Inject()(
     }
 
     GrantedJourneyController.provideWarningsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+  }
+
+  def provideEscalatedByPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(provideEscalatedByForGrantingPage(provideEscalatedByForm, ViewModel(request.application.name, applicationId))))
+  }
+
+  def provideEscalatedByAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    def handleValidForm(form: ProvideEscalatedByForm) = {
+      (
+        for {
+          review      <- EitherT.fromOptionF(submissionReviewService.updateEscalatedBy(form.firstName, form.lastName)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
+        } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
+      )
+      .value
+      .map {
+        case Right(value) => value
+        case Left(err) => {
+          logger.warn(s"Error granting access for application $applicationId: $err")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
+        }
+      }
+    }
+
+    def handleInvalidForm(form: Form[ProvideEscalatedByForm]) = {
+      successful(BadRequest(provideEscalatedByForGrantingPage(form, ViewModel(request.application.name, applicationId))))
+    }
+
+    GrantedJourneyController.provideEscalatedByForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
   def grantedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>

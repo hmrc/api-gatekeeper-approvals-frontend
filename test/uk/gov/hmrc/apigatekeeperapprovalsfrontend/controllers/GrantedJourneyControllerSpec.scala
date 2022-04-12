@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedByForGrantingPage}
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
 
 class GrantedJourneyControllerSpec extends AbstractControllerSpec {
@@ -26,6 +26,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup with ApplicationServiceMockModule {
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val provideWarningsForGrantingPage = app.injector.instanceOf[ProvideWarningsForGrantingPage]
+    val provideEscalatedByForGrantingPage = app.injector.instanceOf[ProvideEscalatedByForGrantingPage]
 
     val controller = new GrantedJourneyController(
         strideAuthConfig,
@@ -37,6 +38,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
         SubmissionServiceMock.aMock,
         SubmissionReviewServiceMock.aMock,
         provideWarningsForGrantingPage,
+        provideEscalatedByForGrantingPage,
         applicationApprovedPage,
         ApplicationServiceMock.aMock
       )

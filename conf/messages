@@ -149,6 +149,13 @@ applicationgrantedwithwarnings.confluence = Use guidance on Confluence to help
 applicationgrantedwithwarnings.note.2 = Include all the issues you have identified working through the checklist.
 applicationgrantedwithwarnings.button.continue = Save and continue
 
+escalatedbyuser.pagetitle = HMRC API Gatekeeper - Who did you escalate the decision to?
+escalatedbyuser.title = Who did you escalate the decision to?
+escalatedbyuser.note = Give us the name of the colleague you spoke to about this request.
+escalatedbyuser.firstname = First name
+escalatedbyuser.lastname = Last name
+escalatedbyuser.button.continue = Save and continue
+
 providedeclinereasons.pagetitle = HMRC API Gatekeeper - Application Declined
 providedeclinereasons.title = Note all the reasons the request is declined
 providedeclinereasons.note.1 = The reasons are saved on Gatekeeper.
