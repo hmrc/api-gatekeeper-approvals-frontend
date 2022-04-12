@@ -96,6 +96,54 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     }
   }
 
+  "provideEscalatedByPage" should {
+    "return 200 when marked submission is found" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+    
+      val result = controller.provideEscalatedByPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+    }
+
+    "return 404 when no marked submission is found" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+
+      val result = controller.provideEscalatedByPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe NOT_FOUND
+    }
+  }
+
+  "provideEscalatedByAction" should {
+    "go to the provide warnings page when a valid form with first and last names is submitted" in new Setup {
+      val grantWithEscalatedByRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "Bob", "last-name" -> "Roberts")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+      SubmissionReviewServiceMock.UpdateEscalatedBy.thenReturn(submissionReview)
+
+      val result = controller.provideEscalatedByAction(applicationId)(grantWithEscalatedByRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url
+    }
+
+    "go to the escalated by input page when an invalid form without first or last names is submitted" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+
+      val result = controller.provideEscalatedByAction(applicationId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
   "grantedPage page" should {
     "return 200 when marked submission is found" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
