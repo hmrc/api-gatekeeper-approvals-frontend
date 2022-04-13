@@ -21,8 +21,8 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@renderHint(hintLink: String, hintLinkUrl: String, hintText: String) = {
-  <div class="givuk-hint govuk-radios__hint">
+@renderHint(hintText: String, hintLink: String, hintLinkUrl: String) = {
+  <div class="govuk-hint govuk-radios__hint">
     <a class="govuk-link govuk-link--no-visited-state" href="@hintLinkUrl">@hintLink</a> @hintText
   </div>
 }
