@@ -21,16 +21,23 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
+@renderHint(hintLink: String, hintLinkUrl: String, hintText: String) = {
+  <div class="givuk-hint govuk-radios__hint">
+    <a class="govuk-link govuk-link--no-visited-state" href="@hintLinkUrl">@hintLink</a> @hintText
+  </div>
+}
+
 @renderRadioButton(id: String, value: String, label: String, hintLink: Option[String] = None, hintLinkUrl: Option[String] = None, hintText: Option[String] = None) = {
   <div class="govuk-radios__item">
     <input class="govuk-radios__input" id="@id" name="grant-decision" type="radio" value="@value">
     <label class="govuk-label govuk-radios__label" for="@id">
       @{messages(label)}
     </label>
-    @if(hintText.isDefined && hintLink.isDefined && hintLinkUrl.isDefined) {
-      <div class="givuk-hint govuk-radios__hint">
-        <a class="govuk-link govuk-link--no-visited-state" href="@hintLinkUrl">@hintLink</a> @hintText
-      </div>
+    @{
+      (hintText, hintLink, hintLinkUrl) match {
+        case (Some(text), Some(link), Some(linkUrl)) => renderHint(text, link, linkUrl)
+        case _                                       =>
+      }
     }
   </div>
 }
