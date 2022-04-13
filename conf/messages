@@ -152,8 +152,7 @@ applicationgrantedwithwarnings.button.continue = Save and continue
 escalatedtouser.pagetitle = HMRC API Gatekeeper - Who did you escalate the decision to?
 escalatedtouser.title = Who did you escalate the decision to?
 escalatedtouser.note = Give us the name of the colleague you spoke to about this request.
-escalatedtouser.firstname = First name
-escalatedtouser.lastname = Last name
+escalatedtouser.escalatedto = Full name
 escalatedtouser.button.continue = Save and continue
 
 providedeclinereasons.pagetitle = HMRC API Gatekeeper - Application Declined

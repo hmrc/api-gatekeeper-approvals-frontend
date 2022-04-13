@@ -43,12 +43,11 @@ object GrantedJourneyController {
     )(ProvideWarningsForm.apply)(ProvideWarningsForm.unapply)
   )
 
-  case class ProvideEscalatedToForm(firstName: String, lastName: String)
+  case class ProvideEscalatedToForm(escalatedTo: String)
 
   val provideEscalatedToForm: Form[ProvideEscalatedToForm] = Form(
     mapping(
-      "first-name" -> nonEmptyText,
-      "last-name" -> nonEmptyText
+      "escalatedto" -> nonEmptyText
     )(ProvideEscalatedToForm.apply)(ProvideEscalatedToForm.unapply)
   )
 }
@@ -80,7 +79,7 @@ class GrantedJourneyController @Inject()(
       (
         for {
           review      <- EitherT.fromOptionF(submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
-          application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings, review.verifiedByDetails.flatMap(_.timestamp)))
+          application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings, review.verifiedByDetails.flatMap(_.timestamp), review.escalatedTo))
           _           <- EitherT(applicationService.addTermsOfUseAcceptance(application, review))
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
       )
@@ -109,7 +108,7 @@ class GrantedJourneyController @Inject()(
     def handleValidForm(form: ProvideEscalatedToForm) = {
       (
         for {
-          review      <- EitherT.fromOptionF(submissionReviewService.updateEscalatedTo(form.firstName, form.lastName)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
+          review      <- EitherT.fromOptionF(submissionReviewService.updateEscalatedTo(form.escalatedTo)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
       )
       .value

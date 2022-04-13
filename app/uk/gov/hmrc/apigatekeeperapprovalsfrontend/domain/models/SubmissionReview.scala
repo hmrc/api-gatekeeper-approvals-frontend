@@ -130,12 +130,7 @@ object SubmissionReview {
     review.copy(verifiedByDetails = Some(verified))
   }
 
-  case class FullName(
-    firstName: String,
-    lastName: String
-  )
-
-  val updateEscalatedTo: SubmissionReview.FullName => SubmissionReview => SubmissionReview = escalated => review => {
+  val updateEscalatedTo: String => SubmissionReview => SubmissionReview = escalated => review => {
     review.copy(escalatedTo = Some(escalated))
   }
 }
@@ -146,7 +141,7 @@ case class SubmissionReview private(
   declineReasons: String,
   grantWarnings: String,
   verifiedByDetails: Option[SubmissionReview.VerifiedByDetails],
-  escalatedTo: Option[SubmissionReview.FullName],
+  escalatedTo: Option[String],
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty

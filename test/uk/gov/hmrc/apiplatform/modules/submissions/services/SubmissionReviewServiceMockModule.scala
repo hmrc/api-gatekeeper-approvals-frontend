@@ -74,11 +74,11 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
 
     object UpdateEscalatedTo {
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateEscalatedTo(*, *)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
+        when(aMock.updateEscalatedTo(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
       }
       
       def thenReturnError() = {
-        when(aMock.updateEscalatedTo(*, *)(*[Submission.Id], *)).thenReturn(Future.successful(None))
+        when(aMock.updateEscalatedTo(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
       }
     }
 

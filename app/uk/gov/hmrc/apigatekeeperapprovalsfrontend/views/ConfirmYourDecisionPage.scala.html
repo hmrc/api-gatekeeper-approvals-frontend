@@ -23,7 +23,7 @@
 
 @renderHint(hintText: String, hintLink: String, hintLinkUrl: String) = {
   <div class="govuk-hint govuk-radios__hint">
-    <a class="govuk-link govuk-link--no-visited-state" href="@hintLinkUrl">@hintLink</a> @hintText
+    <a class="govuk-link govuk-link--no-visited-state" href="@hintLinkUrl" target="_">@hintLink</a> @hintText
   </div>
 }
 
@@ -59,7 +59,7 @@
         <div class="govuk-radios" data-module="govuk-radios">
           @if(model.isFailed) {
             @renderRadioButton("decline-decision", "decline", "confirmyourdecision.declinelabel")
-            @renderRadioButton("grant-with-warnings-decision", "grant-with-warnings", "confirmyourdecision.grantwithwarningslabel", Some("You need approval"), Some("#"), Some(" to grant production access"))
+            @renderRadioButton("grant-with-warnings-decision", "grant-with-warnings", "confirmyourdecision.grantwithwarningslabel", Some("You need approval"), Some("https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?pageId=407700665"), Some(" to grant production access"))
           } else {
             @renderRadioButton("grant-decision", "grant", "confirmyourdecision.grantlabel")
             @renderRadioButton("grant-with-warnings-decision", "grant-with-warnings", "confirmyourdecision.grantwithwarningslabel")
@@ -76,7 +76,7 @@
 
     @if(!model.isFailed) {
       <p class="govuk-body">
-        @{messages("confirmyourdecision.escalate")} <a class="govuk-link govuk-link--no-visited-state" href="#">@{messages("confirmyourdecision.checkguidance")}</a>.
+        @{messages("confirmyourdecision.escalate")} <a class="govuk-link govuk-link--no-visited-state" href="https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?pageId=407700665" target="_">@{messages("confirmyourdecision.checkguidance")}</a>.
       </p>
     }
   }

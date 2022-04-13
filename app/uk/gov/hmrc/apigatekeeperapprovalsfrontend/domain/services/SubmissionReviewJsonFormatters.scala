@@ -48,7 +48,6 @@ trait SubmissionReviewJsonFormatters {
   implicit val actionKeyWrites: KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
   
   implicit val verifiedByDetailsFormat = Json.format[VerifiedByDetails]
-  implicit val fullNameFormat = Json.format[FullName]
   implicit val submissionReviewFormat = Json.format[SubmissionReview]    
 }
 

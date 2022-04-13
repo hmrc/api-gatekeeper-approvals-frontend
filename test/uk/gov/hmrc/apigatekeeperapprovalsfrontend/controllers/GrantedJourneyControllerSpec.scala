@@ -119,8 +119,8 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
   }
 
   "provideEscalatedToAction" should {
-    "go to the provide warnings page when a valid form with first and last names is submitted" in new Setup {
-      val grantWithEscalatedToRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "Bob", "last-name" -> "Roberts")
+    "go to the provide warnings page when a valid form with full name is submitted" in new Setup {
+      val grantWithEscalatedToRequest = fakeRequest.withFormUrlEncodedBody("escalatedto" -> "Bob Roberts")
 
       AuthConnectorMock.Authorise.thenReturn()
       ApplicationActionServiceMock.Process.thenReturn(application)

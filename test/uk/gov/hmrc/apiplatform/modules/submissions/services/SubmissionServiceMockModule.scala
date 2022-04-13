@@ -94,12 +94,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object GrantWithWarnings {
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *, *)(*)).thenReturn(successful(response))
       }
     }
 
