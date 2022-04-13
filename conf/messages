@@ -245,6 +245,7 @@ productionaccess.checkanswers = Check answers
 productionaccess.granted.name = Access granted by
 productionaccess.granted.date = Access granted date
 productionaccess.granted.warnings = Access was granted with warnings
+productionaccess.escalatedto.name = Escalated to
 
 adminstoemail.heading = Copy email addresses and email the team admins
 adminstoemail.button.copyemailaddresses = Copy email addresses to clipboard
