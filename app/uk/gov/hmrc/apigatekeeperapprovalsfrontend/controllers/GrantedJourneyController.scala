@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedByForGrantingPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedToForGrantingPage}
 
 object GrantedJourneyController {
   case class ViewModel(appName: String, applicationId: ApplicationId)
@@ -43,13 +43,13 @@ object GrantedJourneyController {
     )(ProvideWarningsForm.apply)(ProvideWarningsForm.unapply)
   )
 
-  case class ProvideEscalatedByForm(firstName: String, lastName: String)
+  case class ProvideEscalatedToForm(firstName: String, lastName: String)
 
-  val provideEscalatedByForm: Form[ProvideEscalatedByForm] = Form(
+  val provideEscalatedToForm: Form[ProvideEscalatedToForm] = Form(
     mapping(
       "first-name" -> nonEmptyText,
       "last-name" -> nonEmptyText
-    )(ProvideEscalatedByForm.apply)(ProvideEscalatedByForm.unapply)
+    )(ProvideEscalatedToForm.apply)(ProvideEscalatedToForm.unapply)
   )
 }
 
@@ -64,7 +64,7 @@ class GrantedJourneyController @Inject()(
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService,
   provideWarningsForGrantingPage: ProvideWarningsForGrantingPage,
-  provideEscalatedByForGrantingPage: ProvideEscalatedByForGrantingPage,
+  provideEscalatedToForGrantingPage: ProvideEscalatedToForGrantingPage,
   applicationApprovedPage: ApplicationApprovedPage,
   applicationService: ApplicationService
 )(implicit override val ec: ExecutionContext)
@@ -101,15 +101,15 @@ class GrantedJourneyController @Inject()(
     GrantedJourneyController.provideWarningsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
-  def provideEscalatedByPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(provideEscalatedByForGrantingPage(provideEscalatedByForm, ViewModel(request.application.name, applicationId))))
+  def provideEscalatedToPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(provideEscalatedToForGrantingPage(provideEscalatedToForm, ViewModel(request.application.name, applicationId))))
   }
 
-  def provideEscalatedByAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleValidForm(form: ProvideEscalatedByForm) = {
+  def provideEscalatedToAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+    def handleValidForm(form: ProvideEscalatedToForm) = {
       (
         for {
-          review      <- EitherT.fromOptionF(submissionReviewService.updateEscalatedBy(form.firstName, form.lastName)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
+          review      <- EitherT.fromOptionF(submissionReviewService.updateEscalatedTo(form.firstName, form.lastName)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
       )
       .value
@@ -122,11 +122,11 @@ class GrantedJourneyController @Inject()(
       }
     }
 
-    def handleInvalidForm(form: Form[ProvideEscalatedByForm]) = {
-      successful(BadRequest(provideEscalatedByForGrantingPage(form, ViewModel(request.application.name, applicationId))))
+    def handleInvalidForm(form: Form[ProvideEscalatedToForm]) = {
+      successful(BadRequest(provideEscalatedToForGrantingPage(form, ViewModel(request.application.name, applicationId))))
     }
 
-    GrantedJourneyController.provideEscalatedByForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+    GrantedJourneyController.provideEscalatedToForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
   def grantedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>

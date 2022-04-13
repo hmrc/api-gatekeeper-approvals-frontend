@@ -62,7 +62,7 @@ class ConfirmYourDecisionController @Inject()(
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")                                                  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
       case Some("grant-with-warnings") if(!request.markedSubmission.isFail) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
-      case Some("grant-with-warnings") if(request.markedSubmission.isFail)  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedByPage(applicationId)))
+      case Some("grant-with-warnings") if(request.markedSubmission.isFail)  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId)))
       case Some("grant")                                                    => grantAccess(applicationId)
       case _                                                                => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
     }
