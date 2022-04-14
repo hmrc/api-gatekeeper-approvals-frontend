@@ -41,12 +41,18 @@
     </div>
 
     <div class="govuk-form-group">
-      <label class="govuk-label" for="escalatedto">
-        @{messages("escalatedtouser.escalatedto")}
+      <label class="govuk-label" for="first-name">
+        @{messages("escalatedtouser.firstname")}
       </label>
-      <input class="govuk-input govuk-input--width-10" id="escalatedto" name="escalatedto" type="text">
+      <input class="govuk-input govuk-input--width-10" id="first-name" name="first-name" type="text">
     </div>
-
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="last-name">
+        @{messages("escalatedtouser.lastname")}
+      </label>
+      <input class="govuk-input govuk-input--width-10" id="last-name" name="last-name" type="text">
+    </div>
+    
     <button class="govuk-button" data-module="govuk-button">
       @{messages("escalatedtouser.button.continue")}
     </button>

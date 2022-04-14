@@ -43,11 +43,12 @@ object GrantedJourneyController {
     )(ProvideWarningsForm.apply)(ProvideWarningsForm.unapply)
   )
 
-  case class ProvideEscalatedToForm(escalatedTo: String)
+  case class ProvideEscalatedToForm(firstName: String, lastName: String)
 
   val provideEscalatedToForm: Form[ProvideEscalatedToForm] = Form(
     mapping(
-      "escalatedto" -> nonEmptyText
+      "first-name" -> nonEmptyText,
+      "last-name" -> nonEmptyText
     )(ProvideEscalatedToForm.apply)(ProvideEscalatedToForm.unapply)
   )
 }
@@ -106,19 +107,14 @@ class GrantedJourneyController @Inject()(
 
   def provideEscalatedToAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideEscalatedToForm) = {
-      (
-        for {
-          review      <- EitherT.fromOptionF(submissionReviewService.updateEscalatedTo(form.escalatedTo)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
-        } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
-      )
-      .value
-      .map {
-        case Right(value) => value
-        case Left(err) => {
-          logger.warn(s"Error granting access for application $applicationId: $err")
-          InternalServerError(errorHandler.internalServerErrorTemplate)
+      submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index)
+        .map {
+          case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
+          case None        => { 
+                                logger.warn(s"Error updating submission review for application $applicationId: There was a problem updating the escalated to on the submission review")
+                                InternalServerError(errorHandler.internalServerErrorTemplate)
+                              }
         }
-      }
     }
 
     def handleInvalidForm(form: Form[ProvideEscalatedToForm]) = {
