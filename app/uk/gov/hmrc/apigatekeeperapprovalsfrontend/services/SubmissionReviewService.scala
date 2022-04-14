@@ -66,6 +66,17 @@ class SubmissionReviewService @Inject()(
     .value
   }
 
+  def updateEscalatedTo(escalatedTo: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    (
+      for {
+        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview      = SubmissionReview.updateEscalatedTo(escalatedTo)(originalReview)
+        _                 <- OptionT.liftF(repo.update(changedReview))
+      } yield changedReview
+    )
+    .value
+  }
+
   def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {

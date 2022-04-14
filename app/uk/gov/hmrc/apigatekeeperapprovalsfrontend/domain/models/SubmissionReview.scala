@@ -78,7 +78,7 @@ object SubmissionReview {
     instanceIndex: Int,
     requiredActions: List[Action]
   ): SubmissionReview =
-    SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+    SubmissionReview(submissionId, instanceIndex, "", "", None, None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
@@ -129,6 +129,10 @@ object SubmissionReview {
   val updateVerifiedByDetails: SubmissionReview.VerifiedByDetails => SubmissionReview => SubmissionReview = verified => review => {
     review.copy(verifiedByDetails = Some(verified))
   }
+
+  val updateEscalatedTo: String => SubmissionReview => SubmissionReview = escalated => review => {
+    review.copy(escalatedTo = Some(escalated))
+  }
 }
 
 case class SubmissionReview private(
@@ -137,6 +141,7 @@ case class SubmissionReview private(
   declineReasons: String,
   grantWarnings: String,
   verifiedByDetails: Option[SubmissionReview.VerifiedByDetails],
+  escalatedTo: Option[String],
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty

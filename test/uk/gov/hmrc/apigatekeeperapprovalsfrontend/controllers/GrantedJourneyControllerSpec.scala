@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedToForGrantingPage}
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
 
 class GrantedJourneyControllerSpec extends AbstractControllerSpec {
@@ -26,6 +26,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup with ApplicationServiceMockModule {
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val provideWarningsForGrantingPage = app.injector.instanceOf[ProvideWarningsForGrantingPage]
+    val provideEscalatedToForGrantingPage = app.injector.instanceOf[ProvideEscalatedToForGrantingPage]
 
     val controller = new GrantedJourneyController(
         strideAuthConfig,
@@ -37,6 +38,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
         SubmissionServiceMock.aMock,
         SubmissionReviewServiceMock.aMock,
         provideWarningsForGrantingPage,
+        provideEscalatedToForGrantingPage,
         applicationApprovedPage,
         ApplicationServiceMock.aMock
       )
@@ -89,6 +91,54 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
 
       val result = controller.provideWarningsAction(applicationId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
+  "provideEscalatedToPage" should {
+    "return 200 when marked submission is found" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+    
+      val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+    }
+
+    "return 404 when no marked submission is found" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
+
+      val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe NOT_FOUND
+    }
+  }
+
+  "provideEscalatedToAction" should {
+    "go to the provide warnings page when a valid form with first and last name is submitted" in new Setup {
+      val grantWithEscalatedToRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "Bob", "last-name" -> "Roberts")
+
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+      SubmissionReviewServiceMock.UpdateEscalatedTo.thenReturn(submissionReview)
+
+      val result = controller.provideEscalatedToAction(applicationId)(grantWithEscalatedToRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url
+    }
+
+    "go to the escalated by input page when an invalid form without first or last names is submitted" in new Setup {
+      AuthConnectorMock.Authorise.thenReturn()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+
+      val result = controller.provideEscalatedToAction(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

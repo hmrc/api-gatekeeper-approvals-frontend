@@ -34,7 +34,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmYourDecisionPage
 
 object ConfirmYourDecisionController {
-  case class ViewModel(applicationId: ApplicationId, appName: String)
+  case class ViewModel(applicationId: ApplicationId, appName: String, isFailed: Boolean)
 }
 
 @Singleton
@@ -55,18 +55,16 @@ class ConfirmYourDecisionController @Inject()(
   import ConfirmYourDecisionController._
 
   def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    if(request.markedSubmission.isFail) 
-      successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
-    else
-      successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name))))
+    successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name, request.markedSubmission.isFail))))
   }
 
   def action(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
-      case Some("decline")              => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
-      case Some("grant-with-warnings")  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
-      case Some("grant")                => grantAccess(applicationId)
-      case _                            => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
+      case Some("decline")                                                  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
+      case Some("grant-with-warnings") if(!request.markedSubmission.isFail) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
+      case Some("grant-with-warnings") if(request.markedSubmission.isFail)  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId)))
+      case Some("grant")                                                    => grantAccess(applicationId)
+      case _                                                                => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
     }
   }
 

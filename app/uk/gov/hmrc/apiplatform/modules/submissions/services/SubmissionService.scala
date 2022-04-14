@@ -44,9 +44,9 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
     } yield app
   }
 
-  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, responsibleIndividualVerifiedDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, responsibleIndividualVerifiedDate: Option[DateTime], escalatedTo: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     for {
-      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings, responsibleIndividualVerifiedDate)
+      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings, responsibleIndividualVerifiedDate, escalatedTo)
     } yield app
   }
 

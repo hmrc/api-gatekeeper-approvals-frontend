@@ -35,7 +35,7 @@ object SubmissionsConnector {
 
   case class Config(serviceBaseUrl: String, apiKey: String)
 
-  case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, responsibleIndividualVerificationDate: Option[DateTime] = None)
+  case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, responsibleIndividualVerificationDate: Option[DateTime] = None, escalatedTo: Option[String] = None)
   implicit val writesApprovedRequest = Json.writes[GrantedRequest]
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String, responsibleIndividualVerificationDate: Option[DateTime])
@@ -86,12 +86,12 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, responsibleIndividualVerificationDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, responsibleIndividualVerificationDate: Option[DateTime], escalatedTo: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, warnings.some, responsibleIndividualVerificationDate))
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, warnings.some, responsibleIndividualVerificationDate, escalatedTo))
       .map(_.leftMap(failed(_)))
     }
   }

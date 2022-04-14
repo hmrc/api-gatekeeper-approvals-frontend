@@ -43,6 +43,8 @@ POST       /applications/:id/checklist/confirm-verified2             uk.gov.hmrc
 GET        /applications/:id/confirm-decision/granted                uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.grantedPage(id: ApplicationId)
 GET        /applications/:id/confirm-decision/granted-with-warnings  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.provideWarningsPage(id: ApplicationId)
 POST       /applications/:id/confirm-decision/granted-with-warnings  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.provideWarningsAction(id: ApplicationId)
+GET        /applications/:id/confirm-decision/escalated-to           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.provideEscalatedToPage(id: ApplicationId)
+POST       /applications/:id/confirm-decision/escalated-to           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.provideEscalatedToAction(id: ApplicationId)
 
 GET        /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.page(id: ApplicationId)
 POST       /applications/:id/confirm-decision                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.action(id: ApplicationId)

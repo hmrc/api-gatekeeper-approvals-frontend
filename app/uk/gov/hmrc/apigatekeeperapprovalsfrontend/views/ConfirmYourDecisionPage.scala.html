@@ -21,6 +21,27 @@
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
+@renderHint(hintText: String, hintLink: String, hintLinkUrl: String) = {
+  <div class="govuk-hint govuk-radios__hint">
+    <a class="govuk-link govuk-link--no-visited-state" href="@hintLinkUrl" target="_">@hintLink</a> @hintText
+  </div>
+}
+
+@renderRadioButton(id: String, value: String, label: String, hintLink: Option[String] = None, hintLinkUrl: Option[String] = None, hintText: Option[String] = None) = {
+  <div class="govuk-radios__item">
+    <input class="govuk-radios__input" id="@id" name="grant-decision" type="radio" value="@value">
+    <label class="govuk-label govuk-radios__label" for="@id">
+      @{messages(label)}
+    </label>
+    @{
+      (hintText, hintLink, hintLinkUrl) match {
+        case (Some(text), Some(link), Some(linkUrl)) => renderHint(text, link, linkUrl)
+        case _                                       =>
+      }
+    }
+  </div>
+}
+
 @layout(pageTitle = Some(messages("confirmyourdecision.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <span class="govuk-caption-l">@model.appName</span>
@@ -36,24 +57,14 @@
           </h1>
         </legend>
         <div class="govuk-radios" data-module="govuk-radios">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant-decision" name="grant-decision" type="radio" value="grant">
-            <label class="govuk-label govuk-radios__label" for="grant-decision">
-              @{messages("confirmyourdecision.grantlabel")}
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="grant-with-warnings-decision" name="grant-decision" type="radio" value="grant-with-warnings">
-            <label class="govuk-label govuk-radios__label" for="grant-with-warnings-decision">
-              @{messages("confirmyourdecision.grantwithwarningslabel")}
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="decline-decision" name="grant-decision" type="radio" value="decline">
-            <label class="govuk-label govuk-radios__label" for="decline-decision">
-                @{messages("confirmyourdecision.declinelabel")}
-            </label>
-          </div>
+          @if(model.isFailed) {
+            @renderRadioButton("decline-decision", "decline", "confirmyourdecision.declinelabel")
+            @renderRadioButton("grant-with-warnings-decision", "grant-with-warnings", "confirmyourdecision.grantwithwarningslabel", Some("You need approval"), Some("https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?pageId=407700665"), Some(" to grant production access"))
+          } else {
+            @renderRadioButton("grant-decision", "grant", "confirmyourdecision.grantlabel")
+            @renderRadioButton("grant-with-warnings-decision", "grant-with-warnings", "confirmyourdecision.grantwithwarningslabel")
+            @renderRadioButton("decline-decision", "decline", "confirmyourdecision.declinelabel")
+          }
         </div>
     
       </fieldset>
@@ -63,8 +74,10 @@
       <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action">@{messages("confirmyourdecision.continue")}</button>
     </div>
 
-    <p class="govuk-body">
-      @{messages("confirmyourdecision.escalate")} <a class="govuk-link govuk-link--no-visited-state" href="#">@{messages("confirmyourdecision.checkguidance")}</a>.
-    </p>
+    @if(!model.isFailed) {
+      <p class="govuk-body">
+        @{messages("confirmyourdecision.escalate")} <a class="govuk-link govuk-link--no-visited-state" href="https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?pageId=407700665" target="_">@{messages("confirmyourdecision.checkguidance")}</a>.
+      </p>
+    }
   }
 }

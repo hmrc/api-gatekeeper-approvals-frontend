@@ -149,6 +149,13 @@ applicationgrantedwithwarnings.confluence = Use guidance on Confluence to help
 applicationgrantedwithwarnings.note.2 = Include all the issues you have identified working through the checklist.
 applicationgrantedwithwarnings.button.continue = Save and continue
 
+escalatedtouser.pagetitle = HMRC API Gatekeeper - Who did you escalate the decision to?
+escalatedtouser.title = Who did you escalate the decision to?
+escalatedtouser.note = Give us the name of the colleague you spoke to about this request.
+escalatedtouser.firstname = First name
+escalatedtouser.lastname = Last name
+escalatedtouser.button.continue = Save and continue
+
 providedeclinereasons.pagetitle = HMRC API Gatekeeper - Application Declined
 providedeclinereasons.title = Note all the reasons the request is declined
 providedeclinereasons.note.1 = The reasons are saved on Gatekeeper.
@@ -239,6 +246,7 @@ productionaccess.checkanswers = Check answers
 productionaccess.granted.name = Access granted by
 productionaccess.granted.date = Access granted date
 productionaccess.granted.warnings = Access was granted with warnings
+productionaccess.escalatedto.name = Escalated to
 
 adminstoemail.heading = Copy email addresses and email the team admins
 adminstoemail.button.copyemailaddresses = Copy email addresses to clipboard

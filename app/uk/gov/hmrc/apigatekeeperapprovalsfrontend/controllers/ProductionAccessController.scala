@@ -42,6 +42,7 @@ object ProductionAccessController {
     grantedName: String,
     grantedDate: String,
     warnings: Option[String],
+    escalatedTo: Option[String],
     index: Int
   )
 }
@@ -67,9 +68,9 @@ class ProductionAccessController @Inject()(
 
     (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
       case (Granted(grantedTimestamp, grantedName), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
-        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, None, instance.index))))
-      case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
-        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, Some(warnings), instance.index))))
+        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, None, None, instance.index))))
+      case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
+        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, Some(warnings), escalatedTo, instance.index))))
       case _ => 
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
         successful(BadRequest(errorHandler.badRequestTemplate(request)))
