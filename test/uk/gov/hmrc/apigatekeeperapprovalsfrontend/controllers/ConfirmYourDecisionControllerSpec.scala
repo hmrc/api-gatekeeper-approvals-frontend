@@ -39,7 +39,6 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
         ApplicationActionServiceMock.aMock,
         SubmissionServiceMock.aMock,
         confirmYourDecisionPage,
-        ApplicationServiceMock.aMock,
         SubmissionReviewServiceMock.aMock
       )
   }
@@ -100,7 +99,6 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
-      ApplicationServiceMock.AddTermsOfUseAcceptance.succeeds()
 
       val result = controller.action(applicationId)(fakeDeclineRequest)
 

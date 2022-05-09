@@ -21,7 +21,6 @@ import cats.data.EitherT
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
-
 import play.api.mvc.{MessagesControllerComponents, _}
 import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
@@ -30,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmYourDecisionPage
 
 object ConfirmYourDecisionController {
@@ -47,7 +46,6 @@ class ConfirmYourDecisionController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
   confirmYourDecisionPage: ConfirmYourDecisionPage,
-  applicationService: ApplicationService,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) 
     extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
@@ -73,7 +71,6 @@ class ConfirmYourDecisionController @Inject()(
       for {
         review      <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
         application <- EitherT(submissionService.grant(applicationId, request.name.get, review.verifiedByDetails.flatMap(_.timestamp))).leftMap(InternalServerError(_))
-        _           <- EitherT(applicationService.addTermsOfUseAcceptance(application, review)).leftMap(InternalServerError(_))
       } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
     ).fold(identity(_), identity(_))
   }

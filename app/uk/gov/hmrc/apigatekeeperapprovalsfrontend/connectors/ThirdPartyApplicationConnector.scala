@@ -16,9 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector.ErrorOrUnit
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.connectors.AddTermsOfUseAcceptanceRequest
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
@@ -50,11 +47,4 @@ class ThirdPartyApplicationConnector @Inject()(
     }
   }
 
-  def addTermsOfUseAcceptance(id: ApplicationId, addTermsOfUseAcceptanceRequest: AddTermsOfUseAcceptanceRequest)(implicit hc: HeaderCarrier) = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
-
-    metrics.record(api) {
-      httpClient.POST[AddTermsOfUseAcceptanceRequest, ErrorOrUnit](s"$serviceBaseUrl/application/${id.value}/terms-of-use-acceptance", addTermsOfUseAcceptanceRequest)
-    }
-  }
 }

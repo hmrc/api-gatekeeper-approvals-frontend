@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import org.joda.time.DateTime
-import play.api.http.Status.INTERNAL_SERVER_ERROR
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.VerifiedByDetails
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -73,30 +72,4 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     }
   }
 
-  "addTermsOfUseAcceptance" should {
-    "returns nothing if successful" in new Setup {
-      ThirdPartyApplicationConnectorMock.AddTermsOfUseAcceptance.succeeds()
-
-      val result = await(service.addTermsOfUseAcceptance(application, submissionReview))
-
-      result shouldBe Right(())
-    }
-
-    "returns nothing if ToU not agreed" in new Setup {
-      ThirdPartyApplicationConnectorMock.AddTermsOfUseAcceptance.succeeds()
-
-      val result = await(service.addTermsOfUseAcceptance(applicationWithoutTOUAgreement, submissionReviewWithoutTOUAgreement))
-
-      result shouldBe Right(())
-    }
-
-    "returns error message if TPA call fails" in new Setup {
-      val errorMsg = "fail"
-      ThirdPartyApplicationConnectorMock.AddTermsOfUseAcceptance.failsWith(INTERNAL_SERVER_ERROR, errorMsg)
-
-      val result = await(service.addTermsOfUseAcceptance(application, submissionReview))
-
-      result shouldBe Left(errorMsg)
-    }
-  }
 }
