@@ -18,11 +18,14 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.VerifiedByDetails
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepoMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
+import org.joda.time.DateTime
 
 class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
@@ -104,6 +107,65 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckPassedAnswers, SubmissionReview.Status.InProgress)(passedReview.submissionId, passedReview.instanceIndex))
 
       result.value.requiredActions(SubmissionReview.Action.CheckPassedAnswers) shouldBe SubmissionReview.Status.InProgress
+    }
+  }
+
+  "updateDeclineReasons" should {
+    "set decline reasons correctly" in new Setup {
+      val review = SubmissionReview(aSubmission.id, 0, false, true, true, true)
+
+      SubmissionReviewRepoMock.Find.thenReturn(review)
+      SubmissionReviewRepoMock.Update.thenReturn()
+
+      val result = await(underTest.updateDeclineReasons(reasons)(review.submissionId, review.instanceIndex))
+
+      result.value.declineReasons shouldBe reasons
+      SubmissionReviewRepoMock.Update.verifyCalledWith(result.value)
+    }
+  }
+
+  "updateGrantWarnings" should {
+    "set warnings correctly" in new Setup {
+      val warnings = "careful now"
+      val review = SubmissionReview(aSubmission.id, 0, false, true, true, true)
+
+      SubmissionReviewRepoMock.Find.thenReturn(review)
+      SubmissionReviewRepoMock.Update.thenReturn()
+
+      val result = await(underTest.updateGrantWarnings(warnings)(review.submissionId, review.instanceIndex))
+
+      result.value.grantWarnings shouldBe warnings
+      SubmissionReviewRepoMock.Update.verifyCalledWith(result.value)
+    }
+  }
+
+  "updateEscalatedTo" should {
+    "set escalatedTo correctly" in new Setup {
+      val escalatedTo = "mr manager"
+      val review = SubmissionReview(aSubmission.id, 0, false, true, true, true)
+
+      SubmissionReviewRepoMock.Find.thenReturn(review)
+      SubmissionReviewRepoMock.Update.thenReturn()
+
+      val result = await(underTest.updateEscalatedTo(escalatedTo)(review.submissionId, review.instanceIndex))
+
+      result.value.escalatedTo shouldBe Some(escalatedTo)
+      SubmissionReviewRepoMock.Update.verifyCalledWith(result.value)
+    }
+  }
+
+  "updateVerifiedByDetails" should {
+    "set verifiedByDetails correctly" in new Setup {
+      val verifiedBy = VerifiedByDetails(true, Some(DateTime.now()))
+      val review = SubmissionReview(aSubmission.id, 0, false, true, true, true)
+
+      SubmissionReviewRepoMock.Find.thenReturn(review)
+      SubmissionReviewRepoMock.Update.thenReturn()
+
+      val result = await(underTest.updateVerifiedByDetails(verifiedBy)(review.submissionId, review.instanceIndex))
+
+      result.value.verifiedByDetails shouldBe Some(verifiedBy)
+      SubmissionReviewRepoMock.Update.verifyCalledWith(result.value)
     }
   }
 }
