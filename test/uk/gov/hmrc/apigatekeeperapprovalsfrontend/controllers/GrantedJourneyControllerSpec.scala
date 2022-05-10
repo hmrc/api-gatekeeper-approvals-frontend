@@ -39,8 +39,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
         SubmissionReviewServiceMock.aMock,
         provideWarningsForGrantingPage,
         provideEscalatedToForGrantingPage,
-        applicationApprovedPage,
-        ApplicationServiceMock.aMock
+        applicationApprovedPage
       )
   }
 
@@ -75,7 +74,6 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
       SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
-      ApplicationServiceMock.AddTermsOfUseAcceptance.succeeds()
 
       val result = controller.provideWarningsAction(applicationId)(grantWithWarningsRequest)
 

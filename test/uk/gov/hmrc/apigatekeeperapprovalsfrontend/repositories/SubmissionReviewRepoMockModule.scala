@@ -58,8 +58,11 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
     }
 
     object Update {
-      def thenReturn() =
+      def thenReturn() = {
         when(aMock.update(*[SubmissionReview])).thenAnswer((sr: SubmissionReview) => successful(sr))
+      }
+      def verifyCalledWith(review: SubmissionReview) = verify.update(review)
+
     }
   }
 

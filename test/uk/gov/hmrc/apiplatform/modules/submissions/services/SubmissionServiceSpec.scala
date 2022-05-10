@@ -16,20 +16,25 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
+
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.joda.time.DateTime
 
-class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData {
+class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
   
   trait Setup {
     implicit val hc = HeaderCarrier()
     val applicationId = ApplicationId.random
     val mockSubmissionsConnector: SubmissionsConnector = mock[SubmissionsConnector]
+    val requestedBy = "bob@example.com"
+    val verificationDateTime = DateTime.now()
+    val app = anApplication(applicationId)
 
     val underTest = new SubmissionService(mockSubmissionsConnector)
   }
@@ -47,6 +52,33 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
       when(mockSubmissionsConnector.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(Some(markedSubmission)))
       val result = await(underTest.fetchLatestMarkedSubmission(applicationId))
       result shouldBe Some(markedSubmission)
+    }
+  }
+
+  "grant" should {
+    "call submission connector correctly" in new Setup {
+      when(mockSubmissionsConnector.grant(eqTo(applicationId), eqTo(requestedBy), eqTo(Some(verificationDateTime)))(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grant(applicationId, requestedBy, Some(verificationDateTime)))
+      result shouldBe Right(app)
+    }
+  }
+
+  "grantWithWarnings" should {
+    "call submission connector correctly" in new Setup {
+      val warnings = "warn"
+      val manager = "manager"
+      when(mockSubmissionsConnector.grantWithWarnings(eqTo(applicationId), eqTo(requestedBy), eqTo(warnings), eqTo(Some(verificationDateTime)), eqTo(Some(manager)))(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(verificationDateTime), Some(manager)))
+      result shouldBe Right(app)
+    }
+  }
+
+  "decline" should {
+    "call submission connector correctly" in new Setup {
+      val reason = "reason"
+      when(mockSubmissionsConnector.decline(eqTo(applicationId), eqTo(requestedBy), eqTo(reason), eqTo(Some(verificationDateTime)))(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.decline(applicationId, requestedBy, reason, Some(verificationDateTime)))
+      result shouldBe Right(app)
     }
   }
 }
