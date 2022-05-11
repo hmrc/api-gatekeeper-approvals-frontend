@@ -58,11 +58,12 @@ sealed trait State extends EnumEntry {
 object State extends PlayEnum[State] {
   val values = findValues
 
-  final case object TESTING                         extends State
-  final case object PENDING_GATEKEEPER_APPROVAL     extends State
-  final case object PENDING_REQUESTER_VERIFICATION  extends State
-  final case object PRE_PRODUCTION                  extends State
-  final case object PRODUCTION                      extends State
+  final case object TESTING                                      extends State
+  final case object PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION  extends State
+  final case object PENDING_GATEKEEPER_APPROVAL                  extends State
+  final case object PENDING_REQUESTER_VERIFICATION               extends State
+  final case object PRE_PRODUCTION                               extends State
+  final case object PRODUCTION                                   extends State
 }
 
 case class Application(
