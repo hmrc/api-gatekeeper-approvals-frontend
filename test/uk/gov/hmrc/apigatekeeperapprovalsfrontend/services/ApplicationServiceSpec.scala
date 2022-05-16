@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import org.joda.time.DateTime
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.VerifiedByDetails
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, ImportantSubmissionData, PrivacyPolicyLocation, ResponsibleIndividual, Standard, SubmissionReview, TermsAndConditionsLocation, TermsOfUseAcceptance}
@@ -46,8 +45,7 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     val standardAccess = Standard(importantSubmissionData = Some(importantSubmissionData))
     val application = anApplication().copy(access = standardAccess)
 
-    val verifiedByDetails = VerifiedByDetails(true, Some(DateTime.now))
-    val submissionReview = SubmissionReview.updateVerifiedByDetails(verifiedByDetails)(SubmissionReview(Submission.Id.random, 0, true, false, false, false))
+    val submissionReview = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
 
     val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
     val standardAccessWithoutTOUAgreement = Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))

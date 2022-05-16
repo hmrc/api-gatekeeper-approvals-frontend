@@ -18,7 +18,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import play.api.libs.json.Json
-import play.api.libs.json.JodaWrites
 import play.api.libs.json.JodaReads
 import uk.gov.hmrc.play.json.Union
 import play.api.libs.json.KeyReads
@@ -30,7 +29,6 @@ import org.joda.time.DateTimeZone
 
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview._
-  import JodaWrites.JodaDateTimeWrites
 
   implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
 
@@ -47,7 +45,6 @@ trait SubmissionReviewJsonFormatters {
   implicit val actionKeyReads: KeyReads[Action] = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
   implicit val actionKeyWrites: KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
   
-  implicit val verifiedByDetailsFormat = Json.format[VerifiedByDetails]
   implicit val submissionReviewFormat = Json.format[SubmissionReview]    
 }
 

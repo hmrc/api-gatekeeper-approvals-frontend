@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import org.joda.time.DateTime
 
 object SubmissionReview {
   sealed trait Status
@@ -32,8 +31,6 @@ object SubmissionReview {
 
   object Action {
     case object CheckFailsAndWarnings extends Action
-    case object EmailResponsibleIndividual extends Action
-    case object ConfirmResponsibleIndividualVerified extends Action
     case object CheckApplicationName extends Action
     case object CheckCompanyRegistration extends Action
     case object CheckUrls extends Action
@@ -46,8 +43,6 @@ object SubmissionReview {
       import cats.implicits._
       text match {
         case "CheckFailsAndWarnings"                => CheckFailsAndWarnings.some
-        case "EmailResponsibleIndividual"           => EmailResponsibleIndividual.some
-        case "ConfirmResponsibleIndividualVerified" => ConfirmResponsibleIndividualVerified.some
         case "CheckApplicationName"                 => CheckApplicationName.some
         case "CheckCompanyRegistration"             => CheckCompanyRegistration.some
         case "CheckUrls"                            => CheckUrls.some
@@ -61,8 +56,6 @@ object SubmissionReview {
 
     def toText(action: Action) = action match {
         case CheckFailsAndWarnings                => "CheckFailsAndWarnings"
-        case EmailResponsibleIndividual           => "EmailResponsibleIndividual"
-        case ConfirmResponsibleIndividualVerified => "ConfirmResponsibleIndividualVerified"
         case CheckApplicationName                 => "CheckApplicationName"
         case CheckCompanyRegistration             => "CheckCompanyRegistration"
         case CheckUrls                            => "CheckUrls"
@@ -78,7 +71,7 @@ object SubmissionReview {
     instanceIndex: Int,
     requiredActions: List[Action]
   ): SubmissionReview =
-    SubmissionReview(submissionId, instanceIndex, "", "", None, None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+    SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] = 
@@ -92,8 +85,6 @@ object SubmissionReview {
 
     val fixedActions: List[Action] =
       List(
-        Action.EmailResponsibleIndividual, 
-        Action.ConfirmResponsibleIndividualVerified,
         Action.CheckApplicationName,
         Action.CheckCompanyRegistration,
         Action.CheckUrls,
@@ -121,15 +112,6 @@ object SubmissionReview {
     review.copy(requiredActions = review.requiredActions + (action -> newStatus))
   }
 
-  case class VerifiedByDetails(
-    verified: Boolean,
-    timestamp: Option[DateTime] = None
-  )
-
-  val updateVerifiedByDetails: SubmissionReview.VerifiedByDetails => SubmissionReview => SubmissionReview = verified => review => {
-    review.copy(verifiedByDetails = Some(verified))
-  }
-
   val updateEscalatedTo: String => SubmissionReview => SubmissionReview = escalated => review => {
     review.copy(escalatedTo = Some(escalated))
   }
@@ -140,7 +122,6 @@ case class SubmissionReview private(
   instanceIndex: Int,
   declineReasons: String,
   grantWarnings: String,
-  verifiedByDetails: Option[SubmissionReview.VerifiedByDetails],
   escalatedTo: Option[String],
   requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
 ) {

@@ -27,18 +27,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.play.http.metrics.common.API
 import uk.gov.hmrc.http.UpstreamErrorResponse
-import play.api.libs.json.{Json, JodaWrites}
-import org.joda.time.DateTime
+import play.api.libs.json.Json
 
 object SubmissionsConnector {
-  import JodaWrites.JodaDateTimeWrites
 
   case class Config(serviceBaseUrl: String, apiKey: String)
 
-  case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, responsibleIndividualVerificationDate: Option[DateTime] = None, escalatedTo: Option[String] = None)
+  case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, escalatedTo: Option[String] = None)
   implicit val writesApprovedRequest = Json.writes[GrantedRequest]
 
-  case class DeclinedRequest(gatekeeperUserName: String, reasons: String, responsibleIndividualVerificationDate: Option[DateTime])
+  case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
   implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
 }
 
@@ -76,32 +74,32 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def grant(applicationId: ApplicationId, requestedBy: String, responsibleIndividualVerificationDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, None, responsibleIndividualVerificationDate))
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, None))
       .map(_.leftMap(failed(_)))
     }
   }
 
-  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, responsibleIndividualVerificationDate: Option[DateTime], escalatedTo: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, escalatedTo: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, warnings.some, responsibleIndividualVerificationDate, escalatedTo))
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, warnings.some, escalatedTo))
       .map(_.leftMap(failed(_)))
     }
   }
 
-  def decline(applicationId: ApplicationId, requestedBy: String, reason: String, responsibleIndividualVerificationDate: Option[DateTime])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def decline(applicationId: ApplicationId, requestedBy: String, reason: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[DeclinedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/decline", DeclinedRequest(requestedBy, reason, responsibleIndividualVerificationDate))
+      http.POST[DeclinedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/decline", DeclinedRequest(requestedBy, reason))
       .map(_.leftMap(failed(_)))
     }
   }

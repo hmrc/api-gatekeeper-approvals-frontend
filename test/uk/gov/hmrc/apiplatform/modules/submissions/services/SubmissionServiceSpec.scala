@@ -24,7 +24,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.joda.time.DateTime
 
 class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
   
@@ -33,7 +32,6 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
     val applicationId = ApplicationId.random
     val mockSubmissionsConnector: SubmissionsConnector = mock[SubmissionsConnector]
     val requestedBy = "bob@example.com"
-    val verificationDateTime = DateTime.now()
     val app = anApplication(applicationId)
 
     val underTest = new SubmissionService(mockSubmissionsConnector)
@@ -57,8 +55,8 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "grant" should {
     "call submission connector correctly" in new Setup {
-      when(mockSubmissionsConnector.grant(eqTo(applicationId), eqTo(requestedBy), eqTo(Some(verificationDateTime)))(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.grant(applicationId, requestedBy, Some(verificationDateTime)))
+      when(mockSubmissionsConnector.grant(eqTo(applicationId), eqTo(requestedBy))(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grant(applicationId, requestedBy))
       result shouldBe Right(app)
     }
   }
@@ -67,8 +65,8 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
     "call submission connector correctly" in new Setup {
       val warnings = "warn"
       val manager = "manager"
-      when(mockSubmissionsConnector.grantWithWarnings(eqTo(applicationId), eqTo(requestedBy), eqTo(warnings), eqTo(Some(verificationDateTime)), eqTo(Some(manager)))(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(verificationDateTime), Some(manager)))
+      when(mockSubmissionsConnector.grantWithWarnings(eqTo(applicationId), eqTo(requestedBy), eqTo(warnings), eqTo(Some(manager)))(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(manager)))
       result shouldBe Right(app)
     }
   }
@@ -76,8 +74,8 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
   "decline" should {
     "call submission connector correctly" in new Setup {
       val reason = "reason"
-      when(mockSubmissionsConnector.decline(eqTo(applicationId), eqTo(requestedBy), eqTo(reason), eqTo(Some(verificationDateTime)))(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.decline(applicationId, requestedBy, reason, Some(verificationDateTime)))
+      when(mockSubmissionsConnector.decline(eqTo(applicationId), eqTo(requestedBy), eqTo(reason))(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.decline(applicationId, requestedBy, reason))
       result shouldBe Right(app)
     }
   }
