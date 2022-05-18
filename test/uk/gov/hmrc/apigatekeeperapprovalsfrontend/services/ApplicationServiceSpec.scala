@@ -33,7 +33,7 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     val service = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
 
     val responsibleIndividual = ResponsibleIndividual("bob", "bob@example.com")
-    val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, DateTime.now, Submission.Id.random))
+    val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, DateTime.now, Submission.Id.random, 0))
     val importantSubmissionData = ImportantSubmissionData(
       Some("http://example.com"),
       responsibleIndividual,
