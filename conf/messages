@@ -175,6 +175,7 @@ applicationsubmissions.alttitle = Production application
 applicationsubmissions.checkrequest = Check the request
 applicationsubmissions.requestedby = Requested by
 applicationsubmissions.requesteddate = Requested date
+applicationsubmissions.responsibleindividualemail = Responsible individual email
 applicationsubmissions.productionaccessgranted = Production access granted
 applicationsubmissions.previouslydeclined = Previously declined
 applicationsubmissions.check = Check

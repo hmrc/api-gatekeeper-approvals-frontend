@@ -49,7 +49,8 @@ object ApplicationSubmissionsController {
     applicationDetailsUrl: String,
     currentSubmission: Option[CurrentSubmittedInstanceDetails],
     declinedInstances: List[DeclinedInstanceDetails],
-    grantedInstance: Option[GrantedInstanceDetails]
+    grantedInstance: Option[GrantedInstanceDetails],
+    responsibleIndividualEmail: Option[String]
   )
 }
 
@@ -109,6 +110,9 @@ class ApplicationSubmissionsController @Inject()(
       else
         None
 
-    successful(Ok(applicationSubmissionsPage(ViewModel(applicationId, appName, gatekeeperApplicationUrl, currentSubmission, declinedSubmissions, grantedInstance))))
+    val responsibleIndividualEmail =
+      request.application.importantSubmissionData.map(i => i.responsibleIndividual.emailAddress)
+
+    successful(Ok(applicationSubmissionsPage(ViewModel(applicationId, appName, gatekeeperApplicationUrl, currentSubmission, declinedSubmissions, grantedInstance, responsibleIndividualEmail))))
   }
 }
