@@ -70,7 +70,7 @@ class ConfirmYourDecisionController @Inject()(
     (
       for {
         review      <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
-        application <- EitherT(submissionService.grant(applicationId, request.name.get, review.verifiedByDetails.flatMap(_.timestamp))).leftMap(InternalServerError(_))
+        application <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(InternalServerError(_))
       } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
     ).fold(identity(_), identity(_))
   }

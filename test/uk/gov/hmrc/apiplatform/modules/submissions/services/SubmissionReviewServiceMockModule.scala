@@ -81,12 +81,6 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
         when(aMock.updateEscalatedTo(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
       }
     }
-
-    object UpdateVerifiedByDetails {
-      def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateVerifiedByDetails(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
-      }
-    }
   }
 
   object SubmissionReviewServiceMock extends BaseSubmissionReviewServiceMock {

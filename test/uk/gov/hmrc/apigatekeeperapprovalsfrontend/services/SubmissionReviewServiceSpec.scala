@@ -18,14 +18,12 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.VerifiedByDetails
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepoMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
-import org.joda.time.DateTime
 
 class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
 
@@ -72,13 +70,13 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       result.value.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings) shouldBe SubmissionReview.Status.InProgress
     }
 
-    "set correct status in SubmissionReview for emailedResponsibleIndividual" in new Setup {
+    "set correct status in SubmissionReview for arrangedDemo" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
       SubmissionReviewRepoMock.Update.thenReturn()
       
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.EmailResponsibleIndividual, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
+      val result = await(underTest.updateActionStatus(SubmissionReview.Action.ArrangedDemo, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
       
-      result.value.requiredActions(SubmissionReview.Action.EmailResponsibleIndividual) shouldBe SubmissionReview.Status.InProgress
+      result.value.requiredActions(SubmissionReview.Action.ArrangedDemo) shouldBe SubmissionReview.Status.InProgress
     }
     
     "set correct status in SubmissionReview for checkedUrls" in new Setup {
@@ -150,21 +148,6 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       val result = await(underTest.updateEscalatedTo(escalatedTo)(review.submissionId, review.instanceIndex))
 
       result.value.escalatedTo shouldBe Some(escalatedTo)
-      SubmissionReviewRepoMock.Update.verifyCalledWith(result.value)
-    }
-  }
-
-  "updateVerifiedByDetails" should {
-    "set verifiedByDetails correctly" in new Setup {
-      val verifiedBy = VerifiedByDetails(true, Some(DateTime.now()))
-      val review = SubmissionReview(aSubmission.id, 0, false, true, true, true)
-
-      SubmissionReviewRepoMock.Find.thenReturn(review)
-      SubmissionReviewRepoMock.Update.thenReturn()
-
-      val result = await(underTest.updateVerifiedByDetails(verifiedBy)(review.submissionId, review.instanceIndex))
-
-      result.value.verifiedByDetails shouldBe Some(verifiedBy)
       SubmissionReviewRepoMock.Update.verifyCalledWith(result.value)
     }
   }

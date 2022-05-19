@@ -82,36 +82,36 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object Grant {
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.grant(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+        when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grant(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+        when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
     }
 
     object GrantWithWarnings {
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
     }
 
     object Decline {
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.decline(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.decline(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.decline(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.decline(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
       }
     }
   }

@@ -87,15 +87,4 @@ class SubmissionReviewService @Inject()(
     )
     .value
   }
-
-  def updateVerifiedByDetails(verifiedByDetails: SubmissionReview.VerifiedByDetails)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
-    (
-      for {
-        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
-        changedReview      = SubmissionReview.updateVerifiedByDetails(verifiedByDetails)(originalReview)
-        _                 <- OptionT.liftF(repo.update(changedReview))
-      } yield changedReview
-    )
-    .value
-  }
 }
