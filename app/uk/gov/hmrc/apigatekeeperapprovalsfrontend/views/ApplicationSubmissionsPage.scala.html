@@ -77,7 +77,7 @@
         @if(model.responsibleIndividualEmail.nonEmpty) {
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.responsibleindividualemail")}</dt>
-            <dd id="requestedTimestamp" class="govuk-summary-list__value"><p class="govuk-body">@{model.responsibleIndividualEmail}</p></dd>
+            <dd id="responsibleIndividualEmail" class="govuk-summary-list__value"><p class="govuk-body">@{model.responsibleIndividualEmail.get}</p></dd>
           </div>
         }
       </dl>
