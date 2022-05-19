@@ -66,14 +66,20 @@
 
     @if(model.currentSubmission.nonEmpty) {
       <dl class="govuk-summary-list govuk-!-margin-bottom-0">
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requestedby")}</dt>
-        <dd id="requesterEmail" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.requesterEmail}</p></dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requesteddate")}</dt>
-        <dd id="requestedTimestamp" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.timestamp}</p></dd>
-      </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requestedby")}</dt>
+          <dd id="requesterEmail" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.requesterEmail}</p></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requesteddate")}</dt>
+          <dd id="requestedTimestamp" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.timestamp}</p></dd>
+        </div>
+        @if(model.responsibleIndividualEmail.nonEmpty) {
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.responsibleindividualemail")}</dt>
+            <dd id="requestedTimestamp" class="govuk-summary-list__value"><p class="govuk-body">@{model.responsibleIndividualEmail}</p></dd>
+          </div>
+        }
       </dl>
     }
     @if(model.declinedInstances.nonEmpty) {

@@ -88,7 +88,12 @@ case class Application(
   // blocked: Boolean = false,
   // trusted: Boolean = false,
   // ipAllowlist: IpAllowlist = IpAllowlist()
-)
+) {
+  lazy val importantSubmissionData: Option[ImportantSubmissionData] = access match {
+    case Standard(_, Some(submissionData)) => Some(submissionData)
+    case _                                 => None
+  }
+}
 
 object Application {
   import play.api.libs.json.Json
