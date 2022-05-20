@@ -173,12 +173,14 @@ applicationsubmissions.pagetitle = HMRC API Gatekeeper - Request for production 
 applicationsubmissions.title = Request for production access
 applicationsubmissions.alttitle = Production application
 applicationsubmissions.checkrequest = Check the request
+applicationsubmissions.declinerequest = Decline request
 applicationsubmissions.requestedby = Requested by
 applicationsubmissions.requesteddate = Requested date
 applicationsubmissions.responsibleindividualemail = Responsible individual email
 applicationsubmissions.productionaccessgranted = Production access granted
 applicationsubmissions.previouslydeclined = Previously declined
 applicationsubmissions.check = Check
+applicationsubmissions.pendingresponsibleindividualverification = The responsible individual has not verified yet, so you can only decline this request.
 
 applicationsubmissions.requestcreds = Request for credentials
 applicationsubmissions.declinedrequests = Declined requests for credentials
