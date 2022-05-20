@@ -33,6 +33,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.TermsAndConditio
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.PrivacyPolicyLocation
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
 
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
@@ -64,13 +66,16 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
     val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
-    val appWithImportantData = anApplication(applicationId).copy(access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))))
+    val appWithImportantData = anApplication(applicationId).copy(
+          access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))),
+          state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
+        )
   }
 
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION)))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -81,11 +86,12 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe None
       viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
+      viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe true
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
       AuthConnectorMock.Authorise.thenReturn()
-      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Declined(declinedTimestamp, requesterEmail, "reasons")
       ))
@@ -96,7 +102,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       verify(page).apply(viewModelCaptor)(*, *)
       viewModelCaptor.value.currentSubmission shouldBe None
       viewModelCaptor.value.grantedInstance shouldBe None
-        viewModelCaptor.value.declinedInstances shouldBe List(
+      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
+      viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
+      viewModelCaptor.value.declinedInstances shouldBe List(
         DeclinedInstanceDetails(declinedTimestamp.toString("dd MMMM yyyy"), 0)
       )
     }

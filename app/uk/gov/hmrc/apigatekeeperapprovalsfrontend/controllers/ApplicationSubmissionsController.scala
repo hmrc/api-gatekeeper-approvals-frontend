@@ -25,6 +25,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, Gatekeep
 
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
@@ -50,7 +51,8 @@ object ApplicationSubmissionsController {
     currentSubmission: Option[CurrentSubmittedInstanceDetails],
     declinedInstances: List[DeclinedInstanceDetails],
     grantedInstance: Option[GrantedInstanceDetails],
-    responsibleIndividualEmail: Option[String]
+    responsibleIndividualEmail: Option[String],
+    pendingResponsibleIndividualVerification: Boolean
   )
 }
 
@@ -113,6 +115,17 @@ class ApplicationSubmissionsController @Inject()(
     val responsibleIndividualEmail =
       request.application.importantSubmissionData.map(i => i.responsibleIndividual.emailAddress)
 
-    successful(Ok(applicationSubmissionsPage(ViewModel(applicationId, appName, gatekeeperApplicationUrl, currentSubmission, declinedSubmissions, grantedInstance, responsibleIndividualEmail))))
+    val pendingResponsibleIndividualVerification = 
+      request.application.state.name == State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION
+
+    successful(Ok(applicationSubmissionsPage(
+        ViewModel(applicationId, 
+                  appName, 
+                  gatekeeperApplicationUrl, 
+                  currentSubmission, 
+                  declinedSubmissions, 
+                  grantedInstance, 
+                  responsibleIndividualEmail, 
+                  pendingResponsibleIndividualVerification))))
   }
 }
