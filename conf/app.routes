@@ -6,6 +6,7 @@ GET        /applications/:id                                         uk.gov.hmrc
 GET        /applications/:id/reviews                                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.page(id: ApplicationId)
  
 GET        /applications/:id/checklist                               uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.checklistPage(id: ApplicationId)
+GET        /applications/:id/checklist/decline                       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.declineRequest(id: ApplicationId)
 POST       /applications/:id/checklist                               uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.checklistAction(id: ApplicationId)
  
 GET        /applications/:id/checklist/answers-that-failed           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatFailedController.page(id: ApplicationId)
@@ -17,8 +18,8 @@ POST       /applications/:id/checklist/answers-that-passed           uk.gov.hmrc
 GET        /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsPage(id: ApplicationId)
 POST       /applications/:id/checklist/check-urls                    uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController.checkUrlsAction(id: ApplicationId)
 
-GET        /applications/:id/checklist/check-fraud                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController.checkFraudPage(id: ApplicationId)
-POST       /applications/:id/checklist/check-fraud                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController.checkFraudAction(id: ApplicationId)
+GET        /applications/:id/checklist/check-fraud                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController.checkFraudPage(id: ApplicationId)
+POST       /applications/:id/checklist/check-fraud                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckFraudController.checkFraudAction(id: ApplicationId)
 
 GET        /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.page(id: ApplicationId)
 POST       /applications/:id/checklist/check-company                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckCompanyRegistrationController.action(id: ApplicationId)
