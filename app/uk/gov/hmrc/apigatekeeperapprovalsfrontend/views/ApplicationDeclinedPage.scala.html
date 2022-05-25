@@ -25,24 +25,20 @@
 
 @layout(pageTitle = Some(messages("applicationdeclined.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
-
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-three-quarters">
-        <div class="govuk-panel govuk-panel--confirmation">
-          <h1 class="govuk-panel__title">
-            @{messages("applicationdeclined.pagetitle")}
-          </h1>
-          <div class="govuk-panel__body">
-            @model.appName
-          </div>
-        </div>
-        <br>
-
-        <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="@{config.applicationsPageUri}">@{messages("applicationdeclined.checkanotherrequest")}.</a>
-        </p>
+  <div class="govuk-grid-row">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        @{messages("applicationdeclined.title")}
+      </h1>
+      <div class="govuk-panel__body">
+        @model.appName
       </div>
     </div>
-</div>
+    <br>
+
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="@{config.applicationsPageUri}">@{messages("applicationdeclined.checkanotherrequest")}.</a>
+    </p>
+
+  </div>
 }
