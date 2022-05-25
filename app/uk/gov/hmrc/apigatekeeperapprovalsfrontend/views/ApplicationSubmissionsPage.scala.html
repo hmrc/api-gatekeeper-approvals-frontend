@@ -60,7 +60,7 @@
       @if(model.pendingResponsibleIndividualVerification) {
         <p class="govuk-body">@{messages("applicationsubmissions.pendingresponsibleindividualverification")}</p>
         <p class="govuk-body">
-          <a id="declineRequest" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(model.applicationId)}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">
+          <a id="declineRequest" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.declineRequest(model.applicationId)}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">
           @{messages("applicationsubmissions.declinerequest")}
           </a>
         </p>
