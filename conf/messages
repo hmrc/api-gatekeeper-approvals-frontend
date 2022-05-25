@@ -136,11 +136,13 @@ checkfraud.approvalsboard = You need to check the {0} application approvals boar
 checkfraud.checked = Fraud prevention data checked
 checkfraud.checklater = Check again later
 
-applicationapproved.pagetitle = HMRC API Gatekeeper - Application Granted
-applicationapproved.title = Application Granted
-applicationapproved.text = The Application has been granted and is now in a state of Pending Requester Verification
+applicationapproved.pagetitle = HMRC API Gatekeeper - Production access granted
 applicationapproved.productionaccessgranted = Production access granted
 applicationapproved.checkanother = Check another production credentials request.
+
+applicationdeclined.pagetitle = HMRC API Gatekeeper - Request declined
+applicationdeclined.title = You have declined this request
+applicationdeclined.checkanotherrequest = Check another production credentials request
 
 applicationgrantedwithwarnings.pagetitle = HMRC API Gatekeeper - Application Granted With Warnings
 applicationgrantedwithwarnings.title = Add warnings to Gatekeeper before you grant production access
@@ -162,12 +164,6 @@ providedeclinereasons.note.1 = The reasons are saved on Gatekeeper.
 providedeclinereasons.confluence.url = Use guidance on Confluence to help
 providedeclinereasons.note.2 = Include all the issues you have identified working through the checklist.
 providedeclinereasons.button.continue = Save and continue
-
-applicationdeclined.pagetitle = HMRC API Gatekeeper - Application Declined
-applicationdeclined.title = Application Declined
-applicationdeclined.text = The Application has been declined and has been put back in a state of Testing
-applicationdeclined.youhavedeclinedthisrequest = You have declined this request
-applicationdeclined.checkanotherrequest = Check another production credentials request
 
 applicationsubmissions.pagetitle = HMRC API Gatekeeper - Request for production credentials
 applicationsubmissions.title = Request for production access
