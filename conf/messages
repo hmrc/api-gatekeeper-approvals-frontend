@@ -63,9 +63,9 @@ answersthatfailed.failsandwarns.completed = Fails and warnings checked
 
 answersthatfailed.save = I will do this later
 
-answersthatfailed.failsonly.helptext = Advise the developer about these fails when you email the decision
-answersthatfailed.warnsonly.helptext = Advise the developer about these warnings when you email the decision
-answersthatfailed.failsandwarns.helptext = Advise the developer about these fails and warnings when you email the decision
+answersthatfailed.failsonly.helptext = Advise the developer about these fails when you email the decision.
+answersthatfailed.warnsonly.helptext = Advise the developer about these warnings when you email the decision.
+answersthatfailed.failsandwarns.helptext = Advise the developer about these fails and warnings when you email the decision.
 
 answersthatfailed.status.failed = Fail
 answersthatfailed.status.warning = Warning
