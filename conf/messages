@@ -61,20 +61,18 @@ answersthatfailed.failsonly.completed = Fails checked
 answersthatfailed.warnsonly.completed = Warnings checked
 answersthatfailed.failsandwarns.completed = Fails and warnings checked
 
-answersthatfailed.failsonly.save = Check fails later
-answersthatfailed.warnsonly.save = Check warnings later
-answersthatfailed.failsandwarns.save = Check fails and warnings later
+answersthatfailed.save = I will do this later
 
-answersthatfailed.failsonly.helptext = Advise the developer about these fails when you email the decision
-answersthatfailed.warnsonly.helptext = Advise the developer about these warnings when you email the decision
-answersthatfailed.failsandwarns.helptext = Advise the developer about these fails and warnings when you email the decision
+answersthatfailed.failsonly.helptext = Advise the developer about these fails when you email the decision.
+answersthatfailed.warnsonly.helptext = Advise the developer about these warnings when you email the decision.
+answersthatfailed.failsandwarns.helptext = Advise the developer about these fails and warnings when you email the decision.
 
 answersthatfailed.status.failed = Fail
 answersthatfailed.status.warning = Warning
 
 answersthatpassed.title = Check other answers
 answersthatpassed.pagetitle = HMRC API Gatekeeper - Check other answers
-answersthatpassed.save = Check answers later
+answersthatpassed.save = I will do this later
 answersthatpassed.completed = Answers checked
 
 checkurls.title = Check that all URLs work
@@ -83,7 +81,7 @@ checkurls.organisationurl = Organisation
 checkurls.privacypolicy = Privacy policy
 checkurls.termsandconditions = Terms and conditions
 checkurls.urlschecked = URLs checked
-checkurls.checkurlslater = Check URLs later
+checkurls.checkurlslater = I will do this later
 checkurls.indesktop = In desktop software
 checkurls.nourl = None
 checkurls.contactrequester = Contact the requester and ask for evidence of the
@@ -94,7 +92,7 @@ checkurls.contactrequester.both = privacy policy and terms and conditions.
 checkcompanyregistration.title = Check company registration
 checkcompanyregistration.pagetitle = HMRC API Gatekeeper - Check company registration
 checkcompanyregistration.checked = Company registration checked
-checkcompanyregistration.checklater = Check company registration later
+checkcompanyregistration.checklater = I will do this later
 checkcompanyregistration.continue = Continue
 checkcompanyregistration.inukwithregnum.text1 = Company registration number
 checkcompanyregistration.inuknoregnum.text1 = UK organisation with no evidence of official registration
@@ -102,13 +100,11 @@ checkcompanyregistration.inuknoregnum.text2 = Organisations in the UK must provi
 checkcompanyregistration.inuknoregnum.text3 = Not having evidence of official registration in the UK is a fail.
 checkcompanyregistration.outsideuk.text1 = Organisation is outside the UK
 checkcompanyregistration.outsideuk.text2 = Email the requester and ask for evidence of official registration in their country.
-checkcompanyregistration.evidencechecked = Evidence checked
-checkcompanyregistration.comebacktothis = I will come back to this
 
 checkapplicationame.title = Check application name
 checkapplicationame.pagetitle = HMRC API Gatekeeper - Check application name
 checkapplicationame.checked = Application name checked
-checkapplicationame.checklater = Check again later
+checkapplicationame.checklater = I will do this later
 
 arrangedemo.title = Arrange a demo
 arrangedemo.pagetitle = HMRC API Gatekeeper - Arrange a demo
@@ -116,7 +112,7 @@ arrangedemo.text = Contact the person requesting credentials and arrange a demo.
 arrangedemo.linktext = Use the demo checklist to help.
 arrangedemo.email = Email address
 arrangedemo.checked = Demo complete
-arrangedemo.checklater = Complete later
+arrangedemo.checklater = I will do this later
 
 checksandbox.title = Check for evidence of testing in sandbox
 checksandbox.pagetitle = HMRC API Gatekeeper - Check Sandbox
@@ -127,14 +123,14 @@ checksandbox.label.appid = Sandbox application ID
 checksandbox.label.clientid = Sandbox client ID
 checksandbox.label.apisubs = API subscriptions
 checksandbox.sandboxchecked = Sandbox testing checked
-checksandbox.checksandboxlater = Check again later
+checksandbox.checksandboxlater = I will do this later
 
 checkfraud.title = Check fraud prevention data
 checkfraud.pagetitle = HMRC API Gatekeeper - Check fraud prevention data
 checkfraud.description = The Customer Insights Platform (CIP) Metadata Quality team check that fraud prevention data is submitted correctly.
 checkfraud.approvalsboard = You need to check the {0} application approvals board {1}
 checkfraud.checked = Fraud prevention data checked
-checkfraud.checklater = Check again later
+checkfraud.checklater = I will do this later
 
 applicationapproved.pagetitle = HMRC API Gatekeeper - Production access granted
 applicationapproved.productionaccessgranted = Production access granted
@@ -193,44 +189,6 @@ viewdeclinedsubmissions.declineddate = Declined date
 viewdeclinedsubmissions.declinedreason = Reasons the request was declined
 viewdeclinedsubmissions.submittedanswers = All submitted answers
 viewdeclinedsubmissions.checkanswers = Check answers
-
-emailresponsibleindividual.pagetitle = HMRC API Gatekeeper - Email the responsible individual
-emailresponsibleindividual.title = Email the responsible individual
-emailresponsibleindividual.label.name = Name
-emailresponsibleindividual.label.emailaddress = Email address
-emailresponsibleindividual.text.whattodoheading = What you need to do now
-emailresponsibleindividual.text.whattodo1 = Copy the content in the grey box.
-emailresponsibleindividual.text.whattodo2 = Open a new email in Outlook.
-emailresponsibleindividual.text.whattodo3 = Email the responsible individual.
-emailresponsibleindividual.text.whattodofooter = You can complete other tasks on the checklist while waiting for a reply.
-emailresponsibleindividual.text.dear = Dear {0}
-emailresponsibleindividual.text.youhavebeenmaderesponsiblefor = You have been made responsible for {0} on the HMRC Developer Hub.
-emailresponsibleindividual.text.youhave10daystoreply = You have 10 days to reply to this email to verify that you are responsible for {0}.
-emailresponsibleindividual.text.youwillneedtorerequest = You will need to request production access again if you do not reply in 10 days.
-emailresponsibleindividual.text.responsibleperson = As the person responsible for {0} you must make sure that your software conforms to our
-emailresponsibleindividual.text.termsofuse = terms of use
-emailresponsibleindividual.text.contacttheperson = Contact the person who requested credentials for {0} if you think there has been a mistake or you do not want to verify.
-emailresponsibleindividual.sent = Email sent
-emailresponsibleindividual.sendlater = I will do this later
-
-confirmresponsibleindividualverified1.pagetitle = HMRC API Gatekeeper - Responsible individual verified?
-confirmresponsibleindividualverified1.title = Has the responsible individual verified?
-confirmresponsibleindividualverified1.label.problem = There is a problem
-confirmresponsibleindividualverified1.label.hint = The responsible individual must reply in 10 days and verify that they are responsible for their application.
-confirmresponsibleindividualverified1.label.yes = Yes
-confirmresponsibleindividualverified1.label.no = No
-confirmresponsibleindividualverified1.save = Save and continue
-confirmresponsibleindividualverified1.later = I will do this later
-
-confirmresponsibleindividualverified2.pagetitle = HMRC API Gatekeeper - Verification date
-confirmresponsibleindividualverified2.title = When did the responsible individual verify?
-confirmresponsibleindividualverified2.label.problem = There is a problem
-confirmresponsibleindividualverified2.label.hint = For example, 27 3 2022.
-confirmresponsibleindividualverified2.label.day = Day
-confirmresponsibleindividualverified2.label.month = Month
-confirmresponsibleindividualverified2.label.year = Year
-confirmresponsibleindividualverified2.save = Save and continue
-confirmresponsibleindividualverified2.later = I will do this later
 
 submittedanswers.pagetitle = HMRC API Gatekeeper - Submitted answers
 submittedanswers.title = Submitted answers
