@@ -33,7 +33,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.CollaboratorRole
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Collaborator
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresFraudCheck, SubmissionRequiresDemo}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresDemo, SubmissionRequiresFraudCheck}
+import uk.gov.hmrc.play.bootstrap.controller.WithDefaultFormBinding
 
 object DeclinedJourneyController {
   case class ViewModel(applicationId: ApplicationId, appName: String, adminsToEmail: Set[Collaborator] = Set.empty)
@@ -61,7 +62,7 @@ class DeclinedJourneyController @Inject()(
   adminsToEmailPage: AdminsToEmailPage,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext)
-  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) with WithDefaultFormBinding {
 
   import DeclinedJourneyController._
 

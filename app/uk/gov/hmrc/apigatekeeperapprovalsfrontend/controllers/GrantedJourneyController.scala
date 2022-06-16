@@ -30,7 +30,8 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedToForGrantingPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideEscalatedToForGrantingPage, ProvideWarningsForGrantingPage}
+import uk.gov.hmrc.play.bootstrap.controller.WithDefaultFormBinding
 
 object GrantedJourneyController {
   case class ViewModel(appName: String, applicationId: ApplicationId)
@@ -67,7 +68,7 @@ class GrantedJourneyController @Inject()(
   provideEscalatedToForGrantingPage: ProvideEscalatedToForGrantingPage,
   applicationApprovedPage: ApplicationApprovedPage
 )(implicit override val ec: ExecutionContext)
-  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) with WithDefaultFormBinding {
   import GrantedJourneyController._
 
   def provideWarningsPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
