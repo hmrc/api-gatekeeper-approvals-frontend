@@ -25,9 +25,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
-import uk.gov.hmrc.apiplatform.modules.stride.domain.models.GatekeeperRole
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import scala.concurrent.Future.successful
@@ -87,7 +86,7 @@ trait ApplicationActionBuilders {
 trait ApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-  private def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  private def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
@@ -96,7 +95,7 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
-  private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  private def strideRoleWithApplicationAndSubmission(minimumGatekeeperRole: GatekeeperRole)(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
@@ -106,7 +105,7 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
-  private def strideRoleWithApplicationAndSubmissionAndInstance(minimumGatekeeperRole: GatekeeperRole.GatekeeperRole)(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  private def strideRoleWithApplicationAndSubmissionAndInstance(minimumGatekeeperRole: GatekeeperRole)(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
@@ -118,12 +117,12 @@ trait ApplicationActions extends ApplicationActionBuilders {
     }
 
   def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplication(GatekeeperRole.USER)(applicationId)(block)
+    strideRoleWithApplication(GatekeeperRoles.USER)(applicationId)(block)
 
   def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplicationAndSubmission(GatekeeperRole.USER)(applicationId)(block)
+    strideRoleWithApplicationAndSubmission(GatekeeperRoles.USER)(applicationId)(block)
 
   def loggedInWithApplicationAndSubmissionAndInstance(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    strideRoleWithApplicationAndSubmissionAndInstance(GatekeeperRole.USER)(applicationId, index)(block)
+    strideRoleWithApplicationAndSubmissionAndInstance(GatekeeperRoles.USER)(applicationId, index)(block)
 
 }

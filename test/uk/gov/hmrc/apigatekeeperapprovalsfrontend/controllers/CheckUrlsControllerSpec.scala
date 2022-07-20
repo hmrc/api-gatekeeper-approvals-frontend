@@ -26,16 +26,17 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.TermsAndConditio
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.PrivacyPolicyLocation
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class CheckUrlsControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup
+      with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckUrlsPage]
     
     val controller = new CheckUrlsController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       SubmissionReviewServiceMock.aMock,
       errorHandler,
@@ -55,7 +56,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
   "checkUrlsPage" should {
     
     "return 200 for both privacy policy and t&c in desktop" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithData())
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -66,7 +67,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     
     "return 200 for both privacy policy and t&c with URLs" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl"), TermsAndConditionsLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -76,7 +77,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 for only privacy policy in desktop" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -86,7 +87,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
     
     "return 200 for only terms and conditions in desktop" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -96,7 +97,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 for both being NoneProvided" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.NoneProvided,  TermsAndConditionsLocation.NoneProvided))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -106,7 +107,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -118,7 +119,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
   "checkUrlsAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -129,7 +130,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -140,7 +141,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

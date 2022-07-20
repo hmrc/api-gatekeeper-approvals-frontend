@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.domain.models
+package uk.gov.hmrc.apiplatform.modules.gkauth.domain.models
 
-object GatekeeperRole extends Enumeration {
-  type GatekeeperRole = Value
-  val USER, SUPERUSER, ADMIN = Value
-}
+import play.api.mvc.MessagesRequest
+
+class LoggedInRequest[A](val name: Option[String], val role: GatekeeperRole, request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)

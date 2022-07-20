@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.controllers.models
+package uk.gov.hmrc.apiplatform.modules.gkauth.domain.models
 
-import play.api.mvc.MessagesRequest
-import uk.gov.hmrc.auth.core.Enrolments
+case class LoggedInUser(userFullName: Option[String])
 
-class LoggedInRequest[A](val name: Option[String], val authorisedEnrolments: Enrolments, val msgRequest: MessagesRequest[A]) extends MessagesRequest[A](msgRequest, msgRequest.messagesApi)
+object LoggedInUser {
+  implicit def fromRequest(implicit request: LoggedInRequest[_]): LoggedInUser = LoggedInUser(request.name)
+}

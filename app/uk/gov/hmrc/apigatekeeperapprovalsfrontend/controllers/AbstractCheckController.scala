@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
@@ -31,13 +29,12 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewServi
 
 
 abstract class AbstractCheckController(
-  strideAuthConfig: StrideAuthConfig,
-  authConnector: AuthConnector,
-  forbiddenHandler: ForbiddenHandler,
+  strideAuthorisationService: StrideAuthorisationService,
+
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   type Fn = (SubmissionReview.Status) => (Submission.Id, Int) => Future[Option[SubmissionReview]]
 

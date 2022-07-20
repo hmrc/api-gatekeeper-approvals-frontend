@@ -21,16 +21,17 @@ import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup
+      with StrideAuthorisationServiceMockModule {
     val submittedAnswersPage = app.injector.instanceOf[SubmittedAnswersPage]
 
     val controller = new SubmittedAnswersController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
       submittedAnswersPage,
@@ -41,7 +42,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -50,7 +51,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -59,7 +60,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when given an application that doesn't exist" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId, 0)(fakeRequest)

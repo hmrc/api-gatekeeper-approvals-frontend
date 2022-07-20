@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationId}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApmConnectorMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.ApmConnectorMockModule
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global

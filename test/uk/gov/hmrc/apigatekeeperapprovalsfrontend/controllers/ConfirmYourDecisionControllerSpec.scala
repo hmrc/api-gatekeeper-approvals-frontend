@@ -21,19 +21,20 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AbstractSetup with ApplicationServiceMockModule {
+  trait Setup extends AbstractSetup with ApplicationServiceMockModule
+      with StrideAuthorisationServiceMockModule {
     val confirmYourDecisionPage = app.injector.instanceOf[ConfirmYourDecisionPage]
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
   
     val controller = new ConfirmYourDecisionController(
-        strideAuthConfig,
-        AuthConnectorMock.aMock,
-        forbiddenHandler,
+        StrideAuthorisationServiceMock.aMock,
         mcc,
         errorHandler,
         ApplicationActionServiceMock.aMock,
@@ -45,7 +46,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
 
   "confirmYourDecision page" should {
     "return 200 when marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
     
@@ -56,7 +57,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with no grant when marked submission has fails" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
     
@@ -67,7 +68,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -81,7 +82,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when grant decision is decline" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "decline")
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
     
@@ -94,7 +95,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when grant decision is grant without warnings" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
@@ -109,7 +110,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "return redirect back to page when grant decision is something we don't understand" in new Setup {
       val brokenDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "bobbins")
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

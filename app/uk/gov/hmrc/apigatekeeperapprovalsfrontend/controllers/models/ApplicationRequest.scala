@@ -17,9 +17,9 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 class ApplicationRequest[A](
     val application: Application,
     val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.authorisedEnrolments, loggedInRequest)
+) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.role, loggedInRequest)

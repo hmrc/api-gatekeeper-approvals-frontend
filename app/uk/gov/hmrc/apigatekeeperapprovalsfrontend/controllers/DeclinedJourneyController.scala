@@ -22,9 +22,7 @@ import scala.concurrent.Future.successful
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
@@ -50,9 +48,8 @@ object DeclinedJourneyController {
 
 @Singleton
 class DeclinedJourneyController @Inject()(
-  strideAuthConfig: StrideAuthConfig,
-  authConnector: AuthConnector,
-  forbiddenHandler: ForbiddenHandler,
+  strideAuthorisationService: StrideAuthorisationService,
+
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
@@ -62,7 +59,7 @@ class DeclinedJourneyController @Inject()(
   adminsToEmailPage: AdminsToEmailPage,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext)
-  extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) with WithDefaultFormBinding {
+  extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithDefaultFormBinding {
 
   import DeclinedJourneyController._
 

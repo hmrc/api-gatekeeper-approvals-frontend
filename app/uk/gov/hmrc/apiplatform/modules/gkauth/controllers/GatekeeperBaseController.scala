@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.controllers
+package uk.gov.hmrc.apiplatform.modules.gkauth.controllers
 
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.play.bootstrap.controller.WithDefaultFormBinding
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperStrideAuthorisationActions
+import uk.gov.hmrc.apiplatform.modules.gkauth.utils.GatekeeperAuthorisationHelper
 import scala.concurrent.ExecutionContext
 
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.{ForbiddenHandler, GatekeeperAuthorisationActions}
-
 abstract class GatekeeperBaseController(
-  val strideAuthConfig: StrideAuthConfig,
-  val authConnector: AuthConnector,
-
-  val forbiddenHandler: ForbiddenHandler,
+  val strideAuthorisationService: StrideAuthorisationService,
   mcc: MessagesControllerComponents
-)(implicit val ec: ExecutionContext) extends FrontendController(mcc) with GatekeeperAuthorisationActions {
-}
+)(implicit val ec: ExecutionContext) extends FrontendController(mcc) with GatekeeperStrideAuthorisationActions with GatekeeperAuthorisationHelper with WithDefaultFormBinding

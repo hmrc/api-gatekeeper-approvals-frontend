@@ -22,9 +22,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 import play.api.mvc.{MessagesControllerComponents, _}
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
@@ -38,9 +36,8 @@ object ConfirmYourDecisionController {
 
 @Singleton
 class ConfirmYourDecisionController @Inject()(
-  strideAuthConfig: StrideAuthConfig,
-  authConnector: AuthConnector,
-  forbiddenHandler: ForbiddenHandler,
+  strideAuthorisationService: StrideAuthorisationService,
+
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
@@ -48,7 +45,7 @@ class ConfirmYourDecisionController @Inject()(
   confirmYourDecisionPage: ConfirmYourDecisionPage,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) 
-    extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+    extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
       
   import ConfirmYourDecisionController._
 
