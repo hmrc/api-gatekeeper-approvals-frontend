@@ -23,17 +23,20 @@ import play.api.test.Helpers._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup with ApplicationTestData{
+  trait Setup
+      extends AbstractSetup
+      with ApplicationTestData
+      with StrideAuthorisationServiceMockModule {
 
     val viewDeclinedSubmissionPage = app.injector.instanceOf[ViewDeclinedSubmissionPage]
 
     val controller = new ViewDeclinedSubmissionController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       viewDeclinedSubmissionPage,
       errorHandler,
@@ -45,7 +48,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, declinedSubmission)
 
@@ -54,7 +57,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, declinedSubmission)
 
@@ -63,7 +66,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when given a submission that isn't declined" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 

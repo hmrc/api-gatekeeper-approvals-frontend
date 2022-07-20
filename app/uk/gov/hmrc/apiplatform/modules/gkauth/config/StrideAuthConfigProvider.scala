@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.config
+package uk.gov.hmrc.apiplatform.modules.gkauth.config
 
 import javax.inject.{Inject, Provider, Singleton}
-
+import play.api.Configuration
 import com.typesafe.config.Config
 
-import play.api.Configuration
+case class StrideAuthRoles(
+  adminRole: String,
+  superUserRole: String,
+  userRole: String
+)
 
 case class StrideAuthConfig(
   authBaseUrl: String,
   strideLoginUrl: String,
+  successUrl: String,
   origin: String,
-  adminRole: String,
-  superUserRole: String,
-  userRole: String,
-  successUrlBase: String
+  roles: StrideAuthRoles
 )
 
 trait BaseUrl {
@@ -54,12 +56,12 @@ class StrideAuthConfigProvider @Inject()(configuration: Configuration) extends P
     val strideLoginUrl = s"${baseUrl("stride-auth-frontend")}/stride/sign-in"
     
     val strideConfig = configuration.underlying.getConfig("stride")
+    val successUrl = strideConfig.getString("success-url")
     val origin = strideConfig.getString("origin")
     val adminRole = strideConfig.getString("roles.admin")
     val superUserRole = strideConfig.getString("roles.super-user")
     val userRole = strideConfig.getString("roles.user")
-    val successUrlBase = strideConfig.getString("success-url-base")
 
-    StrideAuthConfig(authBaseUrl, strideLoginUrl, origin, adminRole, superUserRole, userRole, successUrlBase)
+    StrideAuthConfig(authBaseUrl, strideLoginUrl, successUrl, origin, StrideAuthRoles(adminRole, superUserRole, userRole))
   }
 }

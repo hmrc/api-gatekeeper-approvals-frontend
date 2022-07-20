@@ -24,16 +24,17 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistr
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with MarkedSubmissionsTestData {
   
-  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule {
+  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
+      with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckCompanyRegistrationPage]
     
     val controller = new CheckCompanyRegistrationController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       page,
       errorHandler,
@@ -45,7 +46,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
 
   "checkCompanyRegistrationPage" should {
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
@@ -57,7 +58,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     "return 400 if the submission is not submitted" in new Setup {
       val mySubmission = MarkedSubmission(answeredSubmission, markedAnswers)
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -67,7 +68,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     }
 
     "return 404 if not found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -79,7 +80,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
 
   "checkCompanyRegistrationAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -91,7 +92,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -103,7 +104,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

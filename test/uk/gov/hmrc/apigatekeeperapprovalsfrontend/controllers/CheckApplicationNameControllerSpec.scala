@@ -24,16 +24,17 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmissio
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckApplicationNamePage
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule {
+  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
+      with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckApplicationNamePage]
 
     val controller = new CheckApplicationNameController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       SubmissionReviewServiceMock.aMock,
       errorHandler,
@@ -47,7 +48,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
       
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -59,7 +60,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     "return 400 if the submission is not submitted" in new Setup {
       val mySubmission = MarkedSubmission(answeredSubmission, markedAnswers)
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -69,7 +70,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if not found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -81,7 +82,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
 
   "checkApplicationNameAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -92,7 +93,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -103,7 +104,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

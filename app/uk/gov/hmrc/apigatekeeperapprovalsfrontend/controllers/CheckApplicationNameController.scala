@@ -20,9 +20,7 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -38,16 +36,15 @@ object CheckApplicationNameController {
 
 @Singleton
 class CheckApplicationNameController @Inject()(
-  strideAuthConfig: StrideAuthConfig,
-  authConnector: AuthConnector,
-  forbiddenHandler: ForbiddenHandler,
+  strideAuthorisationService: StrideAuthorisationService,
+
   mcc: MessagesControllerComponents,
   submissionReviewService: SubmissionReviewService,
   errorHandler: ErrorHandler,
   checkApplicationNamePage: CheckApplicationNamePage,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler, submissionReviewService) {
+)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps

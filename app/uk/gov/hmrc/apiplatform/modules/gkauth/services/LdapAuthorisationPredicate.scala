@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.connectors
+package uk.gov.hmrc.apiplatform.modules.gkauth.services
 
-import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.internalauth.client.{IAAction, Predicate, Resource, ResourceLocation, ResourceType}
 
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.http.HttpClient
-
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-
-@Singleton
-class AuthConnector @Inject()(val http: HttpClient, strideAuthConfig: StrideAuthConfig) extends PlayAuthConnector {
-  lazy val serviceUrl = strideAuthConfig.authBaseUrl
+object LdapAuthorisationPredicate {
+  val gatekeeperReadPermission = Predicate.Permission(
+    Resource(
+      ResourceType("api-gatekeeper-frontend"),
+      ResourceLocation("*")
+    ),
+    IAAction("READ")
+  )
 }
-

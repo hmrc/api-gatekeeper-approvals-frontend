@@ -16,27 +16,24 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.GatekeeperBaseController
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.ApplicationActions
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import org.joda.time.DateTime
 
 
 abstract class AbstractApplicationController(
-  strideAuthConfig: StrideAuthConfig,
-  authConnector: AuthConnector,
-  forbiddenHandler: ForbiddenHandler,
+  strideAuthorisationService: StrideAuthorisationService,
   mcc: MessagesControllerComponents,
   val errorHandler: ErrorHandler
 )(implicit override val ec: ExecutionContext)
-    extends GatekeeperBaseController(strideAuthConfig, authConnector, forbiddenHandler, mcc)
+    extends GatekeeperBaseController(strideAuthorisationService, mcc)
     with ApplicationActions
     with EitherTHelper[Result]
     with ApplicationLogger {

@@ -17,9 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.AuthConnector
-import uk.gov.hmrc.apiplatform.modules.stride.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
@@ -50,16 +48,15 @@ object ViewDeclinedSubmissionController {
 
 @Singleton
 class ViewDeclinedSubmissionController @Inject()(
-  strideAuthConfig: StrideAuthConfig,
-  authConnector: AuthConnector,
-  forbiddenHandler: ForbiddenHandler,
+  strideAuthorisationService: StrideAuthorisationService,
+
   mcc: MessagesControllerComponents,
   viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
   errorHandler: ErrorHandler,
   submissionReviewService: SubmissionReviewService,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthConfig, authConnector, forbiddenHandler, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
   
   import ViewDeclinedSubmissionController._
 

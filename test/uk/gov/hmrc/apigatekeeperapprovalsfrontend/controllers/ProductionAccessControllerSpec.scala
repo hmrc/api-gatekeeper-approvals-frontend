@@ -22,16 +22,17 @@ import play.api.http.Status
 import play.api.test.Helpers._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class ProductionAccessControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup
+      with StrideAuthorisationServiceMockModule {
     val productionAccessPage = app.injector.instanceOf[ProductionAccessPage]
 
     val controller = new ProductionAccessController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
       productionAccessPage,
@@ -43,7 +44,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
   "GET /" should {
     
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, grantedSubmission)
 
@@ -52,7 +53,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when given a submission that isn't granted" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 

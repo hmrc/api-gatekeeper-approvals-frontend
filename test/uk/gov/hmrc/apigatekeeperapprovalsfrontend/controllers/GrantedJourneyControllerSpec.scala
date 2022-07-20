@@ -19,19 +19,20 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedToForGrantingPage}
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.ApplicationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class GrantedJourneyControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AbstractSetup with ApplicationServiceMockModule {
+  trait Setup extends AbstractSetup with ApplicationServiceMockModule
+      with StrideAuthorisationServiceMockModule {
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val provideWarningsForGrantingPage = app.injector.instanceOf[ProvideWarningsForGrantingPage]
     val provideEscalatedToForGrantingPage = app.injector.instanceOf[ProvideEscalatedToForGrantingPage]
 
     val controller = new GrantedJourneyController(
-        strideAuthConfig,
-        AuthConnectorMock.aMock,
-        forbiddenHandler,
+        StrideAuthorisationServiceMock.aMock,
         mcc,
         errorHandler,
         ApplicationActionServiceMock.aMock,
@@ -45,7 +46,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
 
   "provideWarningsPage" should {
     "return 200 when marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
     
@@ -55,7 +56,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -69,7 +70,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     "go to the granted page when a valid form with warnings is submitted" in new Setup {
       val grantWithWarningsRequest = fakeRequest.withFormUrlEncodedBody("warnings" -> "its good but its not right")
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
@@ -82,7 +83,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "go to the warnings input page when an invalid form without warnings is submitted" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
@@ -96,7 +97,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
 
   "provideEscalatedToPage" should {
     "return 200 when marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
     
@@ -106,7 +107,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -120,7 +121,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     "go to the provide warnings page when a valid form with first and last name is submitted" in new Setup {
       val grantWithEscalatedToRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "Bob", "last-name" -> "Roberts")
 
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateEscalatedTo.thenReturn(submissionReview)
@@ -132,7 +133,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "go to the escalated by input page when an invalid form without first or last names is submitted" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
@@ -144,7 +145,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
 
   "grantedPage page" should {
     "return 200 when marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
     
@@ -154,7 +155,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 

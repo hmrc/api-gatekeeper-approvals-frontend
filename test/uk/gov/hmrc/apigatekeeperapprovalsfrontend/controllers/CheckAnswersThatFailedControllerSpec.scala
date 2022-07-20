@@ -23,16 +23,18 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
   
-  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule {
+  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
+      with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckAnswersThatFailedPage]
 
     val controller = new CheckAnswersThatFailedController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
       SubmissionReviewServiceMock.aMock,
@@ -44,7 +46,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
 
   "checkAnswersThatFailedPage" should {
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -54,7 +56,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 if unknown questions exist" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
@@ -64,7 +66,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -76,7 +78,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
 
   "checkAnswersThatFailedAction" should {
     "redirect to correct page when marking answers as checked" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -87,7 +89,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when marking answers as come-back-later" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -98,7 +100,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when marking answers as anything that we don't understand" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -108,7 +110,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

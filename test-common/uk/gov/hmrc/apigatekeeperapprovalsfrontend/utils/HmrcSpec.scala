@@ -23,7 +23,8 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import org.scalatest.EitherValues
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.Inside
 
-abstract class HmrcSpec extends AnyWordSpec with Matchers with OptionValues with EitherValues with WsScalaTestClient with MockitoSugar with ArgumentMatchersSugar
+abstract class HmrcSpec extends AnyWordSpec with Matchers with OptionValues with EitherValues with Inside with WsScalaTestClient with MockitoSugar with ArgumentMatchersSugar
 
 abstract class AsyncHmrcSpec extends HmrcSpec with DefaultAwaitTimeout with FutureAwaits {}

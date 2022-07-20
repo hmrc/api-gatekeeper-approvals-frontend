@@ -26,17 +26,18 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
-  trait Setup extends AbstractSetup with SubscriptionServiceMockModule {
+  trait Setup extends AbstractSetup with SubscriptionServiceMockModule
+      with StrideAuthorisationServiceMockModule {
     val appChecklistPage = mock[ChecklistPage]
     when(appChecklistPage.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
     val viewModelCaptor = ArgCaptor[ViewModel]
 
     val controller = new ChecklistController(
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       SubmissionReviewServiceMock.aMock,
       errorHandler,
@@ -46,7 +47,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     )
 
     def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false, requiresDemo: Boolean = false) = {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
 
       val markedSubmissionWithContext = markedSubmission.copy(submission = markedSubmission.submission.copy(context = if (requiresFraudCheck) vatContext else simpleContext))
@@ -123,7 +124,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -133,7 +134,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no marked application is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -142,7 +143,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.checklistPage(applicationId)(fakeRequest)
@@ -150,13 +151,14 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 303 for SessionRecordNotFound" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
+      StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       val result = controller.checklistPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
@@ -164,7 +166,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
   "POST /" should {
     "return 200 and send to checks completed page if Checks Completed button is clicked" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -174,7 +176,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 and send to submissions page if Save and Come Back Later button is clicked" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -184,7 +186,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 if bad submission action is received" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

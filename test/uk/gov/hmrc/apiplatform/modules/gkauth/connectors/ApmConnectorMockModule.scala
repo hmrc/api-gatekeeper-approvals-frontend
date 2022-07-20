@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks
+package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector

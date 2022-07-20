@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.stride.config
+package uk.gov.hmrc.apiplatform.modules.gkauth.utils
 
-import com.google.inject.AbstractModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models._
 
-class ConfigurationModule extends AbstractModule {
-  override def configure() = {
-    bind(classOf[StrideAuthConfig]).toProvider(classOf[StrideAuthConfigProvider])
-  }
+trait GatekeeperAuthorisationHelper {
+  implicit def loggedIn(implicit request: LoggedInRequest[_]): LoggedInUser = LoggedInUser(request.name)
 }

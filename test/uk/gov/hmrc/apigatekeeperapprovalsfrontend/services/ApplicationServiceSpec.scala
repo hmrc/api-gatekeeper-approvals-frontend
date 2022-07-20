@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, ImportantSubmissionData, PrivacyPolicyLocation, ResponsibleIndividual, Standard, SubmissionReview, TermsAndConditionsLocation, TermsOfUseAcceptance}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.http.HeaderCarrier
 

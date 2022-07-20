@@ -35,11 +35,14 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup
-      with SubmissionReviewServiceMockModule {
+      with SubmissionReviewServiceMockModule
+      with StrideAuthorisationServiceMockModule {
         
     val page = mock[ApplicationSubmissionsPage]
     when(page.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
@@ -47,9 +50,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
     val controller = new ApplicationSubmissionsController(
       config,
-      strideAuthConfig,
-      AuthConnectorMock.aMock,
-      forbiddenHandler,
+      StrideAuthorisationServiceMock.aMock,
       mcc,
       page,
       errorHandler,
@@ -74,7 +75,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION)))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
@@ -90,7 +91,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Declined(declinedTimestamp, requesterEmail, "reasons")
@@ -110,7 +111,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 when submission has been granted" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Granted(grantedTimestamp, requesterEmail)
@@ -128,7 +129,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no marked application is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -137,7 +138,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -145,13 +146,13 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnInsufficientEnrolments()
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
-      AuthConnectorMock.Authorise.thenReturnSessionRecordNotFound()
+      StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
@@ -159,7 +160,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
@@ -169,7 +170,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
 
@@ -179,7 +180,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to Gatekeeper when no submission found" in new Setup {
-      AuthConnectorMock.Authorise.thenReturn()
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 

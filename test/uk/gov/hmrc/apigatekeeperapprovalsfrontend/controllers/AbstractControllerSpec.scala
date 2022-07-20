@@ -20,10 +20,9 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apiplatform.modules.stride.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.stride.connectors.mocks.{ApplicationActionServiceMockModule, AuthConnectorMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
-
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRFAddToken}
 import play.api.test.FakeRequest
@@ -40,8 +39,7 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
       .build()
 
   trait AbstractSetup 
-      extends AuthConnectorMockModule
-      with ApplicationActionServiceMockModule 
+      extends ApplicationActionServiceMockModule 
       with SubmissionServiceMockModule
       with SubmissionReviewServiceMockModule
       with ApplicationTestData {
