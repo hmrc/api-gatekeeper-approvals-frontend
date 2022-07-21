@@ -50,15 +50,15 @@ abstract class AbstractCheckController(
     case _                  => None
   }
 
-  def updateActionStatus(reviewAction: SubmissionReview.Action)(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit markedRequest =>
+  def updateActionStatus(reviewAction: SubmissionReview.Action)(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(reviewAction) _
 
     (
       for {
-        formAction   <- fromOption(markedRequest.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
+        formAction   <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
         newStatus    <- fromOption(deriveStatusFromAction(formAction), log("Invalid submit-action found in request"))
-        _            <- fromOptionF(submissionReviewService.updateActionStatus(reviewAction, newStatus)(markedRequest.submission.id, markedRequest.submission.latestInstance.index), log("Failed to find existing review"))
+        _            <- fromOptionF(submissionReviewService.updateActionStatus(reviewAction, newStatus)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
       } yield ok
     ).fold(identity(_), identity(_))
   }
