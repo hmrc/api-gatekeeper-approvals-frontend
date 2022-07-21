@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{AnyContent, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
@@ -24,10 +24,9 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future.successful
 import play.api.mvc.ActionRefiner
 import play.api.mvc.MessagesRequest
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRole
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles.READ_ONLY
 import uk.gov.hmrc.apiplatform.modules.gkauth.services._
 
 trait ForbiddenHandler {
@@ -40,35 +39,15 @@ trait GatekeeperStrideAuthorisationActions {
   def strideAuthorisationService: StrideAuthorisationService
 
   implicit def ec: ExecutionContext
-
-  def gatekeeperRoleActionRefiner(minimumRoleRequired: GatekeeperRole): ActionRefiner[MessagesRequest, LoggedInRequest] = 
+  
+  def gatekeeperRoleActionRefiner(minimumRoleRequired: GatekeeperStrideRole): ActionRefiner[MessagesRequest, LoggedInRequest] = 
     new ActionRefiner[MessagesRequest, LoggedInRequest] {
       def executionContext = ec
 
       def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
-        
-        val strideRoleRequired: GatekeeperStrideRole = minimumRoleRequired match {
-          case READ_ONLY => GatekeeperRoles.USER  // The lowest stride category
-          case gsr: GatekeeperStrideRole => gsr
-        }
-
-        strideAuthorisationService.createStrideRefiner(strideRoleRequired)(msgRequest)
+        strideAuthorisationService.refineStride(minimumRoleRequired)(msgRequest)
       }
     }
-
-  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperRole)(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    Action.async { implicit request =>
-      gatekeeperRoleActionRefiner(minimumRoleRequired).invokeBlock(request, block)
-    }
-
-  def anyStrideUserAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    gatekeeperRoleAction(GatekeeperRoles.USER)(block)
-
-  def atLeastSuperUserAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    gatekeeperRoleAction(GatekeeperRoles.SUPERUSER)(block)
-
-  def adminOnlyAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    gatekeeperRoleAction(GatekeeperRoles.ADMIN)(block)
 }
 
 trait GatekeeperAuthorisationActions {
@@ -76,13 +55,18 @@ trait GatekeeperAuthorisationActions {
     
   def ldapAuthorisationService: LdapAuthorisationService
     
-  def anyAuthenticatedUserAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] = {
-    Action.async { implicit request => 
+  val anyAuthenticatedUserRefiner = new ActionRefiner[MessagesRequest, LoggedInRequest] {
+
+    override def executionContext = ec
+
+    override protected def refine[A](request: MessagesRequest[A]): Future[Either[Result,LoggedInRequest[A]]] = {
       ldapAuthorisationService.refineLdap(request)
-      .recover { case _ => Left(request) }
+      .recover {
+        case _ => Left(())
+      }
       .flatMap(_ match {
-        case Left(_) => anyStrideUserAction(block)(request)
-        case Right(lir) => block(lir)
+        case Right(lir) => successful(Right(lir))
+        case Left(_) => strideAuthorisationService.refineStride(GatekeeperRoles.USER)(request)
       })
     }
   }

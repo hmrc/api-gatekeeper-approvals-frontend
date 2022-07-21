@@ -73,7 +73,7 @@ class ApplicationSubmissionsController @Inject()(
   import cats.data.OptionT
   import cats.implicits._
 
-  def whichPage(applicationId: ApplicationId): Action[AnyContent] = anyRoleWithApplication(applicationId) { implicit request =>
+  def whichPage(applicationId: ApplicationId): Action[AnyContent] = roleWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission => submission.instances.find(i => i.isSubmitted || i.isGranted || i.isGrantedWithWarnings || i.isDeclined).nonEmpty
@@ -91,7 +91,7 @@ class ApplicationSubmissionsController @Inject()(
     )
   }
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = roleWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
