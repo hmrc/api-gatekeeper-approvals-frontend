@@ -47,7 +47,7 @@ class StrideAuthorisationService @Inject() (
 
   import strideAuthConfig.roles._
 
-  def createStrideRefiner[A](strideRoleRequired: GatekeeperStrideRole): (MessagesRequest[A]) => Future[Either[Result, LoggedInRequest[A]]] = (msgRequest) => {
+  def refineStride[A](strideRoleRequired: GatekeeperStrideRole): (MessagesRequest[A]) => Future[Either[Result, LoggedInRequest[A]]] = (msgRequest) => {
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(msgRequest, msgRequest.session)
 
     val successUrl = s"${strideAuthConfig.successUrlBase}${msgRequest.uri}"

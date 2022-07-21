@@ -78,6 +78,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION)))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
@@ -94,6 +95,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
@@ -114,6 +116,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 when submission has been granted" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
@@ -132,6 +135,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no marked application is found" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
@@ -141,6 +145,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
@@ -149,12 +154,14 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
