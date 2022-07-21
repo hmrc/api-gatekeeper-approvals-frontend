@@ -25,6 +25,7 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.{CurrentSubmittedInstanceDetails, DeclinedInstanceDetails, GrantedInstanceDetails, ViewModel}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.{Declined, Granted, Submitted}
@@ -42,7 +43,8 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule
-      with StrideAuthorisationServiceMockModule {
+      with StrideAuthorisationServiceMockModule
+      with LdapAuthorisationServiceMockModule {
         
     val page = mock[ApplicationSubmissionsPage]
     when(page.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
@@ -51,6 +53,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     val controller = new ApplicationSubmissionsController(
       config,
       StrideAuthorisationServiceMock.aMock,
+      LdapAuthorisationServiceMock.aMock,
       mcc,
       page,
       errorHandler,
@@ -160,6 +163,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
@@ -170,6 +174,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
@@ -179,8 +184,19 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
     }
 
-    "redirect to Gatekeeper when no submission found" in new Setup {
+    "redirect to Gatekeeper when no submission found and authorised using stride" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised()
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+
+      val result = controller.whichPage(applicationId)(fakeRequest)
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
+    }
+
+    "redirect to Gatekeeper when no submission found and authorised using ldap" in new Setup {
+      LdapAuthorisationServiceMock.Auth.succeeds
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 

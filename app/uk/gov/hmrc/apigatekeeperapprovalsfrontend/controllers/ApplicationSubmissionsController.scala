@@ -18,6 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationService
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 
@@ -32,6 +33,8 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import scala.concurrent.Future.successful
 import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 
 
 object ApplicationSubmissionsController {
@@ -58,19 +61,19 @@ object ApplicationSubmissionsController {
 class ApplicationSubmissionsController @Inject()(
   config: GatekeeperConfig,
   strideAuthorisationService: StrideAuthorisationService,
-
+  val ldapAuthorisationService: LdapAuthorisationService,
   mcc: MessagesControllerComponents,
   applicationSubmissionsPage: ApplicationSubmissionsPage,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
   
   import ApplicationSubmissionsController._
   import cats.data.OptionT
   import cats.implicits._
 
-  def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+  def whichPage(applicationId: ApplicationId): Action[AnyContent] = anyRoleWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission => submission.instances.find(i => i.isSubmitted || i.isGranted || i.isGrantedWithWarnings || i.isDeclined).nonEmpty
@@ -88,7 +91,7 @@ class ApplicationSubmissionsController @Inject()(
     )
   }
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 

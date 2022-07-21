@@ -56,18 +56,18 @@ trait GatekeeperStrideAuthorisationActions {
       }
     }
 
-  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperRole)(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperRole)(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       gatekeeperRoleActionRefiner(minimumRoleRequired).invokeBlock(request, block)
     }
 
-  def anyStrideUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+  def anyStrideUserAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     gatekeeperRoleAction(GatekeeperRoles.USER)(block)
 
-  def atLeastSuperUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+  def atLeastSuperUserAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     gatekeeperRoleAction(GatekeeperRoles.SUPERUSER)(block)
 
-  def adminOnlyAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+  def adminOnlyAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     gatekeeperRoleAction(GatekeeperRoles.ADMIN)(block)
 }
 
@@ -76,7 +76,7 @@ trait GatekeeperAuthorisationActions {
     
   def ldapAuthorisationService: LdapAuthorisationService
     
-  def anyAuthenticatedUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =  {
+  def anyAuthenticatedUserAction(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] = {
     Action.async { implicit request => 
       ldapAuthorisationService.refineLdap(request)
       .recover { case _ => Left(request) }

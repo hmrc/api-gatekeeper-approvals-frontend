@@ -45,7 +45,6 @@ object SubmittedAnswersController {
 @Singleton
 class SubmittedAnswersController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   submittedAnswersPage: SubmittedAnswersPage,

@@ -41,7 +41,6 @@ object CheckUrlsController {
 @Singleton
 class CheckUrlsController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   submissionReviewService: SubmissionReviewService,
   errorHandler: ErrorHandler,
@@ -49,7 +48,7 @@ class CheckUrlsController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
-  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
       case std@ Standard(_, Some(importantSubmissionData)) => 

@@ -72,7 +72,7 @@ class ChecklistController @Inject()(
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, requiresFraudCheck, requiresDemo)
   } 
 
-  def checklistPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checklistPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
     val isSuccessful = ! request.markedSubmission.isFail
     val hasWarnings = request.markedSubmission.isWarn
@@ -87,7 +87,7 @@ class ChecklistController @Inject()(
     } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, buildChecklistSections(applicationId, review.requiredActions, automaticChecksResult))))
   }
 
-  def declineRequest(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def declineRequest(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val isSuccessful = ! request.markedSubmission.isFail
     val hasWarnings = request.markedSubmission.isWarn
     for {
@@ -95,7 +95,7 @@ class ChecklistController @Inject()(
     } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId))
   }
 
-  def checklistAction(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checklistAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
       case Some("checked") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
       case Some("come-back-later") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))

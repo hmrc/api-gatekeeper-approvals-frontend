@@ -41,7 +41,6 @@ object CheckAnswersThatPassedController {
 @Singleton
 class CheckAnswersThatPassedController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   submissionReviewService: SubmissionReviewService,
@@ -52,7 +51,7 @@ class CheckAnswersThatPassedController @Inject()(
 
   import CheckAnswersThatPassedController._
 
-  def checkAnswersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkAnswersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Pass).getOrElse(false)
     }

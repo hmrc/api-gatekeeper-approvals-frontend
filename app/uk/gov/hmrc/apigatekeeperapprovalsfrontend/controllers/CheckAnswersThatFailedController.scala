@@ -46,7 +46,6 @@ object CheckAnswersThatFailedController {
 @Singleton
 class CheckAnswersThatFailedController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   submissionReviewService: SubmissionReviewService,
@@ -58,7 +57,7 @@ class CheckAnswersThatFailedController @Inject()(
   
   import CheckAnswersThatFailedController._
 
-  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = 

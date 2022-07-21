@@ -48,7 +48,6 @@ object ProductionAccessController {
 @Singleton
 class ProductionAccessController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   productionAccessPage: ProductionAccessPage,
@@ -58,7 +57,7 @@ class ProductionAccessController @Inject()(
   
   import ProductionAccessController._
 
-  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
 
     val appName = request.application.name
     val instance = request.markedSubmission.submission.latestInstance

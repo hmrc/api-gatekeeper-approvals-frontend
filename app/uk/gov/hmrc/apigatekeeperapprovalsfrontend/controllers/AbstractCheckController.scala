@@ -50,7 +50,7 @@ abstract class AbstractCheckController(
     case _                  => None
   }
 
-  def updateActionStatus(reviewAction: SubmissionReview.Action)(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def updateActionStatus(reviewAction: SubmissionReview.Action)(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(reviewAction) _
 
