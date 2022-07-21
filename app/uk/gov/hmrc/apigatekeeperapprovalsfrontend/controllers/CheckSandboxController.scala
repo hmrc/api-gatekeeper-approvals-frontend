@@ -43,7 +43,6 @@ object CheckSandboxController {
 @Singleton
 class CheckSandboxController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   checkSandboxPage: CheckSandboxPage,
   errorHandler: ErrorHandler,
@@ -53,7 +52,7 @@ class CheckSandboxController @Inject()(
   val applicationService: ApplicationService,
   val subscriptionService: SubscriptionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
-  def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     for {
       linkedSubordinateApplication <- applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId)
       apiSubscriptions <- subscriptionService.fetchSubscriptionsByApplicationId(applicationId)

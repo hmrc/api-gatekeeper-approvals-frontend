@@ -37,7 +37,6 @@ object ConfirmYourDecisionController {
 @Singleton
 class ConfirmYourDecisionController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
@@ -49,11 +48,11 @@ class ConfirmYourDecisionController @Inject()(
       
   import ConfirmYourDecisionController._
 
-  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name, request.markedSubmission.isFail))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request => 
+  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request => 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")                                                  => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
       case Some("grant-with-warnings") if(!request.markedSubmission.isFail) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))

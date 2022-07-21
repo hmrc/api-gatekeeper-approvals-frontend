@@ -31,6 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.SubmissionInstanceApplicationRequest
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -83,10 +84,10 @@ trait ApplicationActionBuilders {
       }
     }
 
-trait ApplicationActions extends ApplicationActionBuilders {
+trait StrideRoleWithApplicationActions extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-  private def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  protected def strideRoleWithApplication(minimumGatekeeperRole: GatekeeperRole)(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       (
         gatekeeperRoleActionRefiner(minimumGatekeeperRole) andThen
@@ -116,13 +117,21 @@ trait ApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
-  def loggedInWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  def loggedInThruStrideWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplication(GatekeeperRoles.USER)(applicationId)(block)
 
-  def loggedInWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  def loggedInThruStrideWithApplicationAndSubmission(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmission(GatekeeperRoles.USER)(applicationId)(block)
 
   def loggedInWithApplicationAndSubmissionAndInstance(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     strideRoleWithApplicationAndSubmissionAndInstance(GatekeeperRoles.USER)(applicationId, index)(block)
+}
 
+trait GatekeeperRoleWithApplicationActions {
+  self: GatekeeperBaseController with StrideRoleWithApplicationActions with GatekeeperAuthorisationActions =>
+
+  def anyRoleWithApplication(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    anyAuthenticatedUserAction { loggedInRequest =>
+      applicationRequestRefiner(applicationId).invokeBlock(loggedInRequest, block)
+    }
 }

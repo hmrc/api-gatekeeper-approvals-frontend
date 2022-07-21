@@ -55,7 +55,6 @@ object GrantedJourneyController {
 @Singleton
 class GrantedJourneyController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
@@ -68,11 +67,11 @@ class GrantedJourneyController @Inject()(
   extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithDefaultFormBinding {
   import GrantedJourneyController._
 
-  def provideWarningsPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideWarningsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(provideWarningsForGrantingPage(provideWarningsForm, ViewModel(request.application.name, applicationId))))
   }
 
-  def provideWarningsAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideWarningsAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideWarningsForm) = {
       (
         for {
@@ -97,11 +96,11 @@ class GrantedJourneyController @Inject()(
     GrantedJourneyController.provideWarningsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
-  def provideEscalatedToPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideEscalatedToPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(provideEscalatedToForGrantingPage(provideEscalatedToForm, ViewModel(request.application.name, applicationId))))
   }
 
-  def provideEscalatedToAction(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideEscalatedToAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideEscalatedToForm) = {
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index)
         .map {
@@ -120,7 +119,7 @@ class GrantedJourneyController @Inject()(
     GrantedJourneyController.provideEscalatedToForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
   }
 
-  def grantedPage(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def grantedPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId))))
   }
 }

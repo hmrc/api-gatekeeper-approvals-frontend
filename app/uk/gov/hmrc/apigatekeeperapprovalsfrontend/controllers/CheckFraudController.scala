@@ -35,7 +35,6 @@ object CheckFraudController {
 @Singleton
 class CheckFraudController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   page: CheckFraudPage,
   errorHandler: ErrorHandler,
@@ -43,7 +42,7 @@ class CheckFraudController @Inject()(
   val submissionService: SubmissionService,
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
-  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
       successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId))))
   }
 

@@ -49,7 +49,6 @@ object ViewDeclinedSubmissionController {
 @Singleton
 class ViewDeclinedSubmissionController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
   errorHandler: ErrorHandler,
@@ -60,7 +59,7 @@ class ViewDeclinedSubmissionController @Inject()(
   
   import ViewDeclinedSubmissionController._
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
 
     val appName = request.application.name
 

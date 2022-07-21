@@ -42,7 +42,6 @@ object CheckCompanyRegistrationController {
 @Singleton
 class CheckCompanyRegistrationController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   checkCompanyRegistrationPage: CheckCompanyRegistrationPage,
   errorHandler: ErrorHandler,
@@ -50,7 +49,7 @@ class CheckCompanyRegistrationController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val companyDetails = CompanyDetailsExtractor(request.submission)    
     
     (request.application.access, companyDetails) match {

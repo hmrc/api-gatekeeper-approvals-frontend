@@ -37,7 +37,6 @@ object CheckApplicationNameController {
 @Singleton
 class CheckApplicationNameController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
-
   mcc: MessagesControllerComponents,
   submissionReviewService: SubmissionReviewService,
   errorHandler: ErrorHandler,
@@ -45,7 +44,7 @@ class CheckApplicationNameController @Inject()(
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps
       case std: Standard if(request.submission.status.isSubmitted) => 
