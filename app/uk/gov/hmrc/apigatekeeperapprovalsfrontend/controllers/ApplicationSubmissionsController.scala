@@ -91,7 +91,7 @@ class ApplicationSubmissionsController @Inject()(
     )
   }
 
-  def page(applicationId: ApplicationId): Action[AnyContent] =roleWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = roleWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
