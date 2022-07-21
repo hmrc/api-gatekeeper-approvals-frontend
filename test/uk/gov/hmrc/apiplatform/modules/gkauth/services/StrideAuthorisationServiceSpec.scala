@@ -39,7 +39,7 @@ class StrideAuthorisationServiceSpec extends AsyncHmrcSpec with StrideAuthConnec
   val msgRequest = new MessagesRequest(fakeRequest, stubMessagesApi())
   
   trait Setup {
-    val strideAuthConfig = StrideAuthConfig(strideLoginUrl = "http:///www.example.com", successUrl = "", origin = "", roles = strideAuthRoles)
+    val strideAuthConfig = StrideAuthConfig(strideLoginUrl = "http:///www.example.com", successUrlBase = "", origin = "", roles = strideAuthRoles)
     
     val underTest = new StrideAuthorisationService(
       strideAuthConnector = StrideAuthConnectorMock.aMock,
@@ -83,7 +83,7 @@ class StrideAuthorisationServiceSpec extends AsyncHmrcSpec with StrideAuthConnec
 
       result.left.value.header.status shouldBe SEE_OTHER
       result.left.value.header.headers(LOCATION) should startWith(strideAuthConfig.strideLoginUrl)
-      result.left.value.header.headers(LOCATION) should include(s"successURL=${strideAuthConfig.successUrl}")
+      result.left.value.header.headers(LOCATION) should include(s"successURL=${strideAuthConfig.successUrlBase}")
     }
   }
 }
