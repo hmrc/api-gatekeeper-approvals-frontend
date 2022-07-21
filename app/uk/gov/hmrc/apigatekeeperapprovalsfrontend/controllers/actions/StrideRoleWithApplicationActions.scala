@@ -60,14 +60,14 @@ trait StrideRoleWithApplicationActions extends ApplicationActionBuilders {
       .invokeBlock(request, block)
     }
 
-  private val USER_REFINER = gatekeeperRoleActionRefiner(GatekeeperRoles.USER)
+  private val userRoleActionRefiner = gatekeeperRoleActionRefiner(GatekeeperRoles.USER)
 
   def loggedInThruStrideWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplication(USER_REFINER) _
+    roleWithApplication(userRoleActionRefiner) _
 
   def loggedInThruStrideWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmission(USER_REFINER) _
+    roleWithApplicationAndSubmission(userRoleActionRefiner) _
 
   def loggedInWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmissionAndInstance(USER_REFINER) _
+    roleWithApplicationAndSubmissionAndInstance(userRoleActionRefiner) _
 }
