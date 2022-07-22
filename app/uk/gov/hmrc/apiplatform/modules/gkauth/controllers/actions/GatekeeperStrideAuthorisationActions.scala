@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 
-import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.Result
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
@@ -24,10 +24,10 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.Future.successful
 import play.api.mvc.ActionRefiner
 import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.apiplatform.modules.gkauth.services._
+import scala.util.control.NonFatal
 
 trait ForbiddenHandler {
   def handle(msgResult: MessagesRequest[_]): Result
@@ -59,15 +59,27 @@ trait GatekeeperAuthorisationActions {
 
     override def executionContext = ec
 
-    override protected def refine[A](request: MessagesRequest[A]): Future[Either[Result,LoggedInRequest[A]]] = {
-      ldapAuthorisationService.refineLdap(request)
-      .recover {
-        case _ => Left(())
+    override protected def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result,LoggedInRequest[A]]] = {
+      type FERLIR = Future[Either[Result,LoggedInRequest[A]]]
+
+      def refineLdap = 
+        ldapAuthorisationService.refineLdap(msgRequest)
+          .recover { 
+            case NonFatal(_) => Left(()) 
+          }
+      
+      def refineStride: FERLIR =
+        strideAuthorisationService.refineStride(GatekeeperRoles.USER)(msgRequest)
+          .recover { 
+            case NonFatal(_) => Left(Unauthorized("")) 
+          }
+
+      import cats.implicits._
+      import cats.data.EitherT
+      EitherT(refineStride).leftFlatMap { strideFailureResult => 
+        EitherT(refineLdap).leftMap(_ => strideFailureResult)
       }
-      .flatMap(_ match {
-        case Right(lir) => successful(Right(lir))
-        case Left(_) => strideAuthorisationService.refineStride(GatekeeperRoles.USER)(request)
-      })
+      .value
     }
   }
 }

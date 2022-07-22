@@ -30,6 +30,8 @@ import play.api.mvc._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationService
 
 
 object SubmittedAnswersController {  
@@ -44,13 +46,14 @@ object SubmittedAnswersController {
 
 @Singleton
 class SubmittedAnswersController @Inject()(
+  val ldapAuthorisationService: LdapAuthorisationService,
   strideAuthorisationService: StrideAuthorisationService,
   mcc: MessagesControllerComponents,
   errorHandler: ErrorHandler,
   submittedAnswersPage: SubmittedAnswersPage,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
+)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
   
   import SubmittedAnswersController._
 

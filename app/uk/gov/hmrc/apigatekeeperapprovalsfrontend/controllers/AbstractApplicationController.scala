@@ -23,7 +23,7 @@ import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.StrideRoleWithApplicationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperStrideRoleWithApplicationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import org.joda.time.DateTime
 
@@ -34,7 +34,7 @@ abstract class AbstractApplicationController(
   val errorHandler: ErrorHandler
 )(implicit override val ec: ExecutionContext)
     extends GatekeeperBaseController(strideAuthorisationService, mcc)
-    with StrideRoleWithApplicationActions
+    with GatekeeperStrideRoleWithApplicationActions
     with EitherTHelper[Result]
     with ApplicationLogger {
 
