@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 
-import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.Result
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
@@ -28,6 +28,7 @@ import scala.concurrent.Future.successful
 import play.api.mvc.ActionRefiner
 import play.api.mvc.MessagesRequest
 import uk.gov.hmrc.apiplatform.modules.gkauth.services._
+import scala.util.control.NonFatal
 
 trait ForbiddenHandler {
   def handle(msgResult: MessagesRequest[_]): Result
@@ -62,7 +63,7 @@ trait GatekeeperAuthorisationActions {
     override protected def refine[A](request: MessagesRequest[A]): Future[Either[Result,LoggedInRequest[A]]] = {
       ldapAuthorisationService.refineLdap(request)
       .recover {
-        case _ => Left(())
+        case NonFatal(_) => Left(())
       }
       .flatMap(_ match {
         case Right(lir) => successful(Right(lir))

@@ -23,14 +23,18 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationServiceMockModule
 
 class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup
+  trait Setup
+      extends AbstractSetup
+      with LdapAuthorisationServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val submittedAnswersPage = app.injector.instanceOf[SubmittedAnswersPage]
 
     val controller = new SubmittedAnswersController(
+      LdapAuthorisationServiceMock.aMock,
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
@@ -42,6 +46,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -50,7 +55,17 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
       status(result) shouldBe Status.OK
     }
 
+    "return 200 for LDAP user" in new Setup {
+      LdapAuthorisationServiceMock.Auth.succeeds
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.page(applicationId, 0)(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
     "return 400 when given a submission index that doesn't exist" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -60,6 +75,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when given an application that doesn't exist" in new Setup {
+      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 

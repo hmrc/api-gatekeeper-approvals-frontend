@@ -24,19 +24,19 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmi
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.SubmissionInstanceApplicationRequest
-import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
-
-trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders with GatekeeperAuthorisationActions {
+trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBuilders {
   self: GatekeeperBaseController =>
-  
-  def loggedInWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplication(anyAuthenticatedUserRefiner) _
 
-  def loggedInWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner) _
+  private val userRoleActionRefiner = gatekeeperRoleActionRefiner(GatekeeperRoles.USER)
 
-  def loggedInWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner) _
+  def loggedInThruStrideWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    roleWithApplication(userRoleActionRefiner) _
 
+  def loggedInThruStrideWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    roleWithApplicationAndSubmission(userRoleActionRefiner) _
+
+  def loggedInThruStrideWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    roleWithApplicationAndSubmissionAndInstance(userRoleActionRefiner) _
 }
