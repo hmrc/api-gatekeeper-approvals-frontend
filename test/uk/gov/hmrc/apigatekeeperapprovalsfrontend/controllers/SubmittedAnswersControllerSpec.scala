@@ -46,7 +46,6 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -56,6 +55,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 for LDAP user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
       LdapAuthorisationServiceMock.Auth.succeeds
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -65,7 +65,6 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when given a submission index that doesn't exist" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -75,7 +74,6 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when given an application that doesn't exist" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 

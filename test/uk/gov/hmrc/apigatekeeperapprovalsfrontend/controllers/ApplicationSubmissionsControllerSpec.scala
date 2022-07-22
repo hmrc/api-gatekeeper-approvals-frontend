@@ -78,7 +78,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION)))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
@@ -95,7 +94,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
@@ -116,7 +114,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 when submission has been granted" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
@@ -135,7 +132,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no marked application is found" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
@@ -145,7 +141,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
@@ -154,15 +149,15 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+      LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
     
     "return 303 for SessionRecordNotFound" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
+      LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }  
@@ -170,7 +165,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
 
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
@@ -181,7 +175,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
@@ -192,7 +185,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to Gatekeeper when no submission found and authorised using stride" in new Setup {
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
@@ -203,6 +195,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to Gatekeeper when no submission found and authorised using ldap" in new Setup {
+      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
       LdapAuthorisationServiceMock.Auth.succeeds
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
