@@ -58,12 +58,10 @@ class StrideAuthorisationService @Inject() (
         Map("successURL" -> Seq(successUrl), "origin" -> Seq(strideAuthConfig.origin))
       )
 
-    implicit val request = msgRequest
-
     authorise(strideRoleRequired) map {
       case Some(name) ~ authorisedEnrolments => 
         def applyRole(role: GatekeeperRole): Either[Result, LoggedInRequest[A]] = {
-          Right(new LoggedInRequest(name.name, role, request))
+          Right(new LoggedInRequest(name.name, role, msgRequest))
         }
 
         ( authorisedEnrolments.getEnrolment(adminRole).isDefined, authorisedEnrolments.getEnrolment(superUserRole).isDefined, authorisedEnrolments.getEnrolment(userRole).isDefined ) match {
