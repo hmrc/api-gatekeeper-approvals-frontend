@@ -36,7 +36,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Stat
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 
-
 object ApplicationSubmissionsController {
 
   case class CurrentSubmittedInstanceDetails(requesterEmail: String, timestamp: String)
@@ -126,6 +125,8 @@ class ApplicationSubmissionsController @Inject()(
                   declinedSubmissions, 
                   grantedInstance, 
                   responsibleIndividualEmail, 
-                  pendingResponsibleIndividualVerification))))
+                  pendingResponsibleIndividualVerification
+                )
+    )))
   }
 }
