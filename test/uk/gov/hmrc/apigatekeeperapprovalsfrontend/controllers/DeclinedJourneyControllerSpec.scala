@@ -24,11 +24,12 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationDeclinedPage, ProvideReasonsForDecliningPage}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.AdminsToEmailPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       with StrideAuthorisationServiceMockModule {
-  trait Setup extends AbstractSetup {
+  trait Setup extends AbstractSetup with ApplicationServiceMockModule {
     val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
     val provideReasonsForDecliningPage = app.injector.instanceOf[ProvideReasonsForDecliningPage]
     val adminsToEmailPage = app.injector.instanceOf[AdminsToEmailPage]
@@ -39,6 +40,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
         errorHandler,
         ApplicationActionServiceMock.aMock,
         SubmissionServiceMock.aMock,
+        ApplicationServiceMock.aMock,
         applicationDeclinedPage,
         provideReasonsForDecliningPage,
         adminsToEmailPage,
@@ -137,7 +139,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
-      SubmissionServiceMock.Decline.thenReturn(applicationId, application)
+      ApplicationServiceMock.DeclineApplicationApprovalRequest.thenReturnSuccess()
     
       val result = controller.emailAddressesAction(applicationId)(fakeRequest)
 
@@ -145,16 +147,14 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId).url
     }
     
-    "return 404 when the decline fails" in new Setup {
+    "throw RuntimeException when the decline fails" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
-      SubmissionServiceMock.Decline.thenReturnError(applicationId)
+      ApplicationServiceMock.DeclineApplicationApprovalRequest.thenReturnFailure()
     
-      val result = controller.emailAddressesAction(applicationId)(fakeRequest)
-
-      status(result) shouldBe BAD_REQUEST
-    }
+      intercept[RuntimeException](await(controller.emailAddressesAction(applicationId)(fakeRequest))).getMessage shouldBe "Application id not found"
+   }
   }
 }

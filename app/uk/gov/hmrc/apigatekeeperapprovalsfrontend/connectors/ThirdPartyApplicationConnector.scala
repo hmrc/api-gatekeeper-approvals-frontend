@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 object ThirdPartyApplicationConnector {
@@ -32,14 +32,15 @@ class ThirdPartyApplicationConnector @Inject()(
   httpClient: HttpClient,
   config: ThirdPartyApplicationConnector.Config,
   val metrics: ConnectorMetrics
-)(implicit val ec: ExecutionContext) {
+)(implicit val ec: ExecutionContext) extends ApplicationUpdateFormatters with CommonResponseHandlers {
+
+  import uk.gov.hmrc.http.HttpReads.Implicits._
 
   val serviceBaseUrl = config.serviceBaseUrl
   val api = API("third-party-application")
 
 
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
 
     metrics.record(api) {
@@ -47,4 +48,9 @@ class ThirdPartyApplicationConnector @Inject()(
     }
   }
 
+  def applicationUpdate(applicationId: ApplicationId, request: ApplicationUpdate)(implicit hc: HeaderCarrier): Future[ApplicationUpdateSuccessful] = {
+    metrics.record(api) {
+      httpClient.PATCH[ApplicationUpdate, ErrorOrUnit](s"$serviceBaseUrl/application/${applicationId.value}", request).map(throwOr(ApplicationUpdateSuccessful))
+    }
+  }  
 }

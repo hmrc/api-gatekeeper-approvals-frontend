@@ -26,6 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
@@ -53,6 +54,7 @@ class DeclinedJourneyController @Inject()(
   errorHandler: ErrorHandler,
   val applicationActionService: ApplicationActionService,
   val submissionService: SubmissionService,
+  val applicationService: ApplicationService,
   applicationDeclinedPage: ApplicationDeclinedPage,
   provideReasonsForDecliningPage: ProvideReasonsForDecliningPage,
   adminsToEmailPage: AdminsToEmailPage,
@@ -97,15 +99,11 @@ class DeclinedJourneyController @Inject()(
   def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
     val requiresDemo = SubmissionRequiresDemo(request.submission)
+    val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
+
     for {
       review <- submissionReviewService.findOrCreateReview(request.submission.id, request.submission.latestInstance.index, !request.markedSubmission.isFail, request.markedSubmission.isWarn, requiresFraudCheck, requiresDemo)
-      result <- submissionService.decline(applicationId, request.name.get, review.declineReasons)
-    } yield result match {
-      case Right(app) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
-      case Left(err) => {
-        logger.warn(s"Decline application failed due to: $err")
-        BadRequest(errorHandler.badRequestTemplate)
-      }
-    }
+      result <- applicationService.declineApplicationApprovalRequest(applicationId, request.name.get, review.declineReasons)
+    } yield ok
   }
 }
