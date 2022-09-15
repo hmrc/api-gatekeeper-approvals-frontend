@@ -22,6 +22,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
 import uk.gov.hmrc.play.http.metrics.common.API
 
+import uk.gov.hmrc.http.HttpReads.Implicits._
+
 object ThirdPartyApplicationConnector {
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
   case class Config(serviceBaseUrl: String)
@@ -34,11 +36,8 @@ class ThirdPartyApplicationConnector @Inject()(
   val metrics: ConnectorMetrics
 )(implicit val ec: ExecutionContext) extends ApplicationUpdateFormatters with CommonResponseHandlers {
 
-  import uk.gov.hmrc.http.HttpReads.Implicits._
-
   val serviceBaseUrl = config.serviceBaseUrl
   val api = API("third-party-application")
-
 
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
