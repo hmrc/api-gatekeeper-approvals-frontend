@@ -10,7 +10,7 @@ object AppDependencies {
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"         % bootstrapPlayVersion,
     "uk.gov.hmrc"             %% "play-frontend-hmrc"                 % "3.4.0-play-28",
-    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-28"                 % "0.58.0",
+    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-28"                 % "0.73.0",
     "uk.gov.hmrc"             %% "http-metrics"                       % "2.5.0-play-28",
     "uk.gov.hmrc"             %% "play-json-union-formatter"          % "1.15.0-play-28",
     "org.typelevel"           %% "cats-core"                          % "2.6.1",
@@ -24,7 +24,7 @@ object AppDependencies {
 
   val test = Seq(
     "uk.gov.hmrc"             %% "bootstrap-test-play-28"             % bootstrapPlayVersion,
-    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"            % "0.58.0",
+    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"            % "0.73.0",
     "org.jsoup"               %  "jsoup"                              % "1.13.1",
     "org.mockito"             %% "mockito-scala-scalatest"            % "1.16.46",
     "com.vladsch.flexmark"    %  "flexmark-all"                       % "0.36.8",
