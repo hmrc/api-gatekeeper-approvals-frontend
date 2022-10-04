@@ -20,7 +20,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ThirdPartyApplicationConnector}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdateSuccessful}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.DeclineApplicationApprovalRequest
+import java.time.LocalDateTime
 
 @Singleton
 class ApplicationService @Inject()(
@@ -36,4 +38,8 @@ class ApplicationService @Inject()(
     apmConnector.fetchLinkedSubordinateApplicationById(applicationId)
   }
 
+  def declineApplicationApprovalRequest(applicationId: ApplicationId, requestedBy: String, reasons: String)(implicit hc: HeaderCarrier): Future[ApplicationUpdateSuccessful] = {
+    val request = DeclineApplicationApprovalRequest(requestedBy, reasons, LocalDateTime.now)
+    thirdPartyApplicationConnector.applicationUpdate(applicationId, request)
+  }
 }

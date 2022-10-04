@@ -23,6 +23,7 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationUpdateSuccessful
 
 trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
   trait BaseApplicationServiceMock {
@@ -45,6 +46,14 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
       }
     }
 
+    object DeclineApplicationApprovalRequest {
+      def thenReturnSuccess() = {
+        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *)(*)).thenReturn(successful(ApplicationUpdateSuccessful))
+      }
+      def thenReturnFailure() = {
+        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *)(*)).thenThrow(new RuntimeException("Application id not found"))
+      }
+    }
   }
 
   object ApplicationServiceMock extends BaseApplicationServiceMock {

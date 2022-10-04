@@ -70,13 +70,4 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
       result shouldBe Right(app)
     }
   }
-
-  "decline" should {
-    "call submission connector correctly" in new Setup {
-      val reason = "reason"
-      when(mockSubmissionsConnector.decline(eqTo(applicationId), eqTo(requestedBy), eqTo(reason))(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.decline(applicationId, requestedBy, reason))
-      result shouldBe Right(app)
-    }
-  }
 }

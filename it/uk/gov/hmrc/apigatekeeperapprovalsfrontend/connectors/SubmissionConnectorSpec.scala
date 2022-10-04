@@ -27,7 +27,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.DeclinedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
@@ -140,27 +139,6 @@ class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOne
       )
       
       val result = await(connector.grant(applicationId, requestedBy))
-
-      result shouldBe 'Right
-      result.right.get.id shouldBe applicationId
-    }
-  }
-
-  "decline application" should {
-    val url = s"/approvals/application/${applicationId.value}/decline"
-
-    "return an application on success" in new Setup {
-      stubFor(
-        post(urlEqualTo(url))
-        .withJsonRequestBody(DeclinedRequest(requestedBy, reason))
-        .willReturn(
-            aResponse()
-            .withStatus(OK)
-            .withJsonBody(anApplication(id = applicationId))
-        )
-      )
-      
-      val result = await(connector.decline(applicationId, requestedBy, reason))
 
       result shouldBe 'Right
       result.right.get.id shouldBe applicationId
