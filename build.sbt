@@ -1,18 +1,20 @@
+import sbt._
 import bloop.integrations.sbt.BloopDefaults
 import com.typesafe.sbt.digest.Import._
 import com.typesafe.sbt.uglify.Import._
 import net.ground5hark.sbt.concat.Import._
-
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, integrationTestSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "api-gatekeeper-approvals-frontend"
+
+Global / bloopAggregateSourceDependencies := true
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     majorVersion                     := 0,
-    scalaVersion                     := "2.12.12",
+    scalaVersion                     := "2.12.15",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     pipelineStages in Assets         := Seq(gzip)
   )
@@ -41,17 +43,24 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     )
   )
-  .settings(
-    ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
-    ThisBuild / semanticdbEnabled := true,
-    ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
-  )
+
+  // Keep this as a reference to reintroduce when a new version is released compatible with 2.12.15
+  // .settings(
+  //   ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
+  //   ThisBuild / semanticdbEnabled := true,
+  //   ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+  // )
+
   .settings(publishingSettings: _*)
   .settings(ScoverageSettings(): _*)
-  .settings(SilencerSettings())
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
-  .settings(resolvers += Resolver.jcenterRepo)
+  .settings(
+    resolvers ++= Seq(
+      Resolver.sonatypeRepo("releases")
+    ),
+    resolvers += "hmrc-releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases/"
+  )
   .settings(
     routesImport ++= Seq(
       "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._"
@@ -67,5 +76,11 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / unmanagedSourceDirectories += (baseDirectory.value / "test-common"),
     inConfig(IntegrationTest)(BloopDefaults.configSettings)
   )
-
-    
+  .settings(
+    scalacOptions ++= Seq(
+    "-Wconf:cat=unused&src=views/.*\\.scala:s",
+    "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
+    "-Wconf:cat=unused&src=.*Routes\\.scala:s",
+    "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s"
+    )
+  )

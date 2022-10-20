@@ -38,6 +38,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SellResellOrDistribute
 
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
@@ -71,7 +72,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
     val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
     val appWithImportantData = anApplication(applicationId).copy(
-          access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))),
+          access = Standard(List.empty, Some(SellResellOrDistribute("Yes")), Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))),
           state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
         )
   }

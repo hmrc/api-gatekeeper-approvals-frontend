@@ -51,7 +51,7 @@ class CheckUrlsController @Inject()(
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
-      case std@ Standard(_, Some(importantSubmissionData)) => 
+      case std@ Standard(_, _, Some(importantSubmissionData)) => 
         successful(
           Ok(
             checkUrlsPage(

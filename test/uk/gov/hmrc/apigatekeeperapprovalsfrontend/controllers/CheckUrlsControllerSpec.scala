@@ -28,6 +28,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SellResellOrDistribute
 
 class CheckUrlsControllerSpec extends AbstractControllerSpec {
   
@@ -46,10 +47,10 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     )
 
     val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
-    val appWithImportantData = anApplication(applicationId).copy(access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))))
+    val appWithImportantData = anApplication(applicationId).copy(access = Standard(List.empty, Some(SellResellOrDistribute("Yes")), Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))))
 
     def appWithData(privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocation.InDesktopSoftware, termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocation.InDesktopSoftware) = {
-      anApplication(applicationId).copy(access = Standard(List.empty, Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, termsAndConditionsLocation, privacyPolicyLocation, List.empty))))
+      anApplication(applicationId).copy(access = Standard(List.empty, Some(SellResellOrDistribute("Yes")), Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, termsAndConditionsLocation, privacyPolicyLocation, List.empty))))
     }
   }
 

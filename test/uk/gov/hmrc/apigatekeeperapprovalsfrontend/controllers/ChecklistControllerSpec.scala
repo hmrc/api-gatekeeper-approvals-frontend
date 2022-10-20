@@ -28,15 +28,19 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMo
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
-  trait Setup extends AbstractSetup with SubscriptionServiceMockModule
+
+  trait BaseSetup extends AbstractSetup
+      with SubscriptionServiceMockModule
       with StrideAuthorisationServiceMockModule {
-    val appChecklistPage = mock[ChecklistPage]
-    when(appChecklistPage.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
+
+    def appChecklistPage: ChecklistPage
+
     val viewModelCaptor = ArgCaptor[ViewModel]
 
-    val controller = new ChecklistController(
+    lazy val controller = new ChecklistController(
       StrideAuthorisationServiceMock.aMock,
       mcc,
       SubmissionReviewServiceMock.aMock,
@@ -46,9 +50,9 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false, requiresDemo: Boolean = false) = {
+    def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false, requiresDemo: Boolean = false, anApplication: Application = application) = {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
+      ApplicationActionServiceMock.Process.thenReturn(anApplication)
 
       val markedSubmissionWithContext = markedSubmission.copy(submission = markedSubmission.submission.copy(context = if (requiresFraudCheck) vatContext else simpleContext))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithContext)
@@ -56,8 +60,17 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
   }
 
+  trait Setup extends BaseSetup {
+    val appChecklistPage = mock[ChecklistPage]
+    when(appChecklistPage.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
+  }
+
+  trait LivePageSetup extends BaseSetup {
+    val appChecklistPage = app.injector.instanceOf[ChecklistPage]
+  }
+
   "Checklist Page" should {
-    "should display check warnings section if submission passed with warnings" in new Setup {
+    "display check warnings section if submission passed with warnings" in new Setup {
       setupForSuccessWith(warnMarkedSubmission)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
@@ -69,7 +82,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkpassed.heading"
       )
     }
-    "should display check failures section if submission failed" in new Setup {
+    "display check failures section if submission failed" in new Setup {
       setupForSuccessWith(failMarkedSubmission)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
@@ -81,7 +94,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkpassed.heading"
       )
     }
-    "should not display check failures/warnings section if submission passed without warnings" in new Setup {
+    "not display check failures/warnings section if submission passed without warnings" in new Setup {
       setupForSuccessWith(passMarkedSubmission)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
@@ -92,7 +105,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkpassed.heading"
       )
     }
-    "should display the correct check application items if fraud check and demo not required" in new Setup {
+    "display the correct check application items if fraud check and demo not required" in new Setup {
       setupForSuccessWith(passMarkedSubmission, false, false)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
@@ -105,7 +118,8 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkapplication.linktext.sandbox"
       )
     }
-    "should display the correct check application items if fraud check and demo are required" in new Setup {
+
+    "display the correct check application items if fraud check and demo are required" in new Setup {
       setupForSuccessWith(passMarkedSubmission, true, true)
 
       await(controller.checklistPage(applicationId)(fakeRequest))
@@ -119,6 +133,26 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
         "checklist.checkapplication.linktext.fraud",
         "checklist.checkapplication.linktext.demo"
       )
+    }
+
+    "render checklist template with in house software section" in new LivePageSetup {
+      setupForSuccessWith(passMarkedSubmission, true, true, inHouseApplication)
+      inHouseApplication.isInHouseSoftware shouldBe true
+      
+      val result = controller.checklistPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should include("This request is from an in-house developer")
+    }
+
+    "render checklist template without in house software section" in new LivePageSetup {
+      setupForSuccessWith(passMarkedSubmission, true, true, application)
+      application.isInHouseSoftware shouldBe false
+
+      val result = controller.checklistPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should not include("This request is from an in-house developer")
     }
   }
 

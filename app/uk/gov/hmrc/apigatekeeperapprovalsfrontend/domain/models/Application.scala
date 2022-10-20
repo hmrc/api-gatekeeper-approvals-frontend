@@ -69,30 +69,23 @@ object State extends PlayEnum[State] {
 case class Application(
   id: ApplicationId,
   clientId: ClientId,
-  // gatewayId: String,
   name: String,
-  // deployedTo: String,
-  // description: Option[String] = None,
   collaborators: Set[Collaborator],
-  // createdOn: DateTime,
-  // lastAccess: Option[DateTime],
-  // grantLength: Int,
-  // lastAccessTokenUsage: Option[DateTime] = None,  
-  // redirectUris: List[String] = List.empty,
-  // termsAndConditionsUrl: Option[String] = None,
-  // privacyPolicyUrl: Option[String] = None,
-  access: Access = Standard(List.empty, None),
+  access: Access = Standard(List.empty, None, None),
   state: ApplicationState = ApplicationState(name = State.TESTING)
-  // rateLimitTier: RateLimitTier = BRONZE,
-  // checkInformation: Option[CheckInformation] = None,
-  // blocked: Boolean = false,
-  // trusted: Boolean = false,
-  // ipAllowlist: IpAllowlist = IpAllowlist()
 ) {
   lazy val importantSubmissionData: Option[ImportantSubmissionData] = access match {
-    case Standard(_, Some(submissionData)) => Some(submissionData)
+    case Standard(_, _, Some(submissionData)) => Some(submissionData)
     case _                                 => None
   }
+
+  lazy val sellResellOrDistribute = access match {
+    case Standard(_, sellResellOrDistribute, _) => sellResellOrDistribute
+    case _                                               => None
+  }
+
+  lazy val isInHouseSoftware = sellResellOrDistribute.fold(false)(_ == SellResellOrDistribute("No"))
+
 }
 
 object Application {
