@@ -28,6 +28,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRF
 import play.api.test.FakeRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SellResellOrDistribute
 
 class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
   override def fakeApplication() =
@@ -51,7 +53,12 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     val errorHandler = app.injector.instanceOf[ErrorHandler]
 
     val application = anApplication(applicationId)
-    
+    val inHouseApplication = application.copy(
+      access = application.access match {
+        case Standard(redirectUris,_,importantSubmissionData) => Standard(redirectUris, Some(SellResellOrDistribute("No")), importantSubmissionData)
+        case other => other
+      }
+    )
     val fakeRequest = FakeRequest().withCSRFToken
 
     val fakeSubmitCheckedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")

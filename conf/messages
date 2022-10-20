@@ -12,6 +12,8 @@ breadcrumbs.applications = Applications
 breadcrumbs.back = Back
 
 checklist.title = Complete the checklist
+checklist.inhouse.label = This request is from an in-house developer
+checklist.inhouse.linktext = Check what you need to do (opens in a new tab)
 checklist.pagetitle = HMRC API Gatekeeper - Complete the checklist
 checklist.requestfailed = This request for production credentials has failed
 checklist.requestpassed = This request for production credentials has passed
