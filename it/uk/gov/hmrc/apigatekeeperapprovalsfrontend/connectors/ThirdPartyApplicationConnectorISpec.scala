@@ -27,7 +27,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 
-class ThirdPartyApplicationConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions{
+class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions{
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port" -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,

@@ -31,7 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
 
-class SubmissionConnectorSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData{
+class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData{
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port" -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
