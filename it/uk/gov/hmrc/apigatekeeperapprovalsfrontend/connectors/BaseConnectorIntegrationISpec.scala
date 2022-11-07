@@ -25,7 +25,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{OptionValues, BeforeAndAfterAll, BeforeAndAfterEach}
 
-trait BaseConnectorIntegrationSpec
+trait BaseConnectorIntegrationISpec
   extends AnyWordSpec
     with Matchers
     with OptionValues
