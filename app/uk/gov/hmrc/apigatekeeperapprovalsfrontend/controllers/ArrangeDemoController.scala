@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ArrangeDemoPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -35,7 +35,8 @@ object ArrangeDemoController {
   case class ViewModel(
     appName: String,
     applicationId: ApplicationId,
-    email: String
+    email: String,
+    isDeleted: Boolean
   )
 }
 
@@ -55,11 +56,12 @@ class ArrangeDemoController @Inject()(
     (request.application.access, request.submission.latestInstance.statusHistory.find(_.isSubmitted)) match {
       // Should only be uplifting and checking Standard apps
       case (std: Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if(request.submission.status.isSubmitted) => 
+        val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
             arrangeDemoPage(
               ArrangeDemoController.ViewModel(
-                request.application.name, applicationId, requestedBy
+                request.application.name, applicationId, requestedBy, isDeleted
               )
             )
           )

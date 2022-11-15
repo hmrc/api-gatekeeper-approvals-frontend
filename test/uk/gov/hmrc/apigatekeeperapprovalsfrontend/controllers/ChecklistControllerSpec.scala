@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{SubmissionReview, ApplicationState}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
@@ -143,6 +143,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe OK
       contentAsString(result) should include("This request is from an in-house developer")
+      contentAsString(result) should not include("This application has been deleted")
     }
 
     "render checklist template without in house software section" in new LivePageSetup {
@@ -153,6 +154,18 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe OK
       contentAsString(result) should not include("This request is from an in-house developer")
+      contentAsString(result) should not include("This application has been deleted")
+    }
+
+    "render checklist template with a deleted application" in new LivePageSetup {
+      val deletedApplication = application.copy(state = ApplicationState.deleted("deleter@example.com"))
+      setupForSuccessWith(passMarkedSubmission, true, true, deletedApplication)
+      application.isInHouseSoftware shouldBe false
+
+      val result = controller.checklistPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should include("This application has been deleted")
     }
   }
 

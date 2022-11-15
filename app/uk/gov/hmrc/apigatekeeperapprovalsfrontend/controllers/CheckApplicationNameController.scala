@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -31,7 +31,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewServi
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckApplicationNameController {  
-  case class ViewModel(appName: String, applicationId: ApplicationId)
+  case class ViewModel(appName: String, applicationId: ApplicationId, isDeleted: Boolean)
 }
 
 @Singleton
@@ -48,11 +48,12 @@ class CheckApplicationNameController @Inject()(
     request.application.access match {
       // Should only be uplifting and checking Standard apps
       case std: Standard if(request.submission.status.isSubmitted) => 
+        val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
             checkApplicationNamePage(
               CheckApplicationNameController.ViewModel(
-                request.application.name, applicationId
+                request.application.name, applicationId, isDeleted
               )
             )
           )

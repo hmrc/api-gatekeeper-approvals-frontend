@@ -33,7 +33,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewServi
 object CheckUrlsController {
   case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String],
                        privacyPolicyLocation: PrivacyPolicyLocation,
-                       termsAndConditionsLocation:TermsAndConditionsLocation) {
+                       termsAndConditionsLocation: TermsAndConditionsLocation,
+                       isDeleted: Boolean) {
     lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
   }
 }
@@ -52,6 +53,7 @@ class CheckUrlsController @Inject()(
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
       case std@ Standard(_, _, Some(importantSubmissionData)) => 
+        val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
             checkUrlsPage(
@@ -60,7 +62,8 @@ class CheckUrlsController @Inject()(
                 applicationId,
                 importantSubmissionData.organisationUrl, 
                 importantSubmissionData.privacyPolicyLocation,
-                importantSubmissionData.termsAndConditionsLocation
+                importantSubmissionData.termsAndConditionsLocation,
+                isDeleted
               )
             )
           )

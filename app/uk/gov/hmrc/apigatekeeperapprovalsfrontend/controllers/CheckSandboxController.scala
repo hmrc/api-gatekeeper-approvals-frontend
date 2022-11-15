@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService, SubscriptionService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -36,7 +36,8 @@ object CheckSandboxController {
     sandboxAppName: String,
     sandboxAppId: ApplicationId,
     sandboxClientId: String,
-    apiSubscriptions: String
+    apiSubscriptions: String,
+    isDeleted: Boolean
   )
 }
 
@@ -53,6 +54,7 @@ class CheckSandboxController @Inject()(
   val subscriptionService: SubscriptionService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
   def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    val isDeleted = request.application.state.name == State.DELETED
     for {
       linkedSubordinateApplication <- applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId)
       apiSubscriptions <- subscriptionService.fetchSubscriptionsByApplicationId(applicationId)
@@ -63,7 +65,8 @@ class CheckSandboxController @Inject()(
         sandboxApplication.name,
         sandboxApplication.id,
         sandboxApplication.clientId.value,
-        apiSubscriptions.map(_.name).mkString(", ")
+        apiSubscriptions.map(_.name).mkString(", "),
+        isDeleted
       )
     )))
   }

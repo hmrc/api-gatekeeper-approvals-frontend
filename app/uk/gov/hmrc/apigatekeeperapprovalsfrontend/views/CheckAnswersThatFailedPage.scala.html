@@ -30,6 +30,10 @@
     @{messages(s"answersthatfailed.${model.messageKey}.title")}
   </h1>
 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+
   <p class="govuk-body">
     @{messages(s"answersthatfailed.${model.messageKey}.helptext")}
   </p>
@@ -61,8 +65,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages(s"answersthatfailed.${model.messageKey}.completed")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("answersthatfailed.save")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages(s"answersthatfailed.${model.messageKey}.completed")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("answersthatfailed.save")}</button>
+      }
     </div>
   }
 }

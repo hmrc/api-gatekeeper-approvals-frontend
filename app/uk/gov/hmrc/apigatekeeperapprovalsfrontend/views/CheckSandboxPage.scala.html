@@ -29,6 +29,10 @@
     @{messages("checksandbox.title")}
   </h1>
 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+  
   <p class="govuk-body">@{messages("checksandbox.requirement1")}</p>
   <p class="govuk-body">@{messages("checksandbox.requirement2")}</p>
 
@@ -71,8 +75,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checksandbox.sandboxchecked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checksandbox.checksandboxlater")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checksandbox.sandboxchecked")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checksandbox.checksandboxlater")}</button>
+      }
     </div>
   }
 }

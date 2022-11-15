@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 object CheckFraudController {
-  case class ViewModel(appName: String, applicationId: ApplicationId)
+  case class ViewModel(appName: String, applicationId: ApplicationId, isDeleted: Boolean)
 }
 
 @Singleton
@@ -43,7 +43,8 @@ class CheckFraudController @Inject()(
   submissionReviewService: SubmissionReviewService
 )(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
   def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-      successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId))))
+      val isDeleted = request.application.state.name == State.DELETED
+      successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
   }
 
   def checkFraudAction(applicationId: ApplicationId): Action[AnyContent] =

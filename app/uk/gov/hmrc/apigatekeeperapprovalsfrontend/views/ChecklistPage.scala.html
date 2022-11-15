@@ -33,6 +33,10 @@
         @{messages("checklist.title")}
     </h1>
     
+    @if(model.isDeleted) {
+      <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+    }
+    
     <div class="govuk-warning-text">
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
@@ -95,8 +99,10 @@
         @helper.CSRF.formField
     
         <div class="govuk-button-group">
-          <button id="completed" class="govuk-button" type="submit" name="submit-action" value="checked">@{messages("checklist.completed")}</button>
-          <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checklist.save")}</button>
+          @if(!model.isDeleted) {
+            <button id="completed" class="govuk-button" type="submit" name="submit-action" value="checked">@{messages("checklist.completed")}</button>
+            <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checklist.save")}</button>
+          }
         </div>
       }
 }
