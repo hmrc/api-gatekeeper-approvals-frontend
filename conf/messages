@@ -166,6 +166,7 @@ providedeclinereasons.button.continue = Save and continue
 applicationsubmissions.pagetitle = HMRC API Gatekeeper - Request for production credentials
 applicationsubmissions.title = Request for production access
 applicationsubmissions.alttitle = Production application
+applicationsubmissions.isdeleted = This application has been deleted
 applicationsubmissions.checkrequest = Check the request
 applicationsubmissions.declinerequest = Decline request
 applicationsubmissions.requestedby = Requested by

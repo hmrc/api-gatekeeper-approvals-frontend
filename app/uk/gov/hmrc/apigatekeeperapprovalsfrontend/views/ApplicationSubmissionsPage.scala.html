@@ -36,6 +36,10 @@
     @model.appName
   </h1>
 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("applicationsubmissions.isdeleted")}</p>
+  }
+
   @if(model.grantedInstance.isDefined) {
     <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@{messages("applicationsubmissions.appdetails")}</h2>
     <p class="govuk-body">
