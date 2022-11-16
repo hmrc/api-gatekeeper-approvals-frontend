@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
-
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -50,6 +50,19 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       val result = controller.checkFraudPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
+      contentAsString(result) should not include("This application has been deleted")
+    }
+
+    "return 200 with a deleted application" in new Setup {
+      val deletedApp = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(deletedApp)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("This application has been deleted")
     }
 
     "return 404" in new Setup {
