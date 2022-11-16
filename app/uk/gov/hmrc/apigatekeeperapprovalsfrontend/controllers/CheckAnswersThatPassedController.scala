@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -35,7 +35,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 object CheckAnswersThatPassedController {  
   case class AnswerDetails(question: String, answer: String)
   case class Section(heading: String, answerDetails: NonEmptyList[AnswerDetails] )
-  case class ViewModel(applicationId: ApplicationId, appName: String, sections: List[Section])
+  case class ViewModel(applicationId: ApplicationId, appName: String, sections: List[Section], isDeleted: Boolean)
 }
 
 @Singleton
@@ -55,6 +55,7 @@ class CheckAnswersThatPassedController @Inject()(
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Pass).getOrElse(false)
     }
+    val isDeleted = request.application.state.name == State.DELETED
 
     val groupedPassedQuestionsIds = 
       request.submission.groups
@@ -80,7 +81,8 @@ class CheckAnswersThatPassedController @Inject()(
           CheckAnswersThatPassedController.ViewModel(
             applicationId,
             request.application.name,
-            groupedPassedQuestionsIds
+            groupedPassedQuestionsIds,
+            isDeleted
           )
         )
       )

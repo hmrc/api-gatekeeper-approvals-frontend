@@ -29,6 +29,10 @@
     @{messages("arrangedemo.title")}
   </h1>
 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+
   <p class="govuk-body">@{messages("arrangedemo.text")} 
     <a href="https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?pageId=407700665" target="_blank" class="govuk-link govuk-link--no-visited-state">@{messages("arrangedemo.linktext")}</a>
   </p>
@@ -48,8 +52,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("arrangedemo.checked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("arrangedemo.checklater")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("arrangedemo.checked")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("arrangedemo.checklater")}</button>
+      }
     </div>
   }
 }

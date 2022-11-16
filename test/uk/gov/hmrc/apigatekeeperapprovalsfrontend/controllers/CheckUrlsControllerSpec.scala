@@ -26,6 +26,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.TermsAndConditio
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.PrivacyPolicyLocation
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SellResellOrDistribute
@@ -64,9 +65,9 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
+      contentAsString(result) should not include("This application has been deleted")
     }
 
-    
     "return 200 for both privacy policy and t&c with URLs" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl"), TermsAndConditionsLocation.Url("aurl")))
@@ -105,6 +106,18 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
+    }
+
+    "return 200 with a deleted application" in new Setup {
+      val deletedApp = appWithData().copy(state = ApplicationState.deleted("delete-user@example.com"))
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(deletedApp)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("This application has been deleted")
     }
 
     "return 404" in new Setup {

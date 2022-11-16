@@ -28,6 +28,10 @@
     @{messages(s"answersthatpassed.title")}
   </h1>
  
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+
   @for(section <- model.sections) {
     <h3 class="govuk-heading-s">
       @section.heading
@@ -46,8 +50,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("answersthatpassed.completed")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("answersthatpassed.save")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("answersthatpassed.completed")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("answersthatpassed.save")}</button>
+      }
     </div>
   }
 }

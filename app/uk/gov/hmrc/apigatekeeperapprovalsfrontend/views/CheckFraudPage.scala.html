@@ -29,6 +29,10 @@
     @{messages("checkfraud.title")}
   </h1>
 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+
   <p class="govuk-body">
     @{messages("checkfraud.description")}
   </p>
@@ -41,8 +45,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkfraud.checked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkfraud.checklater")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkfraud.checked")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkfraud.checklater")}</button>
+      }
     </div>
   }
 }

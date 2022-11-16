@@ -30,8 +30,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
+      }
     </div>
   }
 }
@@ -47,7 +49,9 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.continue")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.continue")}</button>
+      }  
     </div>
   }
 }
@@ -61,8 +65,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.evidencechecked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.comebacktothis")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.evidencechecked")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.comebacktothis")}</button>
+      }
     </div>
   }
 }
@@ -84,8 +90,10 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
+      @if(!model.isDeleted) {
+        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages("checkcompanyregistration.checked")}</button>
+        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checkcompanyregistration.checklater")}</button>
+      }
     </div>
   }
 }
@@ -97,6 +105,10 @@
   <h1 class="govuk-heading-l">        
     @{messages("checkcompanyregistration.title")}
   </h1>
+
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
 
   @{
     model.registrationType match {

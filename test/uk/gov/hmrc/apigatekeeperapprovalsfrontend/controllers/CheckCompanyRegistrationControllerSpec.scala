@@ -21,6 +21,7 @@ import play.api.http.Status
 import play.api.test.Helpers._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
@@ -53,6 +54,19 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       val result = controller.page(applicationId)(fakeRequest)
       
       status(result) shouldBe Status.OK
+      contentAsString(result) should not include("This application has been deleted")
+    }
+
+    "return 200 with a deleted application" in new Setup {
+      val deletedApp = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(deletedApp)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
+
+      val result = controller.page(applicationId)(fakeRequest)
+      
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("This application has been deleted")
     }
 
     "return 400 if the submission is not submitted" in new Setup {

@@ -35,7 +35,7 @@ object ChecklistController {
     lazy val isEmpty = items.isEmpty
   }
   case class ChecklistItem(labelMsgId: String, url: String, uid: String, status: SubmissionReview.Status)
-  case class ViewModel(applicationId: ApplicationId, appName: String, topMsgId: String, sections: List[ChecklistSection], isInHouseSoftware: Boolean)
+  case class ViewModel(applicationId: ApplicationId, appName: String, topMsgId: String, sections: List[ChecklistSection], isInHouseSoftware: Boolean, isDeleted: Boolean)
 }
 
 @Singleton
@@ -83,10 +83,12 @@ class ChecklistController @Inject()(
       case FAILED => "checklist.requestfailed"
     }
     val isInHouseSoftware: Boolean = request.application.isInHouseSoftware
+    val isDeleted = request.application.state.name == State.DELETED
+
     for {
       review <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
       sections = buildChecklistSections(applicationId, review.requiredActions, automaticChecksResult)
-    } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, sections, isInHouseSoftware)))
+    } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, sections, isInHouseSoftware, isDeleted)))
   }
 
   def declineRequest(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>

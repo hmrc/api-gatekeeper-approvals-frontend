@@ -69,6 +69,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
 
       val result = controller.checkSandboxPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
+      contentAsString(result) should not include("This application has been deleted")
     }
 
     "return 404 if no application is found" in new Setup {

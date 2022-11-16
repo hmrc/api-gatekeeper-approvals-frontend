@@ -44,6 +44,9 @@ object ApplicationState {
 
   def production(requestedBy: String, verificationCode: String) =
     ApplicationState(State.PRODUCTION, Some(requestedBy), Some(verificationCode))
+
+  def deleted(requestedBy: String) =
+    ApplicationState(State.DELETED, Some(requestedBy))
 }
 
 sealed trait State extends EnumEntry {

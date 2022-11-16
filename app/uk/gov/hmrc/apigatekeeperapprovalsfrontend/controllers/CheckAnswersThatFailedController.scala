@@ -21,7 +21,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
@@ -36,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 object CheckAnswersThatFailedController {  
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class ViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails]) {
+  case class ViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean) {
     lazy val hasFails: Boolean = answers.exists(_.status == Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsandwarns" else "failsonly"} else "warnsonly"
@@ -59,6 +59,7 @@ class CheckAnswersThatFailedController @Inject()(
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
+    val isDeleted = request.application.state.name == State.DELETED
 
     val questionsAndAnswers: Map[Question, ActualAnswer] = 
       request.submission.latestInstance.answersToQuestions.map {
@@ -85,7 +86,8 @@ class CheckAnswersThatFailedController @Inject()(
           ViewModel(
             applicationId,
             appName,
-            answerDetails
+            answerDetails,
+            isDeleted
           )
         )
       )
