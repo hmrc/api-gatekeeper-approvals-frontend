@@ -52,7 +52,8 @@ object ApplicationSubmissionsController {
     declinedInstances: List[DeclinedInstanceDetails],
     grantedInstance: Option[GrantedInstanceDetails],
     responsibleIndividualEmail: Option[String],
-    pendingResponsibleIndividualVerification: Boolean
+    pendingResponsibleIndividualVerification: Boolean,
+    isDeleted: Boolean
   )
 }
 
@@ -117,6 +118,9 @@ class ApplicationSubmissionsController @Inject()(
     val pendingResponsibleIndividualVerification = 
       request.application.state.name == State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION
 
+    val isDeleted = 
+      request.application.state.name == State.DELETED
+
     successful(Ok(applicationSubmissionsPage(
         ViewModel(applicationId, 
                   appName, 
@@ -125,7 +129,8 @@ class ApplicationSubmissionsController @Inject()(
                   declinedSubmissions, 
                   grantedInstance, 
                   responsibleIndividualEmail, 
-                  pendingResponsibleIndividualVerification
+                  pendingResponsibleIndividualVerification,
+                  isDeleted
                 )
     )))
   }

@@ -92,6 +92,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.grantedInstance shouldBe None
       viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe true
+      viewModelCaptor.value.isDeleted shouldBe false
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
@@ -109,6 +110,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.grantedInstance shouldBe None
       viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
+      viewModelCaptor.value.isDeleted shouldBe false
       viewModelCaptor.value.declinedInstances shouldBe List(
         DeclinedInstanceDetails(declinedTimestamp.toString("dd MMMM yyyy"), 0)
       )
