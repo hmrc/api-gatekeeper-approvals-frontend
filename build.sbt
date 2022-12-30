@@ -56,12 +56,6 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
   .settings(
-    resolvers ++= Seq(
-      Resolver.sonatypeRepo("releases")
-    ),
-    resolvers += "hmrc-releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases/"
-  )
-  .settings(
     routesImport ++= Seq(
       "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._"
     )
