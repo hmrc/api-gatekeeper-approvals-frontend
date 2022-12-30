@@ -3,7 +3,7 @@ import bloop.integrations.sbt.BloopDefaults
 import com.typesafe.sbt.digest.Import._
 import com.typesafe.sbt.uglify.Import._
 import net.ground5hark.sbt.concat.Import._
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, integrationTestSettings, scalaSettings}
+import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "api-gatekeeper-approvals-frontend"
@@ -16,7 +16,7 @@ lazy val microservice = Project(appName, file("."))
     majorVersion                     := 0,
     scalaVersion                     := "2.12.15",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
-    pipelineStages in Assets         := Seq(gzip)
+    Assets / pipelineStages          := Seq(gzip)
   )
   .settings(
     Concat.groups := Seq(
@@ -28,9 +28,9 @@ lazy val microservice = Project(appName, file("."))
       "unused=false",
       "dead_code=true"
     ),
-    includeFilter in uglify := GlobFilter("apis-*.js"),
+    uglify / includeFilter := GlobFilter("apis-*.js"),
     pipelineStages := Seq(digest),
-    pipelineStages in Assets := Seq(
+    Assets / pipelineStages := Seq(
       concat,
       uglify
     )
