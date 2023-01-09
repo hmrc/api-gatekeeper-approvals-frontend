@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import org.joda.time.DateTime
 import java.util.UUID
+
 import cats.data.NonEmptyList
+import org.joda.time.DateTime
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 
 sealed trait QuestionnaireState
 

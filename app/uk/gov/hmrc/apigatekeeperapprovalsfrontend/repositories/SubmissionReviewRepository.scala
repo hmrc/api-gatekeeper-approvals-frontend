@@ -18,12 +18,15 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
+
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionReviewJsonFormatters.submissionReviewFormat
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 @Singleton
 class SubmissionReviewRepo @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext) extends PlayMongoRepository[SubmissionReview](

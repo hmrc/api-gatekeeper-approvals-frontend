@@ -16,15 +16,10 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.services
 
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CompanyRegistrationDetails
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.SingleChoiceAnswer
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.ActualAnswer
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TextAnswer
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Questionnaire
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Question
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.AnswersToQuestions
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CompanyRegistrationDetails
 
 object CompanyDetailsExtractor {
 

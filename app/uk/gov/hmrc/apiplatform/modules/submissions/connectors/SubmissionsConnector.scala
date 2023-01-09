@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.connectors
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.libs.json.Json
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services._
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
-import uk.gov.hmrc.http.UpstreamErrorResponse
-import play.api.libs.json.Json
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
 object SubmissionsConnector {
 

@@ -17,11 +17,12 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.http.metrics.common.API
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+
 import com.kenshoo.play.metrics.Metrics
+
+import uk.gov.hmrc.play.http.metrics.common.API
 
 sealed trait Timer {
   def stop(): Unit

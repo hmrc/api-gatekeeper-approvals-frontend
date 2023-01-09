@@ -17,21 +17,19 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import scala.concurrent.Future.successful
+
+import play.api.mvc.{MessagesControllerComponents, _}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import scala.concurrent.Future.successful
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import play.api.mvc._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
 
 object CheckAnswersThatFailedController {
   case class AnswerDetails(question: String, answer: String, status: Mark)

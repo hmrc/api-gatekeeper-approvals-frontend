@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 import uk.gov.hmrc.http.HeaderCarrier
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ThirdPartyApplicationConnector}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdateSuccessful}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.DeclineApplicationApprovalRequest
-import java.time.LocalDateTime
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdateSuccessful, DeclineApplicationApprovalRequest}
 
 @Singleton
 class ApplicationService @Inject() (

@@ -16,16 +16,12 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import play.api.libs.json.Json
-import play.api.libs.json.JodaReads
-import uk.gov.hmrc.play.json.Union
-import play.api.libs.json.KeyReads
-import play.api.libs.json.JsSuccess
-import play.api.libs.json.KeyWrites
-import play.api.libs.json.JsError
-import play.api.libs.json.JsResult
 import org.joda.time.DateTimeZone
+
+import play.api.libs.json._
+import uk.gov.hmrc.play.json.Union
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview._

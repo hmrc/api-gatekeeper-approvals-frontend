@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 class ApplicationRequest[A](
     val application: Application,

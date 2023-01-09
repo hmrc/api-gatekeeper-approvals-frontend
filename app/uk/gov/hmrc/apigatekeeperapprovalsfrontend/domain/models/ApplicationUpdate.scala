@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import java.time.LocalDateTime
+
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.json.Union
-
-import java.time.LocalDateTime
 
 trait ApplicationUpdate {
   def timestamp: LocalDateTime

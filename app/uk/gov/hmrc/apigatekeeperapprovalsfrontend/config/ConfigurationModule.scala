@@ -17,11 +17,13 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
 import com.google.inject.AbstractModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl, ThirdPartyApplicationConnector}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
+
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.submissions.config.SubmissionsConnectorConfigProvider
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl, ThirdPartyApplicationConnector}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.HandleForbiddenWithView
 
 class ConfigurationModule extends AbstractModule {
 

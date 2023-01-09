@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
-import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
+
+import com.google.inject.ImplementedBy
 
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig

@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import cats.data.EitherT
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
+
+import cats.data.EitherT
+
 import play.api.mvc.{MessagesControllerComponents, _}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId

@@ -17,13 +17,15 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 import scala.concurrent.Future.successful
+import scala.concurrent.{ExecutionContext, Future}
+
+import cats.data.OptionT
+
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
-import cats.data.OptionT
 
 @Singleton
 class SubmissionReviewService @Inject() (

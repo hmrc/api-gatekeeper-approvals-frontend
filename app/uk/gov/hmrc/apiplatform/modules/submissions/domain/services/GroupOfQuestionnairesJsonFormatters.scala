@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.services
 
 import play.api.libs.json.Json
-
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 trait GroupOfQuestionnairesJsonFormatters extends QuestionnaireJsonFormatters {

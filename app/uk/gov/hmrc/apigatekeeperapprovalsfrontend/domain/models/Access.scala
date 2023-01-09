@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.AccessType._
 import play.api.libs.json._
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.AccessType._
 
 case class SellResellOrDistribute(answer: String) extends AnyVal
 

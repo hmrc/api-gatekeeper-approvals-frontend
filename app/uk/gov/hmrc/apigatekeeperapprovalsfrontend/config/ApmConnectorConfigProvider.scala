@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
+import javax.inject.{Inject, Provider, Singleton}
+
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import javax.inject.{Inject, Provider, Singleton}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
 
 @Singleton
 class ApmConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[ApmConnector.Config] {

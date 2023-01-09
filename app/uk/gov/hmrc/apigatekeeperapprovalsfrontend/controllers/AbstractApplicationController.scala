@@ -16,16 +16,17 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
-import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperStrideRoleWithApplicationActions
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
+
 import org.joda.time.DateTime
+
+import play.api.mvc._
+import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperStrideRoleWithApplicationActions
 
 abstract class AbstractApplicationController(
     strideAuthorisationService: StrideAuthorisationService,
