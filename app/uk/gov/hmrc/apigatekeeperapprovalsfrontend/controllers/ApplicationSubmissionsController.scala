@@ -102,11 +102,13 @@ class ApplicationSubmissionsController @Inject() (
       request.markedSubmission.submission.instances.filter(i => i.statusHistory.head.isDeclined)
         .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.asText, i.index))
 
+    // scalastyle:off if.brace
     val grantedInstance =
       if (latestInstanceStatus.isGranted || latestInstanceStatus.isGrantedWithWarnings)
         Some(GrantedInstanceDetails(latestInstanceStatus.timestamp.asText))
       else
         None
+    // scalastyle:on if.brace
 
     val responsibleIndividualEmail =
       request.application.importantSubmissionData.map(i => i.responsibleIndividual.emailAddress)

@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc.{MessagesControllerComponents, _}
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
