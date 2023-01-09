@@ -24,64 +24,64 @@ object SubmissionReview {
   object Status {
     case object NotStarted extends Status
     case object InProgress extends Status
-    case object Completed extends Status
+    case object Completed  extends Status
   }
 
   sealed trait Action
 
   object Action {
-    case object CheckFailsAndWarnings extends Action
-    case object CheckApplicationName extends Action
+    case object CheckFailsAndWarnings    extends Action
+    case object CheckApplicationName     extends Action
     case object CheckCompanyRegistration extends Action
-    case object CheckUrls extends Action
-    case object CheckSandboxTesting extends Action
+    case object CheckUrls                extends Action
+    case object CheckSandboxTesting      extends Action
     case object CheckFraudPreventionData extends Action
-    case object ArrangedDemo extends Action
-    case object CheckPassedAnswers extends Action
+    case object ArrangedDemo             extends Action
+    case object CheckPassedAnswers       extends Action
 
     def fromText(text: String): Option[Action] = {
       import cats.implicits._
       text match {
-        case "CheckFailsAndWarnings"                => CheckFailsAndWarnings.some
-        case "CheckApplicationName"                 => CheckApplicationName.some
-        case "CheckCompanyRegistration"             => CheckCompanyRegistration.some
-        case "CheckUrls"                            => CheckUrls.some
-        case "CheckSandboxTesting"                  => CheckSandboxTesting.some
-        case "CheckFraudPreventionData"             => CheckFraudPreventionData.some
-        case "ArrangedDemo"                         => ArrangedDemo.some
-        case "CheckPassedAnswers"                   => CheckPassedAnswers.some
-        case _                                      => None
+        case "CheckFailsAndWarnings"    => CheckFailsAndWarnings.some
+        case "CheckApplicationName"     => CheckApplicationName.some
+        case "CheckCompanyRegistration" => CheckCompanyRegistration.some
+        case "CheckUrls"                => CheckUrls.some
+        case "CheckSandboxTesting"      => CheckSandboxTesting.some
+        case "CheckFraudPreventionData" => CheckFraudPreventionData.some
+        case "ArrangedDemo"             => ArrangedDemo.some
+        case "CheckPassedAnswers"       => CheckPassedAnswers.some
+        case _                          => None
       }
     }
 
     def toText(action: Action) = action match {
-        case CheckFailsAndWarnings                => "CheckFailsAndWarnings"
-        case CheckApplicationName                 => "CheckApplicationName"
-        case CheckCompanyRegistration             => "CheckCompanyRegistration"
-        case CheckUrls                            => "CheckUrls"
-        case CheckSandboxTesting                  => "CheckSandboxTesting"
-        case CheckFraudPreventionData             => "CheckFraudPreventionData"
-        case ArrangedDemo                         => "ArrangedDemo"
-        case CheckPassedAnswers                   => "CheckPassedAnswers"
+      case CheckFailsAndWarnings    => "CheckFailsAndWarnings"
+      case CheckApplicationName     => "CheckApplicationName"
+      case CheckCompanyRegistration => "CheckCompanyRegistration"
+      case CheckUrls                => "CheckUrls"
+      case CheckSandboxTesting      => "CheckSandboxTesting"
+      case CheckFraudPreventionData => "CheckFraudPreventionData"
+      case ArrangedDemo             => "ArrangedDemo"
+      case CheckPassedAnswers       => "CheckPassedAnswers"
     }
   }
 
   private def apply(
-    submissionId: Submission.Id,
-    instanceIndex: Int,
-    requiredActions: List[Action]
-  ): SubmissionReview =
+      submissionId: Submission.Id,
+      instanceIndex: Int,
+      requiredActions: List[Action]
+    ): SubmissionReview =
     SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
   def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
-    val alternativeActions: List[Action] = 
+    val alternativeActions: List[Action] =
       (isSuccessful, hasWarnings) match {
-        case (true, false)  => List.empty
-        case (_, _)         => List(Action.CheckFailsAndWarnings)
+        case (true, false) => List.empty
+        case (_, _)        => List(Action.CheckFailsAndWarnings)
       }
 
     val fraudAction = if (requiresFraudCheck) List(Action.CheckFraudPreventionData) else List()
-    val demoAction = if (requiresDemo) List(Action.ArrangedDemo) else List()
+    val demoAction  = if (requiresDemo) List(Action.ArrangedDemo) else List()
 
     val fixedActions: List[Action] =
       List(
@@ -94,36 +94,40 @@ object SubmissionReview {
 
     SubmissionReview(
       submissionId,
-      instanceIndex, 
+      instanceIndex,
       alternativeActions ++ fraudAction ++ demoAction ++ fixedActions
     )
   }
 
-  val updateDeclineReasons: String => SubmissionReview => SubmissionReview = reasons => review => {
-    review.copy(declineReasons = reasons)
-  }
+  val updateDeclineReasons: String => SubmissionReview => SubmissionReview = reasons =>
+    review => {
+      review.copy(declineReasons = reasons)
+    }
 
-  val updateGrantWarnings: String => SubmissionReview => SubmissionReview = warnings => review => {
-    review.copy(grantWarnings = warnings)
-  }
+  val updateGrantWarnings: String => SubmissionReview => SubmissionReview = warnings =>
+    review => {
+      review.copy(grantWarnings = warnings)
+    }
 
-  val updateReviewActionStatus : (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) => review => {
-    require(review.requiredActions.keySet.contains(action))
-    review.copy(requiredActions = review.requiredActions + (action -> newStatus))
-  }
+  val updateReviewActionStatus: (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) =>
+    review => {
+      require(review.requiredActions.keySet.contains(action))
+      review.copy(requiredActions = review.requiredActions + (action -> newStatus))
+    }
 
-  val updateEscalatedTo: String => SubmissionReview => SubmissionReview = escalated => review => {
-    review.copy(escalatedTo = Some(escalated))
-  }
+  val updateEscalatedTo: String => SubmissionReview => SubmissionReview = escalated =>
+    review => {
+      review.copy(escalatedTo = Some(escalated))
+    }
 }
 
-case class SubmissionReview private(
-  submissionId: Submission.Id,
-  instanceIndex: Int,
-  declineReasons: String,
-  grantWarnings: String,
-  escalatedTo: Option[String],
-  requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
-) {
+case class SubmissionReview private (
+    submissionId: Submission.Id,
+    instanceIndex: Int,
+    declineReasons: String,
+    grantWarnings: String,
+    escalatedTo: Option[String],
+    requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
+  ) {
   lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty
 }

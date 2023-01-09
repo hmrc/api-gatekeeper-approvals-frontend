@@ -28,16 +28,17 @@ object ApmConnector {
 }
 
 @Singleton
-class ApmConnector @Inject()(
-  httpClient: HttpClient,
-  config: ApmConnector.Config,
-  val metrics: ConnectorMetrics
-)(implicit val ec: ExecutionContext) {
+class ApmConnector @Inject() (
+    httpClient: HttpClient,
+    config: ApmConnector.Config,
+    val metrics: ConnectorMetrics
+  )(implicit val ec: ExecutionContext
+  ) {
 
   val serviceBaseUrl = config.serviceBaseUrl
 
   val api = API("api-platform-microservice")
-  
+
   def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
     import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -47,11 +48,11 @@ class ApmConnector @Inject()(
     }
   }
 
-  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String,ApiDefinition]] = {
+  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String, ApiDefinition]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Map[String,ApiDefinition]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.value))
+      httpClient.GET[Map[String, ApiDefinition]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.value))
     }
   }
 

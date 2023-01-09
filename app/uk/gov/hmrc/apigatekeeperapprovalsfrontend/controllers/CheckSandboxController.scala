@@ -30,45 +30,50 @@ import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 object CheckSandboxController {
+
   case class ViewModel(
-    appName: String,
-    applicationId: ApplicationId,
-    sandboxAppName: String,
-    sandboxAppId: ApplicationId,
-    sandboxClientId: String,
-    apiSubscriptions: String,
-    isDeleted: Boolean
-  )
+      appName: String,
+      applicationId: ApplicationId,
+      sandboxAppName: String,
+      sandboxAppId: ApplicationId,
+      sandboxClientId: String,
+      apiSubscriptions: String,
+      isDeleted: Boolean
+    )
 }
 
 @Singleton
-class CheckSandboxController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  checkSandboxPage: CheckSandboxPage,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  val applicationService: ApplicationService,
-  val subscriptionService: SubscriptionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+class CheckSandboxController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    checkSandboxPage: CheckSandboxPage,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService,
+    val applicationService: ApplicationService,
+    val subscriptionService: SubscriptionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+
   def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val isDeleted = request.application.state.name == State.DELETED
     for {
       linkedSubordinateApplication <- applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId)
-      apiSubscriptions <- subscriptionService.fetchSubscriptionsByApplicationId(applicationId)
-    } yield linkedSubordinateApplication.fold[Result](NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi))))(sandboxApplication => Ok(checkSandboxPage(
-      ViewModel(
-        request.application.name,
-        applicationId,
-        sandboxApplication.name,
-        sandboxApplication.id,
-        sandboxApplication.clientId.value,
-        apiSubscriptions.map(_.name).mkString(", "),
-        isDeleted
-      )
-    )))
+      apiSubscriptions             <- subscriptionService.fetchSubscriptionsByApplicationId(applicationId)
+    } yield linkedSubordinateApplication.fold[Result](NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi))))(sandboxApplication =>
+      Ok(checkSandboxPage(
+        ViewModel(
+          request.application.name,
+          applicationId,
+          sandboxApplication.name,
+          sandboxApplication.id,
+          sandboxApplication.clientId.value,
+          apiSubscriptions.map(_.name).mkString(", "),
+          isDeleted
+        )
+      ))
+    )
   }
 
   def checkSandboxAction(applicationId: ApplicationId): Action[AnyContent] =

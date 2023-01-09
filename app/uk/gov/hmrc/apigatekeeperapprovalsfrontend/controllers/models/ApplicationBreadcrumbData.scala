@@ -19,6 +19,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
 case class ApplicationBreadcrumbData(
-  id: ApplicationId,
-  applicationName: String
-)
+    id: ApplicationId,
+    applicationName: String
+  )

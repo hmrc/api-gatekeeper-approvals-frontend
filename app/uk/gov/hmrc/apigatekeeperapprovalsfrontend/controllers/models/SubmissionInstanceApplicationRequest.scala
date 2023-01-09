@@ -19,5 +19,5 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 
-class SubmissionInstanceApplicationRequest[A](markedSubmission: MarkedSubmission, val instance: Submission.Instance, applicationRequest: ApplicationRequest[A]) 
-  extends MarkedSubmissionApplicationRequest[A](markedSubmission, applicationRequest) 
+class SubmissionInstanceApplicationRequest[A](markedSubmission: MarkedSubmission, val instance: Submission.Instance, applicationRequest: ApplicationRequest[A])
+    extends MarkedSubmissionApplicationRequest[A](markedSubmission, applicationRequest)

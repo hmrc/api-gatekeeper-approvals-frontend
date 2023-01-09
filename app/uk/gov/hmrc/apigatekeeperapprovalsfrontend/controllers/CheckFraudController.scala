@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, SubmissionReview, State}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -33,18 +33,20 @@ object CheckFraudController {
 }
 
 @Singleton
-class CheckFraudController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  page: CheckFraudPage,
-  errorHandler: ErrorHandler,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+class CheckFraudController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    page: CheckFraudPage,
+    errorHandler: ErrorHandler,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService,
+    submissionReviewService: SubmissionReviewService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+
   def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-      val isDeleted = request.application.state.name == State.DELETED
-      successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
+    val isDeleted = request.application.state.name == State.DELETED
+    successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
   }
 
   def checkFraudAction(applicationId: ApplicationId): Action[AnyContent] =

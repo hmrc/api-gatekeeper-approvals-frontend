@@ -32,41 +32,45 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 object ArrangeDemoController {
+
   case class ViewModel(
-    appName: String,
-    applicationId: ApplicationId,
-    email: String,
-    isDeleted: Boolean
-  )
+      appName: String,
+      applicationId: ApplicationId,
+      email: String,
+      isDeleted: Boolean
+    )
 }
 
 @Singleton
-class ArrangeDemoController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  arrangeDemoPage: ArrangeDemoPage,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+class ArrangeDemoController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    arrangeDemoPage: ArrangeDemoPage,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-
     (request.application.access, request.submission.latestInstance.statusHistory.find(_.isSubmitted)) match {
       // Should only be uplifting and checking Standard apps
-      case (std: Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if(request.submission.status.isSubmitted) => 
+      case (std: Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if (request.submission.status.isSubmitted) =>
         val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
             arrangeDemoPage(
               ArrangeDemoController.ViewModel(
-                request.application.name, applicationId, requestedBy, isDeleted
+                request.application.name,
+                applicationId,
+                requestedBy,
+                isDeleted
               )
             )
           )
         )
-      case _ => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                                                                                     => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }
 

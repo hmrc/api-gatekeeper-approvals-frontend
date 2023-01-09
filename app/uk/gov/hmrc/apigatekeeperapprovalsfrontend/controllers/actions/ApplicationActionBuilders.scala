@@ -34,7 +34,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.SubmissionI
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
-  
+
   def errorHandler: ErrorHandler
   def applicationActionService: ApplicationActionService
   def submissionService: SubmissionService
@@ -50,36 +50,36 @@ trait ApplicationActionBuilders {
         import cats.implicits._
 
         applicationActionService.process(applicationId, request)
-        .toRight(NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi)))).value
+          .toRight(NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi)))).value
       }
     }
   }
 
   def applicationSubmissionRefiner(implicit ec: ExecutionContext): ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] =
     new ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] {
-      override def executionContext = ec
+      override def executionContext                                                                                         = ec
+
       override def refine[A](request: ApplicationRequest[A]): Future[Either[Result, MarkedSubmissionApplicationRequest[A]]] = {
         implicit val implicitRequest: MessagesRequest[A] = request
-        
+
         (
           for {
-            submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)) )
+            submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)))
           } yield new MarkedSubmissionApplicationRequest(submission, request)
         )
-        .value
+          .value
       }
     }
 
-    def submissionInstanceRefiner(index: Int)(implicit ec: ExecutionContext): ActionRefiner[MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest] =
-      new ActionRefiner[MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest] {
-        override def executionContext = ec
-        
-        override def refine[A](request: MarkedSubmissionApplicationRequest[A]): Future[Either[Result, SubmissionInstanceApplicationRequest[A]]] = {          
-          successful(request.submission.instances.find(_.index == index) match {
-            case Some(instance) => Right(new SubmissionInstanceApplicationRequest(request.markedSubmission, instance, request))
-            case None => Left(BadRequest(s"No submission with index $index found for application"))
-          })
-        }
+  def submissionInstanceRefiner(index: Int)(implicit ec: ExecutionContext): ActionRefiner[MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest] =
+    new ActionRefiner[MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest] {
+      override def executionContext = ec
+
+      override def refine[A](request: MarkedSubmissionApplicationRequest[A]): Future[Either[Result, SubmissionInstanceApplicationRequest[A]]] = {
+        successful(request.submission.instances.find(_.index == index) match {
+          case Some(instance) => Right(new SubmissionInstanceApplicationRequest(request.markedSubmission, instance, request))
+          case None           => Left(BadRequest(s"No submission with index $index found for application"))
+        })
       }
     }
-
+}

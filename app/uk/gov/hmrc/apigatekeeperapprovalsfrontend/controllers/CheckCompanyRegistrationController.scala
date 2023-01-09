@@ -33,45 +33,49 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 case class CompanyRegistrationDetails(registrationType: String, registrationValue: Option[String])
 
-object CheckCompanyRegistrationController {  
+object CheckCompanyRegistrationController {
+
   case class ViewModel(appName: String, applicationId: ApplicationId, registrationType: String, registrationValue: Option[String], isDeleted: Boolean) {
     lazy val hasRegistrationDetails: Boolean = registrationValue.isDefined
   }
 }
 
 @Singleton
-class CheckCompanyRegistrationController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  checkCompanyRegistrationPage: CheckCompanyRegistrationPage,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+class CheckCompanyRegistrationController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    checkCompanyRegistrationPage: CheckCompanyRegistrationPage,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val companyDetails = CompanyDetailsExtractor(request.submission)    
-    
+    val companyDetails = CompanyDetailsExtractor(request.submission)
+
     (request.application.access, companyDetails) match {
       // Should only be uplifting and checking Standard apps
-      case (std: Standard, Some(details)) if(request.submission.status.isSubmitted) =>  
+      case (std: Standard, Some(details)) if (request.submission.status.isSubmitted) =>
         val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
             checkCompanyRegistrationPage(
               CheckCompanyRegistrationController.ViewModel(
-                request.application.name, applicationId,
-                details.registrationType, 
+                request.application.name,
+                applicationId,
+                details.registrationType,
                 details.registrationValue,
                 isDeleted
               )
             )
           )
         )
-      case _ => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                                         => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = 
+  def action(applicationId: ApplicationId): Action[AnyContent] =
     updateActionStatus(SubmissionReview.Action.CheckCompanyRegistration)(applicationId)
 }

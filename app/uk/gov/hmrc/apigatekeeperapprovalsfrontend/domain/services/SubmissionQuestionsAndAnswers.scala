@@ -21,12 +21,14 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswers
 
 object SubmissionQuestionsAndAnswers {
   case class QuestionAndAnswer(question: String, answer: String)
+
   case class QuestionAndAnswerGroup(heading: String, questionsAndAnswers: List[QuestionAndAnswer]) {
     lazy val isEmpty = questionsAndAnswers.isEmpty
   }
+
   def isDisplayable(answer: ActualAnswer) = answer match {
     case NoAnswer | AcknowledgedAnswer => false
-    case _ => true
+    case _                             => true
   }
 
   def apply(submission: Submission, index: Int): List[QuestionAndAnswerGroup] = {
@@ -36,7 +38,7 @@ object SubmissionQuestionsAndAnswers {
       val question = questionItem.question.wording.value
       instance.answersToQuestions.get(questionItem.question.id).filter(isDisplayable(_)).map(answer => QuestionAndAnswer(question, ActualAnswersAsText(answer)))
     }
-    
+
     def questionnaireToQuestionAndAnswerGroup(questionnaire: Questionnaire) = {
       val questionsAndAnswers = questionnaire.questions.map(questionItemToQuestionAndAnswer).toList.flatten
       QuestionAndAnswerGroup(questionnaire.label.value, questionsAndAnswers)

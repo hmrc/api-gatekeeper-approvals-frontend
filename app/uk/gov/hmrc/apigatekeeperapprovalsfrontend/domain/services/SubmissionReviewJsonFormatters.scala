@@ -34,7 +34,7 @@ trait SubmissionReviewJsonFormatters {
 
   implicit val ReviewNotStartedStatusFormat = Json.format[Status.NotStarted.type]
   implicit val ReviewInProgressStatusFormat = Json.format[Status.InProgress.type]
-  implicit val ReviewCompletedStatusFormat = Json.format[Status.Completed.type]
+  implicit val ReviewCompletedStatusFormat  = Json.format[Status.Completed.type]
 
   implicit val reviewStatus = Union.from[Status]("Review.StatusType")
     .and[Status.NotStarted.type]("notstarted")
@@ -42,10 +42,10 @@ trait SubmissionReviewJsonFormatters {
     .and[Status.Completed.type]("completed")
     .format
 
-  implicit val actionKeyReads: KeyReads[Action] = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
+  implicit val actionKeyReads: KeyReads[Action]   = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
   implicit val actionKeyWrites: KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
-  
-  implicit val submissionReviewFormat = Json.format[SubmissionReview]    
+
+  implicit val submissionReviewFormat = Json.format[SubmissionReview]
 }
 
 object SubmissionReviewJsonFormatters extends SubmissionReviewJsonFormatters

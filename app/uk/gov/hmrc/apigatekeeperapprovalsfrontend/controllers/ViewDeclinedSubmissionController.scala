@@ -32,49 +32,57 @@ import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
-
 object ViewDeclinedSubmissionController {
+
   case class ViewModel(
-    appName: String,
-    applicationId: ApplicationId,
-    submitterEmail: String,
-    submittedDate: String,
-    declinedName: String,
-    declinedDate: String,
-    reasons: String,
-    index: Int
-  )
+      appName: String,
+      applicationId: ApplicationId,
+      submitterEmail: String,
+      submittedDate: String,
+      declinedName: String,
+      declinedDate: String,
+      reasons: String,
+      index: Int
+    )
 }
 
 @Singleton
-class ViewDeclinedSubmissionController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
-  
+class ViewDeclinedSubmissionController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
+
   import ViewDeclinedSubmissionController._
 
   def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
       successful(BadRequest(errorHandler.badRequestTemplate(request)))
-    )(
-      instance => {
-        (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-          case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
-            successful(Ok(viewDeclinedSubmissionPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, declinedName, declinedTimestamp.asText, reasons, instance.index))))
-          case _ => 
-            logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
-            successful(BadRequest(errorHandler.badRequestTemplate(request)))
-        }
+    )(instance => {
+      (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
+        case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
+          successful(Ok(viewDeclinedSubmissionPage(ViewModel(
+            appName,
+            applicationId,
+            requestedBy,
+            submittedTimestamp.asText,
+            declinedName,
+            declinedTimestamp.asText,
+            reasons,
+            instance.index
+          ))))
+        case _                                                                                                                        =>
+          logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
+          successful(BadRequest(errorHandler.badRequestTemplate(request)))
+      }
     })
-    
+
   }
 }

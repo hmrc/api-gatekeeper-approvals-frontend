@@ -47,24 +47,24 @@ object GrantedJourneyController {
   val provideEscalatedToForm: Form[ProvideEscalatedToForm] = Form(
     mapping(
       "first-name" -> nonEmptyText,
-      "last-name" -> nonEmptyText
+      "last-name"  -> nonEmptyText
     )(ProvideEscalatedToForm.apply)(ProvideEscalatedToForm.unapply)
   )
 }
 
 @Singleton
-class GrantedJourneyController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  submissionReviewService: SubmissionReviewService,
-  provideWarningsForGrantingPage: ProvideWarningsForGrantingPage,
-  provideEscalatedToForGrantingPage: ProvideEscalatedToForGrantingPage,
-  applicationApprovedPage: ApplicationApprovedPage
-)(implicit override val ec: ExecutionContext)
-  extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUnsafeDefaultFormBinding {
+class GrantedJourneyController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService,
+    submissionReviewService: SubmissionReviewService,
+    provideWarningsForGrantingPage: ProvideWarningsForGrantingPage,
+    provideEscalatedToForGrantingPage: ProvideEscalatedToForGrantingPage,
+    applicationApprovedPage: ApplicationApprovedPage
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUnsafeDefaultFormBinding {
   import GrantedJourneyController._
 
   def provideWarningsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
@@ -75,18 +75,21 @@ class GrantedJourneyController @Inject()(
     def handleValidForm(form: ProvideWarningsForm) = {
       (
         for {
-          review      <- EitherT.fromOptionF(submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index), "There was a problem updating the grant warnings on the submission review")
+          review      <- EitherT.fromOptionF(
+                           submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index),
+                           "There was a problem updating the grant warnings on the submission review"
+                         )
           application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings, review.escalatedTo))
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
       )
-      .value
-      .map {
-        case Right(value) => value
-        case Left(err) => {
-          logger.warn(s"Error granting access for application $applicationId: $err")
-          InternalServerError(errorHandler.internalServerErrorTemplate)
+        .value
+        .map {
+          case Right(value) => value
+          case Left(err)    => {
+            logger.warn(s"Error granting access for application $applicationId: $err")
+            InternalServerError(errorHandler.internalServerErrorTemplate)
+          }
         }
-      }
     }
 
     def handleInvalidForm(form: Form[ProvideWarningsForm]) = {
@@ -105,10 +108,10 @@ class GrantedJourneyController @Inject()(
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index)
         .map {
           case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
-          case None        => { 
-                                logger.warn(s"Error updating submission review for application $applicationId: There was a problem updating the escalated to on the submission review")
-                                InternalServerError(errorHandler.internalServerErrorTemplate)
-                              }
+          case None        => {
+            logger.warn(s"Error updating submission review for application $applicationId: There was a problem updating the escalated to on the submission review")
+            InternalServerError(errorHandler.internalServerErrorTemplate)
+          }
         }
     }
 

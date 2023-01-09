@@ -30,14 +30,15 @@ object ThirdPartyApplicationConnector {
 }
 
 @Singleton
-class ThirdPartyApplicationConnector @Inject()(
-  httpClient: HttpClient,
-  config: ThirdPartyApplicationConnector.Config,
-  val metrics: ConnectorMetrics
-)(implicit val ec: ExecutionContext) extends ApplicationUpdateFormatters with CommonResponseHandlers {
+class ThirdPartyApplicationConnector @Inject() (
+    httpClient: HttpClient,
+    config: ThirdPartyApplicationConnector.Config,
+    val metrics: ConnectorMetrics
+  )(implicit val ec: ExecutionContext
+  ) extends ApplicationUpdateFormatters with CommonResponseHandlers {
 
   val serviceBaseUrl = config.serviceBaseUrl
-  val api = API("third-party-application")
+  val api            = API("third-party-application")
 
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
@@ -51,5 +52,5 @@ class ThirdPartyApplicationConnector @Inject()(
     metrics.record(api) {
       httpClient.PATCH[ApplicationUpdate, ErrorOrUnit](s"$serviceBaseUrl/application/${applicationId.value}", request).map(throwOr(ApplicationUpdateSuccessful))
     }
-  }  
+  }
 }

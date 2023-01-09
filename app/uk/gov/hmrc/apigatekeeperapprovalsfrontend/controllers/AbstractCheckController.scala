@@ -27,14 +27,13 @@ import play.api.mvc._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
-
 abstract class AbstractCheckController(
-  strideAuthorisationService: StrideAuthorisationService,
-
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   type Fn = (SubmissionReview.Status) => (Submission.Id, Int) => Future[Option[SubmissionReview]]
 
@@ -45,20 +44,27 @@ abstract class AbstractCheckController(
   }
 
   def deriveStatusFromAction(formAction: String): Option[SubmissionReview.Status] = formAction match {
-    case "checked"          => Some(SubmissionReview.Status.Completed)
-    case "come-back-later"  => Some(SubmissionReview.Status.InProgress)
-    case _                  => None
+    case "checked"         => Some(SubmissionReview.Status.Completed)
+    case "come-back-later" => Some(SubmissionReview.Status.InProgress)
+    case _                 => None
   }
 
-  def updateActionStatus(reviewAction: SubmissionReview.Action)(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
+  def updateActionStatus(
+      reviewAction: SubmissionReview.Action
+    )(
+      applicationId: ApplicationId
+    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(reviewAction) _
 
     (
       for {
-        formAction   <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
-        newStatus    <- fromOption(deriveStatusFromAction(formAction), log("Invalid submit-action found in request"))
-        _            <- fromOptionF(submissionReviewService.updateActionStatus(reviewAction, newStatus)(request.submission.id, request.submission.latestInstance.index), log("Failed to find existing review"))
+        formAction <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
+        newStatus  <- fromOption(deriveStatusFromAction(formAction), log("Invalid submit-action found in request"))
+        _          <- fromOptionF(
+                        submissionReviewService.updateActionStatus(reviewAction, newStatus)(request.submission.id, request.submission.latestInstance.index),
+                        log("Failed to find existing review")
+                      )
       } yield ok
     ).fold(identity(_), identity(_))
   }

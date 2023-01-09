@@ -24,13 +24,14 @@ import uk.gov.hmrc.apiplatform.modules.submissions.config.SubmissionsConnectorCo
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 
 class ConfigurationModule extends AbstractModule {
+
   override def configure() = {
     bind(classOf[ConnectorMetrics]).to(classOf[ConnectorMetricsImpl])
 
     bind(classOf[ThirdPartyApplicationConnector.Config]).toProvider(classOf[ThirdPartyApplicationConnectorConfigProvider])
     bind(classOf[ApmConnector.Config]).toProvider(classOf[ApmConnectorConfigProvider])
     bind(classOf[SubmissionsConnector.Config]).toProvider(classOf[SubmissionsConnectorConfigProvider])
-    
+
     bind(classOf[ForbiddenHandler]).to(classOf[HandleForbiddenWithView])
 
     bind(classOf[GatekeeperConfig]).toProvider(classOf[GatekeeperConfigProvider])

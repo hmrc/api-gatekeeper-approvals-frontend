@@ -25,11 +25,12 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.DeclineApplicati
 import java.time.LocalDateTime
 
 @Singleton
-class ApplicationService @Inject()(
-  thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
-  apmConnector: ApmConnector
-)(implicit val ec: ExecutionContext) {
-  
+class ApplicationService @Inject() (
+    thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
+    apmConnector: ApmConnector
+  )(implicit val ec: ExecutionContext
+  ) {
+
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
   }

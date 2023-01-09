@@ -28,10 +28,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 @Singleton
-class ApplicationActionService @Inject()(
-  applicationService: ApplicationService
-)(implicit ec: ExecutionContext) {
-  
+class ApplicationActionService @Inject() (
+    applicationService: ApplicationService
+  )(implicit ec: ExecutionContext
+  ) {
+
   def process[A](applicationId: ApplicationId, loggedInRequest: LoggedInRequest[A])(implicit hc: HeaderCarrier): OptionT[Future, ApplicationRequest[A]] = {
     import cats.implicits._
 

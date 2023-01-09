@@ -26,18 +26,26 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewR
 import cats.data.OptionT
 
 @Singleton
-class SubmissionReviewService @Inject()(
-  repo: SubmissionReviewRepo
-)(implicit val ec: ExecutionContext) {
+class SubmissionReviewService @Inject() (
+    repo: SubmissionReviewRepo
+  )(implicit val ec: ExecutionContext
+  ) {
 
-  def findOrCreateReview(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): Future[SubmissionReview] = {
+  def findOrCreateReview(
+      submissionId: Submission.Id,
+      instanceIndex: Int,
+      isSuccessful: Boolean,
+      hasWarnings: Boolean,
+      requiresFraudCheck: Boolean,
+      requiresDemo: Boolean
+    ): Future[SubmissionReview] = {
     def createANewReview = {
-      
+
       repo.create(SubmissionReview(submissionId, instanceIndex, isSuccessful, hasWarnings, requiresFraudCheck, requiresDemo))
     }
 
     repo.find(submissionId, instanceIndex)
-      .flatMap( _.fold(createANewReview)(r => successful(r)))
+      .flatMap(_.fold(createANewReview)(r => successful(r)))
   }
 
   def findReview(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
@@ -47,44 +55,44 @@ class SubmissionReviewService @Inject()(
   def updateDeclineReasons(reasons: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
-        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
-        changedReview      = SubmissionReview.updateDeclineReasons(reasons)(originalReview)
-        _                 <- OptionT.liftF(repo.update(changedReview))
+        originalReview <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview   = SubmissionReview.updateDeclineReasons(reasons)(originalReview)
+        _              <- OptionT.liftF(repo.update(changedReview))
       } yield changedReview
     )
-    .value
+      .value
   }
 
   def updateGrantWarnings(warnings: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
-        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
-        changedReview      = SubmissionReview.updateGrantWarnings(warnings)(originalReview)
-        _                 <- OptionT.liftF(repo.update(changedReview))
+        originalReview <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview   = SubmissionReview.updateGrantWarnings(warnings)(originalReview)
+        _              <- OptionT.liftF(repo.update(changedReview))
       } yield changedReview
     )
-    .value
+      .value
   }
 
   def updateEscalatedTo(escalatedTo: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
-        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
-        changedReview      = SubmissionReview.updateEscalatedTo(escalatedTo)(originalReview)
-        _                 <- OptionT.liftF(repo.update(changedReview))
+        originalReview <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview   = SubmissionReview.updateEscalatedTo(escalatedTo)(originalReview)
+        _              <- OptionT.liftF(repo.update(changedReview))
       } yield changedReview
     )
-    .value
+      .value
   }
 
   def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
-        originalReview    <- OptionT(repo.find(submissionId, instanceIndex))
-        changedReview      = SubmissionReview.updateReviewActionStatus(action, newStatus)(originalReview)
-        _                 <- OptionT.liftF(repo.update(changedReview))
+        originalReview <- OptionT(repo.find(submissionId, instanceIndex))
+        changedReview   = SubmissionReview.updateReviewActionStatus(action, newStatus)(originalReview)
+        _              <- OptionT.liftF(repo.update(changedReview))
       } yield changedReview
     )
-    .value
+      .value
   }
 }

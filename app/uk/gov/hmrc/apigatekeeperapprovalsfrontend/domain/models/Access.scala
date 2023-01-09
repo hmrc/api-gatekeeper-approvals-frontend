@@ -19,7 +19,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.AccessType._
 import play.api.libs.json._
 
-
 case class SellResellOrDistribute(answer: String) extends AnyVal
 
 object SellResellOrDistribute {
@@ -29,13 +28,13 @@ object SellResellOrDistribute {
 }
 
 case class ImportantSubmissionData(
-  organisationUrl: Option[String] = None,
-  responsibleIndividual: ResponsibleIndividual,
-  serverLocations: Set[ServerLocation],
-  termsAndConditionsLocation: TermsAndConditionsLocation,
-  privacyPolicyLocation: PrivacyPolicyLocation,
-  termsOfUseAcceptances: List[TermsOfUseAcceptance]
-)
+    organisationUrl: Option[String] = None,
+    responsibleIndividual: ResponsibleIndividual,
+    serverLocations: Set[ServerLocation],
+    termsAndConditionsLocation: TermsAndConditionsLocation,
+    privacyPolicyLocation: PrivacyPolicyLocation,
+    termsOfUseAcceptances: List[TermsOfUseAcceptance]
+  )
 
 object ImportantSubmissionData {
   implicit val format = Json.format[ImportantSubmissionData]
@@ -46,10 +45,10 @@ sealed trait Access {
 }
 
 case class Standard(
-  redirectUris: List[String] = List.empty,
-  sellResellOrDistribute: Option[SellResellOrDistribute] = None,
-  importantSubmissionData: Option[ImportantSubmissionData] = None
-) extends Access {
+    redirectUris: List[String] = List.empty,
+    sellResellOrDistribute: Option[SellResellOrDistribute] = None,
+    importantSubmissionData: Option[ImportantSubmissionData] = None
+  ) extends Access {
   override val accessType = STANDARD
 }
 

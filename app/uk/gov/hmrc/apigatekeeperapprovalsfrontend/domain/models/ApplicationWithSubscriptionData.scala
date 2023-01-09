@@ -23,6 +23,6 @@ object ApplicationWithSubscriptionData {
 }
 
 case class ApplicationWithSubscriptionData(
-  application: Application,
-  subscriptions: Set[ApiIdentifier]
-)
+    application: Application,
+    subscriptions: Set[ApiIdentifier]
+  )

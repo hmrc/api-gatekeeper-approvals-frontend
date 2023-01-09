@@ -33,34 +33,35 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQues
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationService
 
+object SubmittedAnswersController {
 
-object SubmittedAnswersController {  
   case class ViewModel(
-    appName: String,
-    applicationId: ApplicationId,
-    index: Int,
-    questionAnswerGroups: List[QuestionAndAnswerGroup],
-    isGranted: Boolean
-  )
+      appName: String,
+      applicationId: ApplicationId,
+      index: Int,
+      questionAnswerGroups: List[QuestionAndAnswerGroup],
+      isGranted: Boolean
+    )
 }
 
 @Singleton
-class SubmittedAnswersController @Inject()(
-  val ldapAuthorisationService: LdapAuthorisationService,
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  submittedAnswersPage: SubmittedAnswersPage,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
-  
+class SubmittedAnswersController @Inject() (
+    val ldapAuthorisationService: LdapAuthorisationService,
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    submittedAnswersPage: SubmittedAnswersPage,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
+
   import SubmittedAnswersController._
 
   def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
-    val appName = request.application.name
+    val appName    = request.application.name
     val submission = request.submission
-    val instance = request.instance
+    val instance   = request.instance
 
     successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, index), instance.isGranted))))
   }

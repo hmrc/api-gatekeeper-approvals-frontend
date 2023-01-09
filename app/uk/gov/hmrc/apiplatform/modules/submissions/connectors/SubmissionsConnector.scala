@@ -45,8 +45,8 @@ class SubmissionsConnector @Inject() (
     val http: HttpClient,
     val config: SubmissionsConnector.Config,
     val metrics: ConnectorMetrics
-)(implicit val ec: ExecutionContext)
-    extends SubmissionsJsonFormatters {
+  )(implicit val ec: ExecutionContext
+  ) extends SubmissionsJsonFormatters {
 
   import SubmissionsConnector._
   import config._
@@ -58,17 +58,17 @@ class SubmissionsConnector @Inject() (
       http.GET[Option[Submission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}")
     }
   }
-  
+
   def fetchLatestExtenedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
     metrics.record(api) {
       http.GET[Option[ExtendedSubmission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}/extended")
     }
   }
-  
+
   def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
     val url = s"$serviceBaseUrl/submissions/marked/application/${id.value}"
-    
+
     metrics.record(api) {
       http.GET[Option[MarkedSubmission]](url)
     }
@@ -80,17 +80,26 @@ class SubmissionsConnector @Inject() (
 
     metrics.record(api) {
       http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, None))
-      .map(_.leftMap(failed(_)))
+        .map(_.leftMap(failed(_)))
     }
   }
 
-  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, escalatedTo: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantWithWarnings(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      warnings: String,
+      escalatedTo: Option[String]
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, warnings.some, escalatedTo))
-      .map(_.leftMap(failed(_)))
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](
+        s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant",
+        GrantedRequest(requestedBy, warnings.some, escalatedTo)
+      )
+        .map(_.leftMap(failed(_)))
     }
   }
 }

@@ -26,16 +26,17 @@ import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionService @Inject()(
-  apmConnector: ApmConnector
-)(implicit val ec: ExecutionContext) {
-  
+class SubscriptionService @Inject() (
+    apmConnector: ApmConnector
+  )(implicit val ec: ExecutionContext
+  ) {
+
   def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinition]] = {
     (
       for {
         applicationWithSubscriptions <- OptionT(apmConnector.fetchApplicationWithSubscriptionData(applicationId))
-        subscribableApis <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
-        applicationSubscriptions = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context))
+        subscribableApis             <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
+        applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context))
       } yield applicationSubscriptions
     ).getOrElseF(successful(Set[ApiDefinition]()))
   }

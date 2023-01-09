@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-
 final case class ResponsibleIndividual(fullName: String, emailAddress: String)
 
 object ResponsibleIndividual {

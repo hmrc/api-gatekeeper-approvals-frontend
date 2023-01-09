@@ -19,6 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 object SubmissionRequiresDemo {
+
   def apply(submission: Submission): Boolean = {
     submission.context.toList.exists(_ == (AskWhen.Context.Keys.VAT_OR_ITSA -> "Yes"))
   }

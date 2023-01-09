@@ -37,6 +37,7 @@ trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBu
   def loggedInThruStrideWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplicationAndSubmission(userRoleActionRefiner) _
 
-  def loggedInThruStrideWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+  def loggedInThruStrideWithApplicationAndSubmissionAndInstance
+      : (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplicationAndSubmissionAndInstance(userRoleActionRefiner) _
 }

@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.{Inject, Provider, Singleton}
 
 @Singleton
-class ApmConnectorConfigProvider @Inject()(config: ServicesConfig) extends Provider[ApmConnector.Config] {
+class ApmConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[ApmConnector.Config] {
 
   override def get(): ApmConnector.Config =
     ApmConnector.Config(

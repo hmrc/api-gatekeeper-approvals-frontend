@@ -20,7 +20,7 @@ object FormKeys {
   val firstnameField = "firstname"
 
   val declineReasonsRequiredKey = "declinereasons.error.required.field"
-  
+
   val declineReasonsRequiredGlobalKey = "declinereasons.error.required.global"
 
   val formKeysMap = Map(

@@ -31,28 +31,35 @@ import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
 object CheckUrlsController {
-  case class ViewModel(appName: String, applicationId: ApplicationId, organisationUrl: Option[String],
-                       privacyPolicyLocation: PrivacyPolicyLocation,
-                       termsAndConditionsLocation: TermsAndConditionsLocation,
-                       isDeleted: Boolean) {
+
+  case class ViewModel(
+      appName: String,
+      applicationId: ApplicationId,
+      organisationUrl: Option[String],
+      privacyPolicyLocation: PrivacyPolicyLocation,
+      termsAndConditionsLocation: TermsAndConditionsLocation,
+      isDeleted: Boolean
+    ) {
     lazy val hasOrganisationUrl: Boolean = organisationUrl.isDefined
   }
 }
 
 @Singleton
-class CheckUrlsController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  submissionReviewService: SubmissionReviewService,
-  errorHandler: ErrorHandler,
-  checkUrlsPage: CheckUrlsPage,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+class CheckUrlsController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    submissionReviewService: SubmissionReviewService,
+    errorHandler: ErrorHandler,
+    checkUrlsPage: CheckUrlsPage,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
-      case std@ Standard(_, _, Some(importantSubmissionData)) => 
+      case std @ Standard(_, _, Some(importantSubmissionData)) =>
         val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
@@ -60,7 +67,7 @@ class CheckUrlsController @Inject()(
               CheckUrlsController.ViewModel(
                 request.application.name,
                 applicationId,
-                importantSubmissionData.organisationUrl, 
+                importantSubmissionData.organisationUrl,
                 importantSubmissionData.privacyPolicyLocation,
                 importantSubmissionData.termsAndConditionsLocation,
                 isDeleted
@@ -68,10 +75,10 @@ class CheckUrlsController @Inject()(
             )
           )
         )
-      case _ => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                   => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }
 
-  def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] = 
+  def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] =
     updateActionStatus(SubmissionReview.Action.CheckUrls)(applicationId)
 }

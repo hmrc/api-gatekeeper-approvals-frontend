@@ -22,4 +22,4 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 class ApplicationRequest[A](
     val application: Application,
     val loggedInRequest: LoggedInRequest[A]
-) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.role, loggedInRequest)
+  ) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.role, loggedInRequest)

@@ -25,6 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.utils.GatekeeperAuthorisationHelpe
 import scala.concurrent.ExecutionContext
 
 abstract class GatekeeperBaseController(
-  val strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents
-)(implicit val ec: ExecutionContext) extends FrontendController(mcc) with GatekeeperStrideAuthorisationActions with GatekeeperAuthorisationHelper with WithUnsafeDefaultFormBinding
+    val strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents
+  )(implicit val ec: ExecutionContext
+  ) extends FrontendController(mcc) with GatekeeperStrideAuthorisationActions with GatekeeperAuthorisationHelper with WithUnsafeDefaultFormBinding

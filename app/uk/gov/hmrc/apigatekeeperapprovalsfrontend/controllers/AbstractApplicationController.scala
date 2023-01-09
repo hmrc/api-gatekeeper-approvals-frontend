@@ -27,13 +27,12 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.Gatekeeper
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import org.joda.time.DateTime
 
-
 abstract class AbstractApplicationController(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  val errorHandler: ErrorHandler
-)(implicit override val ec: ExecutionContext)
-    extends GatekeeperBaseController(strideAuthorisationService, mcc)
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    val errorHandler: ErrorHandler
+  )(implicit override val ec: ExecutionContext
+  ) extends GatekeeperBaseController(strideAuthorisationService, mcc)
     with GatekeeperStrideRoleWithApplicationActions
     with EitherTHelper[Result]
     with ApplicationLogger {

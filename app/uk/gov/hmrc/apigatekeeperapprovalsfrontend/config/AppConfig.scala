@@ -30,10 +30,10 @@ trait AppConfig {
 }
 
 @Singleton
-class AppConfigImpl @Inject()(
-  config: Configuration
-) extends ServicesConfig(config) with AppConfig {
+class AppConfigImpl @Inject() (
+    config: Configuration
+  ) extends ServicesConfig(config) with AppConfig {
   val appName = getString("appName")
-  
+
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 }

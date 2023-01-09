@@ -32,7 +32,8 @@ trait ConnectorMetrics {
 }
 
 @Singleton
-class ConnectorMetricsImpl @Inject()(metrics: Metrics) extends ConnectorMetrics {
+class ConnectorMetricsImpl @Inject() (metrics: Metrics) extends ConnectorMetrics {
+
   def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
     val timer = startTimer(api)
 
