@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
 case class GatekeeperConfig(gatekeeperBaseUrl: String) {
   lazy val applicationsPageUri = s"${gatekeeperBaseUrl}/api-gatekeeper/applications"
-  lazy val developersPageUri = s"${gatekeeperBaseUrl}/api-gatekeeper/developers2"
-  lazy val emailsPageUri = s"${gatekeeperBaseUrl}/api-gatekeeper/emails"
-  lazy val pendingUri = s"${gatekeeperBaseUrl}/api-gatekeeper/pending"
+  lazy val developersPageUri   = s"${gatekeeperBaseUrl}/api-gatekeeper/developers2"
+  lazy val emailsPageUri       = s"${gatekeeperBaseUrl}/api-gatekeeper/emails"
+  lazy val pendingUri          = s"${gatekeeperBaseUrl}/api-gatekeeper/pending"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,26 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext,Future}
+import scala.concurrent.{ExecutionContext, Future}
+
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
+
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionReviewJsonFormatters.submissionReviewFormat
-import org.mongodb.scala.model.{Indexes, IndexModel, IndexOptions, Filters}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 @Singleton
-class SubmissionReviewRepo @Inject()(mongo: MongoComponent)(implicit ec: ExecutionContext
-) extends PlayMongoRepository[SubmissionReview](
-  mongoComponent = mongo,
-  collectionName = "submissionReview",
-  domainFormat   = submissionReviewFormat,
-  indexes        = Seq(
-    IndexModel(Indexes.ascending("submissionId", "instanceIndex"),IndexOptions().unique(true))
-  )) {
+class SubmissionReviewRepo @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext) extends PlayMongoRepository[SubmissionReview](
+      mongoComponent = mongo,
+      collectionName = "submissionReview",
+      domainFormat = submissionReviewFormat,
+      indexes = Seq(
+        IndexModel(Indexes.ascending("submissionId", "instanceIndex"), IndexOptions().unique(true))
+      )
+    ) {
 
   def filterBy(submissionId: Submission.Id, instanceIndex: Int) =
     Filters.and(

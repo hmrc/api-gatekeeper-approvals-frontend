@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,21 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationService
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import scala.concurrent.Future.successful
+
+import play.api.mvc.{MessagesControllerComponents, _}
+import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import scala.concurrent.Future.successful
-import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 
 object ApplicationSubmissionsController {
 
@@ -43,32 +40,33 @@ object ApplicationSubmissionsController {
   case class DeclinedInstanceDetails(timestamp: String, index: Int)
 
   case class GrantedInstanceDetails(timestamp: String)
-  
+
   case class ViewModel(
-    applicationId: ApplicationId,
-    appName: String,
-    applicationDetailsUrl: String,
-    currentSubmission: Option[CurrentSubmittedInstanceDetails],
-    declinedInstances: List[DeclinedInstanceDetails],
-    grantedInstance: Option[GrantedInstanceDetails],
-    responsibleIndividualEmail: Option[String],
-    pendingResponsibleIndividualVerification: Boolean,
-    isDeleted: Boolean
-  )
+      applicationId: ApplicationId,
+      appName: String,
+      applicationDetailsUrl: String,
+      currentSubmission: Option[CurrentSubmittedInstanceDetails],
+      declinedInstances: List[DeclinedInstanceDetails],
+      grantedInstance: Option[GrantedInstanceDetails],
+      responsibleIndividualEmail: Option[String],
+      pendingResponsibleIndividualVerification: Boolean,
+      isDeleted: Boolean
+    )
 }
 
 @Singleton
-class ApplicationSubmissionsController @Inject()(
-  config: GatekeeperConfig,
-  strideAuthorisationService: StrideAuthorisationService,
-  val ldapAuthorisationService: LdapAuthorisationService,
-  mcc: MessagesControllerComponents,
-  applicationSubmissionsPage: ApplicationSubmissionsPage,
-  errorHandler: ErrorHandler,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
-  
+class ApplicationSubmissionsController @Inject() (
+    config: GatekeeperConfig,
+    strideAuthorisationService: StrideAuthorisationService,
+    val ldapAuthorisationService: LdapAuthorisationService,
+    mcc: MessagesControllerComponents,
+    applicationSubmissionsPage: ApplicationSubmissionsPage,
+    errorHandler: ErrorHandler,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
+
   import ApplicationSubmissionsController._
   import cats.data.OptionT
   import cats.implicits._
@@ -84,54 +82,55 @@ class ApplicationSubmissionsController @Inject()(
         if hasEverBeenSubmitted(submission)
       } yield submission
     )
-    .fold(
-      Redirect(gatekeeperApplicationUrl)
-    )(
-      _ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId))
-    )
+      .fold(
+        Redirect(gatekeeperApplicationUrl)
+      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))
   }
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName = request.application.name
+    val appName                  = request.application.name
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
-    val latestInstance = request.markedSubmission.submission.latestInstance
+    val latestInstance       = request.markedSubmission.submission.latestInstance
     val latestInstanceStatus = latestInstance.statusHistory.head
-    val currentSubmission = latestInstanceStatus match {
-        case status: Submitted => Some(CurrentSubmittedInstanceDetails(status.requestedBy, status.timestamp.asText))
-        case _ => None
-      }
+    val currentSubmission    = latestInstanceStatus match {
+      case status: Submitted => Some(CurrentSubmittedInstanceDetails(status.requestedBy, status.timestamp.asText))
+      case _                 => None
+    }
 
     val declinedSubmissions =
       request.markedSubmission.submission.instances.filter(i => i.statusHistory.head.isDeclined)
-      .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.asText, i.index))
+        .map(i => DeclinedInstanceDetails(i.statusHistory.head.timestamp.asText, i.index))
 
+    // scalastyle:off if.brace
     val grantedInstance =
-      if(latestInstanceStatus.isGranted || latestInstanceStatus.isGrantedWithWarnings)
+      if (latestInstanceStatus.isGranted || latestInstanceStatus.isGrantedWithWarnings)
         Some(GrantedInstanceDetails(latestInstanceStatus.timestamp.asText))
       else
         None
+    // scalastyle:on if.brace
 
     val responsibleIndividualEmail =
       request.application.importantSubmissionData.map(i => i.responsibleIndividual.emailAddress)
 
-    val pendingResponsibleIndividualVerification = 
+    val pendingResponsibleIndividualVerification =
       request.application.state.name == State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION
 
-    val isDeleted = 
+    val isDeleted =
       request.application.state.name == State.DELETED
 
     successful(Ok(applicationSubmissionsPage(
-        ViewModel(applicationId, 
-                  appName, 
-                  gatekeeperApplicationUrl, 
-                  currentSubmission, 
-                  declinedSubmissions, 
-                  grantedInstance, 
-                  responsibleIndividualEmail, 
-                  pendingResponsibleIndividualVerification,
-                  isDeleted
-                )
+      ViewModel(
+        applicationId,
+        appName,
+        gatekeeperApplicationUrl,
+        currentSubmission,
+        declinedSubmissions,
+        grantedInstance,
+        responsibleIndividualEmail,
+        pendingResponsibleIndividualVerification,
+        isDeleted
+      )
     )))
   }
 }

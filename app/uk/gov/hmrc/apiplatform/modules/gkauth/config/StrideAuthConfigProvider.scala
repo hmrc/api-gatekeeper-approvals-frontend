@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,36 @@
 package uk.gov.hmrc.apiplatform.modules.gkauth.config
 
 import javax.inject.{Inject, Provider, Singleton}
+
 import play.api.Configuration
 
 case class StrideAuthRoles(
-  adminRole: String,
-  superUserRole: String,
-  userRole: String
-)
+    adminRole: String,
+    superUserRole: String,
+    userRole: String
+  )
 
 case class StrideAuthConfig(
-  strideLoginUrl: String,
-  successUrlBase: String,
-  origin: String,
-  roles: StrideAuthRoles
-)
-
+    strideLoginUrl: String,
+    successUrlBase: String,
+    origin: String,
+    roles: StrideAuthRoles
+  )
 
 @Singleton
-class StrideAuthConfigProvider @Inject()(configuration: Configuration) extends Provider[StrideAuthConfig] with BaseUrlExtractor {
+class StrideAuthConfigProvider @Inject() (configuration: Configuration) extends Provider[StrideAuthConfig] with BaseUrlExtractor {
   val config = configuration.underlying
 
   override def get(): StrideAuthConfig = {
     val strideLoginUrl = s"${extractBaseUrl("stride-auth-frontend")}/stride/sign-in"
-    
-    val strideConfig = configuration.underlying.getConfig("stride")
+
+    val strideConfig  = configuration.underlying.getConfig("stride")
     val successUrBase = strideConfig.getString("success-url-base")
-    val origin = strideConfig.getString("origin")
-    val adminRole = strideConfig.getString("roles.admin")
+    val origin        = strideConfig.getString("origin")
+    val adminRole     = strideConfig.getString("roles.admin")
     val superUserRole = strideConfig.getString("roles.super-user")
-    val userRole = strideConfig.getString("roles.user")
+    val userRole      = strideConfig.getString("roles.user")
 
     StrideAuthConfig(strideLoginUrl, successUrBase, origin, StrideAuthRoles(adminRole, superUserRole, userRole))
   }
 }
-

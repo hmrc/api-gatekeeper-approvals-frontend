@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import enumeratum.{EnumEntry, PlayEnum}
 import org.joda.time.DateTime
+
 import uk.gov.hmrc.time.DateTimeUtils
 
 case class ApplicationState(
-                             name: State,
-                             requestedByEmailAddress: Option[String] = None,
-                             verificationCode: Option[String] = None,
-                             updatedOn: DateTime = DateTimeUtils.now
-                           )
+    name: State,
+    requestedByEmailAddress: Option[String] = None,
+    verificationCode: Option[String] = None,
+    updatedOn: DateTime = DateTimeUtils.now
+  )
 
 object ApplicationState {
   import play.api.libs.json.Json
@@ -53,7 +54,7 @@ sealed trait State extends EnumEntry {
   def isApproved: Boolean = this == State.PRODUCTION || this == State.PRE_PRODUCTION
 
   def isPendingApproval: Boolean = (this == State.PENDING_REQUESTER_VERIFICATION
-                          || this == State.PENDING_GATEKEEPER_APPROVAL)
+    || this == State.PENDING_GATEKEEPER_APPROVAL)
 
   def isInTesting: Boolean = this == State.TESTING
 }
@@ -61,31 +62,32 @@ sealed trait State extends EnumEntry {
 object State extends PlayEnum[State] {
   val values = findValues
 
-  final case object TESTING                                      extends State
-  final case object PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION  extends State
-  final case object PENDING_GATEKEEPER_APPROVAL                  extends State
-  final case object PENDING_REQUESTER_VERIFICATION               extends State
-  final case object PRE_PRODUCTION                               extends State
-  final case object PRODUCTION                                   extends State
-  final case object DELETED                                      extends State
+  final case object TESTING                                     extends State
+  final case object PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION extends State
+  final case object PENDING_GATEKEEPER_APPROVAL                 extends State
+  final case object PENDING_REQUESTER_VERIFICATION              extends State
+  final case object PRE_PRODUCTION                              extends State
+  final case object PRODUCTION                                  extends State
+  final case object DELETED                                     extends State
 }
 
 case class Application(
-  id: ApplicationId,
-  clientId: ClientId,
-  name: String,
-  collaborators: Set[Collaborator],
-  access: Access = Standard(List.empty, None, None),
-  state: ApplicationState = ApplicationState(name = State.TESTING)
-) {
+    id: ApplicationId,
+    clientId: ClientId,
+    name: String,
+    collaborators: Set[Collaborator],
+    access: Access = Standard(List.empty, None, None),
+    state: ApplicationState = ApplicationState(name = State.TESTING)
+  ) {
+
   lazy val importantSubmissionData: Option[ImportantSubmissionData] = access match {
     case Standard(_, _, Some(submissionData)) => Some(submissionData)
-    case _                                 => None
+    case _                                    => None
   }
 
   lazy val sellResellOrDistribute = access match {
     case Standard(_, sellResellOrDistribute, _) => sellResellOrDistribute
-    case _                                               => None
+    case _                                      => None
   }
 
   lazy val isInHouseSoftware = sellResellOrDistribute.fold(false)(_ == SellResellOrDistribute("No"))
@@ -95,6 +97,6 @@ case class Application(
 object Application {
   import play.api.libs.json.Json
 
-  implicit val applicationReads = Json.reads[Application]
+  implicit val applicationReads  = Json.reads[Application]
   implicit val applicationWrites = Json.writes[Application]
 }

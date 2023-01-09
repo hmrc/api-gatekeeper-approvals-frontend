@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.utils
 
 import play.api.libs.json._
 
-class InvalidEnumException(className: String, input:String)
-  extends RuntimeException(s"Enumeration expected of type: '$className', but it does not contain '$input'")
+class InvalidEnumException(className: String, input: String)
+    extends RuntimeException(s"Enumeration expected of type: '$className', but it does not contain '$input'")
 
 object EnumJson {
 
   def enumReads[E <: Enumeration](enum: E): Reads[E#Value] = new Reads[E#Value] {
+
     def reads(json: JsValue): JsResult[E#Value] = json match {
       case JsString(s) =>
         try {
@@ -32,7 +33,7 @@ object EnumJson {
           case _: NoSuchElementException =>
             throw new InvalidEnumException(enum.getClass.getSimpleName, s)
         }
-      case _ => JsError("String value expected")
+      case _           => JsError("String value expected")
     }
   }
 
@@ -41,10 +42,9 @@ object EnumJson {
   }
 
   import scala.language.implicitConversions
-  
+
   implicit def enumFormat[E <: Enumeration](enum: E): Format[E#Value] = {
     Format(enumReads(enum), enumWrites)
   }
 
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,68 +17,68 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import scala.concurrent.Future.successful
+
+import play.api.mvc.{MessagesControllerComponents, _}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import scala.concurrent.Future.successful
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import play.api.mvc._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFailedPage
 
-object CheckAnswersThatFailedController {  
+object CheckAnswersThatFailedController {
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
   case class ViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean) {
-    lazy val hasFails: Boolean = answers.exists(_.status == Fail)
-    lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
-    lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsandwarns" else "failsonly"} else "warnsonly"
+    lazy val hasFails: Boolean  = answers.exists(_.status == Fail)
+    lazy val hasWarns: Boolean  = answers.exists(_.status == Warn)
+
+    lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsandwarns" else "failsonly" }
+    else "warnsonly"
   }
 }
 
 @Singleton
-class CheckAnswersThatFailedController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
-  checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
+class CheckAnswersThatFailedController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService,
+    checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
-  
   import CheckAnswersThatFailedController._
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName = request.application.name
+    val appName   = request.application.name
     val isDeleted = request.application.state.name == State.DELETED
 
-    val questionsAndAnswers: Map[Question, ActualAnswer] = 
+    val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {
         case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
       }
-      .collect {
-        case (q: Some[Question], a) => q.get -> a
-      }
+        .collect {
+          case (q: Some[Question], a) => q.get -> a
+        }
 
     val answerDetails = questionsAndAnswers.map {
-      case (question, answer) => 
+      case (question, answer) =>
         AnswerDetails(
           question.wording.value,
           ActualAnswersAsText(answer),
           request.markedAnswers.getOrElse(question.id, Pass)
         )
     }
-    .toList
-    .filter(_.status != Pass)
+      .toList
+      .filter(_.status != Pass)
 
     successful(
       Ok(

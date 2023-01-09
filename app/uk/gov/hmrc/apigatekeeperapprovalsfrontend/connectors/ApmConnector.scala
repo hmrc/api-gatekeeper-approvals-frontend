@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,30 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, Application, ApplicationId, ApplicationWithSubscriptionData}
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, Application, ApplicationId, ApplicationWithSubscriptionData}
 
 object ApmConnector {
   case class Config(serviceBaseUrl: String)
 }
 
 @Singleton
-class ApmConnector @Inject()(
-  httpClient: HttpClient,
-  config: ApmConnector.Config,
-  val metrics: ConnectorMetrics
-)(implicit val ec: ExecutionContext) {
+class ApmConnector @Inject() (
+    httpClient: HttpClient,
+    config: ApmConnector.Config,
+    val metrics: ConnectorMetrics
+  )(implicit val ec: ExecutionContext
+  ) {
 
   val serviceBaseUrl = config.serviceBaseUrl
 
   val api = API("api-platform-microservice")
-  
+
   def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
     import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -47,11 +49,11 @@ class ApmConnector @Inject()(
     }
   }
 
-  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String,ApiDefinition]] = {
+  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String, ApiDefinition]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Map[String,ApiDefinition]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.value))
+      httpClient.GET[Map[String, ApiDefinition]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.value))
     }
   }
 

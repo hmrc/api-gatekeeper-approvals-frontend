@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 import cats.data.NonEmptyList
 
 sealed trait StatementFragment
-sealed trait NonBulletStatementFragment extends StatementFragment
-sealed trait SimpleStatementFragment extends NonBulletStatementFragment
-case class StatementText(text: String) extends SimpleStatementFragment
+sealed trait NonBulletStatementFragment             extends StatementFragment
+sealed trait SimpleStatementFragment                extends NonBulletStatementFragment
+case class StatementText(text: String)              extends SimpleStatementFragment
 case class StatementLink(text: String, url: String) extends SimpleStatementFragment
 
 case class StatementBullets(bullets: NonEmptyList[NonBulletStatementFragment]) extends StatementFragment
@@ -41,4 +41,3 @@ case class Statement(fragments: NonEmptyList[StatementFragment])
 object Statement {
   def apply(fragment: StatementFragment, fragments: StatementFragment*) = new Statement(NonEmptyList.of(fragment, fragments: _*))
 }
-

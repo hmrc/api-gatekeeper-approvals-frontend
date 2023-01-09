@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,39 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 import scala.concurrent.Future.successful
+
+import cats.data.NonEmptyList
+
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
-import cats.data.NonEmptyList
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-object CheckAnswersThatPassedController {  
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
+
+object CheckAnswersThatPassedController {
   case class AnswerDetails(question: String, answer: String)
-  case class Section(heading: String, answerDetails: NonEmptyList[AnswerDetails] )
+  case class Section(heading: String, answerDetails: NonEmptyList[AnswerDetails])
   case class ViewModel(applicationId: ApplicationId, appName: String, sections: List[Section], isDeleted: Boolean)
 }
 
 @Singleton
-class CheckAnswersThatPassedController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  submissionReviewService: SubmissionReviewService,
-  checkAnswersThatPassedPage: CheckAnswersThatPassedPage,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
+class CheckAnswersThatPassedController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    submissionReviewService: SubmissionReviewService,
+    checkAnswersThatPassedPage: CheckAnswersThatPassedPage,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   import CheckAnswersThatPassedController._
 
@@ -55,25 +57,25 @@ class CheckAnswersThatPassedController @Inject()(
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Pass).getOrElse(false)
     }
-    val isDeleted = request.application.state.name == State.DELETED
+    val isDeleted                        = request.application.state.name == State.DELETED
 
-    val groupedPassedQuestionsIds = 
+    val groupedPassedQuestionsIds =
       request.submission.groups
-      .map(group =>
-        (
-          group.heading,
-          group.links
-            .flatMap(l => l.questions.map(_.question))
-            .filter(q => isPass(q.id))
-            .map(q => (q, request.answersToQuestions.get(q.id)))
-            .collect {
-              case (question, Some(answer)) => AnswerDetails(question.wording.value, ActualAnswersAsText(answer))
-            }
+        .map(group =>
+          (
+            group.heading,
+            group.links
+              .flatMap(l => l.questions.map(_.question))
+              .filter(q => isPass(q.id))
+              .map(q => (q, request.answersToQuestions.get(q.id)))
+              .collect {
+                case (question, Some(answer)) => AnswerDetails(question.wording.value, ActualAnswersAsText(answer))
+              }
+          )
         )
-      )
-      .collect {
-        case (heading, head::tail) => Section(heading, NonEmptyList.of(head, tail:_*))
-      }
+        .collect {
+          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail: _*))
+        }
 
     successful(
       Ok(
@@ -89,6 +91,5 @@ class CheckAnswersThatPassedController @Inject()(
     )
   }
 
-  
   def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckPassedAnswers)(applicationId)
 }

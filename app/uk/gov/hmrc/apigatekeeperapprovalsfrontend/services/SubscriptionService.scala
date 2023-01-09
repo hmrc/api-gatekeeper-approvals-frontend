@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,29 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import cats.data.OptionT
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApplicationId}
-import uk.gov.hmrc.http.HeaderCarrier
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
+import cats.data.OptionT
+
+import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApplicationId}
+
 @Singleton
-class SubscriptionService @Inject()(
-  apmConnector: ApmConnector
-)(implicit val ec: ExecutionContext) {
-  
+class SubscriptionService @Inject() (
+    apmConnector: ApmConnector
+  )(implicit val ec: ExecutionContext
+  ) {
+
   def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinition]] = {
     (
       for {
         applicationWithSubscriptions <- OptionT(apmConnector.fetchApplicationWithSubscriptionData(applicationId))
-        subscribableApis <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
-        applicationSubscriptions = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context))
+        subscribableApis             <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
+        applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context))
       } yield applicationSubscriptions
     ).getOrElseF(successful(Set[ApiDefinition]()))
   }

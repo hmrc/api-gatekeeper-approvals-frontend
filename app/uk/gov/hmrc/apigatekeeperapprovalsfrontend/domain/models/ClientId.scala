@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ case class ClientId(value: String) extends AnyVal
 object ClientId {
   import play.api.libs.json.Json
 
-  def random: ClientId = ClientId(Random.alphanumeric.take(28).mkString)
+  def random: ClientId = ClientId(Random.alphanumeric.take(28).mkString) // scalastyle:ignore
 
   implicit val JsonFormat = Json.valueFormat[ClientId]
 }

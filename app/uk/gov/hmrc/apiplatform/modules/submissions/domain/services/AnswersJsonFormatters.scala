@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ trait AnswersJsonFormatters {
   import play.api.libs.json._
   import uk.gov.hmrc.play.json.Union
 
-  implicit val jfAcknowledgedAnswer = Json.format[AcknowledgedAnswer.type]
-  implicit val jfNoAnswer = Json.format[NoAnswer.type]
-  implicit val jfTextAnswer = Json.format[TextAnswer]
-  implicit val jfSingleChoiceAnswer = Json.format[SingleChoiceAnswer]
+  implicit val jfAcknowledgedAnswer   = Json.format[AcknowledgedAnswer.type]
+  implicit val jfNoAnswer             = Json.format[NoAnswer.type]
+  implicit val jfTextAnswer           = Json.format[TextAnswer]
+  implicit val jfSingleChoiceAnswer   = Json.format[SingleChoiceAnswer]
   implicit val jfMultipleChoiceAnswer = Json.format[MultipleChoiceAnswer]
 
   implicit val jfActualAnswer: OFormat[ActualAnswer] = Union.from[ActualAnswer]("answerType")

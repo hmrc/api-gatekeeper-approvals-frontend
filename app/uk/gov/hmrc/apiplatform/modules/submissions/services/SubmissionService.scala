@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 
 @Singleton
-class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
-(
-  implicit val ec: ExecutionContext
-) {
+class SubmissionService @Inject() (
+    submissionConnector: SubmissionsConnector
+  )(implicit val ec: ExecutionContext
+  ) {
 
   def fetchLatestSubmission(appId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = submissionConnector.fetchLatestSubmission(appId)
 
@@ -43,7 +43,13 @@ class SubmissionService @Inject() (submissionConnector: SubmissionsConnector)
     } yield app
   }
 
-  def grantWithWarnings(applicationId: ApplicationId, requestedBy: String, warnings: String, escalatedTo: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantWithWarnings(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      warnings: String,
+      escalatedTo: Option[String]
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
     for {
       app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings, escalatedTo)
     } yield app

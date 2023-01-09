@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import uk.gov.hmrc.play.json.Union
 sealed trait PrivacyPolicyLocation
 
 object PrivacyPolicyLocation {
-  case object NoneProvided extends PrivacyPolicyLocation
+  case object NoneProvided      extends PrivacyPolicyLocation
   case object InDesktopSoftware extends PrivacyPolicyLocation
   case class Url(value: String) extends PrivacyPolicyLocation
 
-  implicit val noneProvidedFormat = Json.format[NoneProvided.type]
+  implicit val noneProvidedFormat      = Json.format[NoneProvided.type]
   implicit val inDesktopSoftwareFormat = Json.format[InDesktopSoftware.type]
-  implicit val urlFormat = Json.format[Url]
+  implicit val urlFormat               = Json.format[Url]
 
   implicit val format = Union.from[PrivacyPolicyLocation]("privacyPolicyType")
     .and[NoneProvided.type]("noneProvided")

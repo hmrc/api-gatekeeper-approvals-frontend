@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.http.metrics.common.API
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+
 import com.kenshoo.play.metrics.Metrics
+
+import uk.gov.hmrc.play.http.metrics.common.API
 
 sealed trait Timer {
   def stop(): Unit
@@ -32,7 +33,8 @@ trait ConnectorMetrics {
 }
 
 @Singleton
-class ConnectorMetricsImpl @Inject()(metrics: Metrics) extends ConnectorMetrics {
+class ConnectorMetricsImpl @Inject() (metrics: Metrics) extends ConnectorMetrics {
+
   def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
     val timer = startTimer(api)
 

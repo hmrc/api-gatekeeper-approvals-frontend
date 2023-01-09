@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.config
 
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import javax.inject.{Inject, Provider, Singleton}
+
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
 class SubmissionsConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[SubmissionsConnector.Config] {
-    override def get(): SubmissionsConnector.Config = {
 
-      val serviceBaseUrl: String = config.baseUrl("third-party-application")
-      val apiKey: String = config.getConfString("third-party-application.api-key", "")
+  override def get(): SubmissionsConnector.Config = {
 
-      SubmissionsConnector.Config(serviceBaseUrl, apiKey)
-    }
+    val serviceBaseUrl: String = config.baseUrl("third-party-application")
+    val apiKey: String         = config.getConfString("third-party-application.api-key", "")
+
+    SubmissionsConnector.Config(serviceBaseUrl, apiKey)
+  }
 }

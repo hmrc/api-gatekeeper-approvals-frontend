@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,64 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
 import scala.concurrent.Future
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.SubmissionInstanceApplicationRequest
+
 import play.api.mvc._
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 
 trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-    protected def roleWithApplication(refiner: ActionRefiner[MessagesRequest, LoggedInRequest])(applicationId: ApplicationId)(block: ApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  protected def roleWithApplication(
+      refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
+    )(
+      applicationId: ApplicationId
+    )(
+      block: ApplicationRequest[AnyContent] => Future[Result]
+    ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-        applicationRequestRefiner(applicationId)
+          applicationRequestRefiner(applicationId)
       )
-      .invokeBlock(request, block)
+        .invokeBlock(request, block)
     }
 
-  protected def roleWithApplicationAndSubmission(refiner: ActionRefiner[MessagesRequest, LoggedInRequest])(applicationId: ApplicationId)(block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  protected def roleWithApplicationAndSubmission(
+      refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
+    )(
+      applicationId: ApplicationId
+    )(
+      block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]
+    ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-        applicationRequestRefiner(applicationId) andThen
-        applicationSubmissionRefiner
+          applicationRequestRefiner(applicationId) andThen
+          applicationSubmissionRefiner
       )
-      .invokeBlock(request, block)
+        .invokeBlock(request, block)
     }
 
-  protected def roleWithApplicationAndSubmissionAndInstance(refiner: ActionRefiner[MessagesRequest, LoggedInRequest])(applicationId: ApplicationId, index: Int)(block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  protected def roleWithApplicationAndSubmissionAndInstance(
+      refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
+    )(
+      applicationId: ApplicationId,
+      index: Int
+    )(
+      block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]
+    ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-        applicationRequestRefiner(applicationId) andThen
-        applicationSubmissionRefiner andThen 
-        submissionInstanceRefiner(index)
+          applicationRequestRefiner(applicationId) andThen
+          applicationSubmissionRefiner andThen
+          submissionInstanceRefiner(index)
       )
-      .invokeBlock(request, block)
+        .invokeBlock(request, block)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import play.api.libs.json.Json
 sealed trait TextValidation
 
 object TextValidation {
-  case object Url extends TextValidation
+  case object Url                      extends TextValidation
   case class MatchRegex(regex: String) extends TextValidation
-  case object Email extends TextValidation
+  case object Email                    extends TextValidation
 
   import uk.gov.hmrc.play.json.Union
 
-  implicit val formatAsUrl = Json.format[Url.type]
+  implicit val formatAsUrl      = Json.format[Url.type]
   implicit val formatMatchRegex = Json.format[MatchRegex]
-  implicit val formatIsEmail = Json.format[Email.type]
+  implicit val formatIsEmail    = Json.format[Email.type]
 
   implicit val formatTextValidation = Union.from[TextValidation]("validationType")
     .and[Url.type]("url")

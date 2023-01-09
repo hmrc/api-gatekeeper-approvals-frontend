@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,22 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 import uk.gov.hmrc.http.HeaderCarrier
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ThirdPartyApplicationConnector}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdateSuccessful}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.DeclineApplicationApprovalRequest
-import java.time.LocalDateTime
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdateSuccessful, DeclineApplicationApprovalRequest}
 
 @Singleton
-class ApplicationService @Inject()(
-  thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
-  apmConnector: ApmConnector
-)(implicit val ec: ExecutionContext) {
-  
+class ApplicationService @Inject() (
+    thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
+    apmConnector: ApmConnector
+  )(implicit val ec: ExecutionContext
+  ) {
+
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
   }

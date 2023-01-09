@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package uk.gov.hmrc.apiplatform.modules.gkauth.config
 
 import com.google.inject.AbstractModule
+
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.StrideAuthConnector
 
 class ConfigurationModule extends AbstractModule {
+
   override def configure() = {
     bind(classOf[StrideAuthConfig]).toProvider(classOf[StrideAuthConfigProvider])
     bind(classOf[StrideAuthConnector.Config]).toProvider(classOf[StrideAuthConnectorConfigProvider])

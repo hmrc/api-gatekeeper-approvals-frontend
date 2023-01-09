@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
-import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.play.http.metrics.common.API
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
 
 object ThirdPartyApplicationConnector {
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
@@ -30,14 +31,15 @@ object ThirdPartyApplicationConnector {
 }
 
 @Singleton
-class ThirdPartyApplicationConnector @Inject()(
-  httpClient: HttpClient,
-  config: ThirdPartyApplicationConnector.Config,
-  val metrics: ConnectorMetrics
-)(implicit val ec: ExecutionContext) extends ApplicationUpdateFormatters with CommonResponseHandlers {
+class ThirdPartyApplicationConnector @Inject() (
+    httpClient: HttpClient,
+    config: ThirdPartyApplicationConnector.Config,
+    val metrics: ConnectorMetrics
+  )(implicit val ec: ExecutionContext
+  ) extends ApplicationUpdateFormatters with CommonResponseHandlers {
 
   val serviceBaseUrl = config.serviceBaseUrl
-  val api = API("third-party-application")
+  val api            = API("third-party-application")
 
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
@@ -51,5 +53,5 @@ class ThirdPartyApplicationConnector @Inject()(
     metrics.record(api) {
       httpClient.PATCH[ApplicationUpdate, ErrorOrUnit](s"$serviceBaseUrl/application/${applicationId.value}", request).map(throwOr(ApplicationUpdateSuccessful))
     }
-  }  
+  }
 }

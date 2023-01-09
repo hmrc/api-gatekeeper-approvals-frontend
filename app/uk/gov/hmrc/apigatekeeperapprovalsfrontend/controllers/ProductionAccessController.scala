@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,45 +32,66 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
 
 object ProductionAccessController {
+
   case class ViewModel(
-    appName: String,
-    applicationId: ApplicationId,
-    submitterEmail: String,
-    submittedDate: String,
-    grantedName: String,
-    grantedDate: String,
-    warnings: Option[String],
-    escalatedTo: Option[String],
-    index: Int
-  )
+      appName: String,
+      applicationId: ApplicationId,
+      submitterEmail: String,
+      submittedDate: String,
+      grantedName: String,
+      grantedDate: String,
+      warnings: Option[String],
+      escalatedTo: Option[String],
+      index: Int
+    )
 }
 
 @Singleton
-class ProductionAccessController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  productionAccessPage: ProductionAccessPage,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService
-)(implicit override val ec: ExecutionContext) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
-  
+class ProductionAccessController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    productionAccessPage: ProductionAccessPage,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
+
   import ProductionAccessController._
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-
-    val appName = request.application.name
+    val appName  = request.application.name
     val instance = request.markedSubmission.submission.latestInstance
 
     (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-      case (Granted(grantedTimestamp, grantedName), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
-        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, None, None, instance.index))))
-      case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) => 
-        successful(Ok(productionAccessPage(ViewModel(appName, applicationId, requestedBy, submittedTimestamp.asText, grantedName, grantedTimestamp.asText, Some(warnings), escalatedTo, instance.index))))
-      case _ => 
+      case (Granted(grantedTimestamp, grantedName), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                                    =>
+        successful(Ok(productionAccessPage(ViewModel(
+          appName,
+          applicationId,
+          requestedBy,
+          submittedTimestamp.asText,
+          grantedName,
+          grantedTimestamp.asText,
+          None,
+          None,
+          instance.index
+        ))))
+      case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
+        successful(Ok(productionAccessPage(ViewModel(
+          appName,
+          applicationId,
+          requestedBy,
+          submittedTimestamp.asText,
+          grantedName,
+          grantedTimestamp.asText,
+          Some(warnings),
+          escalatedTo,
+          instance.index
+        ))))
+      case _                                                                                                                                               =>
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
         successful(BadRequest(errorHandler.badRequestTemplate(request)))
     }
-    
+
   }
 }

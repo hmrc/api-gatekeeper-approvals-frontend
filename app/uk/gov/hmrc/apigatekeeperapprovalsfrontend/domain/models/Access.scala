@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.AccessType._
 import play.api.libs.json._
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.AccessType._
 
 case class SellResellOrDistribute(answer: String) extends AnyVal
 
@@ -29,13 +29,13 @@ object SellResellOrDistribute {
 }
 
 case class ImportantSubmissionData(
-  organisationUrl: Option[String] = None,
-  responsibleIndividual: ResponsibleIndividual,
-  serverLocations: Set[ServerLocation],
-  termsAndConditionsLocation: TermsAndConditionsLocation,
-  privacyPolicyLocation: PrivacyPolicyLocation,
-  termsOfUseAcceptances: List[TermsOfUseAcceptance]
-)
+    organisationUrl: Option[String] = None,
+    responsibleIndividual: ResponsibleIndividual,
+    serverLocations: Set[ServerLocation],
+    termsAndConditionsLocation: TermsAndConditionsLocation,
+    privacyPolicyLocation: PrivacyPolicyLocation,
+    termsOfUseAcceptances: List[TermsOfUseAcceptance]
+  )
 
 object ImportantSubmissionData {
   implicit val format = Json.format[ImportantSubmissionData]
@@ -46,10 +46,10 @@ sealed trait Access {
 }
 
 case class Standard(
-  redirectUris: List[String] = List.empty,
-  sellResellOrDistribute: Option[SellResellOrDistribute] = None,
-  importantSubmissionData: Option[ImportantSubmissionData] = None
-) extends Access {
+    redirectUris: List[String] = List.empty,
+    sellResellOrDistribute: Option[SellResellOrDistribute] = None,
+    importantSubmissionData: Option[ImportantSubmissionData] = None
+  ) extends Access {
   override val accessType = STANDARD
 }
 

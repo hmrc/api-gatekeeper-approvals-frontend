@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 
-class MarkedSubmissionApplicationRequest[A](val markedSubmission: MarkedSubmission, applicationRequest: ApplicationRequest[A]) extends ApplicationRequest[A](applicationRequest.application, applicationRequest.loggedInRequest) {
-  lazy val submission = markedSubmission.submission
+class MarkedSubmissionApplicationRequest[A](val markedSubmission: MarkedSubmission, applicationRequest: ApplicationRequest[A])
+    extends ApplicationRequest[A](applicationRequest.application, applicationRequest.loggedInRequest) {
+  lazy val submission         = markedSubmission.submission
   lazy val answersToQuestions = submission.latestInstance.answersToQuestions
-  lazy val markedAnswers = markedSubmission.markedAnswers
+  lazy val markedAnswers      = markedSubmission.markedAnswers
 }
