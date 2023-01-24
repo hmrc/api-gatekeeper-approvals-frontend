@@ -214,4 +214,10 @@ adminstoemail.button.copyemailaddresses = Copy email addresses to clipboard
 adminstoemail.text.decline = After sending the email, decline the request.
 adminstoemail.button.decline = Decline request
 
+sendnewtermsofuseconfirm.pagetitle = Send new terms of use
+sendnewtermsofuseconfirm.title = Send new terms of use
+sendnewtermsofuseconfirm.description = Send an email to all admins for the application, inviting them to complete the new terms of use
+sendnewtermsofuseconfirm.send = Send new terms of use
+sendnewtermsofuseconfirm.cancel = Cancel
+
 errorsummary.message = There is a problem
