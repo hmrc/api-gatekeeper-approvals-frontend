@@ -20,12 +20,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
+import cats.data.OptionT
+
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Standard}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Standard, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{SendNewTermsOfUseConfirmPage, SendNewTermsOfUseRequestedPage}
 
@@ -47,11 +49,15 @@ class SendNewTermsOfUseController @Inject() (
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    request.application.access match {
-      // Should only be uplifting and checking Standard apps
-      case std: Standard =>
-        val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
-        successful(
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+
+    def checkForSubmission = {
+      (
+        for {
+          submission <- OptionT(submissionService.fetchLatestSubmission(applicationId))
+        } yield submission
+      )
+        .fold(
           Ok(
             sendNewTermsOfUseConfirmPage(
               SendNewTermsOfUseController.ViewModel(
@@ -61,8 +67,38 @@ class SendNewTermsOfUseController @Inject() (
               )
             )
           )
+        )(_ =>
+          BadRequest(
+            errorHandler.standardErrorTemplate(
+              "Application submission",
+              "Invalid application submissions",
+              "The application already has submissions"
+            )
+          )
         )
-      case _             => successful(BadRequest(errorHandler.badRequestTemplate))
+    }
+
+    request.application.access match {
+      // Should only be uplifting and checking Standard apps
+      case std: Standard if (request.application.state.name == State.PRODUCTION) => checkForSubmission
+      case std: Standard                                                         => successful(
+          BadRequest(
+            errorHandler.standardErrorTemplate(
+              "Application status",
+              "Invalid application status",
+              "The application must have Production status"
+            )
+          )
+        )
+      case _                                                                     => successful(
+          BadRequest(
+            errorHandler.standardErrorTemplate(
+              "Application access type",
+              "Invalid application access type",
+              "The application must be of Standard access type"
+            )
+          )
+        )
     }
   }
 
@@ -70,11 +106,12 @@ class SendNewTermsOfUseController @Inject() (
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("invite-admins").flatMap(_.headOption) match {
       case Some("yes") => successful(Ok(sendNewTermsOfUseRequestedPage(
-              SendNewTermsOfUseController.ViewModel(
-                request.application.name,
-                applicationId,
-                gatekeeperApplicationUrl
-              ))))
+          SendNewTermsOfUseController.ViewModel(
+            request.application.name,
+            applicationId,
+            gatekeeperApplicationUrl
+          )
+        )))
       case _           => successful(Redirect(gatekeeperApplicationUrl))
     }
   }
