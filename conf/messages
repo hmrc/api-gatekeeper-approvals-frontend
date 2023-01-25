@@ -218,4 +218,9 @@ sendnewtermsofuseconfirm.pagetitle = Send new terms of use
 sendnewtermsofuseconfirm.title = Do you want to invite admins to agree to version 2 of the terms of use?
 sendnewtermsofuseconfirm.continue = Continue
 
+sendnewtermsofuserequested.pagetitle = Terms of use sent
+sendnewtermsofuserequested.title = v2 terms of use sent
+sendnewtermsofuserequested.description = We have sent an email to all admins for the application.
+sendnewtermsofuserequested.link = Back to
+
 errorsummary.message = There is a problem
