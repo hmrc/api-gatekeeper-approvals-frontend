@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-
 sealed trait TermsOfUseInvitationSuccessful
 
 case object TermsOfUseInvitationSuccessful extends TermsOfUseInvitationSuccessful

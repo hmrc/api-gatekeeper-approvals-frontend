@@ -110,9 +110,9 @@ class SubmissionsConnector @Inject() (
     metrics.record(api) {
       http.POSTEmpty[ErrorOrUnit](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
         .map {
-          case Right(_)                                        => Right(TermsOfUseInvitationSuccessful)
-          case Left(err)                                       => Left(failed(err))
+          case Right(_)  => Right(TermsOfUseInvitationSuccessful)
+          case Left(err) => Left(failed(err))
         }
     }
-  }  
+  }
 }

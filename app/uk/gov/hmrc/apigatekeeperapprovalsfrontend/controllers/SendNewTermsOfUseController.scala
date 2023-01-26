@@ -114,7 +114,7 @@ class SendNewTermsOfUseController @Inject() (
           err
         )
       )
-      val success   = Ok(
+      val success              = Ok(
         sendNewTermsOfUseRequestedPage(
           SendNewTermsOfUseController.ViewModel(
             request.application.name,
