@@ -148,10 +148,25 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionServiceMock.TermsOfUseInvite.thenReturn(applicationId)
 
       val result = controller.action(applicationId)(fakeYesRequest)
 
       status(result) shouldBe Status.OK
+    }
+
+    "return 400 when yes selected and error calling TPA" in new Setup {
+      val fakeYesRequest = fakeRequest.withFormUrlEncodedBody("invite-admins" -> "yes")
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionServiceMock.TermsOfUseInvite.thenReturnError(applicationId)
+
+      val result = controller.action(applicationId)(fakeYesRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) should include("Error inviting for terms of use")
     }
 
     "redirect when no selected" in new Setup {

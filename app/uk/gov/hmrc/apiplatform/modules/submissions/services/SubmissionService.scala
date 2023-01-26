@@ -54,4 +54,8 @@ class SubmissionService @Inject() (
       app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings, escalatedTo)
     } yield app
   }
+
+  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier) = {
+    submissionConnector.termsOfUseInvite(applicationId)
+  }
 }

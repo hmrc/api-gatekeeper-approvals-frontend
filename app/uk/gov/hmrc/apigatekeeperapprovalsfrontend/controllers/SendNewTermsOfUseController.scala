@@ -24,6 +24,7 @@ import cats.data.OptionT
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationSuccessful
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -79,7 +80,7 @@ class SendNewTermsOfUseController @Inject() (
     }
 
     request.application.access match {
-      // Should only be uplifting and checking Standard apps
+      // Should only be sending new terms of use invites to Standard apps with a state of Production and no submissions
       case std: Standard if (request.application.state.name == State.PRODUCTION) => checkForSubmission
       case std: Standard                                                         => successful(
           BadRequest(
@@ -104,14 +105,30 @@ class SendNewTermsOfUseController @Inject() (
 
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("invite-admins").flatMap(_.headOption) match {
-      case Some("yes") => successful(Ok(sendNewTermsOfUseRequestedPage(
+
+    def inviteTermsOfUse = {
+      def failure(err: String) = BadRequest(
+        errorHandler.standardErrorTemplate(
+          "Terms of use invite",
+          "Error inviting for terms of use",
+          err
+        )
+      )
+      val success   = Ok(
+        sendNewTermsOfUseRequestedPage(
           SendNewTermsOfUseController.ViewModel(
             request.application.name,
             applicationId,
             gatekeeperApplicationUrl
           )
-        )))
+        )
+      )
+
+      submissionService.termsOfUseInvite(applicationId).map((esu: Either[String, TermsOfUseInvitationSuccessful]) => esu.fold(err => failure(err), _ => success))
+    }
+
+    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("invite-admins").flatMap(_.headOption) match {
+      case Some("yes") => inviteTermsOfUse
       case _           => successful(Redirect(gatekeeperApplicationUrl))
     }
   }

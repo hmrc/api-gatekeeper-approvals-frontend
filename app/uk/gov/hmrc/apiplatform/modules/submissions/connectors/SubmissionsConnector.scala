@@ -25,7 +25,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services._
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
@@ -38,6 +37,8 @@ object SubmissionsConnector {
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
   implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
+
+  type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
 
 @Singleton
@@ -102,4 +103,16 @@ class SubmissionsConnector @Inject() (
         .map(_.leftMap(failed(_)))
     }
   }
+
+  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
+    val failed = (err: UpstreamErrorResponse) => s"Failed to invite for terms of use for application with id ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POSTEmpty[ErrorOrUnit](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
+        .map {
+          case Right(_)                                        => Right(TermsOfUseInvitationSuccessful)
+          case Left(err)                                       => Left(failed(err))
+        }
+    }
+  }  
 }
