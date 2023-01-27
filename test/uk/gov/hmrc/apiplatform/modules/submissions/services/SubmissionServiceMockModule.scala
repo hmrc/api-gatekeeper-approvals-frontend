@@ -19,6 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
 import org.joda.time.DateTime
+import java.time.Instant
 
 import scala.concurrent.Future.successful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -112,6 +113,17 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
         when(aMock.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+    }
+
+    object FetchTermsOfUseInvitation {
+      def thenReturn(applicationId: ApplicationId) = {
+        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now))
+        when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenNotFound() = {
+        when(aMock.fetchTermsOfUseInvitation(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
   }

@@ -25,11 +25,13 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, Wi
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
+import java.time.Instant
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful}
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData{
   private val appConfig = Configuration(
@@ -53,6 +55,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     val markSubmission = markedSubmission
     val requestedBy = "bob@blockbusters.com"
     val reason = "reason"
+    val invitation = TermsOfUseInvitation(applicationId, Instant.now, Instant.now)
     implicit val hc = HeaderCarrier()
   }
   
@@ -142,6 +145,59 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       result shouldBe 'Right
       result.right.get.id shouldBe applicationId
+    }
+  }
+
+  "invite application for terms of use" should {
+    val url = s"/terms-of-use/application/${applicationId.value}"
+
+    "return TermsOfUseInvitationSuccessful on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+        .willReturn(
+            aResponse()
+            .withStatus(OK)
+        )
+      )
+      
+      val result = await(connector.termsOfUseInvite(applicationId))
+
+      result shouldBe 'Right
+      result.right.get shouldBe TermsOfUseInvitationSuccessful
+    }
+  }
+
+  "fetch terms of use invitation by app id" should {
+    val url = s"/terms-of-use/application/${applicationId.value}"
+
+    "return an invitation" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+        .willReturn(
+            aResponse()
+            .withStatus(OK)
+            .withJsonBody(invitation)
+        )
+      )
+      
+      val result = await(connector.fetchTermsOfUseInvitation(applicationId))
+
+      result shouldBe defined
+      result.get.applicationId shouldBe invitation.applicationId
+    }
+
+    "return None if the invitation cannot be found" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+        .willReturn(
+            aResponse()
+            .withStatus(NOT_FOUND)
+        )
+      )
+
+      val result = await(connector.fetchTermsOfUseInvitation(applicationId))
+
+      result shouldBe empty
     }
   }
 }

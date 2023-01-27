@@ -115,4 +115,10 @@ class SubmissionsConnector @Inject() (
         }
     }
   }
+
+  def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[TermsOfUseInvitation]] = {
+    metrics.record(api) {
+      http.GET[Option[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
+    }
+  }
 }

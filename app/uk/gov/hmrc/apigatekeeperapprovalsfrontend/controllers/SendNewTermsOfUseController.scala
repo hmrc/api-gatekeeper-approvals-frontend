@@ -20,9 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import cats.data.OptionT
-
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationSuccessful
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -52,14 +50,9 @@ class SendNewTermsOfUseController @Inject() (
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
-    def checkForSubmission = {
-      (
-        for {
-          submission <- OptionT(submissionService.fetchLatestSubmission(applicationId))
-        } yield submission
-      )
-        .fold(
-          Ok(
+    def checkNotAlreadyInvited = {
+      // Check no existing submissions and not already invited
+      val success = Ok(
             sendNewTermsOfUseConfirmPage(
               SendNewTermsOfUseController.ViewModel(
                 request.application.name,
@@ -68,20 +61,27 @@ class SendNewTermsOfUseController @Inject() (
               )
             )
           )
-        )(_ =>
-          BadRequest(
+      val failed = BadRequest(
             errorHandler.standardErrorTemplate(
               "Application submission",
-              "Invalid application submissions",
-              "The application already has submissions"
+              "Application already invited",
+              "The application has already been invited or has submissions"
             )
           )
-        )
+      (
+        for {
+          existingSubmission <- liftF(submissionService.fetchLatestSubmission(applicationId))
+          existingInvitation <- liftF(submissionService.fetchTermsOfUseInvitation(applicationId))
+          result             <- cond((existingSubmission.isEmpty && existingInvitation.isEmpty), success, failed)
+        } yield result
+      )
+      .fold[Result](identity, identity)
     }
 
     request.application.access match {
-      // Should only be sending new terms of use invites to Standard apps with a state of Production and no submissions
-      case std: Standard if (request.application.state.name == State.PRODUCTION) => checkForSubmission
+      // Should only be sending new terms of use invites to Standard apps
+      // with a state of Production and not already invited
+      case std: Standard if (request.application.state.name == State.PRODUCTION) => checkNotAlreadyInvited
       case std: Standard                                                         => successful(
           BadRequest(
             errorHandler.standardErrorTemplate(

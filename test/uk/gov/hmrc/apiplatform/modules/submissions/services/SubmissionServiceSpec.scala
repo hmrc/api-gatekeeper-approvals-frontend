@@ -20,10 +20,12 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, As
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitationSuccessful, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.time.Instant
 
 class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
   
@@ -70,4 +72,21 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
       result shouldBe Right(app)
     }
   }
+
+  "termsOfUseInvite" should {
+    "call submission connector correctly" in new Setup {
+      when(mockSubmissionsConnector.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(Right(TermsOfUseInvitationSuccessful)))
+      val result = await(underTest.termsOfUseInvite(applicationId))
+      result shouldBe Right(TermsOfUseInvitationSuccessful)
+    }
+  }
+
+  "fetchTermsOfUseInvitation" should {
+    "call submission connector correctly" in new Setup {
+      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now)
+      when(mockSubmissionsConnector.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(Some(invite)))
+      val result = await(underTest.fetchTermsOfUseInvitation(applicationId))
+      result shouldBe Some(invite)
+    }
+  }  
 }

@@ -81,6 +81,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PRODUCTION)))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -94,10 +95,22 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PRODUCTION)))
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(appWithImportantData.id)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) should include("Invalid application submissions")
+      contentAsString(result) should include("Application already invited")
+    }
+
+    "return 400 when app already invited" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PRODUCTION)))
+      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(appWithImportantData.id)
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) should include("Application already invited")
     }
 
     "return 400 when app not in Production" in new Setup {
