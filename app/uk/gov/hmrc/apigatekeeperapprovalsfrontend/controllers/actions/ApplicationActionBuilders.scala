@@ -55,7 +55,7 @@ trait ApplicationActionBuilders {
 
   def applicationSubmissionRefiner(implicit ec: ExecutionContext): ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] =
     new ActionRefiner[ApplicationRequest, MarkedSubmissionApplicationRequest] {
-      override def executionContext                                                                                         = ec
+      override def executionContext = ec
 
       override def refine[A](request: ApplicationRequest[A]): Future[Either[Result, MarkedSubmissionApplicationRequest[A]]] = {
         implicit val implicitRequest: MessagesRequest[A] = request

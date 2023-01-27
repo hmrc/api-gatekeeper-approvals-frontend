@@ -16,39 +16,42 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
 class SubmissionSpec extends AnyWordSpec with Matchers with SubmissionsTestData {
-    
-    "submission questionIdsOfInterest app name" in {
-        Submission.updateLatestAnswersTo(completeAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe TextAnswer("name of software")
-    }
 
-    "submission instance state history" in {
-        aSubmission.latestInstance.statusHistory.head.isOpenToAnswers shouldBe true
-        aSubmission.latestInstance.isOpenToAnswers shouldBe true
-        aSubmission.status.isOpenToAnswers shouldBe true
-    }
+  "submission questionIdsOfInterest app name" in {
+    Submission.updateLatestAnswersTo(completeAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(
+      aSubmission.questionIdsOfInterest.applicationNameId
+    ) shouldBe TextAnswer("name of software")
+  }
 
-    "submission instance is in progress" in {
-        aSubmission.latestInstance.isOpenToAnswers shouldBe true
-    }
-    
-    "submission is in progress" in {
-        aSubmission.status.isOpenToAnswers shouldBe true
-    }
+  "submission instance state history" in {
+    aSubmission.latestInstance.statusHistory.head.isOpenToAnswers shouldBe true
+    aSubmission.latestInstance.isOpenToAnswers shouldBe true
+    aSubmission.status.isOpenToAnswers shouldBe true
+  }
 
-    "submission findQuestionnaireContaining" in {
-        aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe Some(CustomersAuthorisingYourSoftware.questionnaire)
-    }
+  "submission instance is in progress" in {
+    aSubmission.latestInstance.isOpenToAnswers shouldBe true
+  }
 
-    "submission setLatestAnswers" in {
-        val newAnswersToQuestions = Map(
-            (OrganisationDetails.question1.id -> TextAnswer("new web site"))
-        )
+  "submission is in progress" in {
+    aSubmission.status.isOpenToAnswers shouldBe true
+  }
 
-        Submission.updateLatestAnswersTo(newAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(OrganisationDetails.question1.id) shouldBe TextAnswer("new web site")
-    }
+  "submission findQuestionnaireContaining" in {
+    aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe Some(CustomersAuthorisingYourSoftware.questionnaire)
+  }
+
+  "submission setLatestAnswers" in {
+    val newAnswersToQuestions = Map(
+      (OrganisationDetails.question1.id -> TextAnswer("new web site"))
+    )
+
+    Submission.updateLatestAnswersTo(newAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(OrganisationDetails.question1.id) shouldBe TextAnswer("new web site")
+  }
 }

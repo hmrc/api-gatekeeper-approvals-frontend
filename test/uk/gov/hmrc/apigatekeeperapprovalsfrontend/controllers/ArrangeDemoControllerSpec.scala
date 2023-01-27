@@ -20,13 +20,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ArrangeDemoPage
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ArrangeDemoPage
 
 class ArrangeDemoControllerSpec extends AbstractControllerSpec {
 
@@ -50,27 +50,27 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
   "arrangeDemoPage" should {
     "return 200" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
-      
+
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      val deletedApp   = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
-      
+
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
     }
@@ -83,7 +83,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.BAD_REQUEST
     }
 
@@ -93,7 +93,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }

@@ -16,22 +16,25 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
-import org.mockito.MockitoSugar
-import org.mockito.ArgumentMatchersSugar
-import org.joda.time.DateTime
 import java.time.Instant
-
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+import org.joda.time.DateTime
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.time.DateTimeUtils
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+
 trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData {
+
   trait BaseSubmissionServiceMock {
     def aMock: SubmissionService
 
     object FetchLatestMarkedSubmission {
+
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(markedSubmission)
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
@@ -43,7 +46,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturnIncludingAnUnknownQuestion(applicationId: ApplicationId) = {
         val answersIncludingUnknownQuestion = aSubmission.latestInstance.answersToQuestions ++ Map(Question.Id.random -> TextAnswer("not there"))
-        val submissionWithUnknownQuestion = aSubmission.answeringWith(answersIncludingUnknownQuestion)
+        val submissionWithUnknownQuestion   = aSubmission.answeringWith(answersIncludingUnknownQuestion)
 
         val response = Some(MarkedSubmission(submissionWithUnknownQuestion, markedAnswers))
         when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
@@ -64,6 +67,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object FetchLatestSubmission {
+
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(aSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
@@ -71,7 +75,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
         val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true)) andThen Submission.submit(DateTime.now, "user"))(aSubmission)
-        val response = Some(submittedSubmission)
+        val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
@@ -81,6 +85,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object Grant {
+
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
         when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
@@ -93,6 +98,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object GrantWithWarnings {
+
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
         when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
@@ -105,6 +111,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object TermsOfUseInvite {
+
       def thenReturn(applicationId: ApplicationId) = {
         val response = Right(TermsOfUseInvitationSuccessful)
         when(aMock.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(response))
@@ -117,6 +124,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object FetchTermsOfUseInvitation {
+
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))

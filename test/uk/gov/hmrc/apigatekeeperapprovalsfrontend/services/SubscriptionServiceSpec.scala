@@ -16,25 +16,26 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationId}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.ApmConnectorMockModule
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class SubscriptionServiceSpec extends AsyncHmrcSpec {
 
   trait Setup extends ApmConnectorMockModule {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val applicationId = ApplicationId.random
-    val context1 = "context1"
-    val context2 = "context2"
-    val context3 = "context3"
-    val context4 = "context4"
-    val apiDefinition1 = ApiDefinition("serviceName1", "name1")
-    val apiDefinition2 = ApiDefinition("serviceName2", "name2")
-    val apiDefinition3 = ApiDefinition("serviceName3", "name3")
+    val applicationId              = ApplicationId.random
+    val context1                   = "context1"
+    val context2                   = "context2"
+    val context3                   = "context3"
+    val context4                   = "context4"
+    val apiDefinition1             = ApiDefinition("serviceName1", "name1")
+    val apiDefinition2             = ApiDefinition("serviceName2", "name2")
+    val apiDefinition3             = ApiDefinition("serviceName3", "name3")
 
     val service = new SubscriptionService(ApmConnectorMock.aMock)
   }
@@ -42,7 +43,9 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
   "fetchSubscriptionsByApplicationId" should {
     "return correct apis for application" in new Setup {
       ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier(context1, "v1"), ApiIdentifier(context2, "v2"), ApiIdentifier(context3, "v3")
+        ApiIdentifier(context1, "v1"),
+        ApiIdentifier(context2, "v2"),
+        ApiIdentifier(context3, "v3")
       )
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
         context1 -> apiDefinition1,
@@ -61,7 +64,9 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
 
     "return empty set if no subscribable apis are found" in new Setup {
       ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier(context1, "v1"), ApiIdentifier(context2, "v2"), ApiIdentifier(context3, "v3")
+        ApiIdentifier(context1, "v1"),
+        ApiIdentifier(context2, "v2"),
+        ApiIdentifier(context3, "v3")
       )
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturnNothing
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))

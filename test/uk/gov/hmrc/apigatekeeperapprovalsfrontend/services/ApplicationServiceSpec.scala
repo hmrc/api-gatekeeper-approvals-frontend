@@ -16,24 +16,27 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.joda.time.DateTime
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, ImportantSubmissionData, PrivacyPolicyLocation, ResponsibleIndividual, Standard, SubmissionReview, TermsAndConditionsLocation, TermsOfUseAcceptance}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 
 class ApplicationServiceSpec extends AsyncHmrcSpec {
 
   trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val applicationId = ApplicationId.random
-    val service = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
+    val applicationId              = ApplicationId.random
+    val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
 
     val responsibleIndividual = ResponsibleIndividual("bob", "bob@example.com")
     val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, DateTime.now, Submission.Id.random, 0))
+
     val importantSubmissionData = ImportantSubmissionData(
       Some("http://example.com"),
       responsibleIndividual,
@@ -42,15 +45,15 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       PrivacyPolicyLocation.InDesktopSoftware,
       termsOfUseAcceptances
     )
-    val standardAccess = Standard(importantSubmissionData = Some(importantSubmissionData))
-    val application = anApplication().copy(access = standardAccess)
+    val standardAccess          = Standard(importantSubmissionData = Some(importantSubmissionData))
+    val application             = anApplication().copy(access = standardAccess)
 
     val submissionReview = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
 
     val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
-    val standardAccessWithoutTOUAgreement = Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
-    val applicationWithoutTOUAgreement = anApplication().copy(access = standardAccessWithoutTOUAgreement)
-    val submissionReviewWithoutTOUAgreement = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
+    val standardAccessWithoutTOUAgreement          = Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
+    val applicationWithoutTOUAgreement             = anApplication().copy(access = standardAccessWithoutTOUAgreement)
+    val submissionReviewWithoutTOUAgreement        = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
   }
 
   "fetchByApplicationId" should {

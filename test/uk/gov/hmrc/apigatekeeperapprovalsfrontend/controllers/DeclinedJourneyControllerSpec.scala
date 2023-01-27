@@ -20,32 +20,31 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationDeclinedPage, ProvideReasonsForDecliningPage}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.AdminsToEmailPage
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{AdminsToEmailPage, ApplicationDeclinedPage, ProvideReasonsForDecliningPage}
 
 class DeclinedJourneyControllerSpec extends AbstractControllerSpec
-      with StrideAuthorisationServiceMockModule {
+    with StrideAuthorisationServiceMockModule {
+
   trait Setup extends AbstractSetup with ApplicationServiceMockModule {
-    val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
+    val applicationDeclinedPage        = app.injector.instanceOf[ApplicationDeclinedPage]
     val provideReasonsForDecliningPage = app.injector.instanceOf[ProvideReasonsForDecliningPage]
-    val adminsToEmailPage = app.injector.instanceOf[AdminsToEmailPage]
-  
+    val adminsToEmailPage              = app.injector.instanceOf[AdminsToEmailPage]
+
     val controller = new DeclinedJourneyController(
-        StrideAuthorisationServiceMock.aMock,
-        mcc,
-        errorHandler,
-        ApplicationActionServiceMock.aMock,
-        SubmissionServiceMock.aMock,
-        ApplicationServiceMock.aMock,
-        applicationDeclinedPage,
-        provideReasonsForDecliningPage,
-        adminsToEmailPage,
-        SubmissionReviewServiceMock.aMock
-      )
+      StrideAuthorisationServiceMock.aMock,
+      mcc,
+      errorHandler,
+      ApplicationActionServiceMock.aMock,
+      SubmissionServiceMock.aMock,
+      ApplicationServiceMock.aMock,
+      applicationDeclinedPage,
+      provideReasonsForDecliningPage,
+      adminsToEmailPage,
+      SubmissionReviewServiceMock.aMock
+    )
   }
 
   "provide reasons page" should {
@@ -53,7 +52,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-    
+
       val result = controller.provideReasonsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
@@ -65,7 +64,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.provideReasonsPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }
@@ -78,7 +77,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturn(submissionReview)
-    
+
       val result = controller.provideReasonsAction(applicationId)(fakeDeclineRequest)
 
       status(result) shouldBe SEE_OTHER
@@ -92,7 +91,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturnError()
-    
+
       val result = controller.provideReasonsAction(applicationId)(fakeDeclineRequest)
 
       status(result) shouldBe BAD_REQUEST
@@ -116,7 +115,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-    
+
       val result = controller.emailAddressesPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
@@ -128,7 +127,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.emailAddressesPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }
@@ -140,21 +139,21 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.DeclineApplicationApprovalRequest.thenReturnSuccess()
-    
+
       val result = controller.emailAddressesAction(applicationId)(fakeRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId).url
     }
-    
+
     "throw RuntimeException when the decline fails" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.DeclineApplicationApprovalRequest.thenReturnFailure()
-    
+
       intercept[RuntimeException](await(controller.emailAddressesAction(applicationId)(fakeRequest))).getMessage shouldBe "Application id not found"
-   }
+    }
   }
 }

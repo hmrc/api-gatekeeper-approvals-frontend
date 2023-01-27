@@ -25,6 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services._
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 

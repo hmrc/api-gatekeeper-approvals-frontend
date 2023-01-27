@@ -16,20 +16,22 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
-import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 
 class CheckSandboxControllerSpec extends AbstractControllerSpec with SubmissionsTestData {
+
   trait Setup
       extends AbstractSetup
       with ApplicationServiceMockModule
@@ -37,7 +39,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       with SubscriptionServiceMockModule
       with ApplicationTestData
       with StrideAuthorisationServiceMockModule {
-        
+
     val checkSandboxPage = app.injector.instanceOf[CheckSandboxPage]
 
     val controller = new CheckSandboxController(
@@ -69,7 +71,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
 
       val result = controller.checkSandboxPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "return 404 if no application is found" in new Setup {

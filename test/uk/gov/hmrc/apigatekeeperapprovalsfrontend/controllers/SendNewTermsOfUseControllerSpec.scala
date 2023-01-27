@@ -55,10 +55,10 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    val requesterEmail                                                    = "test@example.com"
-    val submittedTimestamp                                                = DateTime.now()
-    val declinedTimestamp                                                 = DateTime.now().minus(Days.days(5))
-    val grantedTimestamp                                                  = DateTime.now().minus(Days.days(7))
+    val requesterEmail     = "test@example.com"
+    val submittedTimestamp = DateTime.now()
+    val declinedTimestamp  = DateTime.now().minus(Days.days(5))
+    val grantedTimestamp   = DateTime.now().minus(Days.days(7))
 
     def markedSubmissionWithStatusHistoryOf(statuses: Submission.Status*) = {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
@@ -66,7 +66,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
     val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", "bob@example.com")
 
-    val appWithImportantData                                              = anApplication(applicationId).copy(
+    val appWithImportantData = anApplication(applicationId).copy(
       access = Standard(
         List.empty,
         Some(SellResellOrDistribute("Yes")),

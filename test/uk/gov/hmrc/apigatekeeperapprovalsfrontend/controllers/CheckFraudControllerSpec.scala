@@ -16,20 +16,22 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 
 class CheckFraudControllerSpec extends AbstractControllerSpec {
-  
+
   trait Setup extends AbstractSetup
       with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckFraudPage]
-    
+
     val controller = new CheckFraudController(
       StrideAuthorisationServiceMock.aMock,
       mcc,
@@ -48,9 +50,9 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkFraudPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "return 200 with a deleted application" in new Setup {
@@ -60,7 +62,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkFraudPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
     }
@@ -71,7 +73,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.checkFraudPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }

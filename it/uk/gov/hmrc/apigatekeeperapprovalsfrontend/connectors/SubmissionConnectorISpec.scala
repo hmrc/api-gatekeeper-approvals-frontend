@@ -33,13 +33,14 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJs
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful}
 
-class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData{
+class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData {
+
   private val appConfig = Configuration(
-    "microservice.services.third-party-application.port" -> stubPort,
+    "microservice.services.third-party-application.port"      -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
-    "microservice.services.third-party-application.api-key" -> "",
-    "metrics.jvm"     -> false,
-    "metrics.enabled" -> false
+    "microservice.services.third-party-application.api-key"   -> "",
+    "metrics.jvm"                                             -> false,
+    "metrics.enabled"                                         -> false
   )
 
   override def fakeApplication(): PlayApplication =
@@ -51,27 +52,27 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
-    val extSubmission = aSubmission.withIncompleteProgress
+    val extSubmission  = aSubmission.withIncompleteProgress
     val markSubmission = markedSubmission
-    val requestedBy = "bob@blockbusters.com"
-    val reason = "reason"
-    val invitation = TermsOfUseInvitation(applicationId, Instant.now, Instant.now)
-    implicit val hc = HeaderCarrier()
+    val requestedBy    = "bob@blockbusters.com"
+    val reason         = "reason"
+    val invitation     = TermsOfUseInvitation(applicationId, Instant.now, Instant.now)
+    implicit val hc    = HeaderCarrier()
   }
-  
+
   "fetch latest submission by id" should {
     val url = s"/submissions/application/${applicationId.value}"
 
     "return a submission" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(OK)
-            .withJsonBody(aSubmission)
-        )
+              .withStatus(OK)
+              .withJsonBody(aSubmission)
+          )
       )
-      
+
       val result = await(connector.fetchLatestSubmission(applicationId))
 
       result shouldBe defined
@@ -81,10 +82,10 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return None if the submission cannot be found" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(NOT_FOUND)
-        )
+              .withStatus(NOT_FOUND)
+          )
       )
 
       val result = await(connector.fetchLatestSubmission(applicationId))
@@ -99,13 +100,13 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return a marked submission" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(OK)
-            .withJsonBody(markSubmission)
-        )
+              .withStatus(OK)
+              .withJsonBody(markSubmission)
+          )
       )
-      
+
       val result = await(connector.fetchLatestMarkedSubmission(applicationId))
 
       result shouldBe defined
@@ -115,10 +116,10 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return None if the submission cannot be found" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(NOT_FOUND)
-        )
+              .withStatus(NOT_FOUND)
+          )
       )
 
       val result = await(connector.fetchLatestMarkedSubmission(applicationId))
@@ -133,14 +134,14 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return an application on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
-        .withJsonRequestBody(GrantedRequest(requestedBy, None))
-        .willReturn(
+          .withJsonRequestBody(GrantedRequest(requestedBy, None))
+          .willReturn(
             aResponse()
-            .withStatus(OK)
-            .withJsonBody(anApplication(id = applicationId))
-        )
+              .withStatus(OK)
+              .withJsonBody(anApplication(id = applicationId))
+          )
       )
-      
+
       val result = await(connector.grant(applicationId, requestedBy))
 
       result shouldBe 'Right
@@ -154,12 +155,12 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return TermsOfUseInvitationSuccessful on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(OK)
-        )
+              .withStatus(OK)
+          )
       )
-      
+
       val result = await(connector.termsOfUseInvite(applicationId))
 
       result shouldBe 'Right
@@ -173,13 +174,13 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return an invitation" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(OK)
-            .withJsonBody(invitation)
-        )
+              .withStatus(OK)
+              .withJsonBody(invitation)
+          )
       )
-      
+
       val result = await(connector.fetchTermsOfUseInvitation(applicationId))
 
       result shouldBe defined
@@ -189,10 +190,10 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return None if the invitation cannot be found" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(NOT_FOUND)
-        )
+              .withStatus(NOT_FOUND)
+          )
       )
 
       val result = await(connector.fetchTermsOfUseInvitation(applicationId))

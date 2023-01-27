@@ -17,31 +17,32 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideWarningsForGrantingPage, ProvideEscalatedToForGrantingPage}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideEscalatedToForGrantingPage, ProvideWarningsForGrantingPage}
 
 class GrantedJourneyControllerSpec extends AbstractControllerSpec {
-  
+
   trait Setup extends AbstractSetup with ApplicationServiceMockModule
       with StrideAuthorisationServiceMockModule {
-    val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
-    val provideWarningsForGrantingPage = app.injector.instanceOf[ProvideWarningsForGrantingPage]
+    val applicationApprovedPage           = app.injector.instanceOf[ApplicationApprovedPage]
+    val provideWarningsForGrantingPage    = app.injector.instanceOf[ProvideWarningsForGrantingPage]
     val provideEscalatedToForGrantingPage = app.injector.instanceOf[ProvideEscalatedToForGrantingPage]
 
     val controller = new GrantedJourneyController(
-        StrideAuthorisationServiceMock.aMock,
-        mcc,
-        errorHandler,
-        ApplicationActionServiceMock.aMock,
-        SubmissionServiceMock.aMock,
-        SubmissionReviewServiceMock.aMock,
-        provideWarningsForGrantingPage,
-        provideEscalatedToForGrantingPage,
-        applicationApprovedPage
-      )
+      StrideAuthorisationServiceMock.aMock,
+      mcc,
+      errorHandler,
+      ApplicationActionServiceMock.aMock,
+      SubmissionServiceMock.aMock,
+      SubmissionReviewServiceMock.aMock,
+      provideWarningsForGrantingPage,
+      provideEscalatedToForGrantingPage,
+      applicationApprovedPage
+    )
   }
 
   "provideWarningsPage" should {
@@ -49,7 +50,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
-    
+
       val result = controller.provideWarningsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
@@ -61,7 +62,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.provideWarningsPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe NOT_FOUND
     }
   }
@@ -100,7 +101,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-    
+
       val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
@@ -112,7 +113,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe NOT_FOUND
     }
   }
@@ -148,7 +149,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
-    
+
       val result = controller.grantedPage(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
@@ -160,7 +161,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.grantedPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe NOT_FOUND
     }
   }

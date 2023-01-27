@@ -16,17 +16,18 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
+import scala.collection.Seq
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import scala.collection.Seq
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.Application
-import play.api.Mode
+import play.api.{Application, Mode}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
@@ -42,21 +43,21 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val httpClient = mock[HttpClient]
-    val urlBase = "http://example.com"
-    val appId = ApplicationId.random
+    val httpClient                 = mock[HttpClient]
+    val urlBase                    = "http://example.com"
+    val appId                      = ApplicationId.random
 
     val connector = new ThirdPartyApplicationConnector(httpClient, ThirdPartyApplicationConnector.Config(urlBase), new NoopConnectorMetrics())
 
-    def assertHttpClientWasCalledWithUrl(expectedUrl: String) = 
-      verify(httpClient).GET(eqTo(expectedUrl), *[Seq[(String, String)]], *[Seq[(String, String)]])(*,*,*)
+    def assertHttpClientWasCalledWithUrl(expectedUrl: String) =
+      verify(httpClient).GET(eqTo(expectedUrl), *[Seq[(String, String)]], *[Seq[(String, String)]])(*, *, *)
   }
 
   "fetchApplicationById" should {
     "call the correct endpoint" in new Setup {
       connector.fetchApplicationById(appId)
 
-      assertHttpClientWasCalledWithUrl(s"$urlBase/application/${appId.value}")      
+      assertHttpClientWasCalledWithUrl(s"$urlBase/application/${appId.value}")
     }
   }
 }

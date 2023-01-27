@@ -20,18 +20,18 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
-import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRFAddToken}
 import play.api.test.FakeRequest
+import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SellResellOrDistribute
+import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{SellResellOrDistribute, Standard}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 
 class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
+
   override def fakeApplication() =
     new GuiceApplicationBuilder()
       .configure(
@@ -40,29 +40,30 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
       )
       .build()
 
-  trait AbstractSetup 
-      extends ApplicationActionServiceMockModule 
+  trait AbstractSetup
+      extends ApplicationActionServiceMockModule
       with SubmissionServiceMockModule
       with SubmissionReviewServiceMockModule
       with ApplicationTestData {
 
-    val config = app.injector.instanceOf[GatekeeperConfig]
+    val config           = app.injector.instanceOf[GatekeeperConfig]
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
-    val mcc = app.injector.instanceOf[MessagesControllerComponents]
-    val errorHandler = app.injector.instanceOf[ErrorHandler]
+    val mcc              = app.injector.instanceOf[MessagesControllerComponents]
+    val errorHandler     = app.injector.instanceOf[ErrorHandler]
 
     val application = anApplication(applicationId)
+
     val inHouseApplication = application.copy(
       access = application.access match {
-        case Standard(redirectUris,_,importantSubmissionData) => Standard(redirectUris, Some(SellResellOrDistribute("No")), importantSubmissionData)
-        case other => other
+        case Standard(redirectUris, _, importantSubmissionData) => Standard(redirectUris, Some(SellResellOrDistribute("No")), importantSubmissionData)
+        case other                                              => other
       }
     )
-    val fakeRequest = FakeRequest().withCSRFToken
+    val fakeRequest        = FakeRequest().withCSRFToken
 
-    val fakeSubmitCheckedRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")
+    val fakeSubmitCheckedRequest       = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")
     val fakeSubmitComebackLaterRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")
-    val brokenRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "bobbins")
+    val brokenRequest                  = fakeRequest.withFormUrlEncodedBody("submit-action" -> "bobbins")
   }
 }

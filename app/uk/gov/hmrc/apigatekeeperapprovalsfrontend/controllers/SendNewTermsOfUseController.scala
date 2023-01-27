@@ -54,11 +54,7 @@ class SendNewTermsOfUseController @Inject() (
       // Check no existing submissions and not already invited
       val success = Ok(
         sendNewTermsOfUseConfirmPage(
-          SendNewTermsOfUseController.ViewModel(
-            request.application.name,
-            applicationId,
-            gatekeeperApplicationUrl
-          )
+          SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
         )
       )
       val failed  = BadRequest(
@@ -116,11 +112,7 @@ class SendNewTermsOfUseController @Inject() (
       )
       val success              = Ok(
         sendNewTermsOfUseRequestedPage(
-          SendNewTermsOfUseController.ViewModel(
-            request.application.name,
-            applicationId,
-            gatekeeperApplicationUrl
-          )
+          SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
         )
       )
 

@@ -16,30 +16,33 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories
 
-import org.mockito.MockitoSugar
-import org.mockito.ArgumentMatchersSugar
-
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+
 import org.mockito.verification.VerificationMode
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+
+import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
 trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
+
   trait BaseSubmissionReviewRepoMock {
     def aMock: SubmissionReviewRepo
 
     def verify = MockitoSugar.verify(aMock)
 
-    def verify(mode: VerificationMode) = MockitoSugar.verify(aMock,mode)
+    def verify(mode: VerificationMode) = MockitoSugar.verify(aMock, mode)
 
     def verifyZeroInteractions() = MockitoSugar.verifyZeroInteractions(aMock)
 
     object Create {
+
       def thenReturn(review: SubmissionReview) = {
         when(aMock.create(eqTo(review))).thenReturn(successful(review))
       }
-      
+
       def verifyNotCalled() {
         verify(never).create(*)
       }
@@ -50,6 +53,7 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
     }
 
     object Find {
+
       def thenReturn(review: SubmissionReview) =
         when(aMock.find(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(Some(review)))
 
@@ -58,7 +62,8 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
     }
 
     object Update {
-      def thenReturn() = {
+
+      def thenReturn()                               = {
         when(aMock.update(*[SubmissionReview])).thenAnswer((sr: SubmissionReview) => successful(sr))
       }
       def verifyCalledWith(review: SubmissionReview) = verify.update(review)

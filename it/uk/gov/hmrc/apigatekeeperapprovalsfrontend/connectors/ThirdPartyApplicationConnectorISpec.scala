@@ -27,13 +27,14 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 
-class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions{
+class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions {
+
   private val appConfig = Configuration(
-    "microservice.services.third-party-application.port" -> stubPort,
+    "microservice.services.third-party-application.port"      -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
-    "microservice.services.third-party-application.api-key" -> "",
-    "metrics.jvm"     -> false,
-    "metrics.enabled" -> false
+    "microservice.services.third-party-application.api-key"   -> "",
+    "metrics.jvm"                                             -> false,
+    "metrics.enabled"                                         -> false
   )
 
   override def fakeApplication(): PlayApplication =
@@ -44,26 +45,26 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
 
   private val applicationId = ApplicationId("applicationId")
 
-  trait Setup extends ApplicationTestData{
+  trait Setup extends ApplicationTestData {
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
 
     implicit val hc = HeaderCarrier()
   }
-  
+
   "fetch application by id" should {
-    val url = s"/application/${applicationId.value}"
+    val url     = s"/application/${applicationId.value}"
     val appName = "app name"
 
     "return an application" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(OK)
-            .withJsonBody(anApplication(id = applicationId, name = appName))
-        )
+              .withStatus(OK)
+              .withJsonBody(anApplication(id = applicationId, name = appName))
+          )
       )
-      
+
       val result = await(connector.fetchApplicationById(applicationId))
 
       result shouldBe defined
@@ -74,10 +75,10 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
     "return None if the application cannot be found" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-        .willReturn(
+          .willReturn(
             aResponse()
-            .withStatus(NOT_FOUND)
-        )
+              .withStatus(NOT_FOUND)
+          )
       )
 
       val result = await(connector.fetchApplicationById(applicationId))

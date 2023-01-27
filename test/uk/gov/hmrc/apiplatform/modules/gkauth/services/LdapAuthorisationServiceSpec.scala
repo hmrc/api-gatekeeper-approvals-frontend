@@ -16,34 +16,35 @@
 
 package uk.gov.hmrc.apiplatform.modules.gkauth.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.test.FakeRequest
-import play.api.mvc.MessagesRequest
-import uk.gov.hmrc.internalauth.client.test.FrontendAuthComponentsStub
-
-
-import uk.gov.hmrc.internalauth.client.test.{FrontendAuthComponentsStub, StubBehaviour}
-import uk.gov.hmrc.internalauth.client.Retrieval
-import play.api.test.StubControllerComponentsFactory
-import play.api.mvc.ControllerComponents
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import scala.concurrent.Future
 
-class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComponentsFactory  {
+import play.api.mvc.{ControllerComponents, MessagesRequest}
+import play.api.test.{FakeRequest, StubControllerComponentsFactory}
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, LoggedInRequest}
+import uk.gov.hmrc.internalauth.client.Retrieval
+import uk.gov.hmrc.internalauth.client.test.{FrontendAuthComponentsStub, StubBehaviour}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+
+class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComponentsFactory {
   val fakeRequest = FakeRequest()
-  
+
   val cc: ControllerComponents = stubMessagesControllerComponents()
 
   val expectedRetrieval = Retrieval.username ~ Retrieval.hasPredicate(LdapAuthorisationPredicate.gatekeeperReadPermission)
 
   trait Setup {
     val mockStubBehaviour = mock[StubBehaviour]
-    val frontendAuth = FrontendAuthComponentsStub(mockStubBehaviour)(cc, implicitly)
-    val underTest = new LdapAuthorisationService(frontendAuth)
-    protected def stub(isAuth: Boolean) = when(mockStubBehaviour.stubAuth(None,expectedRetrieval)).thenReturn(Future.successful(uk.gov.hmrc.internalauth.client.~[Retrieval.Username, Boolean](Retrieval.Username("Bob"), isAuth)))
+    val frontendAuth      = FrontendAuthComponentsStub(mockStubBehaviour)(cc, implicitly)
+    val underTest         = new LdapAuthorisationService(frontendAuth)
+
+    protected def stub(
+        isAuth: Boolean
+      ) = when(mockStubBehaviour.stubAuth(None, expectedRetrieval)).thenReturn(Future.successful(uk.gov.hmrc.internalauth.client.~[Retrieval.Username, Boolean](
+      Retrieval.Username("Bob"),
+      isAuth
+    )))
 
   }
 
@@ -73,13 +74,13 @@ class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComp
 
     result shouldBe 'Right
 
-    inside(result.right.value) { case lir : LoggedInRequest[_] => 
+    inside(result.right.value) { case lir: LoggedInRequest[_] =>
       lir.name shouldBe Some("Bob")
       lir.role shouldBe GatekeeperRoles.READ_ONLY
     }
   }
 
-  "return the original request when the user has ldap session but is NOT authorised for GK" in new Setup with SessionPresent with Unauthorised{
+  "return the original request when the user has ldap session but is NOT authorised for GK" in new Setup with SessionPresent with Unauthorised {
     val result = await(underTest.refineLdap(msgRequest))
 
     result shouldBe 'Left
