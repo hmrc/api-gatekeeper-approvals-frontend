@@ -53,21 +53,21 @@ class SendNewTermsOfUseController @Inject() (
     def checkNotAlreadyInvited = {
       // Check no existing submissions and not already invited
       val success = Ok(
-            sendNewTermsOfUseConfirmPage(
-              SendNewTermsOfUseController.ViewModel(
-                request.application.name,
-                applicationId,
-                gatekeeperApplicationUrl
-              )
-            )
+        sendNewTermsOfUseConfirmPage(
+          SendNewTermsOfUseController.ViewModel(
+            request.application.name,
+            applicationId,
+            gatekeeperApplicationUrl
           )
-      val failed = BadRequest(
-            errorHandler.standardErrorTemplate(
-              "Application submission",
-              "Application already invited",
-              "The application has already been invited or has submissions"
-            )
-          )
+        )
+      )
+      val failed  = BadRequest(
+        errorHandler.standardErrorTemplate(
+          "Application submission",
+          "Application already invited",
+          "The application has already been invited or has submissions"
+        )
+      )
       (
         for {
           existingSubmission <- liftF(submissionService.fetchLatestSubmission(applicationId))
@@ -75,7 +75,7 @@ class SendNewTermsOfUseController @Inject() (
           result             <- cond((existingSubmission.isEmpty && existingInvitation.isEmpty), success, failed)
         } yield result
       )
-      .fold[Result](identity, identity)
+        .fold[Result](identity, identity)
     }
 
     request.application.access match {
