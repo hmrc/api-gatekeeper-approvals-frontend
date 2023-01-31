@@ -16,39 +16,38 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import cats.data.NonEmptyList
 import org.joda.time.{DateTime, Days}
 import org.mockito.captor.ArgCaptor
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.{CurrentSubmittedInstanceDetails, DeclinedInstanceDetails, GrantedInstanceDetails, ViewModel}
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.{Declined, Granted, Submitted}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ImportantSubmissionData
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.TermsAndConditionsLocation
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.PrivacyPolicyLocation
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Standard
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ResponsibleIndividual
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SellResellOrDistribute
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.{
+  CurrentSubmittedInstanceDetails,
+  DeclinedInstanceDetails,
+  GrantedInstanceDetails,
+  ViewModel
+}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
+
   trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
-        
-    val page = mock[ApplicationSubmissionsPage]
-    when(page.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
+
+    val page            = mock[ApplicationSubmissionsPage]
+    when(page.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
     val viewModelCaptor = ArgCaptor[ViewModel]
 
     val controller = new ApplicationSubmissionsController(
@@ -59,22 +58,28 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       page,
       errorHandler,
       ApplicationActionServiceMock.aMock,
-      SubmissionServiceMock.aMock,
+      SubmissionServiceMock.aMock
     )
 
-    val requesterEmail = "test@example.com"
+    val requesterEmail     = "test@example.com"
     val submittedTimestamp = DateTime.now()
-    val declinedTimestamp = DateTime.now().minus(Days.days(5))
-    val grantedTimestamp = DateTime.now().minus(Days.days(7))
+    val declinedTimestamp  = DateTime.now().minus(Days.days(5))
+    val grantedTimestamp   = DateTime.now().minus(Days.days(7))
+
     def markedSubmissionWithStatusHistoryOf(statuses: Submission.Status*) = {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
-    val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
+    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", "bob@example.com")
+
     val appWithImportantData = anApplication(applicationId).copy(
-          access = Standard(List.empty, Some(SellResellOrDistribute("Yes")), Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))),
-          state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
-        )
+      access = Standard(
+        List.empty,
+        Some(SellResellOrDistribute("Yes")),
+        Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))
+      ),
+      state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
+    )
   }
 
   "page" should {
@@ -157,13 +162,13 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
-    
+
     "return 303 for SessionRecordNotFound" in new Setup {
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-    }  
+    }
   }
 
   "whichPage" should {

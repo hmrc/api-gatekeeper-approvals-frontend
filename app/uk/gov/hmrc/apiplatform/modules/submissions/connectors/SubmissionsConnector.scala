@@ -38,6 +38,8 @@ object SubmissionsConnector {
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
   implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
+
+  type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
 
 @Singleton
@@ -100,6 +102,24 @@ class SubmissionsConnector @Inject() (
         GrantedRequest(requestedBy, warnings.some, escalatedTo)
       )
         .map(_.leftMap(failed(_)))
+    }
+  }
+
+  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
+    val failed = (err: UpstreamErrorResponse) => s"Failed to invite for terms of use for application with id ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POSTEmpty[ErrorOrUnit](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
+        .map {
+          case Right(_)  => Right(TermsOfUseInvitationSuccessful)
+          case Left(err) => Left(failed(err))
+        }
+    }
+  }
+
+  def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[TermsOfUseInvitation]] = {
+    metrics.record(api) {
+      http.GET[Option[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
     }
   }
 }

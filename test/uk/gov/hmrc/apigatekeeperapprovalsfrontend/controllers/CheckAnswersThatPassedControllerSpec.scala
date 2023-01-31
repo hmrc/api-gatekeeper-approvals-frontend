@@ -20,14 +20,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPassedPage
 
 class CheckAnswersThatPassedControllerSpec extends AbstractControllerSpec {
-  
+
   trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckAnswersThatPassedPage]
@@ -50,9 +51,9 @@ class CheckAnswersThatPassedControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "return 200 if unknown questions exist" in new Setup {
@@ -61,7 +62,7 @@ class CheckAnswersThatPassedControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
       val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
     }
 
@@ -72,7 +73,7 @@ class CheckAnswersThatPassedControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
     }
@@ -83,7 +84,7 @@ class CheckAnswersThatPassedControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.checkAnswersThatPassedPage(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }

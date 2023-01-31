@@ -42,7 +42,7 @@ trait LabelAndHints {
 }
 case class ErrorInfo private (summary: String, message: Option[String])
 
-object ErrorInfo     {
+object ErrorInfo {
   def apply(summary: String): ErrorInfo                  = new ErrorInfo(summary, None)
   def apply(summary: String, message: String): ErrorInfo = if (summary == message) apply(summary) else new ErrorInfo(summary, Some(message))
 
@@ -106,7 +106,7 @@ object Mark {
   import cats.Monoid
 
   implicit val markMonoid: Monoid[Mark] = new Monoid[Mark] {
-    def empty: Mark                     = Pass
+    def empty: Mark = Pass
 
     def combine(x: Mark, y: Mark): Mark = (x, y) match {
       case (Fail, _)    => Fail

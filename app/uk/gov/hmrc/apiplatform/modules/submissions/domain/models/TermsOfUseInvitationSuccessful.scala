@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
+package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+sealed trait TermsOfUseInvitationSuccessful
 
-import play.api.test.{CSRFTokenHelper, FakeRequest}
-import play.filters.csrf.CSRFAddToken
-
-trait WithCSRFAddToken {
-  self: GuiceOneAppPerSuite =>
-
-  val addToken = app.injector.instanceOf[CSRFAddToken]
-
-  implicit class CSRFRequest[T](request: FakeRequest[T]) {
-    def withCSRFToken: FakeRequest[T] = CSRFTokenHelper.addCSRFToken(request).asInstanceOf[FakeRequest[T]]
-  }
-}
+case object TermsOfUseInvitationSuccessful extends TermsOfUseInvitationSuccessful

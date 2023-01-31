@@ -16,37 +16,39 @@
 
 package uk.gov.hmrc.apiplatform.modules.gkauth.services
 
-import org.mockito.MockitoSugar
-import org.mockito.ArgumentMatchersSugar
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
-import cats.data.OptionT
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+import cats.data.OptionT
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 
 trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
+
   trait BaseApplicationActionServiceMock {
     def aMock: ApplicationActionService
 
-     object Process {
-       def thenReturn[A](application: Application) = {
+    object Process {
+
+      def thenReturn[A](application: Application) = {
         import cats.implicits._
 
         when(aMock.process[A](eqTo(application.id), *)(*))
-          .thenAnswer( (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req)))
-       }
+          .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req)))
+      }
 
-       def thenNotFound[A]() = {
+      def thenNotFound[A]() = {
         import cats.implicits._
 
         when(aMock.process[A](*[ApplicationId], *)(*))
-          .thenAnswer( (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none)
-       }
-     }
+          .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none)
+      }
+    }
   }
 
   object ApplicationActionServiceMock extends BaseApplicationActionServiceMock {

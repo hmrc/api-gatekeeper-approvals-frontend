@@ -17,31 +17,32 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ApplicationDeclinedPage, ConfirmYourDecisionPage}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
-  
+
   trait Setup extends AbstractSetup with ApplicationServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val confirmYourDecisionPage = app.injector.instanceOf[ConfirmYourDecisionPage]
     val applicationApprovedPage = app.injector.instanceOf[ApplicationApprovedPage]
     val applicationDeclinedPage = app.injector.instanceOf[ApplicationDeclinedPage]
-  
+
     val controller = new ConfirmYourDecisionController(
-        StrideAuthorisationServiceMock.aMock,
-        mcc,
-        errorHandler,
-        ApplicationActionServiceMock.aMock,
-        SubmissionServiceMock.aMock,
-        confirmYourDecisionPage,
-        SubmissionReviewServiceMock.aMock
-      )
+      StrideAuthorisationServiceMock.aMock,
+      mcc,
+      errorHandler,
+      ApplicationActionServiceMock.aMock,
+      SubmissionServiceMock.aMock,
+      confirmYourDecisionPage,
+      SubmissionReviewServiceMock.aMock
+    )
   }
 
   "confirmYourDecision page" should {
@@ -49,7 +50,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
-    
+
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
@@ -60,7 +61,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-    
+
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
@@ -73,7 +74,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }
@@ -85,7 +86,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-    
+
       val result = controller.action(applicationId)(fakeDeclineRequest)
 
       status(result) shouldBe SEE_OTHER

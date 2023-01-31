@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.mockito.captor.ArgCaptor
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{SubmissionReview, ApplicationState}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.ViewModel
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationState, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
 
@@ -62,7 +63,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends BaseSetup {
     val appChecklistPage = mock[ChecklistPage]
-    when(appChecklistPage.apply(*[ViewModel])(*,*)).thenReturn(play.twirl.api.HtmlFormat.empty)
+    when(appChecklistPage.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
   }
 
   trait LivePageSetup extends BaseSetup {
@@ -138,12 +139,12 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     "render checklist template with in house software section" in new LivePageSetup {
       setupForSuccessWith(passMarkedSubmission, true, true, inHouseApplication)
       inHouseApplication.isInHouseSoftware shouldBe true
-      
+
       val result = controller.checklistPage(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should include("This request is from an in-house developer")
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "render checklist template without in house software section" in new LivePageSetup {
@@ -153,8 +154,8 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       val result = controller.checklistPage(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
-      contentAsString(result) should not include("This request is from an in-house developer")
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This request is from an in-house developer")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "render checklist template with a deleted application" in new LivePageSetup {

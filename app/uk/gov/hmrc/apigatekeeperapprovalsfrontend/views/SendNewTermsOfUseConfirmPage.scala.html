@@ -1,0 +1,55 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SendNewTermsOfUseController._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("sendnewtermsofuseconfirm.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  <span class="govuk-caption-l">
+    @{model.appName}
+  </span>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.SendNewTermsOfUseController.action(model.applicationId), 'class -> "form") {
+    @helper.CSRF.formField
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset_legend-l">
+          <h1> @{messages("sendnewtermsofuseconfirm.title")} </h1>
+        </legend>
+        <div class="govuk-radios govuk-radios--inline">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="invite-admins-yes" name="invite-admins" type="radio" value="yes" checked>
+            <label class="govuk-label govuk-radios__label" for="invite-admins">Yes</label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="invite-admins-no" name="invite-admins" type="radio" value="no">
+            <label class="govuk-label govuk-radios__label" for="invite-admins">No</label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="govuk-button-group">
+      <button id="continue" class="govuk-button govuk-button" type="submit" name="submit-action" value="continue">@{messages("sendnewtermsofuseconfirm.continue")}</button>
+    </div>
+  }
+}

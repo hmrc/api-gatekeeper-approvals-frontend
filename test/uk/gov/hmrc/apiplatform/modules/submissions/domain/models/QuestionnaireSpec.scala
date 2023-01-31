@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+
 class QuestionnaireSpec extends AsyncHmrcSpec {
-  trait Setup extends SubmissionsTestData {
-  }
+  trait Setup extends SubmissionsTestData {}
 
   "Questionnaire" should {
     "find question by id when given a question id that exists in the questionnire" in new Setup {

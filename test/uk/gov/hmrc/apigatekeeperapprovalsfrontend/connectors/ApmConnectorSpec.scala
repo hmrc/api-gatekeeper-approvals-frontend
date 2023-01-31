@@ -16,16 +16,18 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Application, Mode}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-
 import scala.collection.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Mode}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
@@ -41,14 +43,14 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val httpClient = mock[HttpClient]
-    val urlBase = "http://example.com"
-    val appId = ApplicationId.random
+    val httpClient                 = mock[HttpClient]
+    val urlBase                    = "http://example.com"
+    val appId                      = ApplicationId.random
 
     val connector = new ApmConnector(httpClient, ApmConnector.Config(urlBase), new NoopConnectorMetrics())
 
-    def assertHttpClientWasCalledWithUrl(expectedUrl: String, expectedParams: Seq[(String,String)] = Seq()) =
-      verify(httpClient).GET(eqTo(expectedUrl), eqTo(expectedParams), *[Seq[(String, String)]])(*,*,*)
+    def assertHttpClientWasCalledWithUrl(expectedUrl: String, expectedParams: Seq[(String, String)] = Seq()) =
+      verify(httpClient).GET(eqTo(expectedUrl), eqTo(expectedParams), *[Seq[(String, String)]])(*, *, *)
   }
 
   "the Apm Connector" should {

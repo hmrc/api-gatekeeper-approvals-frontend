@@ -16,43 +16,46 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.NoAnswer
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AcknowledgedAnswer
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AcknowledgedAnswer, NoAnswer, Submission}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
 
 class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
+
   trait Setup extends SubmissionsTestData {
     val submissionWithAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions)(aSubmission)
-    val submissionWithAnswersExceptForOrgDetails = Submission.updateLatestAnswersTo(completeAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.questionRI3.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id)(aSubmission)
-    val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions + 
-      (DevelopmentPractices.question1.id -> NoAnswer) + 
-      (DevelopmentPractices.question2.id -> AcknowledgedAnswer) + 
-      (DevelopmentPractices.question3.id -> NoAnswer)
+
+    val submissionWithAnswersExceptForOrgDetails = Submission.updateLatestAnswersTo(
+      completeAnswersToQuestions - OrganisationDetails.question1.id - OrganisationDetails.questionRI1.id - OrganisationDetails.questionRI2.id - OrganisationDetails.questionRI3.id - OrganisationDetails.question2.id - OrganisationDetails.question2c.id
     )(aSubmission)
+
+    val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions +
+      (DevelopmentPractices.question1.id -> NoAnswer) +
+      (DevelopmentPractices.question2.id -> AcknowledgedAnswer) +
+      (DevelopmentPractices.question3.id -> NoAnswer))(aSubmission)
   }
 
   "SubmissionQuestionsAndAnswers" should {
-    "extract questions and answers correctly" in new Setup {      
+    "extract questions and answers correctly" in new Setup {
       val result = SubmissionQuestionsAndAnswers(submissionWithAnswers, 0)
-      
+
       result.length shouldBe 3
       result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 5
       result.find(_.heading == "Organisation details").value.questionsAndAnswers.length shouldBe 6
       result.find(_.heading == "Development practices").value.questionsAndAnswers.length shouldBe 3
     }
 
-    "extract questions and answers omitting groups that have no questions" in new Setup {      
+    "extract questions and answers omitting groups that have no questions" in new Setup {
       val result = SubmissionQuestionsAndAnswers(submissionWithAnswersExceptForOrgDetails, 0)
-      
-      result.map(_.heading) should contain only("Customers authorising your software", "Development practices")
+
+      result.map(_.heading) should contain only ("Customers authorising your software", "Development practices")
     }
 
-    "extract questions and answers omitting groups that have only non-displayable answers" in new Setup {      
+    "extract questions and answers omitting groups that have only non-displayable answers" in new Setup {
       val result = SubmissionQuestionsAndAnswers(submissionWithNonDisplayableDevPracticesAnswers, 0)
-      
-      result.map(_.heading) should contain only("Customers authorising your software", "Organisation details")
+
+      result.map(_.heading) should contain only ("Customers authorising your software", "Organisation details")
     }
 
   }

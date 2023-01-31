@@ -17,23 +17,24 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
-import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
 
 class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with MarkedSubmissionsTestData {
-  
+
   trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val page = app.injector.instanceOf[CheckCompanyRegistrationPage]
-    
+
     val controller = new CheckCompanyRegistrationController(
       StrideAuthorisationServiceMock.aMock,
       mcc,
@@ -52,9 +53,9 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "return 200 with a deleted application" in new Setup {
@@ -64,7 +65,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
     }
@@ -77,7 +78,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.BAD_REQUEST
     }
 
@@ -87,7 +88,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
-      
+
       status(result) shouldBe Status.NOT_FOUND
     }
   }

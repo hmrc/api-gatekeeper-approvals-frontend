@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.http.Status
 import play.api.test.Helpers._
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationServiceMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 
 class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
 

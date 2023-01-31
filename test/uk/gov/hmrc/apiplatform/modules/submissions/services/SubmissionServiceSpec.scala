@@ -16,23 +16,26 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-
-import scala.concurrent.Future.successful
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future.successful
+
+import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful}
+import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 
 class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
-  
+
   trait Setup {
-    implicit val hc = HeaderCarrier()
-    val applicationId = ApplicationId.random
+    implicit val hc                                    = HeaderCarrier()
+    val applicationId                                  = ApplicationId.random
     val mockSubmissionsConnector: SubmissionsConnector = mock[SubmissionsConnector]
-    val requestedBy = "bob@example.com"
-    val app = anApplication(applicationId)
+    val requestedBy                                    = "bob@example.com"
+    val app                                            = anApplication(applicationId)
 
     val underTest = new SubmissionService(mockSubmissionsConnector)
   }
@@ -64,10 +67,27 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
   "grantWithWarnings" should {
     "call submission connector correctly" in new Setup {
       val warnings = "warn"
-      val manager = "manager"
+      val manager  = "manager"
       when(mockSubmissionsConnector.grantWithWarnings(eqTo(applicationId), eqTo(requestedBy), eqTo(warnings), eqTo(Some(manager)))(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(manager)))
+      val result   = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(manager)))
       result shouldBe Right(app)
+    }
+  }
+
+  "termsOfUseInvite" should {
+    "call submission connector correctly" in new Setup {
+      when(mockSubmissionsConnector.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(Right(TermsOfUseInvitationSuccessful)))
+      val result = await(underTest.termsOfUseInvite(applicationId))
+      result shouldBe Right(TermsOfUseInvitationSuccessful)
+    }
+  }
+
+  "fetchTermsOfUseInvitation" should {
+    "call submission connector correctly" in new Setup {
+      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None)
+      when(mockSubmissionsConnector.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(Some(invite)))
+      val result = await(underTest.fetchTermsOfUseInvitation(applicationId))
+      result shouldBe Some(invite)
     }
   }
 }

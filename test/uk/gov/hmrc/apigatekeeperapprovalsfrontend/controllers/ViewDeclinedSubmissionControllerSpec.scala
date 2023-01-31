@@ -20,11 +20,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
 
