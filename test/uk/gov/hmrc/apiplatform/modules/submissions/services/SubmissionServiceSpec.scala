@@ -84,7 +84,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "fetchTermsOfUseInvitation" should {
     "call submission connector correctly" in new Setup {
-      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now)
+      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None)
       when(mockSubmissionsConnector.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(Some(invite)))
       val result = await(underTest.fetchTermsOfUseInvitation(applicationId))
       result shouldBe Some(invite)

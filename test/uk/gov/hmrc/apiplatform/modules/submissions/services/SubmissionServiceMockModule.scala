@@ -126,7 +126,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object FetchTermsOfUseInvitation {
 
       def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now))
+        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 

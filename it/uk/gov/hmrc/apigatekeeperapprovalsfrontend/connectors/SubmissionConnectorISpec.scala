@@ -56,7 +56,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     val markSubmission = markedSubmission
     val requestedBy    = "bob@blockbusters.com"
     val reason         = "reason"
-    val invitation     = TermsOfUseInvitation(applicationId, Instant.now, Instant.now)
+    val invitation     = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None)
     implicit val hc    = HeaderCarrier()
   }
 
