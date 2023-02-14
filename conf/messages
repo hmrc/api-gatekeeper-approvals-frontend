@@ -223,4 +223,7 @@ sendnewtermsofuserequested.title = Admins invited to agree to terms of use V2
 sendnewtermsofuserequested.description = We have emailed all admins of the application.
 sendnewtermsofuserequested.link = Back to
 
+termsofuse.pagetitle = HMRC API Gatekeeper - Terms of use
+termsofuse.title = Terms of use
+
 errorsummary.message = There is a problem

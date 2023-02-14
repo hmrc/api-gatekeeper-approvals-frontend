@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.footer.Footer
 
 @this(
   govukLayout: GovukLayout,
@@ -45,12 +46,22 @@
   </div>
 }
 
+@mainContentFullWidth = {
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      @contentBlock
+    </div>
+  </div>
+}
+
 @govukLayout(
     pageTitle = pageTitle,
     headBlock = Some(hmrcHead()),
     headerBlock = Some(siteHeader()),
     scriptsBlock = Some(scriptElem),
     beforeContentBlock = Some(beforeContentAndUser),
+    mainContentLayout = None,
+    footerBlock = Some(hmrcFooter(new Footer(meta = None, language = En))),
     assetPath = None,
     cspNonce = CSPNonce.get
-)(contentBlock)
+)(mainContentFullWidth)

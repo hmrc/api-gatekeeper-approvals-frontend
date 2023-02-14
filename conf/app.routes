@@ -56,4 +56,6 @@ GET        /applications/:id/submitted-answers/:index                uk.gov.hmrc
 GET        /applications/:id/send-new-terms-of-use                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SendNewTermsOfUseController.page(id: ApplicationId)
 POST       /applications/:id/send-new-terms-of-use                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SendNewTermsOfUseController.action(id: ApplicationId)
 
+GET        /terms-of-use                                             uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseInvitationController.page
+
 GET        /assets/*file                                             controllers.Assets.versioned(path = "/public", file: Asset)

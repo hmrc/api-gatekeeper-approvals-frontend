@@ -122,4 +122,10 @@ class SubmissionsConnector @Inject() (
       http.GET[Option[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
     }
   }
+
+  def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier) = {
+    metrics.record(api) {
+      http.GET[List[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use")
+    }
+  }
 }
