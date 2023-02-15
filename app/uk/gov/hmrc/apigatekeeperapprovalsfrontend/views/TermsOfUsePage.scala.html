@@ -30,7 +30,6 @@
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
           <th scope="col" class="govuk-table__header">Application</th>
-          <th scope="col" class="govuk-table__header">API subscription</th>
           <th scope="col" class="govuk-table__header">Status last updated</th>
           <th scope="col" class="govuk-table__header govuk-!-text-align-right">Status</th>
         </tr>
@@ -39,10 +38,9 @@
         @for(model <- viewModels) {
           <tr class="govuk-table__row">
             <td class="govuk-table__cell">@{model.applicationName}</td>
-            <td class="govuk-table__cell"></td>
             <td class="govuk-table__cell">@{model.lastUpdated}</td>
             <td class="govuk-table__cell govuk-!-text-align-right">
-              <strong class="govuk-tag app-no-wrap">@{model.status}</strong>
+              <strong class="govuk-tag govuk-tag--blue">@{model.status}</strong>
             </td>
           </tr>
         }

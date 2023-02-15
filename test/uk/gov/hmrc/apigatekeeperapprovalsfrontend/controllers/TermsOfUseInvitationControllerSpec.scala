@@ -48,14 +48,46 @@ class TermsOfUseInvitationControllerSpec
   }
 
   "GET /" should {
-    "return Ok (200)" in new Setup {
-      // StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      // ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
-      // SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
+    "return Ok (200) for Stride users" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
+      ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
 
-      // val result = controller.page()(fakeRequest)
+      val result = controller.page()(fakeRequest)
 
-      // status(result) shouldBe OK
+      status(result) shouldBe OK
+    }
+
+    "return Ok (200) for LDAP users" in new Setup {
+      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
+      LdapAuthorisationServiceMock.Auth.succeeds
+      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
+      ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
+
+      val result = controller.page()(fakeRequest)
+
+      status(result) shouldBe OK
+    }
+
+    "return Unauthorised (401) when user not logged in" in new Setup {
+      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
+      LdapAuthorisationServiceMock.Auth.notAuthorised
+
+      val result = controller.page()(fakeRequest)
+
+      status(result) shouldBe UNAUTHORIZED
+    }
+
+    "return Ok (200) when no application found for application id in invitations" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
+      ApplicationServiceMock.FetchByApplicationId.thenNotFound()
+      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+      val result = controller.page()(fakeRequest)
+
+      status(result) shouldBe OK
     }
   }
 }

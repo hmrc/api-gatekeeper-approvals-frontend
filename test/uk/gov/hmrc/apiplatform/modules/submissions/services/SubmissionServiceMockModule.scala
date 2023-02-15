@@ -134,6 +134,18 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         when(aMock.fetchTermsOfUseInvitation(*[ApplicationId])(*)).thenReturn(successful(None))
       }
     }
+
+    object FetchTermsOfUseInvitations {
+
+      def thenReturn() = {
+        val response = List(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None))
+        when(aMock.fetchTermsOfUseInvitations()(*)).thenReturn(successful(response))
+      }
+
+      def thenNotFound() = {
+        when(aMock.fetchTermsOfUseInvitation(*[ApplicationId])(*)).thenReturn(successful(None))
+      }
+    }
   }
 
   object SubmissionServiceMock extends BaseSubmissionServiceMock {
