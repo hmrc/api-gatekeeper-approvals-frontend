@@ -20,6 +20,15 @@
 
 @(viewModels: List[ViewModel])(implicit request: Request[_], messages: Messages)
 
+@buildStatus(status: String) = @{
+  status.toUpperCase() match {
+    case "EMAIL SENT" => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "WARNINGS" => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
+    case "FAILED" => <strong class="govuk-tag govuk-tag--red">{status}</strong>
+    case _ => <strong class="govuk-tag">{status}</strong>
+  }
+}
+
 @layout(pageTitle = Some(messages("termsofuse.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <h1 class="govuk-heading-l">        
     @{messages("termsofuse.title")}
@@ -40,7 +49,7 @@
             <td class="govuk-table__cell">@{model.applicationName}</td>
             <td class="govuk-table__cell">@{model.lastUpdated}</td>
             <td class="govuk-table__cell govuk-!-text-align-right">
-              <strong class="govuk-tag govuk-tag--blue">@{model.status}</strong>
+              @buildStatus({model.status})
             </td>
           </tr>
         }
