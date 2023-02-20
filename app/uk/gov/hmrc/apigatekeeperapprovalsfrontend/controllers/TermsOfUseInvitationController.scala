@@ -36,6 +36,7 @@ import java.time.Instant
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitation
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
 
 object TermsOfUseInvitationController {
   case class ViewModel(applicationId: ApplicationId, applicationName: String, lastUpdated: String, status: String)
@@ -64,11 +65,25 @@ class TermsOfUseInvitationController @Inject()(
       submissionService.fetchLatestSubmission(applicationId)
     }
 
+    def deriveSubmissionStatusDisplayName(status: Submission.Status) = {
+      status match {
+        case s: Answering => "Answering"
+        case s: Created => "Created"
+        case s: Declined => "Declined"
+        case s: Failed => "Failed"
+        case s: Granted => "Granted"
+        case s: GrantedWithWarnings => "Granted with warnings"
+        case s: PendingResponsibleIndividual => "Pending responsible individual"
+        case s: Submitted => "Submitted"
+        case s: Warnings => "Warnings"
+      }
+    }
+
     def buildViewModel(invite: TermsOfUseInvitation, application: Option[Application], submission: Option[Submission]): Option[ViewModel] = {
       (application, submission) match {
         case (Some(app), Some(sub)) => {
           logger.info(s"Found both application and submission for application with id ${invite.applicationId.value} when building terms of use invitation view model")
-          Some(ViewModel(app.id, app.name, DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(sub.status.timestamp.getMillis())), sub.status.toString()))
+          Some(ViewModel(app.id, app.name, DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(sub.status.timestamp.getMillis())), deriveSubmissionStatusDisplayName(sub.status)))
         }
         case (Some(app), None) => {
           logger.info(s"Found only application but no submission for application with id ${invite.applicationId.value} when building terms of use invitation view model")
