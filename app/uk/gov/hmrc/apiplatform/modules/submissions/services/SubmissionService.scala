@@ -62,4 +62,8 @@ class SubmissionService @Inject() (
   def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier) = {
     submissionConnector.fetchTermsOfUseInvitation(applicationId)
   }
+
+  def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier) = {
+    submissionConnector.fetchTermsOfUseInvitations()
+  }
 }

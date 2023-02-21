@@ -24,9 +24,13 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuth
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders with GatekeeperAuthorisationActions {
   self: GatekeeperBaseController =>
+
+  def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    role(anyAuthenticatedUserRefiner) _
 
   def loggedInWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplication(anyAuthenticatedUserRefiner) _
