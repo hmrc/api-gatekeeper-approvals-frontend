@@ -226,4 +226,14 @@ sendnewtermsofuserequested.link = Back to
 termsofuse.pagetitle = HMRC API Gatekeeper - Terms of use
 termsofuse.title = Terms of use
 
+termsofusefailedlist.title = This application does not meet the terms of use
+termsofusefailedlist.pagetitle = HMRC API Gatekeeper - Answers with fails and warnings
+termsofusefailedlist.continue = Continue
+termsofusefailedlist.comebacklater = Come back later
+termsofusefailedlist.failsonly.helptext = Email the admins about these fails.
+termsofusefailedlist.warnsonly.helptext = Email the admins about these warnings.
+termsofusefailedlist.failsandwarns.helptext = Email the admins about these fails and warnings.
+termsofusefailedlist.status.failed = Fail
+termsofusefailedlist.status.warning = Warning
+
 errorsummary.message = There is a problem
