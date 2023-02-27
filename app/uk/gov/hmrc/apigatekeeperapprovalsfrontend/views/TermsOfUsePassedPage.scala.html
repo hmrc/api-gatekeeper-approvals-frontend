@@ -1,0 +1,54 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUsePassedController._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("termsofusepassed.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">@model.appName</span>
+  <h1 class="govuk-heading-l">        
+    @{messages(s"termsofusepassed.title")}
+  </h1>
+ 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+
+  @for(section <- model.sections) {
+    <h3 class="govuk-heading-s">
+      @section.heading
+    </h3>
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+      @for(answerDetails <- section.answerDetails.toList) { 
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__80">@{messages(answerDetails.question)}</dt>
+        <dd class="govuk-summary-list__20">@{messages(answerDetails.answer)}</dd>
+      </div>
+    }
+    </dl>
+  }
+
+  <p class="govuk-body">
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
+      @{messages("termsofusepassed.back")}
+    </a>
+  </p>
+}

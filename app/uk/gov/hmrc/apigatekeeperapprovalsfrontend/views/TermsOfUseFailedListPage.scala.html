@@ -29,6 +29,10 @@
   <h1 class="govuk-heading-l">        
     @{messages(s"termsofusefailedlist.title")}
   </h1>
+ 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
 
   <p class="govuk-body">
     @{messages(s"termsofusefailedlist.${model.messageKey}.helptext")}
@@ -57,10 +61,17 @@
     </tbody>
   </table>
 
+  <p class="govuk-body">
+    @{messages("termsofusefailedlist.youcancheck")}
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUsePassedController.answersThatPassedPage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
+      @{messages("termsofusefailedlist.answersthatpassed")}
+    </a>
+  </p>
+
   @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listAction(model.applicationId), 'class -> "form") {
     @helper.CSRF.formField
 
-    <div class="govuk-button-group">
+    <div class="govuk-button-group govuk-!-margin-top-7">
       <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages(s"termsofusefailedlist.continue")}</button>
       <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("termsofusefailedlist.comebacklater")}</button>
     </div>

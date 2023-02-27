@@ -53,6 +53,19 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.listPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
+      contentAsString(result) should not include("This application has been deleted")
+    }
+
+    "return 200 with a deleted application" in new Setup {
+      val deletedApp = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(deletedApp)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.listPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("This application has been deleted")
     }
 
     "return 200 if unknown questions exist" in new Setup {

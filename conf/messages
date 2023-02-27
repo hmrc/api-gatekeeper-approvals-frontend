@@ -233,7 +233,12 @@ termsofusefailedlist.comebacklater = Come back later
 termsofusefailedlist.failsonly.helptext = Email the admins about these fails.
 termsofusefailedlist.warnsonly.helptext = Email the admins about these warnings.
 termsofusefailedlist.failsandwarns.helptext = Email the admins about these fails and warnings.
-termsofusefailedlist.status.failed = Fail
+termsofusefailedlist.youcancheck = You can check
+termsofusefailedlist.answersthatpassed = answers that passed
 termsofusefailedlist.status.warning = Warning
+
+termsofusepassed.title = Answers that passed
+termsofusepassed.pagetitle = HMRC API Gatekeeper - Answers that passed
+termsofusepassed.back = Back to warnings
 
 errorsummary.message = There is a problem
