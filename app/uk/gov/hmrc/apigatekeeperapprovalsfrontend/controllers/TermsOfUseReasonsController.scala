@@ -34,9 +34,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseReasonsPage
 
 object TermsOfUseReasonsController {
+
   case class ViewModel(applicationId: ApplicationId, appName: String, hasFails: Boolean, hasWarns: Boolean) {
+
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsandwarns" else "failsonly" }
-      else "warnsonly"
+    else "warnsonly"
   }
 
   case class ProvideReasonsForm(reasons: String)

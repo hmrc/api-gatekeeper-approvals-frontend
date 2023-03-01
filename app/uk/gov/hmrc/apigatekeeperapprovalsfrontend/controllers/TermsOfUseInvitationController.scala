@@ -16,44 +16,40 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
-import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.LdapAuthorisationService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
-import scala.concurrent.Future
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
-import java.time.Instant
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitation
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation}
+import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
 object TermsOfUseInvitationController {
   case class ViewModel(applicationId: ApplicationId, applicationName: String, lastUpdated: String, status: String)
 }
 
 @Singleton
-class TermsOfUseInvitationController @Inject()(
-  strideAuthorisationService: StrideAuthorisationService,
-  mcc: MessagesControllerComponents,
-  errorHandler: ErrorHandler,
-  val applicationActionService: ApplicationActionService,
-  val submissionService: SubmissionService,
-  val ldapAuthorisationService: LdapAuthorisationService,
-  termsOfUsePage: TermsOfUsePage,
-  applicationService: ApplicationService
-)(implicit override val ec: ExecutionContext
-) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
+class TermsOfUseInvitationController @Inject() (
+    strideAuthorisationService: StrideAuthorisationService,
+    mcc: MessagesControllerComponents,
+    errorHandler: ErrorHandler,
+    val applicationActionService: ApplicationActionService,
+    val submissionService: SubmissionService,
+    val ldapAuthorisationService: LdapAuthorisationService,
+    termsOfUsePage: TermsOfUsePage,
+    applicationService: ApplicationService
+  )(implicit override val ec: ExecutionContext
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
   import TermsOfUseInvitationController.ViewModel
 
   def page = loggedInOnly() { implicit request =>
@@ -67,15 +63,15 @@ class TermsOfUseInvitationController @Inject()(
 
     def deriveSubmissionStatusDisplayName(status: Submission.Status) = {
       status match {
-        case s: Answering => "Answering"
-        case s: Created => "Created"
-        case s: Declined => "Declined"
-        case s: Failed => "Failed"
-        case s: Granted => "Granted"
-        case s: GrantedWithWarnings => "Granted with warnings"
+        case s: Answering                    => "Answering"
+        case s: Created                      => "Created"
+        case s: Declined                     => "Declined"
+        case s: Failed                       => "Failed"
+        case s: Granted                      => "Granted"
+        case s: GrantedWithWarnings          => "Granted with warnings"
         case s: PendingResponsibleIndividual => "Pending responsible individual"
-        case s: Submitted => "Submitted"
-        case s: Warnings => "Warnings"
+        case s: Submitted                    => "Submitted"
+        case s: Warnings                     => "Warnings"
       }
     }
 
@@ -83,17 +79,22 @@ class TermsOfUseInvitationController @Inject()(
       (application, submission) match {
         case (Some(app), Some(sub)) => {
           logger.info(s"Found both application and submission for application with id ${invite.applicationId.value} when building terms of use invitation view model")
-          Some(ViewModel(app.id, app.name, DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(sub.status.timestamp.getMillis())), deriveSubmissionStatusDisplayName(sub.status)))
+          Some(ViewModel(
+            app.id,
+            app.name,
+            DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(sub.status.timestamp.getMillis())),
+            deriveSubmissionStatusDisplayName(sub.status)
+          ))
         }
-        case (Some(app), None) => {
+        case (Some(app), None)      => {
           logger.info(s"Found only application but no submission for application with id ${invite.applicationId.value} when building terms of use invitation view model")
           Some(ViewModel(app.id, app.name, DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), "Email sent"))
         }
-        case (None, Some(sub)) => {
+        case (None, Some(sub))      => {
           logger.info(s"Found only submission but no application for application with id ${invite.applicationId.value} when building terms of use invitation view model")
           None
         }
-        case (None, None) => {
+        case (None, None)           => {
           logger.info(s"Found neither application nor submission for application with id ${invite.applicationId.value} when building terms of use invitation view model")
           None
         }
@@ -101,12 +102,12 @@ class TermsOfUseInvitationController @Inject()(
     }
 
     for {
-      invites <- submissionService.fetchTermsOfUseInvitations()
-      applications <- Future.sequence(invites.map(invite => getApplication(invite.applicationId))).map(_.flatten)
+      invites       <- submissionService.fetchTermsOfUseInvitations()
+      applications  <- Future.sequence(invites.map(invite => getApplication(invite.applicationId))).map(_.flatten)
       applicationMap = applications.map(app => (app.id -> app)).toMap
-      submissions <- Future.sequence(invites.map(invite => getSubmission(invite.applicationId))).map(_.flatten)
-      submissionMap = submissions.map(sub => (sub.applicationId -> sub)).toMap
-      viewModels = invites.map(invite => buildViewModel(invite, applicationMap.get(invite.applicationId), submissionMap.get(invite.applicationId))).flatten
-     } yield Ok(termsOfUsePage(viewModels))
+      submissions   <- Future.sequence(invites.map(invite => getSubmission(invite.applicationId))).map(_.flatten)
+      submissionMap  = submissions.map(sub => (sub.applicationId -> sub)).toMap
+      viewModels     = invites.map(invite => buildViewModel(invite, applicationMap.get(invite.applicationId), submissionMap.get(invite.applicationId))).flatten
+    } yield Ok(termsOfUsePage(viewModels))
   }
 }

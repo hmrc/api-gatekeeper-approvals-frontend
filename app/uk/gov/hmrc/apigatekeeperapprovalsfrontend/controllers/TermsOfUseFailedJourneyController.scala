@@ -27,9 +27,9 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswers
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State, Collaborator, CollaboratorRole}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Collaborator, CollaboratorRole, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseFailedListPage, TermsOfUseFailedPage, TermsOfUseAdminsPage, TermsOfUseConfirmationPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailedPage}
 
 object TermsOfUseFailedJourneyController {
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -91,22 +91,21 @@ class TermsOfUseFailedJourneyController @Inject() (
       .toList
       .filter(_.status != Pass)
 
-    val isSuccessful               = !request.markedSubmission.isFail
-    val hasWarnings                = request.markedSubmission.isWarn
+    val isSuccessful = !request.markedSubmission.isFail
+    val hasWarnings  = request.markedSubmission.isWarn
 
     for {
-      review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
-    } yield 
-      Ok(
-        termsOfUseFailedListPage(
-          ViewModel(
-            applicationId,
-            appName,
-            answerDetails,
-            isDeleted
-          )
+      review <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
+    } yield Ok(
+      termsOfUseFailedListPage(
+        ViewModel(
+          applicationId,
+          appName,
+          answerDetails,
+          isDeleted
         )
       )
+    )
   }
 
   def listAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
@@ -140,15 +139,13 @@ class TermsOfUseFailedJourneyController @Inject() (
       .filter(_.status != Pass)
 
     successful(Ok(termsOfUseFailedPage(
-          ViewModel(
-            applicationId,
-            appName,
-            answerDetails,
-            isDeleted
-          )
-        )
+      ViewModel(
+        applicationId,
+        appName,
+        answerDetails,
+        isDeleted
       )
-    )
+    )))
   }
 
   def emailAddressesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
@@ -159,16 +156,16 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
-    
+
     for {
       review <- submissionReviewService.findOrCreateReview(
-                request.submission.id,
-                request.submission.latestInstance.index,
-                !request.markedSubmission.isFail,
-                request.markedSubmission.isWarn,
-                false,
-                false
-              )
+                  request.submission.id,
+                  request.submission.latestInstance.index,
+                  !request.markedSubmission.isFail,
+                  request.markedSubmission.isWarn,
+                  false,
+                  false
+                )
       _      <- submissionService.grantOrDeclineForTouUplift(applicationId, request.submission, request.name.get, review.grantWarnings)
     } yield ok
   }

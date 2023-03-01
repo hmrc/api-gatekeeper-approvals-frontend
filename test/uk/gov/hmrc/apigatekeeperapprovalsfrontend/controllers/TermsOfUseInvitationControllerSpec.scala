@@ -18,21 +18,20 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-
 import play.api.http.Status.OK
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
 class TermsOfUseInvitationControllerSpec
-  extends AbstractControllerSpec {
+    extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup  
-    with StrideAuthorisationServiceMockModule 
-    with LdapAuthorisationServiceMockModule
-    with ApplicationServiceMockModule {
+  trait Setup extends AbstractSetup
+      with StrideAuthorisationServiceMockModule
+      with LdapAuthorisationServiceMockModule
+      with ApplicationServiceMockModule {
     val termsOfUsePage = app.injector.instanceOf[TermsOfUsePage]
 
     val controller = new TermsOfUseInvitationController(

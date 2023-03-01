@@ -74,7 +74,10 @@ class ApplicationSubmissionsController @Inject() (
   def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
-    val hasEverBeenSubmitted: Submission => Boolean = submission => submission.instances.find(i => i.isSubmitted || i.isGranted || i.isGrantedWithWarnings || i.isDeclined || i.isFailed || i.isWarnings || i.isPendingResponsibleIndividual).nonEmpty
+    val hasEverBeenSubmitted: Submission => Boolean = submission =>
+      submission.instances.find(i =>
+        i.isSubmitted || i.isGranted || i.isGrantedWithWarnings || i.isDeclined || i.isFailed || i.isWarnings || i.isPendingResponsibleIndividual
+      ).nonEmpty
 
     (
       for {

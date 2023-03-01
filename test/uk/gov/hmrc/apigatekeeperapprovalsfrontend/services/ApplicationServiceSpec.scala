@@ -27,7 +27,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 class ApplicationServiceSpec extends AsyncHmrcSpec {
 
   trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationTestData {

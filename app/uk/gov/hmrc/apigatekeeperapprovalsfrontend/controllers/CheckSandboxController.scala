@@ -26,8 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckSandboxController.ViewModel
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State, SubmissionReview}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService, SubscriptionService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService, SubscriptionService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 
 object CheckSandboxController {

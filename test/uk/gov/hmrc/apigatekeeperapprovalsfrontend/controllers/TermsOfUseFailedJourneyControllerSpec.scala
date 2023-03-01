@@ -25,15 +25,15 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseFailedListPage, TermsOfUseFailedPage, TermsOfUseAdminsPage, TermsOfUseConfirmationPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailedPage}
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule {
-    val listPage = app.injector.instanceOf[TermsOfUseFailedListPage]
-    val failedPage = app.injector.instanceOf[TermsOfUseFailedPage]
-    val adminsPage = app.injector.instanceOf[TermsOfUseAdminsPage]
+    val listPage         = app.injector.instanceOf[TermsOfUseFailedListPage]
+    val failedPage       = app.injector.instanceOf[TermsOfUseFailedPage]
+    val adminsPage       = app.injector.instanceOf[TermsOfUseAdminsPage]
     val confirmationPage = app.injector.instanceOf[TermsOfUseConfirmationPage]
 
     val controller = new TermsOfUseFailedJourneyController(
@@ -60,7 +60,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.listPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should not include("This application has been deleted")
+      contentAsString(result) should not include ("This application has been deleted")
     }
 
     "return 200 with a deleted application" in new Setup {
@@ -173,5 +173,5 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe Status.OK
     }
-  }  
+  }
 }

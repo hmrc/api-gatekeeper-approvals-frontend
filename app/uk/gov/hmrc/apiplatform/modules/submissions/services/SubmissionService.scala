@@ -67,7 +67,13 @@ class SubmissionService @Inject() (
     submissionConnector.fetchTermsOfUseInvitations()
   }
 
-  def grantOrDeclineForTouUplift(applicationId: ApplicationId, submission: Submission, requestedBy: String, reasons: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
+  def grantOrDeclineForTouUplift(
+      applicationId: ApplicationId,
+      submission: Submission,
+      requestedBy: String,
+      reasons: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
     submission.latestInstance.status match {
       // if current submission state is Warnings, then grant with warnings
       case _: Submission.Status.Warnings => submissionConnector.grantWithWarningsForTouUplift(applicationId, requestedBy, reasons)
