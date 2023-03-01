@@ -25,20 +25,26 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseFailedListPage
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseFailedListPage, TermsOfUseFailedPage, TermsOfUseAdminsPage, TermsOfUseConfirmationPage}
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule {
-    val page = app.injector.instanceOf[TermsOfUseFailedListPage]
+    val listPage = app.injector.instanceOf[TermsOfUseFailedListPage]
+    val failedPage = app.injector.instanceOf[TermsOfUseFailedPage]
+    val adminsPage = app.injector.instanceOf[TermsOfUseAdminsPage]
+    val confirmationPage = app.injector.instanceOf[TermsOfUseConfirmationPage]
 
     val controller = new TermsOfUseFailedJourneyController(
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
       SubmissionReviewServiceMock.aMock,
-      page,
+      listPage,
+      failedPage,
+      adminsPage,
+      confirmationPage,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )
@@ -49,6 +55,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
       val result = controller.listPage(applicationId)(fakeRequest)
 
@@ -61,6 +68,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
       val result = controller.listPage(applicationId)(fakeRequest)
 
@@ -72,6 +80,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
       val result = controller.listPage(applicationId)(fakeRequest)
 
@@ -89,47 +98,80 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     }
   }
 
-  // "checkAnswersThatFailedAction" should {
-  //   "redirect to correct page when marking answers as checked" in new Setup {
-  //     StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-  //     ApplicationActionServiceMock.Process.thenReturn(application)
-  //     SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-  //     SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
+  "checkAnswersThatFailedAction" should {
+    "redirect to correct page when marking answers as continue" in new Setup {
+      val fakeSubmitContinueRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "continue")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-  //     val result = controller.listPage(applicationId)(fakeSubmitCheckedRequest)
+      val result = controller.listAction(applicationId)(fakeSubmitContinueRequest)
 
-  //     status(result) shouldBe SEE_OTHER
-  //   }
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseReasonsController.provideReasonsPage(applicationId).url
+    }
 
-  //   "redirect to correct page when marking answers as come-back-later" in new Setup {
-  //     StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-  //     ApplicationActionServiceMock.Process.thenReturn(application)
-  //     SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-  //     SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
+    "redirect to terms of use page when marking answers as come back later" in new Setup {
+      val fakeSubmitComeBackLaterRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-  //     val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.listAction(applicationId)(fakeSubmitComeBackLaterRequest)
 
-  //     status(result) shouldBe SEE_OTHER
-  //   }
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
+    }
+  }
 
-  //   "return bad request when marking answers as anything that we don't understand" in new Setup {
-  //     StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-  //     ApplicationActionServiceMock.Process.thenReturn(application)
-  //     SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+  "answersWithWarningsOrFails" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-  //     val result = controller.action(applicationId)(brokenRequest)
+      val result = controller.answersWithWarningsOrFails(applicationId)(fakeRequest)
 
-  //     status(result) shouldBe BAD_REQUEST
-  //   }
+      status(result) shouldBe Status.OK
+    }
+  }
 
-  //   "return bad request when sending an empty submit-action" in new Setup {
-  //     StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-  //     ApplicationActionServiceMock.Process.thenReturn(application)
-  //     SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+  "emailAddressesPage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-  //     val result = controller.action(applicationId)(fakeRequest)
+      val result = controller.emailAddressesPage(applicationId)(fakeRequest)
 
-  //     status(result) shouldBe BAD_REQUEST
-  //   }
-  // }
+      status(result) shouldBe Status.OK
+    }
+  }
+
+  "emailAddressesAction" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
+      SubmissionServiceMock.GrantOrDeclineForTouUplift.thenReturn(applicationId, application)
+
+      val result = controller.emailAddressesAction(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId).url
+    }
+  }
+
+  "confirmationPage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.confirmationPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+  }  
 }
