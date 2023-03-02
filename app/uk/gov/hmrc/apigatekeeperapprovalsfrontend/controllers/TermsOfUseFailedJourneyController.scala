@@ -166,7 +166,7 @@ class TermsOfUseFailedJourneyController @Inject() (
                   false,
                   false
                 )
-      _      <- submissionService.grantOrDeclineForTouUplift(applicationId, request.submission, request.name.get, review.grantWarnings)
+      _      <- submissionService.grantWithWarningsOrDeclineForTouUplift(applicationId, request.submission, request.name.get, review.grantWarnings)
     } yield ok
   }
 

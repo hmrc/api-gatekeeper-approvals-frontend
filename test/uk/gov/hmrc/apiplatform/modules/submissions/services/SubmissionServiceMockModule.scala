@@ -147,19 +147,31 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
     }
 
-    object GrantOrDeclineForTouUplift {
+    object GrantWithWarningsOrDeclineForTouUplift {
 
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.grantOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarningsOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grantOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarningsOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
     }
 
+    object GrantForTouUplift {
+
+      def thenReturn(applicationId: ApplicationId, application: Application) = {
+        val response = Right(application)
+        when(aMock.grantForTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+      }
+
+      def thenReturnError(applicationId: ApplicationId) = {
+        val response = Left("error")
+        when(aMock.grantForTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+      }
+    }
   }
 
   object SubmissionServiceMock extends BaseSubmissionServiceMock {

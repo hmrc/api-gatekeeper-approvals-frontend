@@ -63,12 +63,12 @@ class TermsOfUseInvitationController @Inject() (
 
     def deriveSubmissionStatusDisplayName(status: Submission.Status) = {
       status match {
-        case s: Answering                    => "Answering"
-        case s: Created                      => "Created"
+        case s: Answering                    => "In progress"
+        case s: Created                      => "In progress"
         case s: Declined                     => "Declined"
         case s: Failed                       => "Failed"
-        case s: Granted                      => "Granted"
-        case s: GrantedWithWarnings          => "Granted with warnings"
+        case s: Granted                      => "Terms of use V2"
+        case s: GrantedWithWarnings          => "Terms of use V2 with warnings"
         case s: PendingResponsibleIndividual => "Pending responsible individual"
         case s: Submitted                    => "Submitted"
         case s: Warnings                     => "Warnings"

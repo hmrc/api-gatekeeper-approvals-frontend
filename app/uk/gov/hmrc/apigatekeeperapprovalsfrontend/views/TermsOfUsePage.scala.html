@@ -22,10 +22,14 @@
 
 @buildStatus(status: String) = @{
   status.toUpperCase() match {
-    case "EMAIL SENT" => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
-    case "WARNINGS" => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
-    case "FAILED" => <strong class="govuk-tag govuk-tag--red">{status}</strong>
-    case _ => <strong class="govuk-tag">{status}</strong>
+    case "EMAIL SENT"                     => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "IN PROGRESS"                    => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "PENDING RESPONSIBLE INDIVIDUAL" => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "WARNINGS"                       => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
+    case "FAILED"                         => <strong class="govuk-tag govuk-tag--red">{status}</strong>
+    case "TERMS OF USE V2"                => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
+    case "TERMS OF USE V2 WITH WARNINGS"  => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
+    case _                                => <strong class="govuk-tag">{status}</strong>
   }
 }
 
@@ -49,9 +53,10 @@
             <td class="govuk-table__cell">
               @{ 
                 model.status.toUpperCase() match {
-                  case "FAILED"   => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
-                  case "WARNINGS" => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
-                  case _          => {model.applicationName}
+                  case "FAILED"                        => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
+                  case "WARNINGS"                      => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
+                  case "TERMS OF USE V2 WITH WARNINGS" => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(model.applicationId).url}>{model.applicationName}</a>
+                  case _                               => {model.applicationName}
                 }
               }
             </td>
