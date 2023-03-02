@@ -46,7 +46,15 @@
       <tbody class="govuk-table__body">
         @for(model <- viewModels) {
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell">@{model.applicationName}</td>
+            <td class="govuk-table__cell">
+              @{ 
+                model.status.toUpperCase() match {
+                  case "FAILED"   => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
+                  case "WARNINGS" => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
+                  case _          => {model.applicationName}
+                }
+              }
+            </td>
             <td class="govuk-table__cell">@{model.lastUpdated}</td>
             <td class="govuk-table__cell govuk-!-text-align-right">
               @buildStatus({model.status})

@@ -1,0 +1,57 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController._
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("termsofusefailed.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  <span class="govuk-caption-l">@model.appName</span>
+  <h1 class="govuk-heading-l">        
+    @{messages(s"termsofusefailed.title")}
+  </h1>
+ 
+  @if(model.isDeleted) {
+    <p class="govuk-body">@{messages("checklist.isdeleted")}</p>
+  }
+
+  <table class="govuk-table">
+    <tbody>
+      @for(answer <- model.answers) {
+        <tr class="govuk-table__row ">
+          <td class="govuk-table__cell">
+            @{messages(answer.question)}
+          </td>
+          <td class="govuk-table__cell">
+            @{messages(answer.answer)}
+          </td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            @{ if (answer.status == Fail) {
+                <strong class="govuk-tag govuk-tag--red"> {messages("termsofusefailedlist.status.failed")} </strong>
+              } else {
+                <strong class="govuk-tag govuk-tag--yellow"> {messages("termsofusefailedlist.status.warning")} </strong>
+              }
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

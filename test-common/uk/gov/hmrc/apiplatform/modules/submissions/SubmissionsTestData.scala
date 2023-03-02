@@ -117,6 +117,8 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
   val answeringSubmission = createdSubmission.answeringWith(completeAnswersToQuestions)
   val answeredSubmission  = createdSubmission.hasCompletelyAnsweredWith(completeAnswersToQuestions)
   val submittedSubmission = Submission.submit(now, "bob@example.com")(answeredSubmission)
+  val warningsSubmission  = Submission.warnings(now, "bob@example.com")(submittedSubmission)
+  val failedSubmission    = Submission.fail(now, "bob@example.com")(submittedSubmission)
   val declinedSubmission  = Submission.decline(now, gatekeeperUserName, reasons)(submittedSubmission)
   val grantedSubmission   = Submission.grant(now, gatekeeperUserName)(submittedSubmission)
 

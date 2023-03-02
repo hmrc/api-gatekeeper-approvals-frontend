@@ -39,6 +39,9 @@ object SubmissionsConnector {
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
   implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
 
+  case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
+  implicit val writesTouUpliftRequest = Json.writes[TouUpliftRequest]
+
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
 
@@ -126,6 +129,42 @@ class SubmissionsConnector @Inject() (
   def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier) = {
     metrics.record(api) {
       http.GET[List[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use")
+    }
+  }
+
+  def grantWithWarningsForTouUplift(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      warnings: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant with warnings application ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
+        s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant-with-warn-tou",
+        TouUpliftRequest(requestedBy, warnings)
+      )
+        .map(_.leftMap(failed(_)))
+    }
+  }
+
+  def declineForTouUplift(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      reasons: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId.value}: ${err}"
+
+    metrics.record(api) {
+      http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
+        s"$serviceBaseUrl/approvals/application/${applicationId.value}/decline-tou",
+        TouUpliftRequest(requestedBy, reasons)
+      )
+        .map(_.leftMap(failed(_)))
     }
   }
 }

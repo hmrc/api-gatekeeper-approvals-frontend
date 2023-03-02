@@ -90,4 +90,32 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
       result shouldBe Some(invite)
     }
   }
+
+  "fetchTermsOfUseInvitations" should {
+    "call submission connector correctly" in new Setup {
+      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None)
+      when(mockSubmissionsConnector.fetchTermsOfUseInvitations()(*)).thenReturn(successful(List(invite)))
+      val result = await(underTest.fetchTermsOfUseInvitations())
+      result shouldBe List(invite)
+    }
+  }
+
+  "grantOrDeclineForTouUplift" should {
+    "call submission connector correctly with a Failed submission" in new Setup {
+      when(mockSubmissionsConnector.declineForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grantOrDeclineForTouUplift(applicationId, failedSubmission, "requestedBy", "reasons"))
+      result shouldBe Right(app)
+    }
+
+    "call submission connector correctly with a Warnings submission" in new Setup {
+      when(mockSubmissionsConnector.grantWithWarningsForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grantOrDeclineForTouUplift(applicationId, warningsSubmission, "requestedBy", "reasons"))
+      result shouldBe Right(app)
+    }
+
+    "return an error if the supplied submission is not Failed or Warnings" in new Setup {
+      val result = await(underTest.grantOrDeclineForTouUplift(applicationId, aSubmission, "requestedBy", "reasons"))
+      result shouldBe Left("Error - invalid submission status")
+    }
+  }
 }

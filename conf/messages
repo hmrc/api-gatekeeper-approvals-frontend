@@ -226,4 +226,43 @@ sendnewtermsofuserequested.link = Back to
 termsofuse.pagetitle = HMRC API Gatekeeper - Terms of use
 termsofuse.title = Terms of use
 
+termsofusefailedlist.title = This application does not meet the terms of use
+termsofusefailedlist.pagetitle = HMRC API Gatekeeper - Answers with fails and warnings
+termsofusefailedlist.continue = Continue
+termsofusefailedlist.comebacklater = Come back later
+termsofusefailedlist.failsonly.helptext = Email the admins about these fails.
+termsofusefailedlist.warnsonly.helptext = Email the admins about these warnings.
+termsofusefailedlist.failsandwarns.helptext = Email the admins about these fails and warnings.
+termsofusefailedlist.youcancheck = You can check
+termsofusefailedlist.answersthatpassed = answers that passed
+termsofusefailedlist.status.warning = Warning
+termsofusefailedlist.status.failed = Failed
+
+termsofusepassed.title = Answers that passed
+termsofusepassed.pagetitle = HMRC API Gatekeeper - Answers that passed
+termsofusepassed.back = Back to warnings
+
+termsofusefailed.title = Answers with warnings or fails
+termsofusefailed.pagetitle = HMRC API Gatekeeper - Answers with warnings or fails
+
+termsofusereasons.pagetitle = HMRC API Gatekeeper - Note all reasons
+termsofusereasons.failsonly.title = Note all the fails
+termsofusereasons.warnsonly.title = Note all the warnings
+termsofusereasons.failsandwarns.title = Note all the fails and warnings
+termsofusereasons.note.1 = The notes are saved on Gatekeeper.
+termsofusereasons.confluence.url = Use guidance on Confluence to help
+termsofusereasons.note.2 = Include
+termsofusereasons.fails.url = answers with warnings or fails (opens in new tab)
+termsofusereasons.button.continue = Save and continue
+
+termsofuseadmins.title = Copy email addresses and email the team admins
+termsofuseadmins.pagetitle = HMRC API Gatekeeper - Copy email addresses
+termsofuseadmins.button.copyemailaddresses = Copy email addresses to clipboard
+termsofuseadmins.continue = Continue
+
+termsofuseconfirmation.pageTitle = HMRC API Gatekeeper - What happens next
+termsofuseconfirmation.title = What happens next
+termsofuseconfirmation.text = Make a note of the application name and today’s date. Admins have 30 days to make changes. After that, you should contact them and follow up.
+termsofuseconfirmation.back = Back to Terms of use
+
 errorsummary.message = There is a problem
