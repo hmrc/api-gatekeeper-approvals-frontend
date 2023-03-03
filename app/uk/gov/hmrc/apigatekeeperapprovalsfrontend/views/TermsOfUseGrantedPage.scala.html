@@ -17,11 +17,11 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController._
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-@this(layout: Layout, breadcrumbs: Breadcrumbs)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
 @(model: ViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(messages("termsofusegranted.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
+@layout(pageTitle = Some(messages("termsofusegranted.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
 
   <span class="govuk-caption-l">

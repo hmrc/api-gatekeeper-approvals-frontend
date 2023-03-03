@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseInvitationController.ViewModel
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
 
 @(viewModels: List[ViewModel])(implicit request: Request[_], messages: Messages)
 
@@ -33,7 +33,7 @@
   }
 }
 
-@layout(pageTitle = Some(messages("termsofuse.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+@layout(pageTitle = Some(messages("termsofuse.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
   <h1 class="govuk-heading-l">        
     @{messages("termsofuse.title")}
   </h1>
