@@ -38,6 +38,8 @@
   </span>
 
   <p class="govuk-body">
-    <a class="govuk-link govuk-link--no-visited-state" href='@{model.applicationDetailsUrl}'>@{messages("termsofusegrantedconfirm.link")} @{model.appName}</a>
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page}" class="govuk-link govuk-link--no-visited-state">
+      @{messages("termsofusegrantedconfirm.link")}
+    </a>
   </p>
 }

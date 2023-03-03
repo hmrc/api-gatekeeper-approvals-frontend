@@ -273,6 +273,9 @@ termsofusegranted.continue = Continue
 termsofusegrantedconfirm.pagetitle = HMRC API Gatekeeper - Terms of use status is version 2
 termsofusegrantedconfirm.title1 = Terms of use status is
 termsofusegrantedconfirm.title2 = Version 2
-termsofusegrantedconfirm.link = Review or manage application details
+termsofusegrantedconfirm.link = Back to Terms of use
+
+termsofuseanswers.pagetitle = HMRC API Gatekeeper - Terms of use answers
+termsofuseanswers.title = Terms of use answers
 
 errorsummary.message = There is a problem

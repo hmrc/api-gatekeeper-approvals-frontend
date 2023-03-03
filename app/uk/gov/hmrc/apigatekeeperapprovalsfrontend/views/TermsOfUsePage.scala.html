@@ -56,6 +56,7 @@
                   case "FAILED"                        => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
                   case "WARNINGS"                      => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
                   case "TERMS OF USE V2 WITH WARNINGS" => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(model.applicationId).url}>{model.applicationName}</a>
+                  case "TERMS OF USE V2"               => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseAnswersController.page(model.applicationId).url}>{model.applicationName}</a>
                   case _                               => {model.applicationName}
                 }
               }

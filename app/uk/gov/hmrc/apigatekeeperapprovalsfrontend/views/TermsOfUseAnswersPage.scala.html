@@ -1,0 +1,51 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseAnswersController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("termsofuseanswers.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+  
+  <h1 class="govuk-heading-l">
+      <span class="govuk-caption-l">@model.appName</span>
+      @{messages("termsofuseanswers.title")}
+  </h1>
+
+  @for(group <- model.questionAnswerGroups) {
+    <h3 class="govuk-heading-m">
+      @{group.heading}
+    </h3>
+    <table class="govuk-table">
+      <tbody>
+        @for(questionAndAnswer <- group.questionsAndAnswers) {
+          <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                  @{questionAndAnswer.question}
+              </td>
+              <td class="govuk-table__cell align-right">
+                @{questionAndAnswer.answer}
+              </td>
+          </tr>
+        }
+      </tbody>
+    </table>    
+  }
+}

@@ -30,7 +30,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseGrantedPage}
 
 object TermsOfUseGrantedController {
-  case class ViewModel(appName: String, applicationId: ApplicationId, applicationDetailsUrl: String)
+  case class ViewModel(appName: String, applicationId: ApplicationId)
 }
 
 @Singleton
@@ -47,17 +47,15 @@ class TermsOfUseGrantedController @Inject() (
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
       successful(Ok(
         termsOfUseGrantedPage(
-          TermsOfUseGrantedController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
+          TermsOfUseGrantedController.ViewModel(request.application.name, applicationId)
         )
       ))
   }
 
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     def grantTermsOfUse = {
       def failure(err: String) = BadRequest(
@@ -69,7 +67,7 @@ class TermsOfUseGrantedController @Inject() (
       )
       val success              = Ok(
         termsOfUseGrantedConfirmationPage(
-          TermsOfUseGrantedController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
+          TermsOfUseGrantedController.ViewModel(request.application.name, applicationId)
         )
       )
 
