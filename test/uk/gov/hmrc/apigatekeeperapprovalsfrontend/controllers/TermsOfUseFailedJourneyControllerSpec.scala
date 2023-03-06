@@ -154,7 +154,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
-      SubmissionServiceMock.GrantOrDeclineForTouUplift.thenReturn(applicationId, application)
+      SubmissionServiceMock.GrantWithWarningsOrDeclineForTouUplift.thenReturn(applicationId, application)
 
       val result = controller.emailAddressesAction(applicationId)(fakeRequest)
 

@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 import java.time.Instant
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.GrantedRequest
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.{GrantedRequest, TouGrantedRequest, TouUpliftRequest}
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
@@ -199,6 +199,69 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.fetchTermsOfUseInvitation(applicationId))
 
       result shouldBe empty
+    }
+  }
+
+  "grant application for ToU" should {
+    val url = s"/approvals/application/${applicationId.value}/grant-tou"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(TouGrantedRequest(requestedBy))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(anApplication(id = applicationId))
+          )
+      )
+
+      val result = await(connector.grantForTouUplift(applicationId, requestedBy))
+
+      result shouldBe 'Right
+      result.right.get.id shouldBe applicationId
+    }
+  }
+
+  "grant with warnings application for ToU" should {
+    val url = s"/approvals/application/${applicationId.value}/grant-with-warn-tou"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(TouUpliftRequest(requestedBy, reason))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(anApplication(id = applicationId))
+          )
+      )
+
+      val result = await(connector.grantWithWarningsForTouUplift(applicationId, requestedBy, reason))
+
+      result shouldBe 'Right
+      result.right.get.id shouldBe applicationId
+    }
+  }
+
+  "decline application for ToU" should {
+    val url = s"/approvals/application/${applicationId.value}/decline-tou"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(TouUpliftRequest(requestedBy, reason))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(anApplication(id = applicationId))
+          )
+      )
+
+      val result = await(connector.declineForTouUplift(applicationId, requestedBy, reason))
+
+      result shouldBe 'Right
+      result.right.get.id shouldBe applicationId
     }
   }
 }

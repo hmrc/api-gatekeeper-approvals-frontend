@@ -61,10 +61,13 @@ GET        /terms-of-use/:id/failed                                  uk.gov.hmrc
 POST       /terms-of-use/:id/failed                                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.listAction(id: ApplicationId)
 GET        /terms-of-use/:id/answers-that-failed                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.answersWithWarningsOrFails(id: ApplicationId)
 GET        /terms-of-use/:id/answers-that-passed                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUsePassedController.answersThatPassedPage(id: ApplicationId)
+GET        /terms-of-use/:id/answers                                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseAnswersController.page(id: ApplicationId)
 GET        /terms-of-use/:id/reasons                                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseReasonsController.provideReasonsPage(id: ApplicationId)
 POST       /terms-of-use/:id/reasons                                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseReasonsController.provideReasonsAction(id: ApplicationId)
 GET        /terms-of-use/:id/admins-to-email                         uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.emailAddressesPage(id: ApplicationId)
 POST       /terms-of-use/:id/admins-to-email                         uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.emailAddressesAction(id: ApplicationId)
 GET        /terms-of-use/:id/confirmation                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.confirmationPage(id: ApplicationId)
+GET        /terms-of-use/:id/grant                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.page(id: ApplicationId)
+POST       /terms-of-use/:id/grant                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.action(id: ApplicationId)
 
 GET        /assets/*file                                             controllers.Assets.versioned(path = "/public", file: Asset)

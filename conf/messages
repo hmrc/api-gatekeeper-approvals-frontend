@@ -265,4 +265,17 @@ termsofuseconfirmation.title = What happens next
 termsofuseconfirmation.text = Make a note of the application name and today’s date. Admins have 30 days to make changes. After that, you should contact them and follow up.
 termsofuseconfirmation.back = Back to Terms of use
 
+termsofusegranted.pagetitle = HMRC API Gatekeeper - Does the application conform to the terms of use?
+termsofusegranted.title = Does the application conform to version 2 of the terms of use?
+termsofusegranted.description = Any outstanding warnings must be resolved before you change the application’s status.
+termsofusegranted.continue = Continue
+
+termsofusegrantedconfirm.pagetitle = HMRC API Gatekeeper - Terms of use status is version 2
+termsofusegrantedconfirm.title1 = Terms of use status is
+termsofusegrantedconfirm.title2 = Version 2
+termsofusegrantedconfirm.link = Back to Terms of use
+
+termsofuseanswers.pagetitle = HMRC API Gatekeeper - Terms of use answers
+termsofuseanswers.title = Terms of use answers
+
 errorsummary.message = There is a problem

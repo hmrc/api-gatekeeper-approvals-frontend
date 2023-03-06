@@ -100,22 +100,30 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
     }
   }
 
-  "grantOrDeclineForTouUplift" should {
+  "grantWithWarningsOrDeclineForTouUplift" should {
     "call submission connector correctly with a Failed submission" in new Setup {
       when(mockSubmissionsConnector.declineForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.grantOrDeclineForTouUplift(applicationId, failedSubmission, "requestedBy", "reasons"))
+      val result = await(underTest.grantWithWarningsOrDeclineForTouUplift(applicationId, failedSubmission, "requestedBy", "reasons"))
       result shouldBe Right(app)
     }
 
     "call submission connector correctly with a Warnings submission" in new Setup {
       when(mockSubmissionsConnector.grantWithWarningsForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.grantOrDeclineForTouUplift(applicationId, warningsSubmission, "requestedBy", "reasons"))
+      val result = await(underTest.grantWithWarningsOrDeclineForTouUplift(applicationId, warningsSubmission, "requestedBy", "reasons"))
       result shouldBe Right(app)
     }
 
     "return an error if the supplied submission is not Failed or Warnings" in new Setup {
-      val result = await(underTest.grantOrDeclineForTouUplift(applicationId, aSubmission, "requestedBy", "reasons"))
+      val result = await(underTest.grantWithWarningsOrDeclineForTouUplift(applicationId, aSubmission, "requestedBy", "reasons"))
       result shouldBe Left("Error - invalid submission status")
+    }
+  }
+
+  "grantForTouUplift" should {
+    "call submission connector correctly" in new Setup {
+      when(mockSubmissionsConnector.grantForTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.grantForTouUplift(applicationId, "requestedBy"))
+      result shouldBe Right(app)
     }
   }
 }
