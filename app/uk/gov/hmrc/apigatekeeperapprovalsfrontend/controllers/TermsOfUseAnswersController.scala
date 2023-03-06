@@ -35,7 +35,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseAnswersPa
 object TermsOfUseAnswersController {
 
   case class ViewModel(
-      appName: String,
+      applicationName: String,
       applicationId: ApplicationId,
       index: Int,
       questionAnswerGroups: List[QuestionAndAnswerGroup]
