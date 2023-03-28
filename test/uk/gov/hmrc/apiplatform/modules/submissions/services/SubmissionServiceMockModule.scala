@@ -24,6 +24,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.time.DateTimeUtils
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -126,7 +127,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object FetchTermsOfUseInvitation {
 
       def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None))
+        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
@@ -138,7 +139,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object FetchTermsOfUseInvitations {
 
       def thenReturn() = {
-        val response = List(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None))
+        val response = List(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT))
         when(aMock.fetchTermsOfUseInvitations()(*)).thenReturn(successful(response))
       }
 
