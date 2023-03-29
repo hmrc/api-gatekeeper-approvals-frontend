@@ -32,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData {
 
@@ -56,7 +57,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     val markSubmission = markedSubmission
     val requestedBy    = "bob@blockbusters.com"
     val reason         = "reason"
-    val invitation     = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None)
+    val invitation     = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
     implicit val hc    = HeaderCarrier()
   }
 
