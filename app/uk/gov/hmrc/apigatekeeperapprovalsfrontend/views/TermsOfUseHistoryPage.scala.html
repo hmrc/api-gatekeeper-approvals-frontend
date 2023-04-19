@@ -1,0 +1,50 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseHistoryController.TermsOfUseHistory
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseHistoryController.ViewModel
+@import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+
+@this(layout: Layout, breadcrumbs: Breadcrumbs)
+
+@(viewModel: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
+
+@buildStatus(status: String) = @{
+  status.toUpperCase() match {
+    case "EMAIL SENT"                     => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "IN PROGRESS"                    => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "PENDING RESPONSIBLE INDIVIDUAL" => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "WARNINGS"                       => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
+    case "FAILED"                         => <strong class="govuk-tag govuk-tag--red">{status}</strong>
+    case "TERMS OF USE V2"                => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
+    case "TERMS OF USE V2 WITH WARNINGS"  => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
+    case _                                => <strong class="govuk-tag">{status}</strong>
+  }
+}
+
+@layout(pageTitle = Some(messages("termsofusehistory.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
+
+  <div>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-3">
+        viewModel.applicationName
+      </h1>
+      <h2 class="govuk-visually-hidden">Terms of use status</h2>
+      @buildStatus({viewModel.status})
+
+
+
+  </div>
+}
