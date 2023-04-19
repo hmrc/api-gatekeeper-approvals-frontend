@@ -262,7 +262,7 @@ termsofuseadmins.pagetitle = HMRC API Gatekeeper - Copy email addresses
 termsofuseadmins.button.copyemailaddresses = Copy email addresses to clipboard
 termsofuseadmins.continue = Continue
 
-termsofuseconfirmation.pageTitle = HMRC API Gatekeeper - What happens next
+termsofuseconfirmation.pagetitle = HMRC API Gatekeeper - What happens next
 termsofuseconfirmation.title = What happens next
 termsofuseconfirmation.text = Make a note of the application name and today’s date. Admins have 30 days to make changes. After that, you should contact them and follow up.
 termsofuseconfirmation.back = Back to Terms of use
