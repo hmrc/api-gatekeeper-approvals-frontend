@@ -44,12 +44,16 @@
       <h2 class="govuk-visually-hidden">Terms of use status</h2>
       @buildStatus({viewModel.status})
 
+      <hr class="govuk-section-break govuk-section-break-xl govuk-section-break--visible">
+
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@{messages("termsofusehistory.title")}</h2>
+
       @for(history <- viewModel.historyEntries) {
 
         <h3 class="govuk-heading-s govuk-!-margin-top-6 govuk-!-margin-bottom-1">@{history.date}</h3>
-        <p class="govuk-body">@buildStatus({history.status})</p>
+        <p class="govuk-body">@{history.status}</p>
         <p class="govuk-body">@{history.description}</p>
-        
+
       }
   </div>
 }

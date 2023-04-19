@@ -57,6 +57,7 @@ GET        /applications/:id/send-new-terms-of-use                   uk.gov.hmrc
 POST       /applications/:id/send-new-terms-of-use                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SendNewTermsOfUseController.action(id: ApplicationId)
 
 GET        /terms-of-use                                             uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseInvitationController.page
+GET        /terms-of-use/:id/history                                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseHistoryController.page(id: ApplicationId)
 GET        /terms-of-use/:id/failed                                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.listPage(id: ApplicationId)
 POST       /terms-of-use/:id/failed                                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.listAction(id: ApplicationId)
 GET        /terms-of-use/:id/answers-that-failed                     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.answersWithWarningsOrFails(id: ApplicationId)

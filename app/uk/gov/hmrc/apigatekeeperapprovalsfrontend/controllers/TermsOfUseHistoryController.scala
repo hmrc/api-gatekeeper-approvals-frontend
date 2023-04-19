@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import cats.data.EitherT
-import cats.data.OptionT
+import cats.data.NonEmptyList
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
@@ -54,7 +53,7 @@ class TermsOfUseHistoryController @Inject() (
     applicationService: ApplicationService
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
-  import TermsOfUseHistoryController.ViewModel
+  import TermsOfUseHistoryController._
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
     def deriveSubmissionStatusDisplayName(status: Submission.Status) = {
@@ -71,6 +70,37 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
+    def deriveSubmissionStatusDescription(status: Submission.Status) = {
+      status match {
+        case s: Answering                    => "The submission was started"
+        case s: Created                      => "The submission was created"
+        case s: Declined                     => s"${s.name} declined that the application complies with the terms of use V2"
+        case s: Failed                       => s"${s.name} submitted the terms of use checklist.  The application did not comply with version 2 of the terms of use."
+        case s: Granted                      => s"${s.name} accepted that the application complies with the terms of use V2"
+        case s: GrantedWithWarnings          => s"${s.name} accepted that the application complies with the terms of use V2 with warnings"
+        case s: PendingResponsibleIndividual => "The submission is waiting for the responsible individual to accept the terms of use"
+        case s: Submitted                    => "The submission was submitted"
+        case s: Warnings                     => s"${s.name} submitted the terms of use checklist.  The application did not comply with version 2 of the terms of use."
+      }
+    }
+
+    def buildHistoryModelFromStatusHistory(invite: TermsOfUseInvitation, application: Application, history: Submission.Status): TermsOfUseHistory = {
+      TermsOfUseHistory(
+        history.timestamp.asText,
+        deriveSubmissionStatusDisplayName(history),
+        deriveSubmissionStatusDescription(history),
+        None
+      )
+    }
+
+    def buildHistoryFromSubmissionInstance(invite: TermsOfUseInvitation, application: Application, instance: Submission.Instance): List[TermsOfUseHistory] = {
+      instance.statusHistory.map(history => buildHistoryModelFromStatusHistory(invite, application, history)).toList
+    }
+
+    def buildHistoryFromSubmission(invite: TermsOfUseInvitation, application: Application, submission: Submission): List[TermsOfUseHistory] = {
+      submission.instances.map(instance => buildHistoryFromSubmissionInstance(invite, application, instance)).toList.flatten
+    }
+
     def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
       submission match {
         case Some(sub) => {
@@ -79,7 +109,7 @@ class TermsOfUseHistoryController @Inject() (
             application.name,
             DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(sub.status.timestamp.getMillis())),
             deriveSubmissionStatusDisplayName(sub.status),
-            List.empty
+            buildHistoryFromSubmission(invite, application, sub)
           )
         }
         case None      => {

@@ -226,7 +226,8 @@ sendnewtermsofuserequested.link = Back to
 termsofuse.pagetitle = HMRC API Gatekeeper - Terms of use
 termsofuse.title = Terms of use
 
-termsofusehistory.pagetitle = HMRC API Gatekeeper - Terms of use
+termsofusehistory.pagetitle = HMRC API Gatekeeper - Terms of use history
+termsofusehistory.title = Terms of use history
 
 termsofusefailedlist.title = This application does not meet the terms of use
 termsofusefailedlist.pagetitle = HMRC API Gatekeeper - Answers with fails and warnings
