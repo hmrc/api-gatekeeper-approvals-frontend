@@ -39,12 +39,17 @@
 
   <div>
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">
-        viewModel.applicationName
+        @{viewModel.applicationName}
       </h1>
       <h2 class="govuk-visually-hidden">Terms of use status</h2>
       @buildStatus({viewModel.status})
 
+      @for(history <- viewModel.historyEntries) {
 
-
+        <h3 class="govuk-heading-s govuk-!-margin-top-6 govuk-!-margin-bottom-1">@{history.date}</h3>
+        <p class="govuk-body">@buildStatus({history.status})</p>
+        <p class="govuk-body">@{history.description}</p>
+        
+      }
   </div>
 }
