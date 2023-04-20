@@ -36,24 +36,34 @@
 }
 
 @layout(pageTitle = Some(messages("termsofusehistory.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
-
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <div>
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">
         @{viewModel.applicationName}
       </h1>
       <h2 class="govuk-visually-hidden">Terms of use status</h2>
-      @buildStatus({viewModel.status})
+      <p class="govuk-body">@buildStatus({viewModel.currentState.status})</p>
+      <p class="govuk-body">@{viewModel.currentState.description}</p>
+      @if(viewModel.currentState.details.isDefined) {
+        <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
+          <p class="govuk-body">@{viewModel.currentState.details.get}</p>
+        </div>
+      }
 
-      <hr class="govuk-section-break govuk-section-break-xl govuk-section-break--visible">
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
       <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@{messages("termsofusehistory.title")}</h2>
 
       @for(history <- viewModel.historyEntries) {
 
-        <h3 class="govuk-heading-s govuk-!-margin-top-6 govuk-!-margin-bottom-1">@{history.date}</h3>
+        <h3 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-3">@{history.date}</h3>
         <p class="govuk-body">@{history.status}</p>
         <p class="govuk-body">@{history.description}</p>
-
+        @if(history.details.isDefined) {
+          <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
+            <p class="govuk-body">@{history.details.get}</p>
+          </div>
+        }
       }
   </div>
 }

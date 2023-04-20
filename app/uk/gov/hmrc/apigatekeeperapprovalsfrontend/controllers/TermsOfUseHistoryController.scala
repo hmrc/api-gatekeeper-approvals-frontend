@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import cats.data.NonEmptyList
-
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, ZoneId}
+import java.time.ZoneId
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
@@ -37,7 +35,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
 object TermsOfUseHistoryController {
-  case class ViewModel(applicationId: ApplicationId, applicationName: String, lastUpdated: String, status: String, historyEntries: List[TermsOfUseHistory])
+  case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory])
   case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String])
 }
 
@@ -56,7 +54,7 @@ class TermsOfUseHistoryController @Inject() (
   import TermsOfUseHistoryController._
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    def deriveSubmissionStatusDisplayName(status: Submission.Status) = {
+    def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "In progress"
         case s: Created                      => "In progress"
@@ -70,7 +68,7 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
-    def deriveSubmissionStatusDescription(status: Submission.Status) = {
+    def deriveSubmissionStatusDescription(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "The submission was started"
         case s: Created                      => "The submission was created"
@@ -84,21 +82,52 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
+    def deriveSubmissionStatusDetail(status: Submission.Status): Option[String] = {
+      status match {
+        case s: Answering                    => None
+        case s: Created                      => None
+        case s: Declined                     => Some(s.reasons)
+        case s: Failed                       => None
+        case s: Granted                      => None
+        case s: GrantedWithWarnings          => Some(s.warnings)
+        case s: PendingResponsibleIndividual => None
+        case s: Submitted                    => None
+        case s: Warnings                     => None
+      }
+    }
+
     def buildHistoryModelFromStatusHistory(invite: TermsOfUseInvitation, application: Application, history: Submission.Status): TermsOfUseHistory = {
       TermsOfUseHistory(
         history.timestamp.asText,
         deriveSubmissionStatusDisplayName(history),
         deriveSubmissionStatusDescription(history),
-        None
+        deriveSubmissionStatusDetail(history)
       )
     }
 
+    def filterSubmissionStatus(status: Submission.Status) = {
+      status match {
+        case s: Answering                    => true
+        case s: Created                      => false
+        case s: Declined                     => true
+        case s: Failed                       => true
+        case s: Granted                      => true
+        case s: GrantedWithWarnings          => true
+        case s: PendingResponsibleIndividual => true
+        case s: Submitted                    => false
+        case s: Warnings                     => true
+      }
+    }
+
     def buildHistoryFromSubmissionInstance(invite: TermsOfUseInvitation, application: Application, instance: Submission.Instance): List[TermsOfUseHistory] = {
-      instance.statusHistory.map(history => buildHistoryModelFromStatusHistory(invite, application, history)).toList
+      instance.statusHistory
+        .filter(history => filterSubmissionStatus(history))
+        .map(history => buildHistoryModelFromStatusHistory(invite, application, history))
+        .toList
     }
 
     def buildHistoryFromSubmission(invite: TermsOfUseInvitation, application: Application, submission: Submission): List[TermsOfUseHistory] = {
-      submission.instances.map(instance => buildHistoryFromSubmissionInstance(invite, application, instance)).toList.flatten
+      submission.instances.map(instance => buildHistoryFromSubmissionInstance(invite, application, instance)).toList.flatten.tail
     }
 
     def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
@@ -107,8 +136,7 @@ class TermsOfUseHistoryController @Inject() (
           ViewModel(
             application.id,
             application.name,
-            DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(sub.status.timestamp.getMillis())),
-            deriveSubmissionStatusDisplayName(sub.status),
+            buildHistoryModelFromStatusHistory(invite, application, sub.status),
             buildHistoryFromSubmission(invite, application, sub)
           )
         }
@@ -116,8 +144,12 @@ class TermsOfUseHistoryController @Inject() (
           ViewModel(
             application.id, 
             application.name, 
-            DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), 
-            "Email sent",
+            TermsOfUseHistory(
+              DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), 
+              "Email sent",
+              "We invited admins of the application to agree to version 2 of the terms of use.",
+              None
+            ),
             List.empty
           )
         }
