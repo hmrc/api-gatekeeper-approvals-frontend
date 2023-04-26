@@ -25,7 +25,6 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockMo
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseInvitationController
 class TermsOfUseInvitationControllerSpec
     extends AbstractControllerSpec {
 

@@ -57,7 +57,7 @@ class TermsOfUseHistoryController @Inject() (
     def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "In progress"
-        case s: Created                      => "In progress"
+        case s: Created                      => "Created"
         case s: Declined                     => "Declined"
         case s: Failed                       => "Failed"
         case s: Granted                      => "Terms of use V2"
@@ -96,38 +96,51 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
-    def buildHistoryModelFromStatusHistory(invite: TermsOfUseInvitation, application: Application, history: Submission.Status): TermsOfUseHistory = {
+    def buildModelFromSubmissionStatus(status: Submission.Status): TermsOfUseHistory = {
       TermsOfUseHistory(
-        history.timestamp.asText,
-        deriveSubmissionStatusDisplayName(history),
-        deriveSubmissionStatusDescription(history),
-        deriveSubmissionStatusDetail(history)
+        status.timestamp.asText,
+        deriveSubmissionStatusDisplayName(status),
+        deriveSubmissionStatusDescription(status),
+        deriveSubmissionStatusDetail(status)
       )
     }
 
-    def filterSubmissionStatus(status: Submission.Status) = {
+    def buildEmailSentModel(invite: TermsOfUseInvitation): TermsOfUseHistory = {
+      TermsOfUseHistory(
+        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), 
+        "Email sent",
+        "We invited admins of the application to agree to version 2 of the terms of use.",
+        None
+      )
+    }
+
+    def filterHistoryStatus(status: String) = {
       status match {
-        case s: Answering                    => true
-        case s: Created                      => false
-        case s: Declined                     => true
-        case s: Failed                       => true
-        case s: Granted                      => true
-        case s: GrantedWithWarnings          => true
-        case s: PendingResponsibleIndividual => true
-        case s: Submitted                    => false
-        case s: Warnings                     => true
+        case "In progress"                    => true
+        case "Created"                        => false
+        case "Declined"                       => true
+        case "Failed"                         => true
+        case "Terms of use V2"                => true
+        case "Terms of use V2 with warnings"  => true
+        case "Pending responsible individual" => true
+        case "Submitted"                      => false
+        case "Warnings"                       => true
       }
     }
 
-    def buildHistoryFromSubmissionInstance(invite: TermsOfUseInvitation, application: Application, instance: Submission.Instance): List[TermsOfUseHistory] = {
+    def buildHistoryFromSubmissionInstance(instance: Submission.Instance): List[TermsOfUseHistory] = {
       instance.statusHistory
-        .filter(history => filterSubmissionStatus(history))
-        .map(history => buildHistoryModelFromStatusHistory(invite, application, history))
+        .map(history => buildModelFromSubmissionStatus(history))
         .toList
     }
 
-    def buildHistoryFromSubmission(invite: TermsOfUseInvitation, application: Application, submission: Submission): List[TermsOfUseHistory] = {
-      submission.instances.map(instance => buildHistoryFromSubmissionInstance(invite, application, instance)).toList.flatten.tail
+    def buildHistoryFromSubmission(submission: Submission): List[TermsOfUseHistory] = {
+      submission.instances
+        .map(instance => buildHistoryFromSubmissionInstance(instance))
+        .toList
+        .flatten
+        .tail
+        .filter(history => filterHistoryStatus(history.status))
     }
 
     def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
@@ -136,20 +149,15 @@ class TermsOfUseHistoryController @Inject() (
           ViewModel(
             application.id,
             application.name,
-            buildHistoryModelFromStatusHistory(invite, application, sub.status),
-            buildHistoryFromSubmission(invite, application, sub)
+            buildModelFromSubmissionStatus(sub.status),
+            buildHistoryFromSubmission(sub) :+ buildEmailSentModel(invite)
           )
         }
         case None      => {
           ViewModel(
             application.id, 
             application.name, 
-            TermsOfUseHistory(
-              DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), 
-              "Email sent",
-              "We invited admins of the application to agree to version 2 of the terms of use.",
-              None
-            ),
+            buildEmailSentModel(invite),
             List.empty
           )
         }

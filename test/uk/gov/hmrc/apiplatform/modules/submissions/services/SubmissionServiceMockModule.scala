@@ -80,6 +80,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
+      def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
+        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true)) andThen Submission.submit(DateTime.now, "user") andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(DateTime.now, "user"))(aSubmission)
+        val response            = Some(submittedSubmission)
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
       def thenNotFound() = {
         when(aMock.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
       }
