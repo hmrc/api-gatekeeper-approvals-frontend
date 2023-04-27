@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseHistoryController.ViewModel
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
-@this(layout: Layout, breadcrumbs: Breadcrumbs)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
 @(viewModel: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
 
@@ -35,7 +35,7 @@
   }
 }
 
-@layout(pageTitle = Some(messages("termsofusehistory.pagetitle")), beforeContent = Some(breadcrumbs(None))) {
+@layout(pageTitle = Some(messages("termsofusehistory.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
   <div>
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">
@@ -43,27 +43,41 @@
       </h1>
       <h2 class="govuk-visually-hidden">Terms of use status</h2>
       <p class="govuk-body">@buildStatus({viewModel.currentState.status})</p>
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-3">@{viewModel.currentState.date}</h3>
       <p class="govuk-body">@{viewModel.currentState.description}</p>
       @if(viewModel.currentState.details.isDefined) {
         <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
           <p class="govuk-body">@{viewModel.currentState.details.get}</p>
         </div>
       }
-
-      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
-
-      <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@{messages("termsofusehistory.title")}</h2>
-
-      @for(history <- viewModel.historyEntries) {
-
-        <h3 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-3">@{history.date}</h3>
-        <p class="govuk-body">@{history.status}</p>
-        <p class="govuk-body">@{history.description}</p>
-        @if(history.details.isDefined) {
-          <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
-            <p class="govuk-body">@{history.details.get}</p>
-          </div>
+      <p class="govuk-body">
+      @{ 
+        (request.role.isUser, viewModel.currentState.status.toUpperCase()) match {
+          case (true, "FAILED")                        => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
+          case (true, "WARNINGS")                      => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
+          case (true, "TERMS OF USE V2 WITH WARNINGS") => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
+          case (true, "TERMS OF USE V2")               => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseAnswersController.page(viewModel.applicationId).url}>{messages("termsofusehistory.viewanswers")}</a>
+          case _                                       => 
         }
       }
+      </p>
+
+      @if(!viewModel.historyEntries.isEmpty) {
+        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@{messages("termsofusehistory.title")}</h2>
+
+        @for(history <- viewModel.historyEntries) {
+          <h3 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-3">@{history.date}</h3>
+          <p class="govuk-body">@{history.status}</p>
+          <p class="govuk-body">@{history.description}</p>
+          @if(history.details.isDefined) {
+            <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
+              <p class="govuk-body">@{history.details.get}</p>
+            </div>
+          }
+        }
+      }
+
   </div>
 }
