@@ -36,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPa
 
 object TermsOfUseHistoryController {
   case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory])
-  case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String])
+  case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], submissionStatus: Option[Submission.Status])
 }
 
 @Singleton
@@ -57,7 +57,7 @@ class TermsOfUseHistoryController @Inject() (
     def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "In progress"
-        case s: Created                      => "Created"
+        case s: Created                      => "In progress"
         case s: Declined                     => "Declined"
         case s: Failed                       => "Failed"
         case s: Granted                      => "Terms of use V2"
@@ -71,7 +71,7 @@ class TermsOfUseHistoryController @Inject() (
     def deriveSubmissionStatusDescription(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "The submission was started"
-        case s: Created                      => "The submission was created"
+        case s: Created                      => "The submission was started"
         case s: Declined                     => s"${s.name} declined that the application complies with the terms of use V2"
         case s: Failed                       => s"${s.name} submitted the terms of use checklist.  The application did not comply with version 2 of the terms of use."
         case s: Granted                      => s"${s.name} accepted that the application complies with the terms of use V2"
@@ -101,7 +101,8 @@ class TermsOfUseHistoryController @Inject() (
         status.timestamp.asText,
         deriveSubmissionStatusDisplayName(status),
         deriveSubmissionStatusDescription(status),
-        deriveSubmissionStatusDetail(status)
+        deriveSubmissionStatusDetail(status),
+        Some(status)
       )
     }
 
@@ -110,21 +111,23 @@ class TermsOfUseHistoryController @Inject() (
         DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), 
         "Email sent",
         "We invited admins of the application to agree to version 2 of the terms of use.",
+        None,
         None
       )
     }
 
-    def filterHistoryStatus(status: String) = {
+    def filterHistoryStatus(status: Option[Submission.Status]) = {
       status match {
-        case "In progress"                    => true
-        case "Created"                        => false
-        case "Declined"                       => true
-        case "Failed"                         => true
-        case "Terms of use V2"                => true
-        case "Terms of use V2 with warnings"  => true
-        case "Pending responsible individual" => true
-        case "Submitted"                      => false
-        case "Warnings"                       => true
+        case Some(Answering(_, _))                    => true
+        case Some(Submission.Status.Created(_, _))    => false
+        case Some(Declined(_, _, _))                  => true
+        case Some(Failed(_, _))                       => true
+        case Some(Granted(_, _))                      => true
+        case Some(GrantedWithWarnings(_, _, _, _))    => true
+        case Some(PendingResponsibleIndividual(_, _)) => true
+        case Some(Submitted(_, _))                    => false
+        case Some(Warnings(_, _))                     => true
+        case None                                     => true
       }
     }
 
@@ -140,7 +143,7 @@ class TermsOfUseHistoryController @Inject() (
         .toList
         .flatten
         .tail
-        .filter(history => filterHistoryStatus(history.status))
+        .filter(history => filterHistoryStatus(history.submissionStatus))
     }
 
     def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
