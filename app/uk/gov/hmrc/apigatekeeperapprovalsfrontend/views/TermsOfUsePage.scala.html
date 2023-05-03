@@ -52,15 +52,7 @@
         @for(model <- viewModels) {
           <tr class="govuk-table__row">
             <td class="govuk-table__cell">
-              @{ 
-                (request.role.isUser, model.status.toUpperCase()) match {
-                  case (true, "FAILED")                        => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
-                  case (true, "WARNINGS")                      => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId).url}>{model.applicationName}</a>
-                  case (true, "TERMS OF USE V2 WITH WARNINGS") => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(model.applicationId).url}>{model.applicationName}</a>
-                  case (true, "TERMS OF USE V2")               => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseAnswersController.page(model.applicationId).url}>{model.applicationName}</a>
-                  case _                                       => {model.applicationName}
-                }
-              }
+              <a class="govuk-link govuk-link--no-visited-state" href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(model.applicationId).url}>@{model.applicationName}</a>
             </td>
             <td class="govuk-table__cell">@{model.lastUpdated}</td>
             <td class="govuk-table__cell govuk-!-text-align-right">
