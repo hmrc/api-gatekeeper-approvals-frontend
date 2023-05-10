@@ -28,19 +28,20 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Stat
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
 object TermsOfUseHistoryController {
-  case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory])
+  case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory], applicationDetailsUrl: String)
   case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], submissionStatus: Option[Submission.Status])
 }
 
 @Singleton
 class TermsOfUseHistoryController @Inject() (
+    config: GatekeeperConfig,
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     errorHandler: ErrorHandler,
@@ -54,6 +55,9 @@ class TermsOfUseHistoryController @Inject() (
   import TermsOfUseHistoryController._
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+
     def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "In progress"
@@ -153,7 +157,8 @@ class TermsOfUseHistoryController @Inject() (
             application.id,
             application.name,
             buildModelFromSubmissionStatus(sub.status),
-            buildHistoryFromSubmission(sub) :+ buildEmailSentModel(invite)
+            buildHistoryFromSubmission(sub) :+ buildEmailSentModel(invite),
+            gatekeeperApplicationUrl
           )
         }
         case None      => {
@@ -161,7 +166,8 @@ class TermsOfUseHistoryController @Inject() (
             application.id, 
             application.name, 
             buildEmailSentModel(invite),
-            List.empty
+            List.empty,
+            gatekeeperApplicationUrl
           )
         }
       }

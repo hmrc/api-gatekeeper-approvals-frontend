@@ -35,6 +35,7 @@ class TermsOfUseHistoryControllerSpec
     val termsOfUsePage = app.injector.instanceOf[TermsOfUseHistoryPage]
 
     val controller = new TermsOfUseHistoryController(
+      config,
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
