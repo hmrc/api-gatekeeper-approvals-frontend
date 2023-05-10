@@ -230,6 +230,8 @@ termsofusehistory.pagetitle = HMRC API Gatekeeper - Terms of use history
 termsofusehistory.title = Terms of use history
 termsofusehistory.managesubmission = Manage submission
 termsofusehistory.viewanswers = View submitted answers
+termsofusehistory.applicationdetails = Application details
+termsofusehistory.viewapplicationdetails = Review or manage application details
 
 termsofusefailedlist.title = This application does not meet the terms of use
 termsofusefailedlist.pagetitle = HMRC API Gatekeeper - Answers with fails and warnings
