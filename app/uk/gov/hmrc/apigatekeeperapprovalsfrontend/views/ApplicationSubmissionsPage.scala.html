@@ -122,13 +122,10 @@
       </dl>
     }
 
-
-    @if(request.role.isUser) {
-      <h2 class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-5">@{messages("applicationsubmissions.appdetails")}</h2>
-      <p class="govuk-body">
-        <a href="@{model.applicationDetailsUrl}" class="govuk-link reviewOrManageApp">@{messages("applicationsubmissions.reviewormanage")}</a>
-      </p>
-    }
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-5">@{messages("applicationsubmissions.appdetails")}</h2>
+    <p class="govuk-body">
+      <a href="@{model.applicationDetailsUrl}" class="govuk-link reviewOrManageApp">@{messages("applicationsubmissions.reviewormanage")}</a>
+    </p>
   }
 
 }
