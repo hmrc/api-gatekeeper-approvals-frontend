@@ -92,6 +92,18 @@ class TermsOfUseHistoryControllerSpec
       status(result) shouldBe OK
     }
 
+    "return Ok (200) for LDAP users with an application and a submitted submission" in new Setup {
+      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
+      LdapAuthorisationServiceMock.Auth.succeeds
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+    }
+
     "return Not Found (404) when no application found for application id in invitations" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()

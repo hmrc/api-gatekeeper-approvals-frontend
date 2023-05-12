@@ -54,7 +54,7 @@ class TermsOfUseHistoryController @Inject() (
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
   import TermsOfUseHistoryController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInWithApplication(applicationId) { implicit request =>
 
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
