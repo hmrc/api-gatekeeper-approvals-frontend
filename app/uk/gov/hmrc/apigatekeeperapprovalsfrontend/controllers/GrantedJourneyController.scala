@@ -99,7 +99,7 @@ class GrantedJourneyController @Inject() (
       successful(BadRequest(provideWarningsForGrantingPage(form, ViewModel(request.application.name, applicationId))))
     }
 
-    GrantedJourneyController.provideWarningsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+    GrantedJourneyController.provideWarningsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
   def provideEscalatedToPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
@@ -122,7 +122,7 @@ class GrantedJourneyController @Inject() (
       successful(BadRequest(provideEscalatedToForGrantingPage(form, ViewModel(request.application.name, applicationId))))
     }
 
-    GrantedJourneyController.provideEscalatedToForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+    GrantedJourneyController.provideEscalatedToForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
   def grantedPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>

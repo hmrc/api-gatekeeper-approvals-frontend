@@ -41,7 +41,7 @@
     @play.twirl.api.HtmlFormat.raw(messages("checkfraud.approvalsboard", "<a class='govuk-link govuk-link--no-visited-state' href='https://jira.tools.tax.service.gov.uk/secure/RapidBoard.jspa?rapidView=4526&projectKey=CMQAA'>", "</a>"))
   </p>
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudAction(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group">

@@ -48,15 +48,6 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     )
   )
-
-  // Keep this as a reference to reintroduce when a new version is released compatible with 2.12.15
-  // .settings(
-  //   ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
-  //   ThisBuild / semanticdbEnabled := true,
-  //   ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
-  // )
-
-  .settings(publishingSettings: _*)
   .settings(ScoverageSettings(): _*)
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
@@ -80,6 +71,7 @@ lazy val microservice = Project(appName, file("."))
     "-Wconf:cat=unused&src=views/.*\\.scala:s",
     "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
     "-Wconf:cat=unused&src=.*Routes\\.scala:s",
-    "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s"
+    "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s",
+    "-Wconf:cat=deprecation&src=.*Routes\\.scala:s"
     )
   )

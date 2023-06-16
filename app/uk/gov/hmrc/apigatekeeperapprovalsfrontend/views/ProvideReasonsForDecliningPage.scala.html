@@ -29,7 +29,7 @@
 
   @ErrorSummary(form)
   
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsAction(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <span class="govuk-caption-l">@model.appName</span>

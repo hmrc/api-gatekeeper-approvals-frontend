@@ -87,6 +87,6 @@ class TermsOfUseReasonsController @Inject() (
       successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
     }
 
-    TermsOfUseReasonsController.provideReasonsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+    TermsOfUseReasonsController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 }

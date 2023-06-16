@@ -81,7 +81,7 @@ class DeclinedJourneyController @Inject() (
       successful(BadRequest(provideReasonsForDecliningPage(form, ViewModel(applicationId, request.application.name))))
     }
 
-    DeclinedJourneyController.provideReasonsForm.bindFromRequest.fold(handleInvalidForm, handleValidForm)
+    DeclinedJourneyController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
   def declinedPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>

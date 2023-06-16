@@ -46,7 +46,7 @@
     </dl>
   }
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedAction(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group">

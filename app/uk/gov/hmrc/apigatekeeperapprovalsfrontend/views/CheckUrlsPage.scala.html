@@ -97,7 +97,7 @@
     }
   }
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsAction(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group">
