@@ -53,7 +53,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
-    val extSubmission  = aSubmission.withIncompleteProgress
+    val extSubmission  = aSubmission.withIncompleteProgress()
     val markSubmission = markedSubmission
     val requestedBy    = "bob@blockbusters.com"
     val reason         = "reason"
@@ -145,7 +145,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.grant(applicationId, requestedBy))
 
-      result shouldBe 'Right
+      result.isRight shouldBe true
       result.right.get.id shouldBe applicationId
     }
   }
@@ -164,7 +164,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.termsOfUseInvite(applicationId))
 
-      result shouldBe 'Right
+      result.isRight shouldBe true
       result.right.get shouldBe TermsOfUseInvitationSuccessful
     }
   }
@@ -219,7 +219,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.grantForTouUplift(applicationId, requestedBy))
 
-      result shouldBe 'Right
+      result.isRight shouldBe true
       result.right.get.id shouldBe applicationId
     }
   }
@@ -240,7 +240,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.grantWithWarningsForTouUplift(applicationId, requestedBy, reason))
 
-      result shouldBe 'Right
+      result.isRight shouldBe true
       result.right.get.id shouldBe applicationId
     }
   }
@@ -261,7 +261,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.declineForTouUplift(applicationId, requestedBy, reason))
 
-      result shouldBe 'Right
+      result.isRight shouldBe true
       result.right.get.id shouldBe applicationId
     }
   }

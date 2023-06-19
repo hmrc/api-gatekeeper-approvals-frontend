@@ -74,7 +74,7 @@ class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComp
 
     result.isRight shouldBe true
 
-    inside(result.right.value) { case lir: LoggedInRequest[_] =>
+      inside(result) { case Right(lir: LoggedInRequest[_]) =>
       lir.name shouldBe Some("Bob")
       lir.role shouldBe GatekeeperRoles.READ_ONLY
     }

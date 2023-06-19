@@ -28,7 +28,7 @@ import play.api.test.{FakeRequest, StubMessagesFactory}
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.{StrideAuthConfig, StrideAuthRoles}
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.StrideAuthConnectorMockModule
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, LoggedInRequest}
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRole, GatekeeperRoles, LoggedInRequest}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
@@ -68,9 +68,10 @@ class StrideAuthorisationServiceSpec extends AsyncHmrcSpec with StrideAuthConnec
         StrideAuthConnectorMock.Authorise.returnsFor(userIsOfRole)
 
         val result: Either[Result, LoggedInRequest[_]] = await(underTest.refineStride(requiredRole)(msgRequest))
-        expected match {
-          case Right(role)      => result.right.value.role shouldBe role
-          case Left(statusCode) => result.left.value.header.status shouldBe statusCode
+        (result, expected)  match {
+          case (Right(request: LoggedInRequest[_]), Right(expectedRole: GatekeeperRole)) => request.role shouldBe expectedRole
+          case (Left(result: Result), Left(expectedCode: Int)) => result.header.status shouldBe expectedCode
+          case _ => fail()
         }
       }
     }
