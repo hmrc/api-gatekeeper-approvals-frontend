@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import scala.collection.Seq
+import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite

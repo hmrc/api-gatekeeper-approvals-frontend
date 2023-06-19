@@ -99,7 +99,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturnError
+      SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturnError()
 
       val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
 

@@ -38,7 +38,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
       val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true, true))
       result shouldBe submissionReview
-      SubmissionReviewRepoMock.Create.verifyNotCalled
+      SubmissionReviewRepoMock.Create.verifyNotCalled()
     }
 
     "create a new review if one does not exist in the database" in new Setup {
@@ -46,7 +46,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       SubmissionReviewRepoMock.Create.thenReturn(submissionReview)
       val result = await(underTest.findOrCreateReview(submissionReview.submissionId, submissionReview.instanceIndex, true, true, true, true))
       result shouldBe submissionReview
-      SubmissionReviewRepoMock.Create.verifyCalled
+      SubmissionReviewRepoMock.Create.verifyCalled()
     }
   }
 

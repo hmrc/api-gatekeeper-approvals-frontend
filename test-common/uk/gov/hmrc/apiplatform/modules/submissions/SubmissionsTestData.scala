@@ -19,11 +19,10 @@ package uk.gov.hmrc.apiplatform.modules.submissions
 import scala.util.Random
 
 import cats.data.NonEmptyList
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen.Context.Keys
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
-import uk.gov.hmrc.time.DateTimeUtils
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 
@@ -33,28 +32,28 @@ trait StatusTestDataHelper {
 
     def hasCompletelyAnsweredWith(answers: Submission.AnswersToQuestions): Submission = {
       (
-        Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true)) andThen
+        Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen
           Submission.updateLatestAnswersTo(answers)
       )(submission)
     }
 
     def hasCompletelyAnswered: Submission = {
-      Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true))(submission)
+      Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true))(submission)
     }
 
     def answeringWith(answers: Submission.AnswersToQuestions): Submission = {
       (
-        Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, false)) andThen
+        Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), false)) andThen
           Submission.updateLatestAnswersTo(answers)
       )(submission)
     }
 
     def answering: Submission = {
-      Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, false))(submission)
+      Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), false))(submission)
     }
 
     def submitted: Submission = {
-      Submission.submit(DateTimeUtils.now, "bob@example.com")(submission)
+      Submission.submit(DateTime.now.withZone(DateTimeZone.UTC), "bob@example.com")(submission)
     }
   }
 }
@@ -95,7 +94,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
     AskWhen.Context.Keys.IN_HOUSE_SOFTWARE -> "No",
     AskWhen.Context.Keys.VAT_OR_ITSA       -> "No"
   )
-  val now                              = DateTimeUtils.now
+  val now                              = DateTime.now.withZone(DateTimeZone.UTC)
 
   val aSubmission = Submission.create("bob@example.com", submissionId, applicationId, now, testGroups, testQuestionIdsOfInterest, standardContext)
 
@@ -109,7 +108,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
   val completelyAnswerExtendedSubmission =
     aSubmission.copy(id = completedSubmissionId)
       .hasCompletelyAnsweredWith(completeAnswersToQuestions)
-      .withCompletedProgress
+      .withCompletedProgress()
 
   val gatekeeperUserName  = "gatekeeperUserName"
   val reasons             = "some reasons"
@@ -169,7 +168,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
       "bob@example.com",
       subId,
       appId,
-      DateTimeUtils.now,
+      DateTime.now.withZone(DateTimeZone.UTC),
       questionnaireGroups,
       QuestionIdsOfInterest(
         questionName.id,
@@ -320,7 +319,7 @@ trait MarkedSubmissionsTestData extends SubmissionsTestData with AnsweringQuesti
   val failMarkedSubmission = markedSubmission
   val warnMarkedSubmission = markAsWarn()(createdSubmission, 3)
 
-  def markAsPass(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
+  def markAsPass(now: DateTime = DateTime.now.withZone(DateTimeZone.UTC), requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
     val answers = answersForGroups(Pass)(submission.groups)
     val marks   = answers.map { case (q, a) => q -> Pass }
 
@@ -329,7 +328,7 @@ trait MarkedSubmissionsTestData extends SubmissionsTestData with AnsweringQuesti
     MarkedSubmission(newSubmission, marks)
   }
 
-  def markAsWarn(now: DateTime = DateTimeUtils.now, requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
+  def markAsWarn(now: DateTime = DateTime.now.withZone(DateTimeZone.UTC), requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
     val answers = answersForGroups(Warn)(submission.groups)
     val marks   = answers.take(warnCount).map { case (q, _) => q -> Warn } ++ answers.drop(warnCount).map { case (q, _) => q -> Pass }
 

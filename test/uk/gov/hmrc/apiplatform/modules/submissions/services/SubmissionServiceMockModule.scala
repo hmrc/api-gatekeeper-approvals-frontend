@@ -19,13 +19,12 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 import java.time.Instant
 import scala.concurrent.Future.successful
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
-import uk.gov.hmrc.time.DateTimeUtils
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
@@ -75,13 +74,13 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
-        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true)) andThen Submission.submit(DateTime.now, "user"))(aSubmission)
+        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(DateTime.now, "user"))(aSubmission)
         val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTimeUtils.now, true)) andThen Submission.submit(DateTime.now, "user") andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(DateTime.now, "user"))(aSubmission)
+        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(DateTime.now, "user") andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(DateTime.now, "user"))(aSubmission)
         val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
