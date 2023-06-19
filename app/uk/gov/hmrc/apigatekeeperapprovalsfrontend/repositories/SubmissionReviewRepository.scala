@@ -47,15 +47,15 @@ class SubmissionReviewRepo @Inject() (mongo: MongoComponent)(implicit ec: Execut
   def find(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     collection.find(
       filter = filterBy(submissionId, instanceIndex)
-    ).headOption
+    ).headOption()
   }
 
   def create(review: SubmissionReview): Future[SubmissionReview] = {
-    collection.insertOne(review).toFuture.map(_ => review)
+    collection.insertOne(review).toFuture().map(_ => review)
   }
 
   def update(review: SubmissionReview): Future[SubmissionReview] = {
     val filter = filterBy(review.submissionId, review.instanceIndex)
-    collection.findOneAndReplace(filter, review).toFuture.map(_ => review)
+    collection.findOneAndReplace(filter, review).toFuture().map(_ => review)
   }
 }

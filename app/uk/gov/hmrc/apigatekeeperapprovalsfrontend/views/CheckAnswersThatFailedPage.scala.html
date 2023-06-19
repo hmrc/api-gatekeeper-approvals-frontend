@@ -61,7 +61,7 @@
     </tbody>
   </table>
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.action(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.action(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group">

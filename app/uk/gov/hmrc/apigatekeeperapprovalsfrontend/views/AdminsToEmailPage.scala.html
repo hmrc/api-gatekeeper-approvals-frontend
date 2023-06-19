@@ -45,7 +45,7 @@
 
   <p class="govuk-body">@{messages("adminstoemail.text.decline")}</p>
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesAction(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
     <button class="govuk-button govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-module="govuk-button">
       @{messages("adminstoemail.button.decline")}

@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController._
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.Breadcrumbs
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
@@ -95,7 +96,7 @@
 
     </ol>
 
-    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistAction(model.applicationId), 'class -> "form") {
+    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistAction(model.applicationId), Symbol("class") -> "form") {
         @helper.CSRF.formField
     
         <div class="govuk-button-group">

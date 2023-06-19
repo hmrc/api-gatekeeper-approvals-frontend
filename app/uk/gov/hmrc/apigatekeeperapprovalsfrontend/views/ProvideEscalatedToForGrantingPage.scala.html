@@ -16,6 +16,8 @@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.GrantedJourneyController.{ProvideEscalatedToForm, ViewModel}
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.Breadcrumbs
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
@@ -27,7 +29,7 @@
 
   @ErrorSummary(form)
   
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToAction(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToAction(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <span class="govuk-caption-l">@model.appName</span>

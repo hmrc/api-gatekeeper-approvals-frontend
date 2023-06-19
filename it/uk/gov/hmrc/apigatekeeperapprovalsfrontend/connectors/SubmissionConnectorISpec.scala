@@ -33,6 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJs
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData {
 
@@ -53,7 +54,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
-    val extSubmission  = aSubmission.withIncompleteProgress
+    val extSubmission  = aSubmission.withIncompleteProgress()
     val markSubmission = markedSubmission
     val requestedBy    = "bob@blockbusters.com"
     val reason         = "reason"
@@ -143,10 +144,11 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      val result = await(connector.grant(applicationId, requestedBy))
+      await(connector.grant(applicationId, requestedBy)) match {
+        case Right(app: Application) => app.id shouldBe applicationId
+        case _ => fail()
+      }
 
-      result shouldBe 'Right
-      result.right.get.id shouldBe applicationId
     }
   }
 
@@ -162,10 +164,11 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      val result = await(connector.termsOfUseInvite(applicationId))
+      await(connector.termsOfUseInvite(applicationId)) match {
+        case Right(_: TermsOfUseInvitationSuccessful) => succeed
+        case _ => fail()
+      }
 
-      result shouldBe 'Right
-      result.right.get shouldBe TermsOfUseInvitationSuccessful
     }
   }
 
@@ -217,10 +220,11 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      val result = await(connector.grantForTouUplift(applicationId, requestedBy))
+      await(connector.grantForTouUplift(applicationId, requestedBy))match {
+          case Right(app: Application) => app.id shouldBe applicationId
+          case _ => fail()
+      }
 
-      result shouldBe 'Right
-      result.right.get.id shouldBe applicationId
     }
   }
 
@@ -240,8 +244,10 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.grantWithWarningsForTouUplift(applicationId, requestedBy, reason))
 
-      result shouldBe 'Right
-      result.right.get.id shouldBe applicationId
+      result match {
+        case Right(app: Application) => app.id shouldBe applicationId
+        case _ => fail("Expected an Application, got something else.")
+      }
     }
   }
 
@@ -261,8 +267,10 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       val result = await(connector.declineForTouUplift(applicationId, requestedBy, reason))
 
-      result shouldBe 'Right
-      result.right.get.id shouldBe applicationId
+      result match {
+        case Right(app: Application) => app.id shouldBe applicationId
+        case _ => fail("Expected an Application, got something else.")
+      }
     }
   }
 }

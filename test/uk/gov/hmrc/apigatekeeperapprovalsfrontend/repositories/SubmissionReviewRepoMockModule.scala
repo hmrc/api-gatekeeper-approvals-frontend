@@ -43,11 +43,11 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
         when(aMock.create(eqTo(review))).thenReturn(successful(review))
       }
 
-      def verifyNotCalled() {
+      def verifyNotCalled() = {
         verify(never).create(*)
       }
 
-      def verifyCalled() {
+      def verifyCalled() = {
         verify(atLeastOnce).create(*)
       }
     }

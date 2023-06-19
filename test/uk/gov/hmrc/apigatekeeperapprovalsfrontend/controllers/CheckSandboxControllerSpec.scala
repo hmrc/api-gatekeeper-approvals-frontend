@@ -76,7 +76,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
 
     "return 404 if no application is found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenNotFound
+      ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.checkSandboxPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND

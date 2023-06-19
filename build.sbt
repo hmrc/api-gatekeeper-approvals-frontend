@@ -11,21 +11,15 @@ val appName = "api-gatekeeper-approvals-frontend"
 Global / bloopAggregateSourceDependencies := true
 
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
+scalaVersion := "2.13.8"
  
-inThisBuild(
-  List(
-    scalaVersion := "2.12.15",
-    semanticdbEnabled := true,
-    semanticdbVersion := scalafixSemanticdb.revision
-  )
-)
-
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     majorVersion                     := 0,
-    scalaVersion                     := "2.12.15",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     Assets / pipelineStages          := Seq(gzip)
   )
@@ -54,15 +48,6 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     )
   )
-
-  // Keep this as a reference to reintroduce when a new version is released compatible with 2.12.15
-  // .settings(
-  //   ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
-  //   ThisBuild / semanticdbEnabled := true,
-  //   ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
-  // )
-
-  .settings(publishingSettings: _*)
   .settings(ScoverageSettings(): _*)
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
@@ -86,6 +71,7 @@ lazy val microservice = Project(appName, file("."))
     "-Wconf:cat=unused&src=views/.*\\.scala:s",
     "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
     "-Wconf:cat=unused&src=.*Routes\\.scala:s",
-    "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s"
+    "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s",
+    "-Wconf:cat=deprecation&src=.*Routes\\.scala:s"
     )
   )

@@ -28,7 +28,7 @@
     @{model.appName}
   </span>
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.action(model.applicationId), 'class -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.action(model.applicationId), Symbol("class") -> "form") {
     @helper.CSRF.formField
     <div class="govuk-form-group">
       <fieldset class="govuk-fieldset" aria-describedby="change-status-hint">
