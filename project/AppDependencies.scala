@@ -15,8 +15,8 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "http-metrics"                       % "2.7.0",
     "uk.gov.hmrc"             %% "play-json-union-formatter"          % "1.18.0-play-28",
     "org.typelevel"           %% "cats-core"                          % "2.6.1",
-    "com.beachape"            %% "enumeratum"                         % "1.7.2",
-    "com.beachape"            %% "enumeratum-play"                    % "1.7.2",
+    "com.beachape"            %% "enumeratum"                         % "1.7.0",
+    "com.beachape"            %% "enumeratum-play"                    % "1.7.0",
     "com.typesafe.play"       %% "play-json"                          % "2.9.2",
     "com.typesafe.play"       %% "play-json-joda"                     % "2.9.2",
     "uk.gov.hmrc"             %% "internal-auth-client-play-28"       % "1.2.0"
