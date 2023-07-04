@@ -71,7 +71,7 @@ class TermsOfUseGrantedController @Inject() (
         )
       )
 
-      submissionService.grantForTouUplift(applicationId, request.name.get).map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
+      submissionService.grantForTouUplift(applicationId, request.name.get, "Note what actions the organisation has taken").map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
     }
 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant").flatMap(_.headOption) match {

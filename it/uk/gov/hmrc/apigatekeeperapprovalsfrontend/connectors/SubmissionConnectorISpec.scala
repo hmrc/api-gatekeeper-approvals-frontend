@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import play.api.Mode
 import java.time.Instant
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.{GrantedRequest, TouGrantedRequest, TouUpliftRequest}
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.{GrantedRequest, TouUpliftRequest}
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
@@ -212,7 +212,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return an application on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
-          .withJsonRequestBody(TouGrantedRequest(requestedBy))
+          .withJsonRequestBody(TouUpliftRequest(requestedBy, reason))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -220,7 +220,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      await(connector.grantForTouUplift(applicationId, requestedBy))match {
+      await(connector.grantForTouUplift(applicationId, requestedBy, reason))match {
           case Right(app: Application) => app.id shouldBe applicationId
           case _ => fail()
       }
