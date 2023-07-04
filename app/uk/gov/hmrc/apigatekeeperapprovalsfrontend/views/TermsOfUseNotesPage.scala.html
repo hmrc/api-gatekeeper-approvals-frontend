@@ -1,0 +1,52 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController.{ProvideNotesForm, ViewModel}
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(form: Form[ProvideNotesForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("termsofusenotes.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  @ErrorSummary(form)
+  
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.action(model.applicationId), Symbol("class") -> "form") {
+    @helper.CSRF.formField
+
+    <span class="govuk-caption-l">@model.appName</span>
+    <h1 class="govuk-label-wrapper">
+      <label class="govuk-label govuk-label--l" for="reasons">
+        @{messages(s"termsofusenotes.title")}
+      </label>
+    </h1>
+    <div id="notes-hint" class="govuk-hint">
+      @{messages("termsofusenotes.note.1")}
+    </div>
+    <div id="notes-hint2" class="govuk-hint">
+      @{messages("termsofusenotes.note.2")}
+    </div>
+    <textarea class="govuk-textarea @if(form.errors("reasons").nonEmpty) {govuk-textarea--error}" id="notes" name="notes" rows="5" aria-describedby="notes-hint">@form.data.get("notes")</textarea>
+
+    <button class="govuk-button" data-module="govuk-button">
+      @{messages("termsofusenotes.button.continue")}
+    </button>
+  }
+}

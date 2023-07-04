@@ -25,9 +25,9 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseGrantedPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
 
 object TermsOfUseGrantedController {
   case class ViewModel(appName: String, applicationId: ApplicationId)
@@ -39,7 +39,6 @@ class TermsOfUseGrantedController @Inject() (
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     errorHandler: ErrorHandler,
-    termsOfUseGrantedConfirmationPage: TermsOfUseGrantedConfirmationPage,
     termsOfUseGrantedPage: TermsOfUseGrantedPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
@@ -57,25 +56,8 @@ class TermsOfUseGrantedController @Inject() (
 
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
 
-    def grantTermsOfUse = {
-      def failure(err: String) = BadRequest(
-        errorHandler.standardErrorTemplate(
-          "Terms of use grant",
-          "Error granting terms of use",
-          err
-        )
-      )
-      val success              = Ok(
-        termsOfUseGrantedConfirmationPage(
-          TermsOfUseGrantedController.ViewModel(request.application.name, applicationId)
-        )
-      )
-
-      submissionService.grantForTouUplift(applicationId, request.name.get, "Note what actions the organisation has taken").map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
-    }
-
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant").flatMap(_.headOption) match {
-      case Some("yes") => grantTermsOfUse
+      case Some("yes") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(applicationId)))
       case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page))
     }
   }

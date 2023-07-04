@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.ViewModel
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedPage, TermsOfUseGrantedConfirmationPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
 
 class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
@@ -39,8 +39,6 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       with LdapAuthorisationServiceMockModule {
 
     val firstPage     = mock[TermsOfUseGrantedPage]
-    val confirmPage   = mock[TermsOfUseGrantedConfirmationPage]
-    when(confirmPage.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
     when(firstPage.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
     val viewModelCaptor = ArgCaptor[ViewModel]
 
@@ -49,7 +47,6 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
-      confirmPage,
       firstPage,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
@@ -120,25 +117,11 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionServiceMock.GrantForTouUplift.thenReturn(applicationId, application)
 
       val result = controller.action(applicationId)(fakeYesRequest)
 
-      status(result) shouldBe Status.OK
-    }
-
-    "return 400 when yes selected and error calling TPA" in new Setup {
-      val fakeYesRequest = fakeRequest.withFormUrlEncodedBody("grant" -> "yes")
-
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionServiceMock.GrantForTouUplift.thenReturnError(applicationId)
-
-      val result = controller.action(applicationId)(fakeYesRequest)
-
-      status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) should include("Error granting terms of use")
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(applicationId).url
     }
 
     "redirect when no selected" in new Setup {
@@ -151,6 +134,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       val result = controller.action(applicationId)(fakeNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
     }
   }
 }

@@ -22,35 +22,34 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
-import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseReasonsPage
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseReasonsController
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseNotesPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController
 
-class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
+class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
-      with StrideAuthorisationServiceMockModule {
-    val page = app.injector.instanceOf[TermsOfUseReasonsPage]
+  trait Setup extends AbstractSetup with StrideAuthorisationServiceMockModule {
+    val notesPage = app.injector.instanceOf[TermsOfUseNotesPage]
+    val confirmPage = app.injector.instanceOf[TermsOfUseGrantedConfirmationPage]
 
-    val controller = new TermsOfUseReasonsController(
+    val controller = new TermsOfUseNotesController(
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      page,
-      SubmissionReviewServiceMock.aMock
+      notesPage,
+      confirmPage
     )
   }
 
-  "provideReasonsPage" should {
+  "page" should {
     "return 200" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -60,36 +59,34 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
   }
 
-  "provideReasonsAction" should {
+  "action" should {
     "return 200" in new Setup {
-      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
+      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "submission looks bad")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
+      SubmissionServiceMock.GrantForTouUplift.thenReturn(applicationId, application)
 
-      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
+      val result = controller.action(applicationId)(fakeReasonsRequest)
 
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId).url
+      status(result) shouldBe Status.OK
     }
 
     "return 400 if no reasons supplied" in new Setup {
-      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "")
+      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
 
-      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
+      val result = controller.action(applicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -100,9 +97,9 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturnError()
+      SubmissionServiceMock.GrantForTouUplift.thenReturnError(applicationId)
 
-      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
+      val result = controller.action(applicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
