@@ -92,7 +92,7 @@ class TermsOfUseHistoryController @Inject() (
         case s: Created                      => None
         case s: Declined                     => Some(s.reasons)
         case s: Failed                       => None
-        case s: Granted                      => None
+        case s: Granted                      => s.comments
         case s: GrantedWithWarnings          => Some(s.warnings)
         case s: PendingResponsibleIndividual => None
         case s: Submitted                    => None
@@ -126,7 +126,7 @@ class TermsOfUseHistoryController @Inject() (
         case Some(Submission.Status.Created(_, _))    => false
         case Some(Declined(_, _, _))                  => true
         case Some(Failed(_, _))                       => true
-        case Some(Granted(_, _))                      => true
+        case Some(Granted(_, _, _))                   => true
         case Some(GrantedWithWarnings(_, _, _, _))    => true
         case Some(PendingResponsibleIndividual(_, _)) => true
         case Some(Submitted(_, _))                    => false
