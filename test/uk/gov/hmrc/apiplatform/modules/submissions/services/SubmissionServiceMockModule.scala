@@ -80,7 +80,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(DateTime.now, "user") andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(DateTime.now, "user"))(aSubmission)
+        val submittedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(DateTime.now, "user") andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(DateTime.now, "user", None))(aSubmission)
         val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
@@ -170,12 +170,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.grantForTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.grantForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grantForTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.grantForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
       }
     }
   }

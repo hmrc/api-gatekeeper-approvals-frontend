@@ -262,6 +262,12 @@ termsofusereasons.note.2 = Include
 termsofusereasons.fails.url = answers with warnings or fails (opens in new tab)
 termsofusereasons.button.continue = Save and continue
 
+termsofusenotes.pagetitle = HMRC API Gatekeeper - Note all reasons
+termsofusenotes.title = Note all the reasons
+termsofusenotes.note.1 = The notes are saved on the Terms of Use history page for the submission.
+termsofusenotes.note.2 = Include what action the organisation has taken to resolve the warnings.
+termsofusenotes.button.continue = Save and continue
+
 termsofuseadmins.title = Copy email addresses and email the team admins
 termsofuseadmins.pagetitle = HMRC API Gatekeeper - Copy email addresses
 termsofuseadmins.button.copyemailaddresses = Copy email addresses to clipboard

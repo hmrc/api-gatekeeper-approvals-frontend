@@ -64,7 +64,7 @@ class ProductionAccessController @Inject() (
     val instance = request.markedSubmission.submission.latestInstance
 
     (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-      case (Granted(grantedTimestamp, grantedName), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                                    =>
+      case (Granted(grantedTimestamp, grantedName, _), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                                    =>
         successful(Ok(productionAccessPage(ViewModel(
           appName,
           applicationId,
