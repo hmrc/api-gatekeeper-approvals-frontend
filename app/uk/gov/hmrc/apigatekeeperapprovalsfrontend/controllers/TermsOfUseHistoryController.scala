@@ -152,7 +152,7 @@ class TermsOfUseHistoryController @Inject() (
 
     def isInHouseSoftware(submission: Submission): Boolean = {
       val inHouse = submission.context.get(AskWhen.Context.Keys.IN_HOUSE_SOFTWARE)
-      if (inHouse == Some("No")) true else false
+      if (inHouse == Some("Yes")) true else false
     }
 
     def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
