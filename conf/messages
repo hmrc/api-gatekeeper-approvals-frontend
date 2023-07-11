@@ -232,6 +232,7 @@ termsofusehistory.managesubmission = Manage submission
 termsofusehistory.viewanswers = View submitted answers
 termsofusehistory.applicationdetails = Application details
 termsofusehistory.viewapplicationdetails = Review or manage application details
+termsofusehistory.inhouse = This request is from an in-house developer
 
 termsofusefailedlist.title = This application does not meet the terms of use
 termsofusefailedlist.pagetitle = HMRC API Gatekeeper - Answers with fails and warnings

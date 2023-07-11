@@ -25,7 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -35,7 +35,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
 object TermsOfUseHistoryController {
-  case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory], applicationDetailsUrl: String)
+  case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory], applicationDetailsUrl: String, isInHouseSoftware: Boolean)
   case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], submissionStatus: Option[Submission.Status])
 }
 
@@ -150,6 +150,11 @@ class TermsOfUseHistoryController @Inject() (
         .filter(history => filterHistoryStatus(history.submissionStatus))
     }
 
+    def isInHouseSoftware(submission: Submission): Boolean = {
+      val inHouse = submission.context.get(AskWhen.Context.Keys.IN_HOUSE_SOFTWARE)
+      if (inHouse == Some("No")) true else false
+    }
+
     def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
       submission match {
         case Some(sub) => {
@@ -158,7 +163,8 @@ class TermsOfUseHistoryController @Inject() (
             application.name,
             buildModelFromSubmissionStatus(sub.status),
             buildHistoryFromSubmission(sub) :+ buildEmailSentModel(invite),
-            gatekeeperApplicationUrl
+            gatekeeperApplicationUrl,
+            isInHouseSoftware(sub)
           )
         }
         case None      => {
@@ -167,7 +173,8 @@ class TermsOfUseHistoryController @Inject() (
             application.name, 
             buildEmailSentModel(invite),
             List.empty,
-            gatekeeperApplicationUrl
+            gatekeeperApplicationUrl,
+            false
           )
         }
       }

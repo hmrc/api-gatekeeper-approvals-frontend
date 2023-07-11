@@ -43,6 +43,11 @@
       </h1>
       <h2 class="govuk-visually-hidden">Terms of use status</h2>
       <p class="govuk-body">@buildStatus({viewModel.currentState.status})</p>
+
+      @if(viewModel.isInHouseSoftware) {
+        <p class="govuk-body govuk-!-margin-bottom-1">@{messages("termsofusehistory.inhouse")}.</p>
+      }
+  
       <h3 class="govuk-heading-s govuk-!-margin-bottom-3">@{viewModel.currentState.date}</h3>
       <p class="govuk-body">@{viewModel.currentState.description}</p>
       @if(viewModel.currentState.details.isDefined) {
