@@ -23,13 +23,13 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseNotesPage}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseNotesPage}
 
 class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with StrideAuthorisationServiceMockModule {
-    val notesPage = app.injector.instanceOf[TermsOfUseNotesPage]
+    val notesPage   = app.injector.instanceOf[TermsOfUseNotesPage]
     val confirmPage = app.injector.instanceOf[TermsOfUseGrantedConfirmationPage]
 
     val controller = new TermsOfUseNotesController(

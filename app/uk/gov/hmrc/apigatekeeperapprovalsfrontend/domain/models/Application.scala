@@ -17,8 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import enumeratum.{EnumEntry, PlayEnum}
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.joda.time.{DateTime, DateTimeZone}
 
 case class ApplicationState(
     name: State,

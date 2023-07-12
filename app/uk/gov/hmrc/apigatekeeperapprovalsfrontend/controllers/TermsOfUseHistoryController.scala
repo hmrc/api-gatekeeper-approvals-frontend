@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.time.format.DateTimeFormatter
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
@@ -35,7 +35,15 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
 object TermsOfUseHistoryController {
-  case class ViewModel(applicationId: ApplicationId, applicationName: String, currentState: TermsOfUseHistory, historyEntries: List[TermsOfUseHistory], applicationDetailsUrl: String, isInHouseSoftware: Boolean)
+
+  case class ViewModel(
+      applicationId: ApplicationId,
+      applicationName: String,
+      currentState: TermsOfUseHistory,
+      historyEntries: List[TermsOfUseHistory],
+      applicationDetailsUrl: String,
+      isInHouseSoftware: Boolean
+    )
   case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], submissionStatus: Option[Submission.Status])
 }
 
@@ -55,7 +63,6 @@ class TermsOfUseHistoryController @Inject() (
   import TermsOfUseHistoryController._
 
   def page(applicationId: ApplicationId) = loggedInWithApplication(applicationId) { implicit request =>
-
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
@@ -112,7 +119,7 @@ class TermsOfUseHistoryController @Inject() (
 
     def buildEmailSentModel(invite: TermsOfUseInvitation): TermsOfUseHistory = {
       TermsOfUseHistory(
-        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn), 
+        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn),
         "Email sent",
         "We invited admins of the application to agree to version 2 of the terms of use.",
         None,
@@ -168,8 +175,8 @@ class TermsOfUseHistoryController @Inject() (
         }
         case None      => {
           ViewModel(
-            application.id, 
-            application.name, 
+            application.id,
+            application.name,
             buildEmailSentModel(invite),
             List.empty,
             gatekeeperApplicationUrl,
@@ -181,9 +188,9 @@ class TermsOfUseHistoryController @Inject() (
 
     (
       for {
-        invite        <- fromOptionF(submissionService.fetchTermsOfUseInvitation(applicationId), BadRequest("Unable to find terms of use invitation"))
-        submission    <- liftF(submissionService.fetchLatestSubmission(applicationId))
-        viewModel      = buildViewModel(invite, request.application, submission)
+        invite     <- fromOptionF(submissionService.fetchTermsOfUseInvitation(applicationId), BadRequest("Unable to find terms of use invitation"))
+        submission <- liftF(submissionService.fetchLatestSubmission(applicationId))
+        viewModel   = buildViewModel(invite, request.application, submission)
       } yield Ok(termsOfUseHistoryPage(viewModel))
     ).fold(identity(_), identity(_))
   }

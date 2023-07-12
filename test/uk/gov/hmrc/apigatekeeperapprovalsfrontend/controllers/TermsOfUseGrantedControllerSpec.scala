@@ -38,7 +38,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
 
-    val firstPage     = mock[TermsOfUseGrantedPage]
+    val firstPage       = mock[TermsOfUseGrantedPage]
     when(firstPage.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
     val viewModelCaptor = ArgCaptor[ViewModel]
 

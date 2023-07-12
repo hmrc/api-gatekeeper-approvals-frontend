@@ -146,7 +146,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       await(connector.grant(applicationId, requestedBy)) match {
         case Right(app: Application) => app.id shouldBe applicationId
-        case _ => fail()
+        case _                       => fail()
       }
 
     }
@@ -166,7 +166,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       await(connector.termsOfUseInvite(applicationId)) match {
         case Right(_: TermsOfUseInvitationSuccessful) => succeed
-        case _ => fail()
+        case _                                        => fail()
       }
 
     }
@@ -220,9 +220,9 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      await(connector.grantForTouUplift(applicationId, requestedBy, reason))match {
-          case Right(app: Application) => app.id shouldBe applicationId
-          case _ => fail()
+      await(connector.grantForTouUplift(applicationId, requestedBy, reason)) match {
+        case Right(app: Application) => app.id shouldBe applicationId
+        case _                       => fail()
       }
 
     }
@@ -246,7 +246,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       result match {
         case Right(app: Application) => app.id shouldBe applicationId
-        case _ => fail("Expected an Application, got something else.")
+        case _                       => fail("Expected an Application, got something else.")
       }
     }
   }
@@ -269,7 +269,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
 
       result match {
         case Right(app: Application) => app.id shouldBe applicationId
-        case _ => fail("Expected an Application, got something else.")
+        case _                       => fail("Expected an Application, got something else.")
       }
     }
   }

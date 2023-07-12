@@ -91,7 +91,7 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
-      contentAsString(result) should include ("This request is from an in-house developer")
+      contentAsString(result) should include("This request is from an in-house developer")
     }
 
     "return Ok (200) for Stride users with an application but no submission" in new Setup {

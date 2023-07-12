@@ -46,16 +46,14 @@ class TermsOfUseGrantedController @Inject() (
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-
-      successful(Ok(
-        termsOfUseGrantedPage(
-          TermsOfUseGrantedController.ViewModel(request.application.name, applicationId)
-        )
-      ))
+    successful(Ok(
+      termsOfUseGrantedPage(
+        TermsOfUseGrantedController.ViewModel(request.application.name, applicationId)
+      )
+    ))
   }
 
   def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant").flatMap(_.headOption) match {
       case Some("yes") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(applicationId)))
       case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page))

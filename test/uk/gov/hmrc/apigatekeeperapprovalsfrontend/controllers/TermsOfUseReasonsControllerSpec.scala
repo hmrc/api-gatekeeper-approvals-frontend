@@ -24,8 +24,8 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseReasonsPage
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseReasonsController
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseReasonsPage
 
 class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
 
