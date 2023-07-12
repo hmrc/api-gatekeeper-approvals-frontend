@@ -68,10 +68,10 @@ class StrideAuthorisationServiceSpec extends AsyncHmrcSpec with StrideAuthConnec
         StrideAuthConnectorMock.Authorise.returnsFor(userIsOfRole)
 
         val result: Either[Result, LoggedInRequest[_]] = await(underTest.refineStride(requiredRole)(msgRequest))
-        (result, expected)  match {
+        (result, expected) match {
           case (Right(request: LoggedInRequest[_]), Right(expectedRole: GatekeeperRole)) => request.role shouldBe expectedRole
-          case (Left(result: Result), Left(expectedCode: Int)) => result.header.status shouldBe expectedCode
-          case _ => fail()
+          case (Left(result: Result), Left(expectedCode: Int))                           => result.header.status shouldBe expectedCode
+          case _                                                                         => fail()
         }
       }
     }

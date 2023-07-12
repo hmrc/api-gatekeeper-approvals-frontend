@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseNotesPage, TermsOfUseGrantedConfirmationPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseNotesPage}
 
 object TermsOfUseNotesController {
 
@@ -64,7 +64,6 @@ class TermsOfUseNotesController @Inject() (
   }
 
   def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(err: String) = BadRequest(
         errorHandler.standardErrorTemplate(

@@ -85,10 +85,10 @@ class SubmissionService @Inject() (
 
   def grantForTouUplift(
       applicationId: ApplicationId,
-      requestedBy: String, 
+      requestedBy: String,
       comments: String
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, Application]] = {
-      submissionConnector.grantForTouUplift(applicationId, requestedBy, comments)
+    submissionConnector.grantForTouUplift(applicationId, requestedBy, comments)
   }
 }
