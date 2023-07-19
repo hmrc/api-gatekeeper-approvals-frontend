@@ -23,14 +23,12 @@
 @(viewModels: List[ViewModel])(implicit request: LoggedInRequest[_], messages: Messages)
 
 @buildStatus(status: String) = @{
-  status.toUpperCase() match {
-    case "EMAIL SENT"                     => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
-    case "IN PROGRESS"                    => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
-    case "PENDING RESPONSIBLE INDIVIDUAL" => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+  status match {
+    case "EMAIL_SENT"                     => <strong class="govuk-tag govuk-tag--blue">EMAIL SENT</strong>
     case "WARNINGS"                       => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
     case "FAILED"                         => <strong class="govuk-tag govuk-tag--red">{status}</strong>
-    case "TERMS OF USE V2"                => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
-    case "TERMS OF USE V2 WITH WARNINGS"  => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
+    case "TERMS_OF_USE_V2"                => <strong class="govuk-tag govuk-tag--purple">TERMS OF USE V2</strong>
+    case "TERMS_OF_USE_V2_WITH_WARNINGS"  => <strong class="govuk-tag govuk-tag--purple">TERMS OF USE V2 WITH WARNINGS</strong>
     case _                                => <strong class="govuk-tag">{status}</strong>
   }
 }
