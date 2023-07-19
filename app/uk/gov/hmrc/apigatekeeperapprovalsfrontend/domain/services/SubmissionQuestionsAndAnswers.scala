@@ -31,9 +31,7 @@ object SubmissionQuestionsAndAnswers {
     case _                             => true
   }
 
-  def apply(submission: Submission, index: Int): List[QuestionAndAnswerGroup] = {
-    val instance = submission.instances.toList(index)
-
+  def apply(submission: Submission, instance: Submission.Instance): List[QuestionAndAnswerGroup] = {
     def questionItemToQuestionAndAnswer(questionItem: QuestionItem): Option[QuestionAndAnswer] = {
       val question = questionItem.question.wording.value
       instance.answersToQuestions.get(questionItem.question.id).filter(isDisplayable(_)).map(answer => QuestionAndAnswer(question, ActualAnswersAsText(answer)))
