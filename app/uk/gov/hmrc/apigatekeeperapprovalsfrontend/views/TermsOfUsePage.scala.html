@@ -25,6 +25,8 @@
 @buildStatus(status: String) = @{
   status match {
     case "EMAIL_SENT"                     => <strong class="govuk-tag govuk-tag--blue">EMAIL SENT</strong>
+    case "REMINDER_EMAIL_SENT"            => <strong class="govuk-tag govuk-tag--blue">REMINDER EMAIL SENT</strong>
+    case "OVERDUE"                        => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
     case "WARNINGS"                       => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
     case "FAILED"                         => <strong class="govuk-tag govuk-tag--red">{status}</strong>
     case "TERMS_OF_USE_V2"                => <strong class="govuk-tag govuk-tag--purple">TERMS OF USE V2</strong>

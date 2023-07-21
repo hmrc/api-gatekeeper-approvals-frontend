@@ -23,7 +23,7 @@ import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -154,6 +154,11 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT))
+        when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
+      def thenReturn(applicationId: ApplicationId, status: TermsOfUseInvitationState) = {
+        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, status))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
