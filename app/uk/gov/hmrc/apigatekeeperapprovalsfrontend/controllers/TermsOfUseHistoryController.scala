@@ -25,8 +25,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -82,9 +82,9 @@ class TermsOfUseHistoryController @Inject() (
 
     def deriveInvitationStatusDisplayName(status: TermsOfUseInvitationState): String = {
       status match {
-        case REMINDER_EMAIL_SENT          => "Reminder email sent"
-        case OVERDUE                      => "Overdue"
-        case _                            => "Email sent"
+        case REMINDER_EMAIL_SENT => "Reminder email sent"
+        case OVERDUE             => "Overdue"
+        case _                   => "Email sent"
       }
     }
 
@@ -174,7 +174,8 @@ class TermsOfUseHistoryController @Inject() (
 
     def buildHistoryFromInvitation(invite: TermsOfUseInvitation, excludeLatest: Boolean): List[TermsOfUseHistory] = {
       (invite.status, excludeLatest) match {
-        case (OVERDUE, false)             => List[TermsOfUseHistory](buildOverdueModelFromInvitation(invite), buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
+        case (OVERDUE, false)             =>
+          List[TermsOfUseHistory](buildOverdueModelFromInvitation(invite), buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
         case (OVERDUE, true)              => List[TermsOfUseHistory](buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
         case (REMINDER_EMAIL_SENT, false) => List[TermsOfUseHistory](buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
         case (REMINDER_EMAIL_SENT, true)  => List[TermsOfUseHistory](buildEmailSentModelFromInvitation(invite))
