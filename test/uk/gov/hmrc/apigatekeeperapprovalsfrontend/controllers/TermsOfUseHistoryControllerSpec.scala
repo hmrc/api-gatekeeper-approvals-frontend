@@ -116,6 +116,7 @@ class TermsOfUseHistoryControllerSpec
 
       status(result) shouldBe OK
       contentAsString(result) should include("Reminder email sent")
+      contentAsString(result) should include("Unknown")
     }
 
     "return Ok (200) for Stride users with an application but no submission overdue" in new Setup {

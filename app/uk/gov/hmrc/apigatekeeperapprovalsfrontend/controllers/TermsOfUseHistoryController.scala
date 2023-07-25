@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
@@ -105,7 +105,7 @@ class TermsOfUseHistoryController @Inject() (
     def deriveInvitationStatusDescription(status: TermsOfUseInvitationState): String = {
       status match {
         case REMINDER_EMAIL_SENT => "We sent a reminder email to the admins of the application."
-        case OVERDUE             => "The terms of use has not been completed by the due date."
+        case OVERDUE             => "The terms of use have not been completed by the due date."
         case _                   => "We invited admins of the application to agree to version 2 of the terms of use."
       }
     }
@@ -134,31 +134,11 @@ class TermsOfUseHistoryController @Inject() (
       )
     }
 
-    def buildEmailSentModelFromInvitation(invite: TermsOfUseInvitation): TermsOfUseHistory = {
+    def buildModelFromInvitationStateAndDate(status: TermsOfUseInvitationState, date: Option[Instant]): TermsOfUseHistory = {
       TermsOfUseHistory(
-        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn),
-        deriveInvitationStatusDisplayName(EMAIL_SENT),
-        deriveInvitationStatusDescription(EMAIL_SENT),
-        None,
-        None
-      )
-    }
-
-    def buildReminderEmailSentModelFromInvitation(invite: TermsOfUseInvitation): TermsOfUseHistory = {
-      TermsOfUseHistory(
-        invite.reminderSent.fold("Unknown")(r => DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(r)),
-        deriveInvitationStatusDisplayName(REMINDER_EMAIL_SENT),
-        deriveInvitationStatusDescription(REMINDER_EMAIL_SENT),
-        None,
-        None
-      )
-    }
-
-    def buildOverdueModelFromInvitation(invite: TermsOfUseInvitation): TermsOfUseHistory = {
-      TermsOfUseHistory(
-        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.dueBy),
-        deriveInvitationStatusDisplayName(OVERDUE),
-        deriveInvitationStatusDescription(OVERDUE),
+        date.fold("Unknown")(d => DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(d)),
+        deriveInvitationStatusDisplayName(status),
+        deriveInvitationStatusDescription(status),
         None,
         None
       )
@@ -166,20 +146,30 @@ class TermsOfUseHistoryController @Inject() (
 
     def buildModelFromInvitation(invite: TermsOfUseInvitation): TermsOfUseHistory = {
       invite.status match {
-        case OVERDUE             => buildOverdueModelFromInvitation(invite)
-        case REMINDER_EMAIL_SENT => buildReminderEmailSentModelFromInvitation(invite)
-        case _                   => buildEmailSentModelFromInvitation(invite)
+        case OVERDUE             => buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy))
+        case REMINDER_EMAIL_SENT => buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent)
+        case _                   => buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
       }
     }
 
     def buildHistoryFromInvitation(invite: TermsOfUseInvitation, excludeLatest: Boolean): List[TermsOfUseHistory] = {
       (invite.status, excludeLatest) match {
         case (OVERDUE, false)             =>
-          List[TermsOfUseHistory](buildOverdueModelFromInvitation(invite), buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
-        case (OVERDUE, true)              => List[TermsOfUseHistory](buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
-        case (REMINDER_EMAIL_SENT, false) => List[TermsOfUseHistory](buildReminderEmailSentModelFromInvitation(invite), buildEmailSentModelFromInvitation(invite))
-        case (REMINDER_EMAIL_SENT, true)  => List[TermsOfUseHistory](buildEmailSentModelFromInvitation(invite))
-        case (_, false)                   => List[TermsOfUseHistory](buildEmailSentModelFromInvitation(invite))
+          List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy)),
+            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+          )
+        case (OVERDUE, true)              => List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+          )
+        case (REMINDER_EMAIL_SENT, false) => List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+          )
+        case (REMINDER_EMAIL_SENT, true)  => List[TermsOfUseHistory](buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn)))
+        case (_, false)                   => List[TermsOfUseHistory](buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn)))
         case (_, true)                    => List[TermsOfUseHistory]()
       }
     }
