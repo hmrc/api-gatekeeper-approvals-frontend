@@ -22,6 +22,7 @@ import play.api.http.Status.OK
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
@@ -103,6 +104,31 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
+    }
+
+    "return Ok (200) for Stride users with an application but no submission with reminder sent" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId, REMINDER_EMAIL_SENT)
+      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should include("Reminder email sent")
+      contentAsString(result) should include("Unknown")
+    }
+
+    "return Ok (200) for Stride users with an application but no submission overdue" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId, OVERDUE)
+      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should include("Overdue")
     }
 
     "return Ok (200) for LDAP users with an application and a submitted submission" in new Setup {

@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
@@ -25,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -79,6 +80,14 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
+    def deriveInvitationStatusDisplayName(status: TermsOfUseInvitationState): String = {
+      status match {
+        case REMINDER_EMAIL_SENT => "Reminder email sent"
+        case OVERDUE             => "Overdue"
+        case _                   => "Email sent"
+      }
+    }
+
     def deriveSubmissionStatusDescription(status: Submission.Status): String = {
       status match {
         case s: Answering                    => "The submission was started"
@@ -90,6 +99,14 @@ class TermsOfUseHistoryController @Inject() (
         case s: PendingResponsibleIndividual => "The submission is waiting for the responsible individual to accept the terms of use"
         case s: Submitted                    => "The submission was submitted"
         case s: Warnings                     => s"${s.name} submitted the terms of use checklist.  The application did not comply with version 2 of the terms of use."
+      }
+    }
+
+    def deriveInvitationStatusDescription(status: TermsOfUseInvitationState): String = {
+      status match {
+        case REMINDER_EMAIL_SENT => "We sent a reminder email to the admins of the application."
+        case OVERDUE             => "The terms of use have not been completed by the due date."
+        case _                   => "We invited admins of the application to agree to version 2 of the terms of use."
       }
     }
 
@@ -117,14 +134,44 @@ class TermsOfUseHistoryController @Inject() (
       )
     }
 
-    def buildEmailSentModel(invite: TermsOfUseInvitation): TermsOfUseHistory = {
+    def buildModelFromInvitationStateAndDate(status: TermsOfUseInvitationState, date: Option[Instant]): TermsOfUseHistory = {
       TermsOfUseHistory(
-        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.createdOn),
-        "Email sent",
-        "We invited admins of the application to agree to version 2 of the terms of use.",
+        date.fold("Unknown")(d => DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(d)),
+        deriveInvitationStatusDisplayName(status),
+        deriveInvitationStatusDescription(status),
         None,
         None
       )
+    }
+
+    def buildModelFromInvitation(invite: TermsOfUseInvitation): TermsOfUseHistory = {
+      invite.status match {
+        case OVERDUE             => buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy))
+        case REMINDER_EMAIL_SENT => buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent)
+        case _                   => buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+      }
+    }
+
+    def buildHistoryFromInvitation(invite: TermsOfUseInvitation, excludeLatest: Boolean): List[TermsOfUseHistory] = {
+      (invite.status, excludeLatest) match {
+        case (OVERDUE, false)             =>
+          List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy)),
+            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+          )
+        case (OVERDUE, true)              => List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+          )
+        case (REMINDER_EMAIL_SENT, false) => List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+          )
+        case (REMINDER_EMAIL_SENT, true)  => List[TermsOfUseHistory](buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn)))
+        case (_, false)                   => List[TermsOfUseHistory](buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn)))
+        case (_, true)                    => List[TermsOfUseHistory]()
+      }
     }
 
     def filterHistoryStatus(status: Option[Submission.Status]) = {
@@ -157,6 +204,11 @@ class TermsOfUseHistoryController @Inject() (
         .filter(history => filterHistoryStatus(history.submissionStatus))
     }
 
+    def buildHistoryFromSubmissionAndInvitation(submission: Submission, invite: TermsOfUseInvitation): List[TermsOfUseHistory] = {
+      val history = buildHistoryFromSubmission(submission) ++ buildHistoryFromInvitation(invite, false)
+      history
+    }
+
     def isInHouseSoftware(submission: Submission): Boolean = {
       submission.context.get(AskWhen.Context.Keys.IN_HOUSE_SOFTWARE).contains("Yes")
     }
@@ -168,7 +220,7 @@ class TermsOfUseHistoryController @Inject() (
             application.id,
             application.name,
             buildModelFromSubmissionStatus(sub.status),
-            buildHistoryFromSubmission(sub) :+ buildEmailSentModel(invite),
+            buildHistoryFromSubmissionAndInvitation(sub, invite),
             gatekeeperApplicationUrl,
             isInHouseSoftware(sub)
           )
@@ -177,8 +229,8 @@ class TermsOfUseHistoryController @Inject() (
           ViewModel(
             application.id,
             application.name,
-            buildEmailSentModel(invite),
-            List.empty,
+            buildModelFromInvitation(invite),
+            buildHistoryFromInvitation(invite, true),
             gatekeeperApplicationUrl,
             false
           )

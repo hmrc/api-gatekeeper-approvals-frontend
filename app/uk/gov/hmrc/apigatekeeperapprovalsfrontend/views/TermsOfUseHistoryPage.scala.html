@@ -25,6 +25,8 @@
 @buildStatus(status: String) = @{
   status.toUpperCase() match {
     case "EMAIL SENT"                     => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "REMINDER EMAIL SENT"            => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "OVERDUE"                        => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
     case "IN PROGRESS"                    => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
     case "PENDING RESPONSIBLE INDIVIDUAL" => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
     case "WARNINGS"                       => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
