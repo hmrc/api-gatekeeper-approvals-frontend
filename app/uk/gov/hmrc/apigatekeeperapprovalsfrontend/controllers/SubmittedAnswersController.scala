@@ -62,6 +62,6 @@ class SubmittedAnswersController @Inject() (
     val submission = request.submission
     val instance   = request.instance
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, index), instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
   }
 }

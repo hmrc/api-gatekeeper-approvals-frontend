@@ -59,8 +59,9 @@ class TermsOfUseAnswersController @Inject() (
   def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
-    val index      = submission.latestInstance.index
+    val instance   = request.submission.latestInstance
+    val index      = instance.index
 
-    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, index)))))
+    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance)))))
   }
 }
