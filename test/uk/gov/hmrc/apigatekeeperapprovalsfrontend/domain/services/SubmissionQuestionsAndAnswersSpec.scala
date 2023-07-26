@@ -38,7 +38,7 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
 
   "SubmissionQuestionsAndAnswers" should {
     "extract questions and answers correctly" in new Setup {
-      val result = SubmissionQuestionsAndAnswers(submissionWithAnswers, 0)
+      val result = SubmissionQuestionsAndAnswers(submissionWithAnswers, submissionWithAnswers.latestInstance)
 
       result.length shouldBe 3
       result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 5
@@ -47,13 +47,13 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
     }
 
     "extract questions and answers omitting groups that have no questions" in new Setup {
-      val result = SubmissionQuestionsAndAnswers(submissionWithAnswersExceptForOrgDetails, 0)
+      val result = SubmissionQuestionsAndAnswers(submissionWithAnswersExceptForOrgDetails, submissionWithAnswersExceptForOrgDetails.latestInstance)
 
       result.map(_.heading) should contain.only("Customers authorising your software", "Development practices")
     }
 
     "extract questions and answers omitting groups that have only non-displayable answers" in new Setup {
-      val result = SubmissionQuestionsAndAnswers(submissionWithNonDisplayableDevPracticesAnswers, 0)
+      val result = SubmissionQuestionsAndAnswers(submissionWithNonDisplayableDevPracticesAnswers, submissionWithNonDisplayableDevPracticesAnswers.latestInstance)
 
       result.map(_.heading) should contain.only("Customers authorising your software", "Organisation details")
     }
