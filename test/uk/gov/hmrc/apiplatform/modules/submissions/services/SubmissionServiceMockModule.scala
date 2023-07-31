@@ -87,6 +87,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         ) andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(
           DateTime.now,
           "user",
+          None,
           None
         ))(aSubmission)
         val response          = Some(grantedSubmission)
@@ -100,6 +101,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         ) andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(
           DateTime.now,
           "user",
+          None,
           None
         ))(aSubmission)
         val response          = Some(grantedSubmission.copy(context = simpleContext))

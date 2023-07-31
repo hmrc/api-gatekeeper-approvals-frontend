@@ -180,7 +180,7 @@ class TermsOfUseHistoryController @Inject() (
         case Some(Submission.Status.Created(_, _))    => false
         case Some(Declined(_, _, _))                  => true
         case Some(Failed(_, _))                       => true
-        case Some(Granted(_, _, _))                   => true
+        case Some(Granted(_, _, _, _))                => true
         case Some(GrantedWithWarnings(_, _, _, _))    => true
         case Some(PendingResponsibleIndividual(_, _)) => true
         case Some(Submitted(_, _))                    => false
