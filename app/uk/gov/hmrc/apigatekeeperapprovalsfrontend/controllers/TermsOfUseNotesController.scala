@@ -78,7 +78,7 @@ class TermsOfUseNotesController @Inject() (
         )
       )
 
-      submissionService.grantForTouUplift(applicationId, request.name.get, form.notes).map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
+      submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None).map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {
