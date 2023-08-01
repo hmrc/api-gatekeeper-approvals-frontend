@@ -20,6 +20,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.mvc.{MessagesControllerComponents, _}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
@@ -29,7 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Collaborator, CollaboratorRole, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailedPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailOverridePage, TermsOfUseFailedPage, TermsOfUseGrantedConfirmationPage, TermsOfUseOverrideApproverPage, TermsOfUseOverrideNotesPage}
 
 object TermsOfUseFailedJourneyController {
   case class AnswerDetails(question: String, answer: String, status: Mark)
@@ -44,7 +46,24 @@ object TermsOfUseFailedJourneyController {
 
   case class EmailsViewModel(applicationId: ApplicationId, appName: String, adminsToEmail: Set[Collaborator] = Set.empty)
 
-  case class ConfirmationViewModel(applicationId: ApplicationId, appName: String)
+  case class SummaryViewModel(applicationId: ApplicationId, appName: String)
+
+  case class ApproverForm(firstName: String, lastName: String)
+
+  val approverForm: Form[ApproverForm] = Form(
+    mapping(
+      "first-name" -> nonEmptyText,
+      "last-name" -> nonEmptyText
+    )(ApproverForm.apply)(ApproverForm.unapply)
+  )  
+
+  case class ProvideNotesForm(notes: String)
+
+  val provideNotesForm: Form[ProvideNotesForm] = Form(
+    mapping(
+      "notes" -> nonEmptyText
+    )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
+  )  
 }
 
 @Singleton
@@ -57,6 +76,10 @@ class TermsOfUseFailedJourneyController @Inject() (
     termsOfUseFailedPage: TermsOfUseFailedPage,
     termsOfUseAdminsPage: TermsOfUseAdminsPage,
     termsOfUseConfirmationPage: TermsOfUseConfirmationPage,
+    termsOfUseFailOverridePage: TermsOfUseFailOverridePage,
+    termsOfUseOverrideApproverPage: TermsOfUseOverrideApproverPage,
+    termsOfUseGrantedConfirmationPage: TermsOfUseGrantedConfirmationPage,
+    termsOfUseOverrideNotesPage: TermsOfUseOverrideNotesPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
   )(implicit override val ec: ExecutionContext
@@ -170,7 +193,62 @@ class TermsOfUseFailedJourneyController @Inject() (
     } yield ok
   }
 
+  def failOverridePage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseFailOverridePage(SummaryViewModel(applicationId, request.application.name))))
+  }
+
+  def failOverrideAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
+      case Some("yes") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
+      case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
+    }
+  }
+
+  def overrideApproverPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseOverrideApproverPage(approverForm, SummaryViewModel(applicationId, request.application.name))))
+  }
+
+  def overrideApproverAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    def handleValidForm(form: ApproverForm) = {
+      submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).map {
+        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId))
+        case None        => {
+          logger.warn("Persisting override escalated to failed")
+          BadRequest(errorHandler.badRequestTemplate)
+        }
+      }
+    }
+
+    def handleInvalidForm(form: Form[ApproverForm]) = {
+      successful(BadRequest(termsOfUseOverrideApproverPage(form, SummaryViewModel(applicationId, request.application.name))))
+    }
+
+    TermsOfUseFailedJourneyController.approverForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+  }
+
+  def overrideNotesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, SummaryViewModel(applicationId, request.application.name))))
+  }
+
+  def overrideNotesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    def handleValidForm(form: ProvideNotesForm) = {
+      submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).map {
+        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId))
+        case None        => {
+          logger.warn("Persisting override reasons failed")
+          BadRequest(errorHandler.badRequestTemplate)
+        }
+      }
+    }
+
+    def handleInvalidForm(form: Form[ProvideNotesForm]) = {
+      successful(BadRequest(termsOfUseOverrideNotesPage(form, SummaryViewModel(applicationId, request.application.name))))
+    }
+
+    TermsOfUseFailedJourneyController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+  }
+
   def confirmationPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmationPage(ConfirmationViewModel(applicationId, request.application.name))))
+    successful(Ok(termsOfUseConfirmationPage(SummaryViewModel(applicationId, request.application.name))))
   }
 }

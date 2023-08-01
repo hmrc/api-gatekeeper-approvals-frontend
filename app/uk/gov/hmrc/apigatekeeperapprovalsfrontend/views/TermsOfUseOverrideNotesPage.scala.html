@@ -1,0 +1,52 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.{ProvideNotesForm, SummaryViewModel}
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(form: Form[ProvideNotesForm], model: SummaryViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("termsofuseoverridenotes.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  @ErrorSummary(form)
+  
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesAction(model.applicationId), Symbol("class") -> "form") {
+    @helper.CSRF.formField
+
+    <span class="govuk-caption-l">@model.appName</span>
+    <h1 class="govuk-label-wrapper">
+      <label class="govuk-label govuk-label--l" for="notes">
+        @{messages(s"termsofuseoverridenotes.title")}
+      </label>
+    </h1>
+    <div id="notes-hint" class="govuk-hint">
+      @{messages("termsofuseoverridenotes.note.1")} <a href="https://confluence.tools.tax.service.gov.uk/display/SDC/DRM+Terms+of+Use+guidance" target="_" class="govuk-link govuk-link--no-visited-state">@{messages("termsofuseoverridenotes.confluence.url")}</a>.
+    </div>
+    <div id="notes-hint2" class="govuk-hint">
+      @{messages("termsofuseoverridenotes.note.2")} <a href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.answersWithWarningsOrFails(model.applicationId).url} target="_" class="govuk-link govuk-link--no-visited-state">@{messages("termsofuseoverridenotes.fails.url")}</a>.
+    </div>
+    <textarea class="govuk-textarea @if(form.errors("notes").nonEmpty) {govuk-textarea--error}" id="notes" name="notes" rows="5" aria-describedby="notes-hint">@form.data.get("notes")</textarea>
+
+    <button class="govuk-button" data-module="govuk-button">
+      @{messages("termsofuseoverridenotes.continue")}
+    </button>
+  }
+}

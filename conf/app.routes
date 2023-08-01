@@ -72,5 +72,11 @@ POST       /terms-of-use/:id/admins-to-email                         uk.gov.hmrc
 GET        /terms-of-use/:id/confirmation                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.confirmationPage(id: ApplicationId)
 GET        /terms-of-use/:id/grant                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.page(id: ApplicationId)
 POST       /terms-of-use/:id/grant                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.action(id: ApplicationId)
+GET        /terms-of-use/:id/fail-override                           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.failOverridePage(id: ApplicationId)
+POST       /terms-of-use/:id/fail-override                           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.failOverrideAction(id: ApplicationId)
+GET        /terms-of-use/:id/override-approver                       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideApproverPage(id: ApplicationId)
+POST       /terms-of-use/:id/override-approver                       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideApproverAction(id: ApplicationId)
+GET        /terms-of-use/:id/override-notes                          uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideNotesPage(id: ApplicationId)
+POST       /terms-of-use/:id/override-notes                          uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideNotesAction(id: ApplicationId)
 
 GET        /assets/*file                                             controllers.Assets.versioned(path = "/public", file: Asset)

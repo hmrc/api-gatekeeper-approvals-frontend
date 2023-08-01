@@ -245,6 +245,7 @@ termsofusefailedlist.youcancheck = You can check
 termsofusefailedlist.answersthatpassed = answers that passed
 termsofusefailedlist.status.warning = Warning
 termsofusefailedlist.status.failed = Failed
+termsofusefailedlist.override = Override the application’s status
 
 termsofusepassed.title = Answers that passed
 termsofusepassed.pagetitle = HMRC API Gatekeeper - Answers that passed
@@ -278,6 +279,27 @@ termsofuseconfirmation.pagetitle = HMRC API Gatekeeper - What happens next
 termsofuseconfirmation.title = What happens next
 termsofuseconfirmation.text = Make a note of the application name and today’s date. Admins have 30 days to make changes. After that, you should contact them and follow up.
 termsofuseconfirmation.back = Back to Terms of use
+
+termsofusefailoverride.pagetitle = HMRC API Gatekeeper - Do you want to override the application's status to terms of use v2?
+termsofusefailoverride.title = Do you want to override the application's status to terms of use version 2?
+termsofusefailoverride.description = This application failed to meet the automated checks to conform with the terms of use version 2.
+termsofusefailoverride.warning = Overriding an application's status should only be done in exceptional circumstances.
+termsofusefailoverride.continue = Continue
+
+termsofuseoverrideapprover.pagetitle = HMRC API Gatekeeper - Who approved overriding the status of this application?
+termsofuseoverrideapprover.title = Who approved overriding the status of this application?
+termsofuseoverrideapprover.description = Overriding the status of an application requires approval from a senior colleague.
+termsofuseoverrideapprover.firstname = First name
+termsofuseoverrideapprover.lastname = Last name
+termsofuseoverrideapprover.continue = Continue
+
+termsofuseoverridenotes.pagetitle = HMRC API Gatekeeper - What are the reasons for overriding the status of this application?
+termsofuseoverridenotes.title = What are the reasons for overriding the status of this application?
+termsofuseoverridenotes.note.1 = The notes are saved on Gatekeeper.
+termsofuseoverridenotes.confluence.url = Use guidance on Confluence to help
+termsofuseoverridenotes.note.2 = Include
+termsofuseoverridenotes.fails.url = answers with warnings or fails (opens in new tab)
+termsofuseoverridenotes.continue = Continue
 
 termsofusegranted.pagetitle = HMRC API Gatekeeper - Does the application conform to the terms of use?
 termsofusegranted.title = Does the application conform to version 2 of the terms of use?
