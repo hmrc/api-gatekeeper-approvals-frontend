@@ -52,11 +52,15 @@
   
       <h3 class="govuk-heading-s govuk-!-margin-bottom-3">@{viewModel.currentState.date}</h3>
       <p class="govuk-body">@{viewModel.currentState.description}</p>
+      @if(viewModel.currentState.escalatedTo.isDefined) {
+        <p class="govuk-body">@{messages("termsofusehistory.approver")}: @{viewModel.currentState.escalatedTo.get}</p>
+      }
       @if(viewModel.currentState.details.isDefined) {
         <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
           <p class="govuk-body">@{viewModel.currentState.details.get}</p>
         </div>
       }
+
       <p class="govuk-body">
       @{ 
         (request.role.isUser, viewModel.currentState.status.toUpperCase()) match {
@@ -78,6 +82,9 @@
           <h3 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-3">@{history.date}</h3>
           <p class="govuk-body">@{history.status}</p>
           <p class="govuk-body">@{history.description}</p>
+          @if(history.escalatedTo.isDefined) {
+            <p class="govuk-body">@{messages("termsofusehistory.approver")}: @{history.escalatedTo.get}</p>
+          }
           @if(history.details.isDefined) {
             <div class="text-area-highlight govuk-!-padding-top-3 govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-margin-bottom-7">
               <p class="govuk-body">@{history.details.get}</p>
