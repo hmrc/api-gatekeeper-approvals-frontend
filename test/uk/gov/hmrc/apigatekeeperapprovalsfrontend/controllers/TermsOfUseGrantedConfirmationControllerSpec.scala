@@ -29,7 +29,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedCo
 class TermsOfUseGrantedConfirmationControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with StrideAuthorisationServiceMockModule {
-    val page   = app.injector.instanceOf[TermsOfUseGrantedConfirmationPage]
+    val page = app.injector.instanceOf[TermsOfUseGrantedConfirmationPage]
 
     val controller = new TermsOfUseGrantedConfirmationController(
       StrideAuthorisationServiceMock.aMock,

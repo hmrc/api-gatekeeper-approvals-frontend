@@ -29,7 +29,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseNotesPage
 class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with StrideAuthorisationServiceMockModule {
-    val notesPage   = app.injector.instanceOf[TermsOfUseNotesPage]
+    val notesPage = app.injector.instanceOf[TermsOfUseNotesPage]
 
     val controller = new TermsOfUseNotesController(
       StrideAuthorisationServiceMock.aMock,

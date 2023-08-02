@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import cats.data.EitherT
+
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{MessagesControllerComponents, _}
@@ -32,7 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, Collaborator, CollaboratorRole, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailOverridePage, TermsOfUseFailedPage, TermsOfUseOverrideApproverPage, TermsOfUseOverrideConfirmPage, TermsOfUseOverrideNotesPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 object TermsOfUseFailedJourneyController {
 
@@ -57,9 +58,9 @@ object TermsOfUseFailedJourneyController {
   val approverForm: Form[ApproverForm] = Form(
     mapping(
       "first-name" -> nonEmptyText,
-      "last-name" -> nonEmptyText
+      "last-name"  -> nonEmptyText
     )(ApproverForm.apply)(ApproverForm.unapply)
-  )  
+  )
 
   case class ProvideNotesForm(notes: String)
 
@@ -67,7 +68,7 @@ object TermsOfUseFailedJourneyController {
     mapping(
       "notes" -> nonEmptyText
     )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
-  )  
+  )
 }
 
 @Singleton
@@ -271,7 +272,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     (
       for {
         review      <- fromOptionF(
-                         submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), 
+                         submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index),
                          BadRequest("Unable to find submission review")
                        )
         application <- EitherT(submissionService.grantForTouUplift(applicationId, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(InternalServerError(_))

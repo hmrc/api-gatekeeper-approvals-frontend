@@ -65,15 +65,15 @@
     </strong>
   </div>
 
-  <div class="govuk-button-group govuk-!-margin-top-7">
-    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmAction(model.applicationId), Symbol("class") -> "form") {
-      @helper.CSRF.formField
-      <button class="govuk-button govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-module="govuk-button">
-        @{messages("termsofuseoverrideconfirm.continue")}
-      </button>
-    }
-    <a class="govuk-link govuk-link--no-visited-state" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId)}">
-      @{messages("termsofuseoverrideconfirm.cancel")}
-    </a>
-  </div>
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmAction(model.applicationId), Symbol("class") -> "form") {
+    @helper.CSRF.formField
+      <div class="govuk-button-group govuk-!-margin-top-7">
+        <button class="govuk-button govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-module="govuk-button">
+          @{messages("termsofuseoverrideconfirm.continue")}
+        </button>
+        <a class="govuk-link govuk-link--no-visited-state" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId)}">
+          @{messages("termsofuseoverrideconfirm.cancel")}
+        </a>
+      </div>
+  }
 }

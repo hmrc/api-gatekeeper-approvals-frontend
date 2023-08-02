@@ -120,7 +120,8 @@ object Submission {
     addDeclinedStatus andThen addNewlyAnsweringInstance
   }
 
-  val grant: (DateTime, String, Option[String], Option[String]) => Submission => Submission = (timestamp, name, comments, escalatedTo) => addStatusHistory(Status.Granted(timestamp, name, comments, escalatedTo))
+  val grant: (DateTime, String, Option[String], Option[String]) => Submission => Submission =
+    (timestamp, name, comments, escalatedTo) => addStatusHistory(Status.Granted(timestamp, name, comments, escalatedTo))
 
   val grantWithWarnings: (DateTime, String, String, Option[String]) => Submission => Submission = (timestamp, name, warnings, escalatedTo) => {
     addStatusHistory(Status.GrantedWithWarnings(timestamp, name, warnings, escalatedTo))

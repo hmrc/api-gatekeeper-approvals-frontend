@@ -25,7 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailedPage, TermsOfUseFailOverridePage, TermsOfUseOverrideApproverPage, TermsOfUseOverrideConfirmPage, TermsOfUseOverrideNotesPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
@@ -193,7 +193,9 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.failOverrideAction(applicationId)(fakeSubmitOverrideYesRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(
+        applicationId
+      ).url
     }
   }
 
@@ -287,7 +289,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
-    }    
+    }
 
     "return 400 if escalated to not set" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
@@ -298,7 +300,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
-    }    
+    }
   }
 
   "overrideConfirmAction" should {
