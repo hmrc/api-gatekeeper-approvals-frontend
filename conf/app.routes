@@ -67,6 +67,7 @@ GET        /terms-of-use/:id/reasons                                 uk.gov.hmrc
 POST       /terms-of-use/:id/reasons                                 uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseReasonsController.provideReasonsAction(id: ApplicationId)
 GET        /terms-of-use/:id/notes                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController.page(id: ApplicationId)
 POST       /terms-of-use/:id/notes                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController.action(id: ApplicationId)
+GET        /terms-of-use/:id/grant-confirmation                      uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedConfirmationController.page(id: ApplicationId)
 GET        /terms-of-use/:id/admins-to-email                         uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.emailAddressesPage(id: ApplicationId)
 POST       /terms-of-use/:id/admins-to-email                         uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.emailAddressesAction(id: ApplicationId)
 GET        /terms-of-use/:id/confirmation                            uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.confirmationPage(id: ApplicationId)
@@ -78,5 +79,7 @@ GET        /terms-of-use/:id/override-approver                       uk.gov.hmrc
 POST       /terms-of-use/:id/override-approver                       uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideApproverAction(id: ApplicationId)
 GET        /terms-of-use/:id/override-notes                          uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideNotesPage(id: ApplicationId)
 POST       /terms-of-use/:id/override-notes                          uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideNotesAction(id: ApplicationId)
+GET        /terms-of-use/:id/override-confirm                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideConfirmPage(id: ApplicationId)
+POST       /terms-of-use/:id/override-confirm                        uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.overrideConfirmAction(id: ApplicationId)
 
 GET        /assets/*file                                             controllers.Assets.versioned(path = "/public", file: Asset)

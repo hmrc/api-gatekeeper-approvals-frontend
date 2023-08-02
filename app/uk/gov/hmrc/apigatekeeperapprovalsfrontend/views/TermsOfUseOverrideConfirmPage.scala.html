@@ -1,0 +1,79 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.OverrideViewModel
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+
+@(model: OverrideViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(messages("termsofuseoverrideconfirm.pagetitle")), beforeContent = Some(backbreadcrumb())) {
+  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
+
+  <h1 class="govuk-heading-l">
+    @{messages("termsofuseoverrideconfirm.title")}
+  </h1>
+
+  <dl class="govuk-summary-list govuk-!-margin-bottom-7">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("termsofuseoverrideconfirm.applicationname")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        @model.appName
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("termsofuseoverrideconfirm.approver")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        @model.escalatedTo
+      </dd>
+  </div>  
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">
+        @{messages("termsofuseoverrideconfirm.reasons")}
+      </dt>
+      <dd class="govuk-summary-list__value">
+        @model.notes
+      </dd>
+  </div> 
+  </dl>
+
+  <div class="govuk-warning-text govuk-!-margin-top-6">
+    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+    <strong class="govuk-warning-text__text">
+      <span class="govuk-warning-text__assistive">Warning</span>
+      @{messages("termsofuseoverrideconfirm.warning")}
+    </strong>
+  </div>
+
+  <div class="govuk-button-group govuk-!-margin-top-7">
+    @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmAction(model.applicationId), Symbol("class") -> "form") {
+      @helper.CSRF.formField
+      <button class="govuk-button govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-module="govuk-button">
+        @{messages("termsofuseoverrideconfirm.continue")}
+      </button>
+    }
+    <a class="govuk-link govuk-link--no-visited-state" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(model.applicationId)}">
+      @{messages("termsofuseoverrideconfirm.cancel")}
+    </a>
+  </div>
+}

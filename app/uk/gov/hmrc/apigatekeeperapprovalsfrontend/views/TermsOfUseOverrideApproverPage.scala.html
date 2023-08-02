@@ -14,14 +14,14 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.{ApproverForm, SummaryViewModel}
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.{ApproverForm, ViewModel}
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(form: Form[ApproverForm], model: SummaryViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[ApproverForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = Some(messages("termsofuseoverrideapprover.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
