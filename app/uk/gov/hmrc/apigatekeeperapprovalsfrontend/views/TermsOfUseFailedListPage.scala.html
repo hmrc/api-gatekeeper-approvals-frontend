@@ -77,9 +77,11 @@
     </div>
   }
 
-  <p class="govuk-body">
-    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.failOverridePage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
-      @{messages("termsofusefailedlist.override")}
-    </a>
-  </p>
+  @if(model.submissionStatus.isFailed) {
+    <p class="govuk-body">
+      <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.failOverridePage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
+        @{messages("termsofusefailedlist.override")}
+      </a>
+    </p>
+  }
 }

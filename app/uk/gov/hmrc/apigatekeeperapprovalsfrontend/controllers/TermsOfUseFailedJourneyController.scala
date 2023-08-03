@@ -43,7 +43,7 @@ object TermsOfUseFailedJourneyController {
 
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class AnswersViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean) {
+  case class AnswersViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean, submissionStatus: Submission.Status) {
     lazy val hasFails: Boolean = answers.exists(_.status == Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
 
@@ -130,7 +130,8 @@ class TermsOfUseFailedJourneyController @Inject() (
           applicationId,
           appName,
           answerDetails,
-          isDeleted
+          isDeleted,
+          request.submission.latestInstance.status
         )
       )
     )
@@ -171,7 +172,8 @@ class TermsOfUseFailedJourneyController @Inject() (
         applicationId,
         appName,
         answerDetails,
-        isDeleted
+        isDeleted,
+        request.submission.latestInstance.status
       )
     )))
   }
