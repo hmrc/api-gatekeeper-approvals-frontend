@@ -16,21 +16,20 @@
 
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.footer.Footer
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcScripts
 
 @this(
   govukLayout: GovukLayout,
   siteHeader: SiteHeader,
   hmrcFooter: HmrcFooter,
-  hmrcHead: HmrcHead
+  hmrcHead: HmrcHead, 
+  hmrcScripts: HmrcScripts
 )
 
 @(pageTitle: Option[String] = None, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @scriptElem = {
-  <script @CSPNonce.attr src='@routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
-  <script @CSPNonce.attr src='@routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
-  <script @CSPNonce.attr>window.GOVUKFrontend.initAll();</script>
-  <script @CSPNonce.attr>window.HMRCFrontend.initAll();</script>
+  @hmrcScripts()
   <script @CSPNonce.attr src='@routes.Assets.versioned("javascripts/apis-app.min.js")' type="text/javascript"></script>
 }
 
