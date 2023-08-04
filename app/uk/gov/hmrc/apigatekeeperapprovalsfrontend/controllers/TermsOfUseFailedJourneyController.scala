@@ -139,8 +139,8 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def listAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
-      case Some("continue") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
-      case _                => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page))
+      case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
+      case _                => successful(Redirect(routes.TermsOfUseInvitationController.page))
     }
   }
 
@@ -185,7 +185,7 @@ class TermsOfUseFailedJourneyController @Inject() (
   }
 
   def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
+    val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
 
     for {
       review <- submissionReviewService.findOrCreateReview(
@@ -206,8 +206,8 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def failOverrideAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
-      case Some("yes") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
-      case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
+      case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
+      case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
     }
   }
 
@@ -218,9 +218,9 @@ class TermsOfUseFailedJourneyController @Inject() (
   def overrideApproverAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ApproverForm) = {
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId))
+        case Some(value) => Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId))
         case None        => {
-          logger.warn("Persisting override escalated to failed")
+          logger.warn(s"Failed to save escalated to in submission review for applicationId: ${applicationId}")
           BadRequest(errorHandler.badRequestTemplate)
         }
       }
@@ -240,9 +240,9 @@ class TermsOfUseFailedJourneyController @Inject() (
   def overrideNotesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId))
+        case Some(value) => Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId))
         case None        => {
-          logger.warn("Persisting override reasons failed")
+          logger.warn(s"Failed to save reasons in submission review for applicationId: ${applicationId}")
           BadRequest(errorHandler.badRequestTemplate)
         }
       }
@@ -278,7 +278,7 @@ class TermsOfUseFailedJourneyController @Inject() (
                          BadRequest("Unable to find submission review")
                        )
         application <- EitherT(submissionService.grantForTouUplift(applicationId, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(InternalServerError(_))
-      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId).url)
+      } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(applicationId).url)
     ).fold(identity(_), identity(_))
   }
 
