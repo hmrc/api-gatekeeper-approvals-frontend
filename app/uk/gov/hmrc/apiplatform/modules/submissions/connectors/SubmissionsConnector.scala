@@ -42,6 +42,9 @@ object SubmissionsConnector {
   case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
   implicit val writesTouUpliftRequest = Json.writes[TouUpliftRequest]
 
+  case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
+  implicit val writesTouGrantedRequest = Json.writes[TouGrantedRequest]
+
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
 
@@ -153,16 +156,17 @@ class SubmissionsConnector @Inject() (
   def grantForTouUplift(
       applicationId: ApplicationId,
       requestedBy: String,
-      reasons: String
+      reasons: String,
+      escalatedTo: Option[String]
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, Application]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
 
     metrics.record(api) {
-      http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
+      http.POST[TouGrantedRequest, Either[UpstreamErrorResponse, Application]](
         s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant-tou",
-        TouUpliftRequest(requestedBy, reasons)
+        TouGrantedRequest(requestedBy, reasons, escalatedTo)
       )
         .map(_.leftMap(failed(_)))
     }

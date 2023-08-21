@@ -125,7 +125,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
-        Granted(grantedTimestamp, requesterEmail, None)
+        Granted(grantedTimestamp, requesterEmail, None, None)
       ))
 
       val result = controller.page(applicationId)(fakeRequest)

@@ -20,7 +20,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: AnswersViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = Some(messages("termsofusefailedlist.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
@@ -75,5 +75,13 @@
       <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="continue">@{messages(s"termsofusefailedlist.continue")}</button>
       <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("termsofusefailedlist.comebacklater")}</button>
     </div>
+  }
+
+  @if(model.submissionStatus.isFailed) {
+    <p class="govuk-body">
+      <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.failOverridePage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
+        @{messages("termsofusefailedlist.override")}
+      </a>
+    </p>
   }
 }
