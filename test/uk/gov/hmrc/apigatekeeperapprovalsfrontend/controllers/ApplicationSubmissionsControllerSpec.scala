@@ -19,7 +19,8 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
-import org.joda.time.{DateTime, Days}
+import java.time.{LocalDateTime, ZoneOffset}
+import java.time.format.DateTimeFormatter
 import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
@@ -62,9 +63,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     )
 
     val requesterEmail     = "test@example.com"
-    val submittedTimestamp = DateTime.now()
-    val declinedTimestamp  = DateTime.now().minus(Days.days(5))
-    val grantedTimestamp   = DateTime.now().minus(Days.days(7))
+    val submittedTimestamp = LocalDateTime.now(ZoneOffset.UTC)
+    val declinedTimestamp  = LocalDateTime.now(ZoneOffset.UTC).minusDays(5)
+    val grantedTimestamp   = LocalDateTime.now(ZoneOffset.UTC).minusDays(7)
 
     def markedSubmissionWithStatusHistoryOf(statuses: Submission.Status*) = {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
@@ -92,7 +93,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       status(result) shouldBe Status.OK
 
       verify(page).apply(viewModelCaptor)(*, *)
-      viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, submittedTimestamp.toString("dd MMMM yyyy")))
+      viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, DateTimeFormatter.ofPattern("dd MMMM yyyy").format(submittedTimestamp)))
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe None
       viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
@@ -117,7 +118,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
       viewModelCaptor.value.isDeleted shouldBe false
       viewModelCaptor.value.declinedInstances shouldBe List(
-        DeclinedInstanceDetails(declinedTimestamp.toString("dd MMMM yyyy"), 0)
+        DeclinedInstanceDetails(DateTimeFormatter.ofPattern("dd MMMM yyyy").format(declinedTimestamp), 0)
       )
     }
 
@@ -135,7 +136,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.currentSubmission shouldBe None
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe Some(
-        GrantedInstanceDetails(grantedTimestamp.toString("dd MMMM yyyy"))
+        GrantedInstanceDetails(DateTimeFormatter.ofPattern("dd MMMM yyyy").format(grantedTimestamp))
       )
     }
 

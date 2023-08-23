@@ -18,8 +18,9 @@ package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
 import java.util.UUID
 
+import java.time.LocalDateTime
+
 import cats.data.NonEmptyList
-import org.joda.time.DateTime
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 
@@ -75,7 +76,7 @@ object Submission {
       String,
       Submission.Id,
       ApplicationId,
-      DateTime,
+      LocalDateTime,
       NonEmptyList[GroupOfQuestionnaires],
       QuestionIdsOfInterest,
       AskWhen.Context
@@ -113,29 +114,29 @@ object Submission {
 
   val updateLatestAnswersTo: (Submission.AnswersToQuestions) => Submission => Submission = (newAnswers) => changeLatestInstance(_.copy(answersToQuestions = newAnswers))
 
-  val decline: (DateTime, String, String) => Submission => Submission = (timestamp, name, reasons) => {
+  val decline: (LocalDateTime, String, String) => Submission => Submission = (timestamp, name, reasons) => {
     val addDeclinedStatus                                   = addStatusHistory(Status.Declined(timestamp, name, reasons))
     val addNewlyAnsweringInstance: Submission => Submission = (s) => addInstance(s.latestInstance.answersToQuestions, Status.Answering(timestamp, true))(s)
 
     addDeclinedStatus andThen addNewlyAnsweringInstance
   }
 
-  val grant: (DateTime, String, Option[String]) => Submission => Submission = (timestamp, name, comments) => addStatusHistory(Status.Granted(timestamp, name, comments))
+  val grant: (LocalDateTime, String, Option[String]) => Submission => Submission = (timestamp, name, comments) => addStatusHistory(Status.Granted(timestamp, name, comments))
 
-  val grantWithWarnings: (DateTime, String, String, Option[String]) => Submission => Submission = (timestamp, name, warnings, escalatedTo) => {
+  val grantWithWarnings: (LocalDateTime, String, String, Option[String]) => Submission => Submission = (timestamp, name, warnings, escalatedTo) => {
     addStatusHistory(Status.GrantedWithWarnings(timestamp, name, warnings, escalatedTo))
   }
 
-  val fail: (DateTime, String) => Submission => Submission = (timestamp, name) => addStatusHistory(Status.Failed(timestamp, name))
+  val fail: (LocalDateTime, String) => Submission => Submission = (timestamp, name) => addStatusHistory(Status.Failed(timestamp, name))
 
-  val warnings: (DateTime, String) => Submission => Submission = (timestamp, name) => addStatusHistory(Status.Warnings(timestamp, name))
+  val warnings: (LocalDateTime, String) => Submission => Submission = (timestamp, name) => addStatusHistory(Status.Warnings(timestamp, name))
 
-  val pendingResponsibleIndividual: (DateTime, String) => Submission => Submission = (timestamp, name) => addStatusHistory(Status.PendingResponsibleIndividual(timestamp, name))
+  val pendingResponsibleIndividual: (LocalDateTime, String) => Submission => Submission = (timestamp, name) => addStatusHistory(Status.PendingResponsibleIndividual(timestamp, name))
 
-  val submit: (DateTime, String) => Submission => Submission = (timestamp, requestedBy) => addStatusHistory(Status.Submitted(timestamp, requestedBy))
+  val submit: (LocalDateTime, String) => Submission => Submission = (timestamp, requestedBy) => addStatusHistory(Status.Submitted(timestamp, requestedBy))
 
   sealed trait Status {
-    def timestamp: DateTime
+    def timestamp: LocalDateTime
 
     def isOpenToAnswers = isCreated || isAnswering
 
@@ -195,51 +196,51 @@ object Submission {
   object Status {
 
     case class Declined(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         name: String,
         reasons: String
       ) extends Status
 
     case class Granted(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         name: String,
         comments: Option[String]
       ) extends Status
 
     case class GrantedWithWarnings(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         name: String,
         warnings: String,
         escalatedTo: Option[String]
       ) extends Status
 
     case class Failed(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         name: String
       ) extends Status
 
     case class Warnings(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         name: String
       ) extends Status
 
     case class PendingResponsibleIndividual(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         name: String
       ) extends Status
 
     case class Submitted(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         requestedBy: String
       ) extends Status
 
     case class Answering(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         completed: Boolean
       ) extends Status
 
     case class Created(
-        timestamp: DateTime,
+        timestamp: LocalDateTime,
         requestedBy: String
       ) extends Status
 
@@ -291,7 +292,7 @@ object Submission {
 case class Submission(
     id: Submission.Id,
     applicationId: ApplicationId,
-    startedOn: DateTime,
+    startedOn: LocalDateTime,
     groups: NonEmptyList[GroupOfQuestionnaires],
     questionIdsOfInterest: QuestionIdsOfInterest,
     instances: NonEmptyList[Submission.Instance],

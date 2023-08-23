@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 import java.time.Instant
 import scala.concurrent.Future.successful
 
-import org.joda.time.{DateTime, DateTimeZone}
+import java.time.{LocalDateTime, ZoneOffset}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
@@ -75,17 +75,17 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
         val submittedSubmission =
-          (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(DateTime.now, "user"))(aSubmission)
+          (Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen Submission.submit(LocalDateTime.now(ZoneOffset.UTC), "user"))(aSubmission)
         val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(
-          DateTime.now,
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen Submission.submit(
+          LocalDateTime.now(ZoneOffset.UTC),
           "user"
-        ) andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(
-          DateTime.now,
+        ) andThen Submission.warnings(LocalDateTime.now(ZoneOffset.UTC), "user") andThen Submission.grantWithWarnings(LocalDateTime.now(ZoneOffset.UTC), "user", "Warnings", None) andThen Submission.grant(
+          LocalDateTime.now(ZoneOffset.UTC),
           "user",
           None
         ))(aSubmission)
@@ -94,11 +94,11 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId: ApplicationId) = {
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(DateTime.now.withZone(DateTimeZone.UTC), true)) andThen Submission.submit(
-          DateTime.now,
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen Submission.submit(
+          LocalDateTime.now(ZoneOffset.UTC),
           "user"
-        ) andThen Submission.warnings(DateTime.now, "user") andThen Submission.grantWithWarnings(DateTime.now, "user", "Warnings", None) andThen Submission.grant(
-          DateTime.now,
+        ) andThen Submission.warnings(LocalDateTime.now(ZoneOffset.UTC), "user") andThen Submission.grantWithWarnings(LocalDateTime.now(ZoneOffset.UTC), "user", "Warnings", None) andThen Submission.grant(
+          LocalDateTime.now(ZoneOffset.UTC),
           "user",
           None
         ))(aSubmission)
