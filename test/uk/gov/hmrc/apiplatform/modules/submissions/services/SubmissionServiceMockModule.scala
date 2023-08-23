@@ -87,6 +87,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         ) andThen Submission.warnings(LocalDateTime.now(ZoneOffset.UTC), "user") andThen Submission.grantWithWarnings(LocalDateTime.now(ZoneOffset.UTC), "user", "Warnings", None) andThen Submission.grant(
           LocalDateTime.now(ZoneOffset.UTC),
           "user",
+          None,
           None
         ))(aSubmission)
         val response          = Some(grantedSubmission)
@@ -100,6 +101,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         ) andThen Submission.warnings(LocalDateTime.now(ZoneOffset.UTC), "user") andThen Submission.grantWithWarnings(LocalDateTime.now(ZoneOffset.UTC), "user", "Warnings", None) andThen Submission.grant(
           LocalDateTime.now(ZoneOffset.UTC),
           "user",
+          None,
           None
         ))(aSubmission)
         val response          = Some(grantedSubmission.copy(context = simpleContext))
@@ -196,12 +198,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: Application) = {
         val response = Right(application)
-        when(aMock.grantForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grantForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
     }
   }

@@ -44,7 +44,7 @@ object TermsOfUseHistoryController {
       applicationDetailsUrl: String,
       isInHouseSoftware: Boolean
     )
-  case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], submissionStatus: Option[Submission.Status], dateAsString: String)
+  case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], escalatedTo: Option[String], submissionStatus: Option[Submission.Status], dateAsString: String)
 }
 
 @Singleton
@@ -123,12 +123,27 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
+    def deriveSubmissionEscalatedTo(status: Submission.Status): Option[String] = {
+      status match {
+        case s: Answering                    => None
+        case s: Created                      => None
+        case s: Declined                     => None
+        case s: Failed                       => None
+        case s: Granted                      => s.escalatedTo
+        case s: GrantedWithWarnings          => s.escalatedTo
+        case s: PendingResponsibleIndividual => None
+        case s: Submitted                    => None
+        case s: Warnings                     => None
+      }
+    }
+
     def buildModelFromSubmissionStatus(status: Submission.Status): TermsOfUseHistory = {
       TermsOfUseHistory(
         status.timestamp.asText,
         deriveSubmissionStatusDisplayName(status),
         deriveSubmissionStatusDescription(status),
         deriveSubmissionStatusDetail(status),
+        deriveSubmissionEscalatedTo(status),
         Some(status),
         status.timestamp.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()))
       )
@@ -139,6 +154,7 @@ class TermsOfUseHistoryController @Inject() (
         date.fold("Unknown")(d => DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(d)),
         deriveInvitationStatusDisplayName(status),
         deriveInvitationStatusDescription(status),
+        None,
         None,
         None,
         date.fold("0")(d => DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(d)),
@@ -168,7 +184,7 @@ class TermsOfUseHistoryController @Inject() (
         case Some(Submission.Status.Created(_, _))    => false
         case Some(Declined(_, _, _))                  => true
         case Some(Failed(_, _))                       => true
-        case Some(Granted(_, _, _))                   => true
+        case Some(Granted(_, _, _, _))                => true
         case Some(GrantedWithWarnings(_, _, _, _))    => true
         case Some(PendingResponsibleIndividual(_, _)) => true
         case Some(Submitted(_, _))                    => false

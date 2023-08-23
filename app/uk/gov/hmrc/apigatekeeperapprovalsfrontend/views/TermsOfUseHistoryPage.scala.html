@@ -61,6 +61,9 @@
             <p class="govuk-body">@{history.details.get}</p>
           </div>
         }
+        @if(history.escalatedTo.isDefined) {
+          <p class="govuk-body">@{messages("termsofusehistory.approver")}: @{history.escalatedTo.get}</p>
+        }
 
         @if(history == viewModel.historyEntries.head) {
           <p class="govuk-body">

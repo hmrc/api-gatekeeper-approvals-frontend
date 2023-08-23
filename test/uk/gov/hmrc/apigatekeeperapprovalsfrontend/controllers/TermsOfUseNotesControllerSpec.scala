@@ -24,13 +24,12 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseGrantedConfirmationPage, TermsOfUseNotesPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseNotesPage
 
 class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup with StrideAuthorisationServiceMockModule {
-    val notesPage   = app.injector.instanceOf[TermsOfUseNotesPage]
-    val confirmPage = app.injector.instanceOf[TermsOfUseGrantedConfirmationPage]
+    val notesPage = app.injector.instanceOf[TermsOfUseNotesPage]
 
     val controller = new TermsOfUseNotesController(
       StrideAuthorisationServiceMock.aMock,
@@ -38,8 +37,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      notesPage,
-      confirmPage
+      notesPage
     )
   }
 
@@ -66,7 +64,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
   }
 
   "action" should {
-    "return 200" in new Setup {
+    "return 303" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "submission looks bad")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
@@ -76,7 +74,8 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
 
       val result = controller.action(applicationId)(fakeReasonsRequest)
 
-      status(result) shouldBe Status.OK
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId).url
     }
 
     "return 400 if no reasons supplied" in new Setup {

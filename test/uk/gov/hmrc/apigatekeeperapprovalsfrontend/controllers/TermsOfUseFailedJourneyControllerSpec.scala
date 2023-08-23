@@ -25,7 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{TermsOfUseAdminsPage, TermsOfUseConfirmationPage, TermsOfUseFailedListPage, TermsOfUseFailedPage}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
@@ -35,6 +35,10 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     val failedPage       = app.injector.instanceOf[TermsOfUseFailedPage]
     val adminsPage       = app.injector.instanceOf[TermsOfUseAdminsPage]
     val confirmationPage = app.injector.instanceOf[TermsOfUseConfirmationPage]
+    val failOverridePage = app.injector.instanceOf[TermsOfUseFailOverridePage]
+    val approverPage     = app.injector.instanceOf[TermsOfUseOverrideApproverPage]
+    val notesPage        = app.injector.instanceOf[TermsOfUseOverrideNotesPage]
+    val confirmPage      = app.injector.instanceOf[TermsOfUseOverrideConfirmPage]
 
     val controller = new TermsOfUseFailedJourneyController(
       StrideAuthorisationServiceMock.aMock,
@@ -45,6 +49,10 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       failedPage,
       adminsPage,
       confirmationPage,
+      failOverridePage,
+      approverPage,
+      notesPage,
+      confirmPage,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )
@@ -160,6 +168,154 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId).url
+    }
+  }
+
+  "failOverridePage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.failOverridePage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+  }
+
+  "failOverrideYesAction" should {
+    "return 200" in new Setup {
+      val fakeSubmitOverrideYesRequest = fakeRequest.withFormUrlEncodedBody("override" -> "yes")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.failOverrideAction(applicationId)(fakeSubmitOverrideYesRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(
+        applicationId
+      ).url
+    }
+  }
+
+  "failOverrideNoAction" should {
+    "return 200" in new Setup {
+      val fakeSubmitOverrideYesRequest = fakeRequest.withFormUrlEncodedBody("override" -> "no")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.failOverrideAction(applicationId)(fakeSubmitOverrideYesRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(applicationId).url
+    }
+  }
+
+  "overrideApproverPage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.overrideApproverPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+  }
+
+  "overrideApproverAction" should {
+    "return 200" in new Setup {
+      val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "Bob", "last-name" -> "Mortimer")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.UpdateEscalatedTo.thenReturn(submissionReview)
+
+      val result = controller.overrideApproverAction(applicationId)(fakeSubmitApproverRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId).url
+    }
+  }
+
+  "overrideNotesPage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.overrideNotesPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+  }
+
+  "overrideNotesAction" should {
+    "return 200" in new Setup {
+      val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "Reasons to be cheerful")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
+
+      val result = controller.overrideNotesAction(applicationId)(fakeSubmitApproverRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId).url
+    }
+  }
+
+  "overrideConfirmPage" should {
+    "return 200" in new Setup {
+      val review = submissionReview.copy(escalatedTo = Some("Mr Bob"))
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindReview.thenReturn(review)
+
+      val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+
+    "return 400 if no submission review" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindReview.thenReturnNone()
+
+      val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "return 400 if escalated to not set" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindReview.thenReturn(submissionReview)
+
+      val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+  }
+
+  "overrideConfirmAction" should {
+    "return 200" in new Setup {
+      val review = submissionReview.copy(escalatedTo = Some("Mr Bob"))
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindReview.thenReturn(review)
+      SubmissionServiceMock.GrantForTouUplift.thenReturn(applicationId, application)
+
+      val result = controller.overrideConfirmAction(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId).url
     }
   }
 
