@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import scala.concurrent.Future.successful
 
 import java.time.{LocalDateTime, ZoneOffset}
@@ -74,18 +75,20 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
+        val now = LocalDateTime.now(ZoneOffset.UTC)
         val submittedSubmission =
-          (Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen Submission.submit(LocalDateTime.now(ZoneOffset.UTC), "user"))(aSubmission)
+          (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(now.minusDays(8), "user"))(aSubmission)
         val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen Submission.submit(
-          LocalDateTime.now(ZoneOffset.UTC),
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(
+          now.minusDays(9),
           "user"
-        ) andThen Submission.warnings(LocalDateTime.now(ZoneOffset.UTC), "user") andThen Submission.grantWithWarnings(LocalDateTime.now(ZoneOffset.UTC), "user", "Warnings", None) andThen Submission.grant(
-          LocalDateTime.now(ZoneOffset.UTC),
+        ) andThen Submission.warnings(now.minusDays(8), "user") andThen Submission.grantWithWarnings(now.minusDays(5), "user", "Warnings", None) andThen Submission.grant(
+          now.minusDays(2),
           "user",
           None,
           None
@@ -95,11 +98,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId: ApplicationId) = {
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen Submission.submit(
-          LocalDateTime.now(ZoneOffset.UTC),
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(
+          now.minusDays(9),
           "user"
-        ) andThen Submission.warnings(LocalDateTime.now(ZoneOffset.UTC), "user") andThen Submission.grantWithWarnings(LocalDateTime.now(ZoneOffset.UTC), "user", "Warnings", None) andThen Submission.grant(
-          LocalDateTime.now(ZoneOffset.UTC),
+        ) andThen Submission.warnings(now.minusDays(8), "user") andThen Submission.grantWithWarnings(now.minusDays(5), "user", "Warnings", None) andThen Submission.grant(
+          now.minusDays(2),
           "user",
           None,
           None
@@ -155,12 +159,14 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object FetchTermsOfUseInvitation {
 
       def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT))
+        val now = Instant.now
+        val response = Some(TermsOfUseInvitation(applicationId, now.minus(20, ChronoUnit.DAYS), now.minus(20, ChronoUnit.DAYS), now.plus(20, ChronoUnit.DAYS), None, EMAIL_SENT))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturn(applicationId: ApplicationId, status: TermsOfUseInvitationState) = {
-        val response = Some(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, status))
+        val now = Instant.now
+        val response = Some(TermsOfUseInvitation(applicationId, now.minus(20, ChronoUnit.DAYS), now.minus(20, ChronoUnit.DAYS), now.plus(20, ChronoUnit.DAYS), None, status))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
