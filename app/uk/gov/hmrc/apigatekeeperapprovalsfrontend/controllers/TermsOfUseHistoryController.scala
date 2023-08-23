@@ -157,7 +157,7 @@ class TermsOfUseHistoryController @Inject() (
         None,
         None,
         None,
-        date.fold("0")(d => DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(d)),
+        date.fold("0")(d => DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(d))
       )
     }
 
