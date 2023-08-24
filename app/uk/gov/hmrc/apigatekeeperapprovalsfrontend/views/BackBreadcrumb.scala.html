@@ -15,18 +15,15 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import views.html.helper.CSPNonce
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
-
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukBackLink
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
 @this(
-  appConfig: AppConfig
+  appConfig: AppConfig,
+  govukBackLink: GovukBackLink
 )
 
 @()(implicit messages: Messages)
   <div class="govuk-breadcrumbs">
-    <ol class="govuk-breadcrumbs__list">
-      <li class="govuk-breadcrumbs__list-item"><a href="javascript:history.back()" class="govuk-back-link">@{messages("breadcrumbs.back")}</a></li>
-    </ol>
+    @govukBackLink(BackLink.mimicsBrowserBackButtonViaJavaScript)
   </div>

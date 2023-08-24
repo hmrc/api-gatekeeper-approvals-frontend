@@ -5,12 +5,12 @@ import sbt._
 
 object AppDependencies {
 
-  lazy val bootstrapPlayVersion = "7.12.0"
+  lazy val bootstrapPlayVersion = "7.19.0"
   lazy val mongoVersion = "0.74.0"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"         % bootstrapPlayVersion,
-    "uk.gov.hmrc"             %% "play-frontend-hmrc"                 % "6.2.0-play-28",
+    "uk.gov.hmrc"             %% "play-frontend-hmrc"                 % "7.14.0-play-28",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-28"                 % mongoVersion,
     "uk.gov.hmrc"             %% "http-metrics"                       % "2.7.0",
     "uk.gov.hmrc"             %% "play-json-union-formatter"          % "1.18.0-play-28",
