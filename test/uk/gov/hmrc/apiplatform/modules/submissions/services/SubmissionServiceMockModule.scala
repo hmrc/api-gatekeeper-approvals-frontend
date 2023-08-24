@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
-import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future.successful
 
-import java.time.{LocalDateTime, ZoneOffset}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
@@ -75,7 +74,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now                 = LocalDateTime.now(ZoneOffset.UTC)
         val submittedSubmission =
           (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(now.minusDays(8), "user"))(aSubmission)
         val response            = Some(submittedSubmission)
@@ -83,7 +82,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now               = LocalDateTime.now(ZoneOffset.UTC)
         val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(
           now.minusDays(9),
           "user"
@@ -98,7 +97,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId: ApplicationId) = {
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now               = LocalDateTime.now(ZoneOffset.UTC)
         val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(
           now.minusDays(9),
           "user"
@@ -159,13 +158,13 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object FetchTermsOfUseInvitation {
 
       def thenReturn(applicationId: ApplicationId) = {
-        val now = Instant.now
+        val now      = Instant.now
         val response = Some(TermsOfUseInvitation(applicationId, now.minus(20, ChronoUnit.DAYS), now.minus(20, ChronoUnit.DAYS), now.plus(20, ChronoUnit.DAYS), None, EMAIL_SENT))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturn(applicationId: ApplicationId, status: TermsOfUseInvitationState) = {
-        val now = Instant.now
+        val now      = Instant.now
         val response = Some(TermsOfUseInvitation(applicationId, now.minus(20, ChronoUnit.DAYS), now.minus(20, ChronoUnit.DAYS), now.plus(20, ChronoUnit.DAYS), None, status))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }

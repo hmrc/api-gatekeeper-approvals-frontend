@@ -44,7 +44,16 @@ object TermsOfUseHistoryController {
       applicationDetailsUrl: String,
       isInHouseSoftware: Boolean
     )
-  case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], escalatedTo: Option[String], submissionStatus: Option[Submission.Status], dateAsString: String)
+
+  case class TermsOfUseHistory(
+      date: String,
+      status: String,
+      description: String,
+      details: Option[String],
+      escalatedTo: Option[String],
+      submissionStatus: Option[Submission.Status],
+      dateAsString: String
+    )
 }
 
 @Singleton

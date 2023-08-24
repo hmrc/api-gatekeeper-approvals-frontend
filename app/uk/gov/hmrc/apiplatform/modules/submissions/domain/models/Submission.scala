@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-import java.util.UUID
-
 import java.time.LocalDateTime
+import java.util.UUID
 
 import cats.data.NonEmptyList
 

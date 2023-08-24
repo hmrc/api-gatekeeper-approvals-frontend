@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions
 
+import java.time.{LocalDateTime, ZoneOffset}
 import scala.util.Random
 
 import cats.data.NonEmptyList
-import java.time.{LocalDateTime, ZoneOffset}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen.Context.Keys
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._

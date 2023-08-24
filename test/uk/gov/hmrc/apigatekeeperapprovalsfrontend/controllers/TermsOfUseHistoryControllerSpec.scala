@@ -58,7 +58,7 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
-      contentAsString(result) should not include("View submitted answers")
+      contentAsString(result) should not include ("View submitted answers")
     }
 
     "return Ok (200) for Stride users with an application and a created submission" in new Setup {
@@ -70,7 +70,7 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
-      contentAsString(result) should not include("View submitted answers")
+      contentAsString(result) should not include ("View submitted answers")
     }
 
     "return Ok (200) for Stride users with an application and a granted submission" in new Setup {
@@ -82,7 +82,7 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
-      contentAsString(result) should not include("This request is from an in-house developer")
+      contentAsString(result) should not include ("This request is from an in-house developer")
       contentAsString(result) should include("View submitted answers")
     }
 
