@@ -145,7 +145,7 @@ class TermsOfUseHistoryController @Inject() (
         deriveSubmissionStatusDetail(status),
         deriveSubmissionEscalatedTo(status),
         Some(status),
-        status.timestamp.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()))
+        status.timestamp.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("UTC")))
       )
     }
 
@@ -157,7 +157,7 @@ class TermsOfUseHistoryController @Inject() (
         None,
         None,
         None,
-        date.fold("0")(d => DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(d))
+        date.fold("0")(d => DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("UTC")).format(d))
       )
     }
 
