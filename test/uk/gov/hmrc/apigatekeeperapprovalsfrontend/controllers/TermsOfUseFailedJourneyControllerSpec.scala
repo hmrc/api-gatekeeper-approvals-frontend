@@ -238,6 +238,17 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId).url
     }
+
+    "return 400 when no names submitted" in new Setup {
+      val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "", "last-name" -> "Mortimer")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.overrideApproverAction(applicationId)(fakeSubmitApproverRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+    }
   }
 
   "overrideNotesPage" should {
@@ -264,6 +275,17 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId).url
+    }
+
+    "return 400 when nothing submitted" in new Setup {
+      val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "")
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.overrideNotesAction(applicationId)(fakeSubmitApproverRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 

@@ -40,12 +40,20 @@ object TermsOfUseHistoryController {
   case class ViewModel(
       applicationId: ApplicationId,
       applicationName: String,
-      currentState: TermsOfUseHistory,
       historyEntries: List[TermsOfUseHistory],
       applicationDetailsUrl: String,
       isInHouseSoftware: Boolean
     )
-  case class TermsOfUseHistory(date: String, status: String, description: String, details: Option[String], escalatedTo: Option[String], submissionStatus: Option[Submission.Status])
+
+  case class TermsOfUseHistory(
+      date: String,
+      status: String,
+      description: String,
+      details: Option[String],
+      escalatedTo: Option[String],
+      submissionStatus: Option[Submission.Status],
+      dateAsString: String
+    )
 }
 
 @Singleton
@@ -145,7 +153,8 @@ class TermsOfUseHistoryController @Inject() (
         deriveSubmissionStatusDescription(status),
         deriveSubmissionStatusDetail(status),
         deriveSubmissionEscalatedTo(status),
-        Some(status)
+        Some(status),
+        status.timestamp.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("UTC")))
       )
     }
 
@@ -156,37 +165,25 @@ class TermsOfUseHistoryController @Inject() (
         deriveInvitationStatusDescription(status),
         None,
         None,
-        None
+        None,
+        date.fold("0")(d => DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("UTC")).format(d))
       )
     }
 
-    def buildModelFromInvitation(invite: TermsOfUseInvitation): TermsOfUseHistory = {
+    def buildHistoryFromInvitation(invite: TermsOfUseInvitation): List[TermsOfUseHistory] = {
       invite.status match {
-        case OVERDUE             => buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy))
-        case REMINDER_EMAIL_SENT => buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent)
-        case _                   => buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
-      }
-    }
-
-    def buildHistoryFromInvitation(invite: TermsOfUseInvitation, excludeLatest: Boolean): List[TermsOfUseHistory] = {
-      (invite.status, excludeLatest) match {
-        case (OVERDUE, false)             =>
-          List[TermsOfUseHistory](
+        case OVERDUE             => List[TermsOfUseHistory](
             buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy)),
             buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
             buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
           )
-        case (OVERDUE, true)              => List[TermsOfUseHistory](
+        case REMINDER_EMAIL_SENT => List[TermsOfUseHistory](
             buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
             buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
           )
-        case (REMINDER_EMAIL_SENT, false) => List[TermsOfUseHistory](
-            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
+        case _                   => List[TermsOfUseHistory](
             buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
           )
-        case (REMINDER_EMAIL_SENT, true)  => List[TermsOfUseHistory](buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn)))
-        case (_, false)                   => List[TermsOfUseHistory](buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn)))
-        case (_, true)                    => List[TermsOfUseHistory]()
       }
     }
 
@@ -216,12 +213,11 @@ class TermsOfUseHistoryController @Inject() (
         .map(instance => buildHistoryFromSubmissionInstance(instance))
         .toList
         .flatten
-        .tail
         .filter(history => filterHistoryStatus(history.submissionStatus))
     }
 
     def buildHistoryFromSubmissionAndInvitation(submission: Submission, invite: TermsOfUseInvitation): List[TermsOfUseHistory] = {
-      val history = buildHistoryFromSubmission(submission) ++ buildHistoryFromInvitation(invite, false)
+      val history = buildHistoryFromSubmission(submission) ++ buildHistoryFromInvitation(invite)
       history
     }
 
@@ -235,8 +231,7 @@ class TermsOfUseHistoryController @Inject() (
           ViewModel(
             application.id,
             application.name,
-            buildModelFromSubmissionStatus(sub.status),
-            buildHistoryFromSubmissionAndInvitation(sub, invite),
+            buildHistoryFromSubmissionAndInvitation(sub, invite).sortBy(_.dateAsString).reverse,
             gatekeeperApplicationUrl,
             isInHouseSoftware(sub)
           )
@@ -245,8 +240,7 @@ class TermsOfUseHistoryController @Inject() (
           ViewModel(
             application.id,
             application.name,
-            buildModelFromInvitation(invite),
-            buildHistoryFromInvitation(invite, true),
+            buildHistoryFromInvitation(invite).sortBy(_.dateAsString).reverse,
             gatekeeperApplicationUrl,
             false
           )
