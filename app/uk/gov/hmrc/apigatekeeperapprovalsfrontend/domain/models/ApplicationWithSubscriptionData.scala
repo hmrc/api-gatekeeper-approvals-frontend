@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiIdentifier
+
 object ApplicationWithSubscriptionData {
   import play.api.libs.json.Json
 

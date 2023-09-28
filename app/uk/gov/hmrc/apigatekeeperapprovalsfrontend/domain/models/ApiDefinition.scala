@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-object ApiDefinition {
+object ApiDefinitionGK {
   import play.api.libs.json.Json
-  implicit val apiDefinitionReads = Json.reads[ApiDefinition]
+  implicit val apiDefinitionReads = Json.reads[ApiDefinitionGK]
 }
 
-case class ApiDefinition(serviceName: String, name: String)
+case class ApiDefinitionGK(serviceName: String, name: String)

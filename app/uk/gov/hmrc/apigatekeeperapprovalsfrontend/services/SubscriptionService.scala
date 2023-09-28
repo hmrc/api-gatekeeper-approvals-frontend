@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApiDefinition
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApiDefinitionGK
 
 @Singleton
 class SubscriptionService @Inject() (
@@ -34,13 +34,13 @@ class SubscriptionService @Inject() (
   )(implicit val ec: ExecutionContext
   ) {
 
-  def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinition]] = {
+  def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinitionGK]] = {
     (
       for {
         applicationWithSubscriptions <- OptionT(apmConnector.fetchApplicationWithSubscriptionData(applicationId))
         subscribableApis             <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
-        applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context))
+        applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context.toString()))
       } yield applicationSubscriptions
-    ).getOrElseF(successful(Set[ApiDefinition]()))
+    ).getOrElseF(successful(Set[ApiDefinitionGK]()))
   }
 }

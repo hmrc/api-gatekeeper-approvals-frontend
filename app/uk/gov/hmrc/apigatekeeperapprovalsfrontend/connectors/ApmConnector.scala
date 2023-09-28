@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, Application, ApplicationWithSubscriptionData}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinitionGK, Application, ApplicationWithSubscriptionData}
 
 object ApmConnector {
   case class Config(serviceBaseUrl: String)
@@ -50,11 +50,11 @@ class ApmConnector @Inject() (
     }
   }
 
-  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String, ApiDefinition]] = {
+  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String, ApiDefinitionGK]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Map[String, ApiDefinition]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.toString()))
+      httpClient.GET[Map[String, ApiDefinitionGK]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.toString()))
     }
   }
 

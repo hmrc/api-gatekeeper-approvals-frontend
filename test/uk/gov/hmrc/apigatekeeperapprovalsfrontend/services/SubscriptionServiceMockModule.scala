@@ -33,7 +33,7 @@ trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     object FetchSubscriptionsByApplicationId {
 
       def thenReturn(apiDefinitions: (String, String)*) = {
-        val definitions = apiDefinitions.map(t => ApiDefinition(t._1, t._2)).toSet
+        val definitions = apiDefinitions.map(t => ApiDefinitionGK(t._1, t._2)).toSet
         when(aMock.fetchSubscriptionsByApplicationId(*[ApplicationId])(*)).thenReturn(successful(definitions))
       }
     }

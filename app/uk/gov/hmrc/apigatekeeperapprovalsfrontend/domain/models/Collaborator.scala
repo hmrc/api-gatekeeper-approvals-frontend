@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+
 case class Collaborator(emailAddress: String, role: CollaboratorRole, userId: UserId)
 
 object Collaborator {

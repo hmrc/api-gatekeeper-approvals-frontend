@@ -20,9 +20,9 @@ import scala.concurrent.Future.successful
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiIdentifier, ApplicationId}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationWithSubscriptionData}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinitionGK, ApplicationWithSubscriptionData}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
 trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
@@ -38,7 +38,7 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
 
     object FetchSubscribableApisForApplication {
 
-      def thenReturn(apiDefinitions: Map[String, ApiDefinition]) =
+      def thenReturn(apiDefinitions: Map[String, ApiDefinitionGK]) =
         when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(apiDefinitions))
       def thenReturnNothing                                      = when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(Map()))
     }
