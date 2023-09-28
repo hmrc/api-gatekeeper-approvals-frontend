@@ -13,7 +13,6 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "play-frontend-hmrc"                 % "7.14.0-play-28",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-28"                 % mongoVersion,
     "uk.gov.hmrc"             %% "http-metrics"                       % "2.7.0",
-    "uk.gov.hmrc"             %% "play-json-union-formatter"          % "1.18.0-play-28",
     "org.typelevel"           %% "cats-core"                          % "2.6.1",
     "com.beachape"            %% "enumeratum"                         % "1.7.0",
     "com.beachape"            %% "enumeratum-play"                    % "1.7.0",
