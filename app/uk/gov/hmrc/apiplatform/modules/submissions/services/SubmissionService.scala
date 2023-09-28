@@ -19,11 +19,12 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
 class SubmissionService @Inject() (

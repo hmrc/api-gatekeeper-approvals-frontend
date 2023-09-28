@@ -21,13 +21,13 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPage
 

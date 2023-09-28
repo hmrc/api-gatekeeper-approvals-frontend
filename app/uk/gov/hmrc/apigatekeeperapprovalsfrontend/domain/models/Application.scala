@@ -19,6 +19,8 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 import enumeratum.{EnumEntry, PlayEnum}
 import org.joda.time.{DateTime, DateTimeZone}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+
 case class ApplicationState(
     name: State,
     requestedByEmailAddress: Option[String] = None,

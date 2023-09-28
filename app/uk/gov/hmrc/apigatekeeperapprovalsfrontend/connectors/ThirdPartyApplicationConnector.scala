@@ -23,7 +23,8 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
 
 object ThirdPartyApplicationConnector {
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
@@ -45,13 +46,13 @@ class ThirdPartyApplicationConnector @Inject() (
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
 
     metrics.record(api) {
-      httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id.value}")
+      httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id}")
     }
   }
 
   def applicationUpdate(applicationId: ApplicationId, request: ApplicationUpdate)(implicit hc: HeaderCarrier): Future[ApplicationUpdateSuccessful] = {
     metrics.record(api) {
-      httpClient.PATCH[ApplicationUpdate, ErrorOrUnit](s"$serviceBaseUrl/application/${applicationId.value}", request).map(throwOr(ApplicationUpdateSuccessful))
+      httpClient.PATCH[ApplicationUpdate, ErrorOrUnit](s"$serviceBaseUrl/application/${applicationId}", request).map(throwOr(ApplicationUpdateSuccessful))
     }
   }
 }

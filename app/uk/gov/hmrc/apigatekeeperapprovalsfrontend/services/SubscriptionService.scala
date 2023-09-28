@@ -24,8 +24,9 @@ import cats.data.OptionT
 
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApplicationId}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApiDefinition
 
 @Singleton
 class SubscriptionService @Inject() (

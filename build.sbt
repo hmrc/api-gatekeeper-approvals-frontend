@@ -53,7 +53,8 @@ lazy val microservice = Project(appName, file("."))
   .settings(integrationTestSettings(): _*)
   .settings(
     routesImport ++= Seq(
-      "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._"
+      "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._",
+      "uk.gov.hmrc.apiplatform.modules.common.domain.models._"
     )
   )
   .settings(

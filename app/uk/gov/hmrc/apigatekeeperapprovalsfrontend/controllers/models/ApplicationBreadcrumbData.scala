@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 case class ApplicationBreadcrumbData(
     id: ApplicationId,

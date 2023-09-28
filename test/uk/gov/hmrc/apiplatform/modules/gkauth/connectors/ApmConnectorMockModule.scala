@@ -20,8 +20,9 @@ import scala.concurrent.Future.successful
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationId, ApplicationWithSubscriptionData}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, ApiIdentifier, ApplicationWithSubscriptionData}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
 trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {

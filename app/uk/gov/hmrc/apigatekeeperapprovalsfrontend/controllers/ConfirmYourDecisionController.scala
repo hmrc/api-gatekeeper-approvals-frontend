@@ -23,12 +23,12 @@ import scala.concurrent.Future.successful
 import cats.data.EitherT
 
 import play.api.mvc.{MessagesControllerComponents, _}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmYourDecisionPage
 

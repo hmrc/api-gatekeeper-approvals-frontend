@@ -20,6 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.joda.time.DateTime
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.http.HeaderCarrier
