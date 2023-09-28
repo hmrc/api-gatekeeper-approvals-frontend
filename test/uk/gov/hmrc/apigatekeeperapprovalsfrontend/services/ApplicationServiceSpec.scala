@@ -20,6 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.joda.time.DateTime
 
+import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -42,8 +43,8 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       Some("http://example.com"),
       responsibleIndividual,
       serverLocations = Set.empty,
-      TermsAndConditionsLocation.InDesktopSoftware,
-      PrivacyPolicyLocation.InDesktopSoftware,
+      TermsAndConditionsLocations.InDesktopSoftware,
+      PrivacyPolicyLocations.InDesktopSoftware,
       termsOfUseAcceptances
     )
     val standardAccess          = Standard(importantSubmissionData = Some(importantSubmissionData))
