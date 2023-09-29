@@ -18,6 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
 import uk.gov.hmrc.apiplatform.modules.applications.domain.models.Collaborator
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 trait ApplicationTestData {

@@ -19,10 +19,10 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinitionGK, Application, ApplicationWithSubscriptionData}
 
 object ApmConnector {

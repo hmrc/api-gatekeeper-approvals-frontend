@@ -33,7 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswers
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{State}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 

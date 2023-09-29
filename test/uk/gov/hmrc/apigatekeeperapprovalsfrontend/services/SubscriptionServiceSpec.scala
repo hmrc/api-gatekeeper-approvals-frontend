@@ -20,9 +20,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models._
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.ApmConnectorMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApiDefinitionGK
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApiDefinitionGK
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class SubscriptionServiceSpec extends AsyncHmrcSpec {

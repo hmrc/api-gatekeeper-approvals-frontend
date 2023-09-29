@@ -21,6 +21,7 @@ import scala.concurrent.Future.successful
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationUpdateSuccessful
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
