@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocation, PrivacyPolicyLocations, TermsAndConditionsLocation, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
@@ -43,7 +44,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
+    val responsibleIndividual = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(access =
       Standard(

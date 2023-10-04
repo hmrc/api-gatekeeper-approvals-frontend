@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.joda.time.DateTime
 
 import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,7 +36,7 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     val applicationId              = ApplicationId.random
     val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
 
-    val responsibleIndividual = ResponsibleIndividual("bob", "bob@example.com")
+    val responsibleIndividual = ResponsibleIndividual("bob", LaxEmailAddress("bob@example.com"))
     val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, DateTime.now, Submission.Id.random, 0))
 
     val importantSubmissionData = ImportantSubmissionData(

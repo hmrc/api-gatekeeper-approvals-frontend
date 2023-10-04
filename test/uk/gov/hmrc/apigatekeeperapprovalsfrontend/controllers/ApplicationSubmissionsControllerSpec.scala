@@ -26,6 +26,7 @@ import org.mockito.captor.ArgCaptor
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -72,7 +73,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
-    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", "bob@example.com")
+    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(
       access = Standard(
@@ -97,7 +98,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, DateTimeFormatter.ofPattern("dd MMMM yyyy").format(submittedTimestamp)))
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe None
-      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
+      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(LaxEmailAddress("bob@example.com"))
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe true
       viewModelCaptor.value.isDeleted shouldBe false
     }
@@ -115,7 +116,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       verify(page).apply(viewModelCaptor)(*, *)
       viewModelCaptor.value.currentSubmission shouldBe None
       viewModelCaptor.value.grantedInstance shouldBe None
-      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some("bob@example.com")
+      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(LaxEmailAddress("bob@example.com"))
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
       viewModelCaptor.value.isDeleted shouldBe false
       viewModelCaptor.value.declinedInstances shouldBe List(
