@@ -20,11 +20,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.ApplicationCommand
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationUpdate, ApplicationUpdateFormatters, ApplicationUpdateSuccessful}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 object ThirdPartyApplicationConnector {
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
@@ -37,7 +38,7 @@ class ThirdPartyApplicationConnector @Inject() (
     config: ThirdPartyApplicationConnector.Config,
     val metrics: ConnectorMetrics
   )(implicit val ec: ExecutionContext
-  ) extends ApplicationUpdateFormatters with CommonResponseHandlers {
+  ) extends CommonResponseHandlers {
 
   val serviceBaseUrl = config.serviceBaseUrl
   val api            = API("third-party-application")
@@ -47,12 +48,6 @@ class ThirdPartyApplicationConnector @Inject() (
 
     metrics.record(api) {
       httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id}")
-    }
-  }
-
-  def applicationUpdate(applicationId: ApplicationId, request: ApplicationUpdate)(implicit hc: HeaderCarrier): Future[ApplicationUpdateSuccessful] = {
-    metrics.record(api) {
-      httpClient.PATCH[ApplicationUpdate, ErrorOrUnit](s"$serviceBaseUrl/application/${applicationId}", request).map(throwOr(ApplicationUpdateSuccessful))
     }
   }
 }

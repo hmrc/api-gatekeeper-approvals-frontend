@@ -98,6 +98,7 @@ class DeclinedJourneyController @Inject() (
   def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
     val requiresDemo       = SubmissionRequiresDemo(request.submission)
+    val adminsToEmail      = request.application.collaborators.filter(_.role.isAdministrator).map(_.emailAddress)
     val ok                 = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
 
     for {
@@ -109,7 +110,7 @@ class DeclinedJourneyController @Inject() (
                   requiresFraudCheck,
                   requiresDemo
                 )
-      result <- applicationService.declineApplicationApprovalRequest(applicationId, request.name.get, review.declineReasons)
+      result <- applicationService.declineApplicationApprovalRequest(applicationId, request.name.get, review.declineReasons, adminsToEmail)
     } yield ok
   }
 }

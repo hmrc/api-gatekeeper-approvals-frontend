@@ -17,18 +17,24 @@
 package uk.gov.hmrc.apiplatform.modules.gkauth.services
 
 import scala.concurrent.Future.successful
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationUpdateSuccessful
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
 trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
 
   trait BaseApplicationServiceMock {
+    val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
+
+    import CHT.Implicits._
+
     def aMock: ApplicationService
 
     object FetchByApplicationId {
@@ -54,11 +60,11 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
     object DeclineApplicationApprovalRequest {
 
       def thenReturnSuccess() = {
-        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *)(*)).thenReturn(successful(ApplicationUpdateSuccessful))
+        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *, *[Set[LaxEmailAddress]])(*)).thenReturn(DispatchSuccessResult(mock[Application]).asSuccess)
       }
 
       def thenReturnFailure() = {
-        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *)(*)).thenThrow(new RuntimeException("Application id not found"))
+        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *, *)(*)).thenThrow(new RuntimeException("Application id not found"))
       }
     }
   }

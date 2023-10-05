@@ -21,8 +21,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.joda.time.DateTime
 
 import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
-import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ApplicationCommandConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -31,10 +32,10 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, As
 
 class ApplicationServiceSpec extends AsyncHmrcSpec {
 
-  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationTestData {
+  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationCommandConnectorMockModule with ApplicationTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId              = ApplicationId.random
-    val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
+    val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock, ApplicationCommandConnectorMock.aMock)
 
     val responsibleIndividual = ResponsibleIndividual("bob", LaxEmailAddress("bob@example.com"))
     val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, DateTime.now, Submission.Id.random, 0))
@@ -75,4 +76,15 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     }
   }
 
+  "declineApplicationApprovalRequest" should {
+    "return the correct application" in new Setup {
+      val requestedBy = "requestedBy"
+      val reasons     = "reasons"
+      val adminEmails = Set(LaxEmailAddress("bob@example.com"))
+      ApplicationCommandConnectorMock.Dispatch.thenReturn(application)
+      val result = await(service.declineApplicationApprovalRequest(applicationId, requestedBy, reasons, adminEmails))
+      result.isRight shouldBe true
+      result shouldBe Right(DispatchSuccessResult(application))
+    }
+  }
 }
