@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import java.time.Clock
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.ApplicationCommands
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{DispatchSuccessResult, _}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult, _}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ApplicationCommandConnector, ThirdPartyApplicationConnector}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 
 @Singleton
 class ApplicationService @Inject() (
@@ -46,7 +43,13 @@ class ApplicationService @Inject() (
     apmConnector.fetchLinkedSubordinateApplicationById(applicationId)
   }
 
-  def declineApplicationApprovalRequest(applicationId: ApplicationId, requestedBy: String, reasons: String, adminsToEmail: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): AppCmdResult = {
+  def declineApplicationApprovalRequest(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      reasons: String,
+      adminsToEmail: Set[LaxEmailAddress]
+    )(implicit hc: HeaderCarrier
+    ): AppCmdResult = {
     val request = ApplicationCommands.DeclineApplicationApprovalRequest(requestedBy, reasons, LocalDateTime.now)
     applicationCommandConnector.dispatch(applicationId, request, adminsToEmail)
   }

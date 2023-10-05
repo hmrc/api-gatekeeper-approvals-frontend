@@ -82,7 +82,7 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       val reasons     = "reasons"
       val adminEmails = Set(LaxEmailAddress("bob@example.com"))
       ApplicationCommandConnectorMock.Dispatch.thenReturn(application)
-      val result = await(service.declineApplicationApprovalRequest(applicationId, requestedBy, reasons, adminEmails))
+      val result      = await(service.declineApplicationApprovalRequest(applicationId, requestedBy, reasons, adminEmails))
       result.isRight shouldBe true
       result shouldBe Right(DispatchSuccessResult(application))
     }
