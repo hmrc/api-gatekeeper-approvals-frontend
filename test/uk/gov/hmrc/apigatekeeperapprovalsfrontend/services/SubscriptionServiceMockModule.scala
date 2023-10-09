@@ -23,9 +23,9 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApiDataTestData
 
-trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData {
+trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData with ApiDataTestData {
 
   trait BaseSubscriptionServiceMock {
     def aMock: SubscriptionService
@@ -33,7 +33,7 @@ trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     object FetchSubscriptionsByApplicationId {
 
       def thenReturn(apiDefinitions: (String, String)*) = {
-        val definitions = apiDefinitions.map(t => ApiDefinitionGK(t._1, t._2)).toSet
+        val definitions = apiDefinitions.map(t => anApiData(t._1, t._2)).toSet
         when(aMock.fetchSubscriptionsByApplicationId(*[ApplicationId])(*)).thenReturn(successful(definitions))
       }
     }

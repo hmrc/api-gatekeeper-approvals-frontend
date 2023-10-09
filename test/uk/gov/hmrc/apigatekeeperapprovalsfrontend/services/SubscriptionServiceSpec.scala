@@ -22,21 +22,20 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models._
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.ApmConnectorMockModule
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApiDefinitionGK
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, AsyncHmrcSpec}
 
 class SubscriptionServiceSpec extends AsyncHmrcSpec {
 
-  trait Setup extends ApmConnectorMockModule {
+  trait Setup extends ApmConnectorMockModule with ApiDataTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId              = ApplicationId.random
     val context1                   = ApiContext("context1")
     val context2                   = ApiContext("context2")
     val context3                   = ApiContext("context3")
     val context4                   = ApiContext("context4")
-    val apiDefinition1             = ApiDefinitionGK("serviceName1", "name1")
-    val apiDefinition2             = ApiDefinitionGK("serviceName2", "name2")
-    val apiDefinition3             = ApiDefinitionGK("serviceName3", "name3")
+    val apiData1                   = anApiData("serviceName1", "name1")
+    val apiData2                   = anApiData("serviceName2", "name2")
+    val apiData3                   = anApiData("serviceName3", "name3")
 
     val service = new SubscriptionService(ApmConnectorMock.aMock)
   }
@@ -49,12 +48,12 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
         ApiIdentifier(context3, ApiVersionNbr("3.0"))
       )
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
-        context1.value -> apiDefinition1,
-        context2.value -> apiDefinition2,
-        context4.value -> ApiDefinitionGK("serviceName4", "name4")
+        context1 -> apiData1,
+        context2 -> apiData2,
+        context4 -> anApiData("serviceName4", "name4")
       ))
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))
-      result shouldBe Set(apiDefinition1, apiDefinition2)
+      result shouldBe Set(apiData1, apiData2)
     }
 
     "return empty set if no application is found" in new Setup {
