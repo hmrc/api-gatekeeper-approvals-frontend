@@ -24,6 +24,8 @@ import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -64,13 +66,13 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
-    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", "bob@example.com")
+    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(
       access = Standard(
         List.empty,
         Some(SellResellOrDistribute("Yes")),
-        Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))
+        Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
       state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
     )

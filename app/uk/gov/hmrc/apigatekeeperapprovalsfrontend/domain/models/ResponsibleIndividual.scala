@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-final case class ResponsibleIndividual(fullName: String, emailAddress: String)
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+
+final case class ResponsibleIndividual(fullName: String, emailAddress: LaxEmailAddress)
 
 object ResponsibleIndividual {
   import play.api.libs.json.{Format, Json}

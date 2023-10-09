@@ -20,6 +20,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocation, PrivacyPolicyLocations, TermsAndConditionsLocation, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
@@ -42,19 +44,19 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    val responsibleIndividual = ResponsibleIndividual("Bob Example", "bob@example.com")
+    val responsibleIndividual = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(access =
       Standard(
         List.empty,
         Some(SellResellOrDistribute("Yes")),
-        Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocation.InDesktopSoftware, PrivacyPolicyLocation.InDesktopSoftware, List.empty))
+        Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       )
     )
 
     def appWithData(
-        privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocation.InDesktopSoftware,
-        termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocation.InDesktopSoftware
+        privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocations.InDesktopSoftware,
+        termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocations.InDesktopSoftware
       ) = {
       anApplication(applicationId).copy(access =
         Standard(
@@ -81,7 +83,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     "return 200 for both privacy policy and t&c with URLs" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl"), TermsAndConditionsLocation.Url("aurl")))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocations.Url("aurl"), TermsAndConditionsLocations.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)
@@ -91,7 +93,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     "return 200 for only privacy policy in desktop" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl")))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocations.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)
@@ -101,7 +103,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     "return 200 for only terms and conditions in desktop" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocation.Url("aurl")))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocations.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)
@@ -111,7 +113,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     "return 200 for both being NoneProvided" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.NoneProvided, TermsAndConditionsLocation.NoneProvided))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocations.NoneProvided, TermsAndConditionsLocations.NoneProvided))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.checkUrlsPage(applicationId)(fakeRequest)

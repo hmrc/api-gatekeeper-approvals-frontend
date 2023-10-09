@@ -19,10 +19,12 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiData
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApiDefinition, Application, ApplicationId, ApplicationWithSubscriptionData}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationWithSubscriptionData}
 
 object ApmConnector {
   case class Config(serviceBaseUrl: String)
@@ -45,15 +47,15 @@ class ApmConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Option[Application]](s"$serviceBaseUrl/applications/${id.value}/linked-subordinate")
+      httpClient.GET[Option[Application]](s"$serviceBaseUrl/applications/${id}/linked-subordinate")
     }
   }
 
-  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Map[String, ApiDefinition]] = {
+  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[ApiData.ApiDefinitionMap] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Map[String, ApiDefinition]](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.value))
+      httpClient.GET[ApiData.ApiDefinitionMap](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.toString()))
     }
   }
 
@@ -61,7 +63,7 @@ class ApmConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Option[ApplicationWithSubscriptionData]](s"$serviceBaseUrl/applications/${id.value}")
+      httpClient.GET[Option[ApplicationWithSubscriptionData]](s"$serviceBaseUrl/applications/${id}")
     }
   }
 }

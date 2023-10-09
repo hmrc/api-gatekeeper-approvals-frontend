@@ -21,7 +21,7 @@ import play.api.http.Status._
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,7 +43,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
       .in(Mode.Test)
       .build()
 
-  private val applicationId = ApplicationId("applicationId")
+  private val applicationId = ApplicationId.random
 
   trait Setup extends ApplicationTestData {
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]

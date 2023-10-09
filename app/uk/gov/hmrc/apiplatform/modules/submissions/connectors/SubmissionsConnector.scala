@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.libs.json.Json
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services._
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -63,19 +64,19 @@ class SubmissionsConnector @Inject() (
 
   def fetchLatestSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = {
     metrics.record(api) {
-      http.GET[Option[Submission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}")
+      http.GET[Option[Submission]](s"$serviceBaseUrl/submissions/application/${applicationId}")
     }
   }
 
   def fetchLatestExtenedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
     metrics.record(api) {
-      http.GET[Option[ExtendedSubmission]](s"$serviceBaseUrl/submissions/application/${applicationId.value}/extended")
+      http.GET[Option[ExtendedSubmission]](s"$serviceBaseUrl/submissions/application/${applicationId}/extended")
     }
   }
 
   def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
-    val url = s"$serviceBaseUrl/submissions/marked/application/${id.value}"
+    val url = s"$serviceBaseUrl/submissions/marked/application/${id}"
 
     metrics.record(api) {
       http.GET[Option[MarkedSubmission]](url)
@@ -84,10 +85,10 @@ class SubmissionsConnector @Inject() (
 
   def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId}: ${err}"
 
     metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant", GrantedRequest(requestedBy, None))
+      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId}/grant", GrantedRequest(requestedBy, None))
         .map(_.leftMap(failed(_)))
     }
   }
@@ -100,11 +101,11 @@ class SubmissionsConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](
-        s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant",
+        s"$serviceBaseUrl/approvals/application/${applicationId}/grant",
         GrantedRequest(requestedBy, warnings.some, escalatedTo)
       )
         .map(_.leftMap(failed(_)))
@@ -112,10 +113,10 @@ class SubmissionsConnector @Inject() (
   }
 
   def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
-    val failed = (err: UpstreamErrorResponse) => s"Failed to invite for terms of use for application with id ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to invite for terms of use for application with id ${applicationId}: ${err}"
 
     metrics.record(api) {
-      http.POSTEmpty[ErrorOrUnit](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
+      http.POSTEmpty[ErrorOrUnit](s"$serviceBaseUrl/terms-of-use/application/${applicationId}")
         .map {
           case Right(_)  => Right(TermsOfUseInvitationSuccessful)
           case Left(err) => Left(failed(err))
@@ -125,7 +126,7 @@ class SubmissionsConnector @Inject() (
 
   def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[TermsOfUseInvitation]] = {
     metrics.record(api) {
-      http.GET[Option[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use/application/${applicationId.value}")
+      http.GET[Option[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use/application/${applicationId}")
     }
   }
 
@@ -142,11 +143,11 @@ class SubmissionsConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant with warnings application ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant with warnings application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
-        s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant-with-warn-tou",
+        s"$serviceBaseUrl/approvals/application/${applicationId}/grant-with-warn-tou",
         TouUpliftRequest(requestedBy, warnings)
       )
         .map(_.leftMap(failed(_)))
@@ -161,11 +162,11 @@ class SubmissionsConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.POST[TouGrantedRequest, Either[UpstreamErrorResponse, Application]](
-        s"$serviceBaseUrl/approvals/application/${applicationId.value}/grant-tou",
+        s"$serviceBaseUrl/approvals/application/${applicationId}/grant-tou",
         TouGrantedRequest(requestedBy, reasons, escalatedTo)
       )
         .map(_.leftMap(failed(_)))
@@ -179,11 +180,11 @@ class SubmissionsConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, Application]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId.value}: ${err}"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
-        s"$serviceBaseUrl/approvals/application/${applicationId.value}/decline-tou",
+        s"$serviceBaseUrl/approvals/application/${applicationId}/decline-tou",
         TouUpliftRequest(requestedBy, reasons)
       )
         .map(_.leftMap(failed(_)))

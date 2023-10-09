@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{MessagesControllerComponents, _}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
@@ -29,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{ApplicationId, State}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.State
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 
@@ -48,7 +49,7 @@ object ApplicationSubmissionsController {
       currentSubmission: Option[CurrentSubmittedInstanceDetails],
       declinedInstances: List[DeclinedInstanceDetails],
       grantedInstance: Option[GrantedInstanceDetails],
-      responsibleIndividualEmail: Option[String],
+      responsibleIndividualEmail: Option[LaxEmailAddress],
       pendingResponsibleIndividualVerification: Boolean,
       isDeleted: Boolean
     )

@@ -24,9 +24,9 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
@@ -61,7 +61,7 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
     "call the correct endpoint for fetchSubscribableApisForApplication" in new Setup {
       connector.fetchSubscribableApisForApplication(appId)
-      assertHttpClientWasCalledWithUrl(s"$urlBase/api-definitions", Seq("applicationId" -> appId.value))
+      assertHttpClientWasCalledWithUrl(s"$urlBase/api-definitions", Seq("applicationId" -> appId.toString()))
     }
 
     "call the correct endpoint for fetchApplicationWithSubscriptionData" in new Setup {

@@ -20,17 +20,20 @@ import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult, _}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ThirdPartyApplicationConnector}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationId, ApplicationUpdateSuccessful, DeclineApplicationApprovalRequest}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ApplicationCommandConnector, ThirdPartyApplicationConnector}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
 class ApplicationService @Inject() (
     thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
-    apmConnector: ApmConnector
+    apmConnector: ApmConnector,
+    applicationCommandConnector: ApplicationCommandConnector
   )(implicit val ec: ExecutionContext
-  ) {
+  ) extends CommandHandlerTypes[DispatchSuccessResult] {
 
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
@@ -40,8 +43,14 @@ class ApplicationService @Inject() (
     apmConnector.fetchLinkedSubordinateApplicationById(applicationId)
   }
 
-  def declineApplicationApprovalRequest(applicationId: ApplicationId, requestedBy: String, reasons: String)(implicit hc: HeaderCarrier): Future[ApplicationUpdateSuccessful] = {
-    val request = DeclineApplicationApprovalRequest(requestedBy, reasons, LocalDateTime.now)
-    thirdPartyApplicationConnector.applicationUpdate(applicationId, request)
+  def declineApplicationApprovalRequest(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      reasons: String,
+      adminsToEmail: Set[LaxEmailAddress]
+    )(implicit hc: HeaderCarrier
+    ): AppCmdResult = {
+    val request = ApplicationCommands.DeclineApplicationApprovalRequest(requestedBy, reasons, LocalDateTime.now)
+    applicationCommandConnector.dispatch(applicationId, request, adminsToEmail)
   }
 }

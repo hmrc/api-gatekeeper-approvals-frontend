@@ -19,11 +19,11 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 import scala.concurrent.Future
 
 import play.api.mvc._
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationId
 
 trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>

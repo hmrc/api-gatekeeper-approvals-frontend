@@ -92,10 +92,10 @@
           <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.requesteddate")}</dt>
           <dd id="requestedTimestamp" class="govuk-summary-list__value"><p class="govuk-body">@{model.currentSubmission.get.timestamp}</p></dd>
         </div>
-        @if(model.responsibleIndividualEmail.nonEmpty) {
+        @if(model.responsibleIndividualEmail.isDefined) {
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@{messages("applicationsubmissions.responsibleindividualemail")}</dt>
-            <dd id="responsibleIndividualEmail" class="govuk-summary-list__value"><p class="govuk-body">@{model.responsibleIndividualEmail.get}</p></dd>
+            <dd id="responsibleIndividualEmail" class="govuk-summary-list__value"><p class="govuk-body">@{model.responsibleIndividualEmail.get.text}</p></dd>
           </div>
         }
       </dl>

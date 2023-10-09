@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
+package uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models
 
-import scala.util.Random
+import play.api.libs.json.Json
 
-case class ClientId(value: String) extends AnyVal
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
-object ClientId {
-  import play.api.libs.json.Json
+case class DispatchSuccessResult(applicationResponse: Application)
 
-  def random: ClientId = ClientId(Random.alphanumeric.take(28).mkString) // scalastyle:ignore
+object DispatchSuccessResult {
 
-  implicit val JsonFormat = Json.valueFormat[ClientId]
+  implicit val format = Json.format[DispatchSuccessResult]
 }

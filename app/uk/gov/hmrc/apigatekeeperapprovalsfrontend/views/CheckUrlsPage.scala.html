@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckUrlsController._
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{TermsAndConditionsLocation, PrivacyPolicyLocation}
+@import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
@@ -64,9 +64,9 @@
         <td class="govuk-table__cell">
           @{
             model.privacyPolicyLocation match {
-              case PrivacyPolicyLocation.Url(value)        => <a href={value} target="_blank">{value}</a>
-              case PrivacyPolicyLocation.InDesktopSoftware => {messages("checkurls.indesktop")}
-              case PrivacyPolicyLocation.NoneProvided      => {messages("checkurls.nourl")}
+              case PrivacyPolicyLocations.Url(value)        => <a href={value} target="_blank">{value}</a>
+              case PrivacyPolicyLocations.InDesktopSoftware => {messages("checkurls.indesktop")}
+              case PrivacyPolicyLocations.NoneProvided      => {messages("checkurls.nourl")}
             }
           }
         </td>
@@ -78,9 +78,9 @@
         <td class="govuk-table__cell">
           @{
             model.termsAndConditionsLocation match {
-              case TermsAndConditionsLocation.Url(value)        => <a href={value} target="_blank">{value}</a>
-              case TermsAndConditionsLocation.InDesktopSoftware => {messages("checkurls.indesktop")}
-              case TermsAndConditionsLocation.NoneProvided      => {messages("checkurls.nourl")}
+              case TermsAndConditionsLocations.Url(value)        => <a href={value} target="_blank">{value}</a>
+              case TermsAndConditionsLocations.InDesktopSoftware => {messages("checkurls.indesktop")}
+              case TermsAndConditionsLocations.NoneProvided      => {messages("checkurls.nourl")}
             }
           }
         </td>
@@ -90,9 +90,9 @@
 
   @{
     (model.privacyPolicyLocation, model.termsAndConditionsLocation) match {
-      case (PrivacyPolicyLocation.InDesktopSoftware, TermsAndConditionsLocation.InDesktopSoftware) => {contactRequester("checkurls.contactrequester.both")}
-      case (PrivacyPolicyLocation.InDesktopSoftware, _)                                            => {contactRequester("checkurls.contactrequester.privacypolicy")}
-      case (_, TermsAndConditionsLocation.InDesktopSoftware)                                       => {contactRequester("checkurls.contactrequester.termsandconditions")}
+      case (PrivacyPolicyLocations.InDesktopSoftware, TermsAndConditionsLocations.InDesktopSoftware) => {contactRequester("checkurls.contactrequester.both")}
+      case (PrivacyPolicyLocations.InDesktopSoftware, _)                                            => {contactRequester("checkurls.contactrequester.privacypolicy")}
+      case (_, TermsAndConditionsLocations.InDesktopSoftware)                                       => {contactRequester("checkurls.contactrequester.termsandconditions")}
       case _  => 
     }
   }
