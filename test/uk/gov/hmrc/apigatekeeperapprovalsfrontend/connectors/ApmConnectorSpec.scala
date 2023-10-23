@@ -18,12 +18,14 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future.successful
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.MappedApiDefinitions
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -60,6 +62,7 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
     }
 
     "call the correct endpoint for fetchSubscribableApisForApplication" in new Setup {
+      when(httpClient.GET[MappedApiDefinitions](*, *, *)(*, *, *)).thenReturn(successful(MappedApiDefinitions(Map())))
       connector.fetchSubscribableApisForApplication(appId)
       assertHttpClientWasCalledWithUrl(s"$urlBase/api-definitions", Seq("applicationId" -> appId.toString()))
     }

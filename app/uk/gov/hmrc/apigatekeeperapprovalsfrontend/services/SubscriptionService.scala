@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.OptionT
 
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiData
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,13 +34,13 @@ class SubscriptionService @Inject() (
   )(implicit val ec: ExecutionContext
   ) {
 
-  def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiData]] = {
+  def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinition]] = {
     (
       for {
         applicationWithSubscriptions <- OptionT(apmConnector.fetchApplicationWithSubscriptionData(applicationId))
         subscribableApis             <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
-        applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.get(apiDefinition.context))
+        applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.find(_.context == apiDefinition.context))
       } yield applicationSubscriptions
-    ).getOrElseF(successful(Set[ApiData]()))
+    ).getOrElseF(successful(Set[ApiDefinition]()))
   }
 }

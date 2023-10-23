@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiData
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.http.metrics.common.API
@@ -47,15 +47,16 @@ class ApmConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Option[Application]](s"$serviceBaseUrl/applications/${id}/linked-subordinate")
+      httpClient.GET[Option[Application]](s"$serviceBaseUrl/applications/$id/linked-subordinate")
     }
   }
 
-  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[ApiData.ApiDefinitionMap] = {
+  def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[List[ApiDefinition]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[ApiData.ApiDefinitionMap](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.toString()))
+      httpClient.GET[MappedApiDefinitions](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.toString()))
+        .map(_.wrapped.values.toList)
     }
   }
 
@@ -63,7 +64,7 @@ class ApmConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Option[ApplicationWithSubscriptionData]](s"$serviceBaseUrl/applications/${id}")
+      httpClient.GET[Option[ApplicationWithSubscriptionData]](s"$serviceBaseUrl/applications/$id")
     }
   }
 }
