@@ -41,6 +41,6 @@ class SubscriptionService @Inject() (
         subscribableApis             <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
         applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.find(_.context == apiDefinition.context))
       } yield applicationSubscriptions
-    ).getOrElseF(successful(Set[ApiDefinition]()))
+    ).getOrElseF(successful(Set.empty))
   }
 }
