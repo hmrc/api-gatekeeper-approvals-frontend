@@ -23,28 +23,29 @@ trait ApiDataTestData {
 
   def anApiData(
       serviceName: String,
-      name: String
-    ) = ApiData(
+      name: String,
+      context: String
+    ) = ApiDefinition(
     ServiceName(serviceName),
-    s"https://${serviceName}.protected.mdtp",
+    serviceBaseUrl = s"https://$serviceName.protected.mdtp",
     name,
-    name,
-    ApiContext(serviceName),
+    description = name,
+    ApiContext(context),
     Map(
       ApiVersionNbr("1.0") ->
         ApiVersion(
           ApiVersionNbr("1.0"),
           ApiStatus.STABLE,
           ApiAccess.PUBLIC,
-          List(Endpoint("/sa/{utr}/status", s"Get ${serviceName}", HttpMethod.GET, AuthType.USER)),
-          true,
+          List(Endpoint("/sa/{utr}/status", s"Get $serviceName", HttpMethod.GET, AuthType.USER)),
+          endpointsEnabled = true,
           None,
           ApiVersionSource.OAS
         )
     ),
-    false,
-    false,
-    None,
+    requiresTrust = false,
+    isTestSupport = false,
+    lastPublishedAt = None,
     List(
       ApiCategory.SELF_ASSESSMENT
     )

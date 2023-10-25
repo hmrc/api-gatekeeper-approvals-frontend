@@ -33,9 +33,9 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
     val context2                   = ApiContext("context2")
     val context3                   = ApiContext("context3")
     val context4                   = ApiContext("context4")
-    val apiData1                   = anApiData("serviceName1", "name1")
-    val apiData2                   = anApiData("serviceName2", "name2")
-    val apiData3                   = anApiData("serviceName3", "name3")
+    val apiData1                   = anApiData("serviceName1", "name1", context1.value)
+    val apiData2                   = anApiData("serviceName2", "name2", context2.value)
+    val apiData3                   = anApiData("serviceName3", "name3", context3.value)
 
     val service = new SubscriptionService(ApmConnectorMock.aMock)
   }
@@ -47,10 +47,10 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec {
         ApiIdentifier(context2, ApiVersionNbr("2.0")),
         ApiIdentifier(context3, ApiVersionNbr("3.0"))
       )
-      ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(Map(
-        context1 -> apiData1,
-        context2 -> apiData2,
-        context4 -> anApiData("serviceName4", "name4")
+      ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(List(
+        apiData1,
+        apiData2,
+        anApiData("serviceName4", "name4", "context4")
       ))
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))
       result shouldBe Set(apiData1, apiData2)
