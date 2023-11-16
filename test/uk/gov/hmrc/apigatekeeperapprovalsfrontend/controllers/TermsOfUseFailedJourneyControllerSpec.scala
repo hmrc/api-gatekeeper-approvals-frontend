@@ -153,6 +153,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.emailAddressesPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
+      contentAsString(result) shouldNot include("LaxEmailAddress")
     }
   }
 

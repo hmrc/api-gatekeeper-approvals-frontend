@@ -29,7 +29,7 @@
   <label class="govuk-label govuk-label--l" for="more-detail">
     @{messages("termsofuseadmins.title")}
   </label>
-  @defining(model.adminsToEmail.map(_.emailAddress).mkString("; ")) { emails =>
+  @defining(model.adminsToEmail.map(_.emailAddress.text).mkString("; ")) { emails =>
     <div class="govuk-button-group">
       <span id="emails-to-copy" class="govuk-visually-hidden" aria-hidden="true">@emails</span>
       <button id="admin-emails" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-4" data-module="govuk-button">
@@ -40,7 +40,7 @@
 
   <ul class="govuk-list">
     @for(collaborator <- model.adminsToEmail) {
-      <li>@{collaborator.emailAddress}</li>
+      <li>@{collaborator.emailAddress.text}</li>
     }
   </ul>
 
