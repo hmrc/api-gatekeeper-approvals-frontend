@@ -119,6 +119,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       val result = controller.emailAddressesPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
+      contentAsString(result) shouldNot include("LaxEmailAddress")
     }
 
     "return 404 when no marked submission is found" in new Setup {
