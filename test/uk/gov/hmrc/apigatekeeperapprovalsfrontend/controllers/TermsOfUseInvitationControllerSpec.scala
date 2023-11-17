@@ -49,44 +49,7 @@ class TermsOfUseInvitationControllerSpec
   "GET /" should {
     "return Ok (200) for Stride users with an application and a submission" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
-      ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
-      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
-
-      val result = controller.page()(fakeRequest)
-
-      status(result) shouldBe OK
-    }
-
-    "return Ok (200) for Stride users with an application but no submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
-      ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
-
-      val result = controller.page()(fakeRequest)
-
-      status(result) shouldBe OK
-    }
-
-    "return Ok (200) for LDAP users with an application and a submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.succeeds
-      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
-      ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
-      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
-
-      val result = controller.page()(fakeRequest)
-
-      status(result) shouldBe OK
-    }
-
-    "return Ok (200) for LDAP users with an application and no submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.succeeds
-      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
-      ApplicationServiceMock.FetchByApplicationId.thenReturn(applicationId)
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
+      SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
       val result = controller.page()(fakeRequest)
 
@@ -100,16 +63,6 @@ class TermsOfUseInvitationControllerSpec
       val result = controller.page()(fakeRequest)
 
       status(result) shouldBe UNAUTHORIZED
-    }
-
-    "return Ok (200) when no application found for application id in invitations" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.FetchTermsOfUseInvitations.thenReturn()
-      ApplicationServiceMock.FetchByApplicationId.thenNotFound()
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
-      val result = controller.page()(fakeRequest)
-
-      status(result) shouldBe OK
     }
   }
 }
