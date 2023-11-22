@@ -197,6 +197,9 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       def thenNotFound() = {
         when(aMock.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(List.empty))
       }
+
+      def verifyCalled(params: Seq[(String, String)]) =
+        verify(aMock).searchTermsOfUseInvitations(eqTo(params))(*)
     }
 
     object GrantWithWarningsOrDeclineForTouUplift {

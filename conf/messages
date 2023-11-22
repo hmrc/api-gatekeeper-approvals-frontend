@@ -225,6 +225,18 @@ sendnewtermsofuserequested.link = Back to
 
 termsofuse.pagetitle = HMRC API Gatekeeper - Terms of use
 termsofuse.title = Terms of use
+termsofuse.filterbystatus = Filter by status
+termsofuse.filter = Filter
+termsofuse.emailsent = Email sent
+termsofuse.warnings = Warnings
+termsofuse.termsofusev2withwarnings = Terms of use V2 with warnings
+termsofuse.overdue = Overdue
+termsofuse.failed = Failed
+termsofuse.termsofusev2 = Terms of use V2
+termsofuse.reminderemailsent = Reminder email sent
+termsofuse.application = Application
+termsofuse.statuslastupdated = Status last updated
+termsofuse.status = Status
 
 termsofusehistory.pagetitle = HMRC API Gatekeeper - Terms of use history
 termsofusehistory.title = Terms of use history

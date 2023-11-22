@@ -108,17 +108,16 @@ class TermsOfUseInvitationController @Inject() (
   }
 
   private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {
-    getQueryParamFromVar("EMAIL_SENT", form.emailSentStatus) ++ 
-      getQueryParamFromVar("WARNINGS", form.warningsStatus) ++
-      getQueryParamFromVar("TERMS_OF_USE_V2_WITH_WARNINGS", form.termsOfUseV2WithWarningsStatus) ++
-      getQueryParamFromVar("OVERDUE", form.overdueStatus) ++
-      getQueryParamFromVar("FAILED", form.failedStatus) ++
-      getQueryParamFromVar("TERMS_OF_USE_V2", form.termsOfUseV2Status) ++
-      getQueryParamFromVar("REMINDER_EMAIL_SENT", form.reminderEmailSentStatus)
-
+    getQueryParamFromStatusVar("EMAIL_SENT", form.emailSentStatus) ++ 
+      getQueryParamFromStatusVar("WARNINGS", form.warningsStatus) ++
+      getQueryParamFromStatusVar("TERMS_OF_USE_V2_WITH_WARNINGS", form.termsOfUseV2WithWarningsStatus) ++
+      getQueryParamFromStatusVar("OVERDUE", form.overdueStatus) ++
+      getQueryParamFromStatusVar("FAILED", form.failedStatus) ++
+      getQueryParamFromStatusVar("TERMS_OF_USE_V2", form.termsOfUseV2Status) ++
+      getQueryParamFromStatusVar("REMINDER_EMAIL_SENT", form.reminderEmailSentStatus)
   }
 
-  private def getQueryParamFromVar(key: String, value: Option[String]): Seq[(String, String)] = {
+  private def getQueryParamFromStatusVar(key: String, value: Option[String]): Seq[(String, String)] = {
     if (value == Some("true")) {
       Seq("status" -> key)
     } else {

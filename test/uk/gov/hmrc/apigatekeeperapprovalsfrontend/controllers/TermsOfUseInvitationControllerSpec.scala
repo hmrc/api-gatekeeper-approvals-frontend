@@ -47,13 +47,25 @@ class TermsOfUseInvitationControllerSpec
   }
 
   "GET /" should {
-    "return Ok (200) for Stride users with an application and a submission" in new Setup {
+    "return Ok (200) for Stride users" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
       val result = controller.page()(fakeRequest)
 
       status(result) shouldBe OK
+    }
+
+    "return Ok (200) for Stride users with passed in status filter" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
+
+      val request = fakeRequest.withCSRFToken.withFormUrlEncodedBody("emailSentStatus" -> "true", "overdueStatus" -> "true")
+
+      val result = controller.page()(request)
+
+      status(result) shouldBe OK
+      SubmissionServiceMock.SearchTermsOfUseInvitations.verifyCalled(Seq("status" -> "EMAIL_SENT", "status" -> "OVERDUE"))
     }
 
     "return Unauthorised (401) when user not logged in" in new Setup {
