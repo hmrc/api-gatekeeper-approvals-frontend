@@ -136,9 +136,9 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def searchTermsOfUseInvitations(params: Map[String, String])(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitationWithApplication]] = {
+  def searchTermsOfUseInvitations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitationWithApplication]] = {
     metrics.record(api) {
-      http.GET[List[TermsOfUseInvitationWithApplication]](s"$serviceBaseUrl/terms-of-use/search", params.toSeq)
+      http.GET[List[TermsOfUseInvitationWithApplication]](s"$serviceBaseUrl/terms-of-use/search", params)
     }
   }
 

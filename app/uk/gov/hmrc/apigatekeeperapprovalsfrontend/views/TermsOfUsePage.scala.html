@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseInvitationController.ViewModel
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseInvitationController.{ViewModel, FilterForm}
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.Breadcrumbs
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(viewModels: List[ViewModel])(implicit request: LoggedInRequest[_], messages: Messages)
+@(form: Form[FilterForm], viewModels: List[ViewModel])(implicit request: LoggedInRequest[_], messages: Messages)
 
 @buildStatus(status: String) = @{
   status match {
@@ -39,6 +39,109 @@
   <h1 class="govuk-heading-l">        
     @{messages("termsofuse.title")}
   </h1>
+
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page, Symbol("class") -> "form") {
+  @helper.CSRF.formField
+  
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-heading-m govuk-!-margin-bottom-1 govuk-!-font-weight-bold">
+        Filter by status
+      </legend>
+      <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+        <div class="govuk-grid-row">
+          @defining(if(form("emailSentStatus").value == Some("EMAIL_SENT")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="emailSentStatusFilter" 
+                  name="emailSentStatus" value="EMAIL_SENT" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="emailSentStatusFilter">
+                  Email sent
+                </label>
+              </div>
+            </div>
+          }
+          @defining(if(form("warningsStatus").value == Some("WARNINGS")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="warningsStatusFilter" 
+                  name="warningsStatus" value="WARNINGS" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="warningsStatusFilter">
+                  Warnings
+                </label>
+              </div>
+            </div>
+          }
+          @defining(if(form("termsOfUseV2WithWarningsStatus").value == Some("TERMS_OF_USE_V2_WITH_WARNINGS")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="termsOfUseV2WithWarningsStatusFilter" 
+                  name="termsOfUseV2WithWarningsStatus" value="TERMS_OF_USE_V2_WITH_WARNINGS" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="termsOfUseV2WithWarningsStatusFilter">
+                  Terms of Use V2 with warnings
+                </label>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="govuk-grid-row">
+          @defining(if(form("overdueStatus").value == Some("OVERDUE")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="overdueStatusFilter" 
+                  name="overdueStatus" value="OVERDUE" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="overdueStatusFilter">
+                  Overdue
+                </label>
+              </div>
+            </div>
+          }
+          @defining(if(form("failedStatus").value == Some("FAILED")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="failedStatusFilter" 
+                  name="failedStatus" value="FAILED" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="failedStatusFilter">
+                  Failed
+                </label>
+              </div>
+            </div>
+          }
+          @defining(if(form("termsOfUseV2Status").value == Some("TERMS_OF_USE_V2")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="termsOfUseV2StatusFilter" 
+                  name="termsOfUseV2Status" value="TERMS_OF_USE_V2" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="termsOfUseV2StatusFilter">
+                  Terms of Use V2
+                </label>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="govuk-grid-row">
+          @defining(if(form("reminderEmailSentStatus").value == Some("REMINDER_EMAIL_SENT")) """checked="checked"""" else "") { checked =>
+            <div class="govuk-grid-column-one-third">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" type="checkbox" id="reminderEmailSentStatusFilter" 
+                  name="reminderEmailSentStatus" value="REMINDER_EMAIL_SENT" @{checked}>
+                <label class="govuk-body-s govuk-checkboxes__label" for="reminderEmailSentStatusFilter">
+                  Reminder email sent
+                </label>
+              </div>
+            </div>
+          }
+        </div>  
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="govuk-form-group govuk-!-margin-bottom-0">
+    <button id="filterResults" class="govuk-button" type="submit">Filter</button>
+  </div>
+  }
+  
+  <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible">
 
   <div>
     <table class="govuk-table">

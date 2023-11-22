@@ -68,7 +68,7 @@ class SubmissionService @Inject() (
     submissionConnector.fetchTermsOfUseInvitations()
   }
 
-  def searchTermsOfUseInvitations(params: Map[String, String])(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitationWithApplication]] = {
+  def searchTermsOfUseInvitations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitationWithApplication]] = {
     submissionConnector.searchTermsOfUseInvitations(params)
   }
 
