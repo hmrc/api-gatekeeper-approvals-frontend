@@ -50,33 +50,33 @@
       </legend>
       <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
         <div class="govuk-grid-row">
-          @defining(if(form("emailSentStatus").value == Some("EMAIL_SENT")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("emailSentStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="emailSentStatusFilter" 
-                  name="emailSentStatus" value="EMAIL_SENT" @{checked}>
+                  name="emailSentStatus" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="emailSentStatusFilter">
                   Email sent
                 </label>
               </div>
             </div>
           }
-          @defining(if(form("warningsStatus").value == Some("WARNINGS")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("warningsStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="warningsStatusFilter" 
-                  name="warningsStatus" value="WARNINGS" @{checked}>
+                  name="warningsStatus" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="warningsStatusFilter">
                   Warnings
                 </label>
               </div>
             </div>
           }
-          @defining(if(form("termsOfUseV2WithWarningsStatus").value == Some("TERMS_OF_USE_V2_WITH_WARNINGS")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("termsOfUseV2WithWarningsStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="termsOfUseV2WithWarningsStatusFilter" 
-                  name="termsOfUseV2WithWarningsStatus" value="TERMS_OF_USE_V2_WITH_WARNINGS" @{checked}>
+                  name="termsOfUseV2WithWarningsStatus" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="termsOfUseV2WithWarningsStatusFilter">
                   Terms of Use V2 with warnings
                 </label>
@@ -85,33 +85,33 @@
           }
         </div>
         <div class="govuk-grid-row">
-          @defining(if(form("overdueStatus").value == Some("OVERDUE")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("overdueStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="overdueStatusFilter" 
-                  name="overdueStatus" value="OVERDUE" @{checked}>
+                  name="overdueStatus" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="overdueStatusFilter">
                   Overdue
                 </label>
               </div>
             </div>
           }
-          @defining(if(form("failedStatus").value == Some("FAILED")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("failedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="failedStatusFilter" 
-                  name="failedStatus" value="FAILED" @{checked}>
+                  name="failedStatus" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="failedStatusFilter">
                   Failed
                 </label>
               </div>
             </div>
           }
-          @defining(if(form("termsOfUseV2Status").value == Some("TERMS_OF_USE_V2")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("termsOfUseV2Status").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="termsOfUseV2StatusFilter" 
-                  name="termsOfUseV2Status" value="TERMS_OF_USE_V2" @{checked}>
+                  name="termsOfUseV2Status" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="termsOfUseV2StatusFilter">
                   Terms of Use V2
                 </label>
@@ -120,11 +120,11 @@
           }
         </div>
         <div class="govuk-grid-row">
-          @defining(if(form("reminderEmailSentStatus").value == Some("REMINDER_EMAIL_SENT")) """checked="checked"""" else "") { checked =>
+          @defining(if(form("reminderEmailSentStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
             <div class="govuk-grid-column-one-third">
               <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" type="checkbox" id="reminderEmailSentStatusFilter" 
-                  name="reminderEmailSentStatus" value="REMINDER_EMAIL_SENT" @{checked}>
+                  name="reminderEmailSentStatus" value="true" @{checked}>
                 <label class="govuk-body-s govuk-checkboxes__label" for="reminderEmailSentStatusFilter">
                   Reminder email sent
                 </label>
@@ -140,7 +140,7 @@
     <button id="filterResults" class="govuk-button" type="submit">Filter</button>
   </div>
   }
-  
+
   <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible">
 
   <div>

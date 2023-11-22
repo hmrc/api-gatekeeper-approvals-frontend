@@ -119,7 +119,7 @@ class TermsOfUseInvitationController @Inject() (
   }
 
   private def getQueryParamFromVar(key: String, value: Option[String]): Seq[(String, String)] = {
-    if (value == Some(key)) {
+    if (value == Some("true")) {
       Seq("status" -> key)
     } else {
       Seq.empty
