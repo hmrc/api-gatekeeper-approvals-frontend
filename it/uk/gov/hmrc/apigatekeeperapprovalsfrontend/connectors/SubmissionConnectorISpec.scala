@@ -31,7 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnect
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
 import uk.gov.hmrc.apiplatform.modules.submissions.ProgressTestDataHelper
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationWithApplication, TermsOfUseInvitationSuccessful}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
@@ -54,13 +54,14 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
-    val extSubmission  = aSubmission.withIncompleteProgress()
-    val markSubmission = markedSubmission
-    val requestedBy    = "bob@blockbusters.com"
-    val reason         = "reason"
-    val escalatedTo    = "Mr Edmund Blackadder"
-    val invitation     = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
-    implicit val hc    = HeaderCarrier()
+    val extSubmission     = aSubmission.withIncompleteProgress()
+    val markSubmission    = markedSubmission
+    val requestedBy       = "bob@blockbusters.com"
+    val reason            = "reason"
+    val escalatedTo       = "Mr Edmund Blackadder"
+    val invitation        = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
+    val invitationWithApp = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "Petes app")
+    implicit val hc       = HeaderCarrier()
   }
 
   "fetch latest submission by id" should {
@@ -204,6 +205,78 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.fetchTermsOfUseInvitation(applicationId))
 
       result shouldBe empty
+    }
+  }
+
+  "fetch terms of use invitations" should {
+    val url = "/terms-of-use"
+
+    "return an invitation" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(List(invitation))
+          )
+      )
+
+      val result = await(connector.fetchTermsOfUseInvitations())
+
+      result.size shouldBe 1
+      result.head.applicationId shouldBe invitation.applicationId
+    }
+
+    "return empty list if no invitations found" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(List[TermsOfUseInvitation]())
+          )
+      )
+
+      val result = await(connector.fetchTermsOfUseInvitations())
+
+      result.size shouldBe 0
+    }
+  }
+
+  "search terms of use invitations" should {
+    val url = "/terms-of-use/search?status=EMAIL_SENT"
+
+    "return an invitation" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+          .withQueryParam("status", equalTo("EMAIL_SENT"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(List(invitationWithApp))
+          )
+      )
+
+      val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EMAIL_SENT")))
+
+      result.size shouldBe 1
+      result.head.applicationId shouldBe invitation.applicationId
+    }
+
+    "return empty list if no invitations found" in new Setup {
+      stubFor(
+        get(urlEqualTo(url))
+          .withQueryParam("status", equalTo("EMAIL_SENT"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(List[TermsOfUseInvitationWithApplication]())
+          )
+      )
+
+      val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EMAIL_SENT")))
+
+      result.size shouldBe 0
     }
   }
 
