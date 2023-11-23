@@ -19,23 +19,46 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitation
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationWithApplication
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
 object TermsOfUseInvitationController {
   case class ViewModel(applicationId: ApplicationId, applicationName: String, lastUpdated: String, status: String)
+
+  case class FilterForm(
+      emailSentStatus: Option[String],
+      overdueStatus: Option[String],
+      reminderEmailSentStatus: Option[String],
+      warningsStatus: Option[String],
+      failedStatus: Option[String],
+      termsOfUseV2WithWarningsStatus: Option[String],
+      termsOfUseV2Status: Option[String]
+    )
+
+  val filterForm: Form[FilterForm] = Form(
+    mapping(
+      "emailSentStatus"                -> optional(text),
+      "overdueStatus"                  -> optional(text),
+      "reminderEmailSentStatus"        -> optional(text),
+      "warningsStatus"                 -> optional(text),
+      "failedStatus"                   -> optional(text),
+      "termsOfUseV2WithWarningsStatus" -> optional(text),
+      "termsOfUseV2Status"             -> optional(text)
+    )(FilterForm.apply)(FilterForm.unapply)
+  )
 }
 
 @Singleton
@@ -50,35 +73,54 @@ class TermsOfUseInvitationController @Inject() (
     applicationService: ApplicationService
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
-  import TermsOfUseInvitationController.ViewModel
+  import TermsOfUseInvitationController._
 
   def page = loggedInOnly() { implicit request =>
-    def getApplication(applicationId: ApplicationId): Future[Option[Application]] = {
-      applicationService.fetchByApplicationId(applicationId)
+    def buildViewModel(invite: TermsOfUseInvitationWithApplication): ViewModel = {
+      ViewModel(
+        invite.applicationId,
+        invite.applicationName,
+        DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.lastUpdated),
+        invite.status.toString()
+      )
     }
 
-    def buildViewModel(invite: TermsOfUseInvitation, application: Option[Application]): Option[ViewModel] = {
-      application match {
-        case Some(app) => {
-          Some(ViewModel(
-            app.id,
-            app.name,
-            DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.lastUpdated),
-            invite.status.toString()
-          ))
-        }
-        case None      => {
-          logger.info(s"Found no application for application with id ${invite.applicationId.value} when building terms of use invitation view model")
-          None
-        }
-      }
+    def handleValidForm(form: FilterForm) = {
+      val params: Seq[(String, String)] = getQueryParamsFromForm(form)
+      val queryForm                     = filterForm.fill(form)
+
+      for {
+        invites   <- submissionService.searchTermsOfUseInvitations(params)
+        viewModels = invites.map(invite => buildViewModel(invite))
+      } yield Ok(termsOfUsePage(queryForm, viewModels))
     }
 
-    for {
-      invites       <- submissionService.fetchTermsOfUseInvitations()
-      applications  <- Future.sequence(invites.map(invite => getApplication(invite.applicationId))).map(_.flatten)
-      applicationMap = applications.map(app => (app.id -> app)).toMap
-      viewModels     = invites.map(invite => buildViewModel(invite, applicationMap.get(invite.applicationId))).flatten
-    } yield Ok(termsOfUsePage(viewModels))
+    def handleInvalidForm(form: Form[FilterForm]) = {
+
+      for {
+        invites   <- submissionService.searchTermsOfUseInvitations(Seq.empty)
+        viewModels = invites.map(invite => buildViewModel(invite))
+      } yield Ok(termsOfUsePage(form, viewModels))
+    }
+
+    TermsOfUseInvitationController.filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+  }
+
+  private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {
+    getQueryParamFromStatusVar("EMAIL_SENT", form.emailSentStatus) ++
+      getQueryParamFromStatusVar("WARNINGS", form.warningsStatus) ++
+      getQueryParamFromStatusVar("TERMS_OF_USE_V2_WITH_WARNINGS", form.termsOfUseV2WithWarningsStatus) ++
+      getQueryParamFromStatusVar("OVERDUE", form.overdueStatus) ++
+      getQueryParamFromStatusVar("FAILED", form.failedStatus) ++
+      getQueryParamFromStatusVar("TERMS_OF_USE_V2", form.termsOfUseV2Status) ++
+      getQueryParamFromStatusVar("REMINDER_EMAIL_SENT", form.reminderEmailSentStatus)
+  }
+
+  private def getQueryParamFromStatusVar(key: String, value: Option[String]): Seq[(String, String)] = {
+    if (value == Some("true")) {
+      Seq("status" -> key)
+    } else {
+      Seq.empty
+    }
   }
 }

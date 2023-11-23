@@ -183,8 +183,23 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenNotFound() = {
-        when(aMock.fetchTermsOfUseInvitation(*[ApplicationId])(*)).thenReturn(successful(None))
+        when(aMock.fetchTermsOfUseInvitations()(*)).thenReturn(successful(List.empty))
       }
+    }
+
+    object SearchTermsOfUseInvitations {
+
+      def thenReturn() = {
+        val response = List(TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "app name"))
+        when(aMock.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(response))
+      }
+
+      def thenNotFound() = {
+        when(aMock.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(List.empty))
+      }
+
+      def verifyCalled(params: Seq[(String, String)]) =
+        verify(aMock).searchTermsOfUseInvitations(eqTo(params))(*)
     }
 
     object GrantWithWarningsOrDeclineForTouUplift {

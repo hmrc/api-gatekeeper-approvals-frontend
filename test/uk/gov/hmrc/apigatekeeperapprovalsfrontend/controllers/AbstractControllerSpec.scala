@@ -21,6 +21,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
+import uk.gov.hmrc.apiplatform.modules.applications.domain.models.Collaborator
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ClientId, LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
@@ -30,7 +31,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{SellResellOrDistribute, Standard}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
-import uk.gov.hmrc.apiplatform.modules.applications.domain.models.Collaborator
 
 class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
 
@@ -54,7 +54,8 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     val mcc              = app.injector.instanceOf[MessagesControllerComponents]
     val errorHandler     = app.injector.instanceOf[ErrorHandler]
 
-    val application = anApplication(applicationId, ClientId.random, "app name", Set(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random)))
+    val application =
+      anApplication(applicationId, ClientId.random, "app name", Set(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random)))
 
     val inHouseApplication = application.copy(
       access = application.access match {

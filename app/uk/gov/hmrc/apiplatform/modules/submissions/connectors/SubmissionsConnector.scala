@@ -130,9 +130,15 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier) = {
+  def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitation]] = {
     metrics.record(api) {
       http.GET[List[TermsOfUseInvitation]](s"$serviceBaseUrl/terms-of-use")
+    }
+  }
+
+  def searchTermsOfUseInvitations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitationWithApplication]] = {
+    metrics.record(api) {
+      http.GET[List[TermsOfUseInvitationWithApplication]](s"$serviceBaseUrl/terms-of-use/search", params)
     }
   }
 

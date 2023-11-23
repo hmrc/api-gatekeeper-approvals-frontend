@@ -56,16 +56,20 @@ class SubmissionService @Inject() (
     } yield app
   }
 
-  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier) = {
+  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
     submissionConnector.termsOfUseInvite(applicationId)
   }
 
-  def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier) = {
+  def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[TermsOfUseInvitation]] = {
     submissionConnector.fetchTermsOfUseInvitation(applicationId)
   }
 
-  def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier) = {
+  def fetchTermsOfUseInvitations()(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitation]] = {
     submissionConnector.fetchTermsOfUseInvitations()
+  }
+
+  def searchTermsOfUseInvitations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[TermsOfUseInvitationWithApplication]] = {
+    submissionConnector.searchTermsOfUseInvitations(params)
   }
 
   def grantWithWarningsOrDeclineForTouUplift(
