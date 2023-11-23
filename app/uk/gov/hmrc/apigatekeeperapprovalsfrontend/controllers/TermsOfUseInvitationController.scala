@@ -23,7 +23,6 @@ import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
 import play.api.data.Forms._
-
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
@@ -40,24 +39,24 @@ object TermsOfUseInvitationController {
   case class ViewModel(applicationId: ApplicationId, applicationName: String, lastUpdated: String, status: String)
 
   case class FilterForm(
-    emailSentStatus: Option[String], 
-    overdueStatus: Option[String], 
-    reminderEmailSentStatus: Option[String],
-    warningsStatus: Option[String],
-    failedStatus: Option[String],
-    termsOfUseV2WithWarningsStatus: Option[String],
-    termsOfUseV2Status: Option[String]
-  )
+      emailSentStatus: Option[String],
+      overdueStatus: Option[String],
+      reminderEmailSentStatus: Option[String],
+      warningsStatus: Option[String],
+      failedStatus: Option[String],
+      termsOfUseV2WithWarningsStatus: Option[String],
+      termsOfUseV2Status: Option[String]
+    )
 
   val filterForm: Form[FilterForm] = Form(
     mapping(
-      "emailSentStatus" -> optional(text),
-      "overdueStatus" -> optional(text),
-      "reminderEmailSentStatus" -> optional(text),
-      "warningsStatus" -> optional(text),
-      "failedStatus" -> optional(text),
+      "emailSentStatus"                -> optional(text),
+      "overdueStatus"                  -> optional(text),
+      "reminderEmailSentStatus"        -> optional(text),
+      "warningsStatus"                 -> optional(text),
+      "failedStatus"                   -> optional(text),
       "termsOfUseV2WithWarningsStatus" -> optional(text),
-      "termsOfUseV2Status" -> optional(text)
+      "termsOfUseV2Status"             -> optional(text)
     )(FilterForm.apply)(FilterForm.unapply)
   )
 }
@@ -88,19 +87,19 @@ class TermsOfUseInvitationController @Inject() (
 
     def handleValidForm(form: FilterForm) = {
       val params: Seq[(String, String)] = getQueryParamsFromForm(form)
-      val queryForm = filterForm.fill(form)
+      val queryForm                     = filterForm.fill(form)
 
       for {
-        invites    <- submissionService.searchTermsOfUseInvitations(params)
-        viewModels  = invites.map(invite => buildViewModel(invite))
+        invites   <- submissionService.searchTermsOfUseInvitations(params)
+        viewModels = invites.map(invite => buildViewModel(invite))
       } yield Ok(termsOfUsePage(queryForm, viewModels))
     }
 
     def handleInvalidForm(form: Form[FilterForm]) = {
 
       for {
-        invites    <- submissionService.searchTermsOfUseInvitations(Seq.empty)
-        viewModels  = invites.map(invite => buildViewModel(invite))
+        invites   <- submissionService.searchTermsOfUseInvitations(Seq.empty)
+        viewModels = invites.map(invite => buildViewModel(invite))
       } yield Ok(termsOfUsePage(form, viewModels))
     }
 
@@ -108,7 +107,7 @@ class TermsOfUseInvitationController @Inject() (
   }
 
   private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {
-    getQueryParamFromStatusVar("EMAIL_SENT", form.emailSentStatus) ++ 
+    getQueryParamFromStatusVar("EMAIL_SENT", form.emailSentStatus) ++
       getQueryParamFromStatusVar("WARNINGS", form.warningsStatus) ++
       getQueryParamFromStatusVar("TERMS_OF_USE_V2_WITH_WARNINGS", form.termsOfUseV2WithWarningsStatus) ++
       getQueryParamFromStatusVar("OVERDUE", form.overdueStatus) ++
