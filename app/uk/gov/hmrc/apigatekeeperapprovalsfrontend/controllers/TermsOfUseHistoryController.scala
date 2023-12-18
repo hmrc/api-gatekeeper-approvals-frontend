@@ -43,7 +43,8 @@ object TermsOfUseHistoryController {
       applicationName: String,
       historyEntries: List[TermsOfUseHistory],
       applicationDetailsUrl: String,
-      isInHouseSoftware: Boolean
+      isInHouseSoftware: Boolean,
+      dueDate: String
     )
 
   case class TermsOfUseHistory(
@@ -234,7 +235,8 @@ class TermsOfUseHistoryController @Inject() (
             application.name,
             buildHistoryFromSubmissionAndInvitation(sub, invite).sortBy(_.dateAsString).reverse,
             gatekeeperApplicationUrl,
-            isInHouseSoftware(sub)
+            isInHouseSoftware(sub),
+            DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.dueBy)
           )
         }
         case None      => {
@@ -243,7 +245,8 @@ class TermsOfUseHistoryController @Inject() (
             application.name,
             buildHistoryFromInvitation(invite).sortBy(_.dateAsString).reverse,
             gatekeeperApplicationUrl,
-            false
+            false,
+            DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.dueBy)
           )
         }
       }
