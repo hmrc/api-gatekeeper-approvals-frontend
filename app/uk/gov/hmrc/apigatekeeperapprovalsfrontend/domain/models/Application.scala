@@ -16,41 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.time.{Clock, LocalDateTime}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models._
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{Collaborator, State}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, Collaborator, State}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ImportantSubmissionData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
-
-case class ApplicationState(
-    name: State,
-    requestedByEmailAddress: Option[String] = None,
-    verificationCode: Option[String] = None,
-    updatedOn: Instant = Instant.now
-  )
-
-object ApplicationState {
-  import play.api.libs.json.Format
-  import play.api.libs.json.Json
-  import uk.gov.hmrc.apiplatform.modules.common.domain.services.InstantJsonFormatter.WithTimeZone._
-
-  implicit val format: Format[ApplicationState] = Json.format[ApplicationState]
-
-  val testing = ApplicationState(State.TESTING, None)
-
-  def pendingGatekeeperApproval(requestedBy: String) =
-    ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, Some(requestedBy))
-
-  def pendingRequesterVerification(requestedBy: String, verificationCode: String) =
-    ApplicationState(State.PENDING_REQUESTER_VERIFICATION, Some(requestedBy), Some(verificationCode))
-
-  def production(requestedBy: String, verificationCode: String) =
-    ApplicationState(State.PRODUCTION, Some(requestedBy), Some(verificationCode))
-
-  def deleted(requestedBy: String) =
-    ApplicationState(State.DELETED, Some(requestedBy))
-}
 
 case class Application(
     id: ApplicationId,
@@ -58,7 +30,7 @@ case class Application(
     name: String,
     collaborators: Set[Collaborator],
     access: Access = Access.Standard(List.empty, None, None),
-    state: ApplicationState = ApplicationState(name = State.TESTING)
+    state: ApplicationState = ApplicationState(State.TESTING, None, None, None, LocalDateTime.now(Clock.systemUTC()).truncatedTo(ChronoUnit.MILLIS))
   ) {
 
   lazy val importantSubmissionData: Option[ImportantSubmissionData] = access match {

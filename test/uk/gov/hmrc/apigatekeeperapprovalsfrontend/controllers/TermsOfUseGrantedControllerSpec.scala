@@ -26,7 +26,7 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, State}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -34,7 +34,6 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
 
 class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
@@ -77,7 +76,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
-      state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
+      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, now)
     )
   }
 

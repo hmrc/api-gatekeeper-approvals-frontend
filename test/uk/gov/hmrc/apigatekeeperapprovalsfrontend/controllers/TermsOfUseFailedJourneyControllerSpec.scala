@@ -24,7 +24,6 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
@@ -72,7 +71,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      val deletedApp = application.copy(state = application.state.toDeleted(now).copy(requestedByName = Some("delete-user@example.com")))
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)

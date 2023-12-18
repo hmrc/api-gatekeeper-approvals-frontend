@@ -27,7 +27,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationState, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 
@@ -159,7 +159,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "render checklist template with a deleted application" in new LivePageSetup {
-      val deletedApplication = application.copy(state = ApplicationState.deleted("deleter@example.com"))
+      val deletedApplication = application.copy(state = application.state.toDeleted(now).copy(requestedByName = Some("deletee@example.com")))
       setupForSuccessWith(passMarkedSubmission, true, true, deletedApplication)
       application.isInHouseSoftware shouldBe false
 

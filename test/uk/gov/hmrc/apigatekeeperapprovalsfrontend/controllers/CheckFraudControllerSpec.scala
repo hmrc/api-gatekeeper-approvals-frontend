@@ -23,7 +23,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 
 class CheckFraudControllerSpec extends AbstractControllerSpec {
@@ -56,7 +55,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      val deletedApp = application.copy(state = application.state.toDeleted(now).copy(requestedByName = Some("delete-user@example.com")))
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
