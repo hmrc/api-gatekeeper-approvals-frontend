@@ -18,10 +18,8 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import java.time.Instant
 
-import enumeratum.{EnumEntry, PlayEnum}
-
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models._
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{Collaborator, State}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ImportantSubmissionData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
 
@@ -52,27 +50,6 @@ object ApplicationState {
 
   def deleted(requestedBy: String) =
     ApplicationState(State.DELETED, Some(requestedBy))
-}
-
-sealed trait State extends EnumEntry {
-  def isApproved: Boolean = this == State.PRODUCTION || this == State.PRE_PRODUCTION
-
-  def isPendingApproval: Boolean = (this == State.PENDING_REQUESTER_VERIFICATION
-    || this == State.PENDING_GATEKEEPER_APPROVAL)
-
-  def isInTesting: Boolean = this == State.TESTING
-}
-
-object State extends PlayEnum[State] {
-  val values = findValues
-
-  final case object TESTING                                     extends State
-  final case object PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION extends State
-  final case object PENDING_GATEKEEPER_APPROVAL                 extends State
-  final case object PENDING_REQUESTER_VERIFICATION              extends State
-  final case object PRE_PRODUCTION                              extends State
-  final case object PRODUCTION                                  extends State
-  final case object DELETED                                     extends State
 }
 
 case class Application(

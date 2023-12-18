@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -87,7 +88,7 @@ class ChecklistController @Inject() (
       case FAILED                  => "checklist.requestfailed"
     }
     val isInHouseSoftware: Boolean = request.application.isInHouseSoftware
-    val isDeleted                  = request.application.state.name == State.DELETED
+    val isDeleted                  = request.application.state.name == domain.models.State.DELETED
 
     for {
       review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
