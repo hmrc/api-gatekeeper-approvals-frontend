@@ -17,9 +17,8 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import play.api.libs.json._
-import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.AccessType._
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.AccessType
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
 
 case class SellResellOrDistribute(answer: String) extends AnyVal
 
@@ -43,7 +42,7 @@ object ImportantSubmissionData {
 }
 
 sealed trait Access {
-  val accessType: AccessType.Value
+  val accessType: AccessType
 }
 
 case class Standard(
@@ -51,15 +50,15 @@ case class Standard(
     sellResellOrDistribute: Option[SellResellOrDistribute] = None,
     importantSubmissionData: Option[ImportantSubmissionData] = None
   ) extends Access {
-  override val accessType = STANDARD
+  override val accessType = AccessType.STANDARD
 }
 
 case class Privileged(totpIds: Option[TotpId] = None, scopes: Set[String] = Set.empty) extends Access {
-  override val accessType = PRIVILEGED
+  override val accessType = AccessType.PRIVILEGED
 }
 
 case class Ropc(scopes: Set[String] = Set.empty) extends Access {
-  override val accessType = ROPC
+  override val accessType = AccessType.ROPC
 }
 
 object Standard {
@@ -78,8 +77,8 @@ object Access {
   import uk.gov.hmrc.play.json.Union
 
   implicit val formatAccess: OFormat[Access] = Union.from[Access]("accessType")
-    .and[Standard](STANDARD.toString)
-    .and[Privileged](PRIVILEGED.toString)
-    .and[Ropc](ROPC.toString)
+    .and[Standard](AccessType.STANDARD.toString)
+    .and[Privileged](AccessType.PRIVILEGED.toString)
+    .and[Ropc](AccessType.ROPC.toString)
     .format
 }

@@ -20,7 +20,7 @@ import java.time.Instant
 
 import enumeratum.{EnumEntry, PlayEnum}
 
-import uk.gov.hmrc.apiplatform.modules.applications.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
 
 case class ApplicationState(
