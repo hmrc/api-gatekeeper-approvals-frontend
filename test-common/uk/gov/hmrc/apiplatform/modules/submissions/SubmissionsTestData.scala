@@ -22,6 +22,7 @@ import scala.util.Random
 import cats.data.NonEmptyList
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen.Context.Keys
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
@@ -84,7 +85,7 @@ trait ProgressTestDataHelper {
   }
 }
 
-trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData with ProgressTestDataHelper with StatusTestDataHelper {
+trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData with ProgressTestDataHelper with StatusTestDataHelper with FixedClock {
 
   val submissionId  = Submission.Id.random
   val applicationId = ApplicationId.random
@@ -93,9 +94,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
     AskWhen.Context.Keys.IN_HOUSE_SOFTWARE -> "No",
     AskWhen.Context.Keys.VAT_OR_ITSA       -> "No"
   )
-  val now                              = LocalDateTime.now(ZoneOffset.UTC)
-
-  val aSubmission = Submission.create("bob@example.com", submissionId, applicationId, now, testGroups, testQuestionIdsOfInterest, standardContext)
+  val aSubmission                      = Submission.create("bob@example.com", submissionId, applicationId, now, testGroups, testQuestionIdsOfInterest, standardContext)
 
   val altSubmissionId = Submission.Id.random
   require(altSubmissionId != submissionId)

@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import org.joda.time.{DateTime, DateTimeZone}
-
 import play.api.libs.json._
 import uk.gov.hmrc.play.json.Union
 
@@ -25,9 +23,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview._
-
-  implicit val utcReads: Reads[DateTime] = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
-
   implicit val ReviewNotStartedStatusFormat: OFormat[Status.NotStarted.type] = Json.format[Status.NotStarted.type]
   implicit val ReviewInProgressStatusFormat: OFormat[Status.InProgress.type] = Json.format[Status.InProgress.type]
   implicit val ReviewCompletedStatusFormat: OFormat[Status.Completed.type]   = Json.format[Status.Completed.type]

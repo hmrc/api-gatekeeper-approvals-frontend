@@ -20,7 +20,6 @@ object AppDependencies {
     "com.beachape"            %% "enumeratum"                         % "1.7.0",
     "com.beachape"            %% "enumeratum-play"                    % "1.7.0",
     "com.typesafe.play"       %% "play-json"                          % "2.9.2",
-    "com.typesafe.play"       %% "play-json-joda"                     % "2.9.2",
     "uk.gov.hmrc"             %% "internal-auth-client-play-28"       % "1.2.0",
     "uk.gov.hmrc"             %% "api-platform-application-domain"    % appDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-api-domain"            % apiDomainVersion

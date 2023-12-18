@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
+import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AcknowledgedAnswer, NoAnswer, Submission}
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.HmrcSpec
 
 class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
 

@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import java.time.Instant
+
 import enumeratum.{EnumEntry, PlayEnum}
-import org.joda.time.{DateTime, DateTimeZone}
 
 import uk.gov.hmrc.apiplatform.modules.applications.domain.models.Collaborator
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
@@ -26,14 +27,13 @@ case class ApplicationState(
     name: State,
     requestedByEmailAddress: Option[String] = None,
     verificationCode: Option[String] = None,
-    updatedOn: DateTime = DateTime.now.withZone(DateTimeZone.UTC)
+    updatedOn: Instant = Instant.now
   )
 
 object ApplicationState {
   import play.api.libs.json.Format
   import play.api.libs.json.Json
-  import play.api.libs.json.JodaReads._
-  import play.api.libs.json.JodaWrites._
+  import uk.gov.hmrc.apiplatform.modules.common.domain.services.InstantJsonFormatter.WithTimeZone._
 
   implicit val format: Format[ApplicationState] = Json.format[ApplicationState]
 

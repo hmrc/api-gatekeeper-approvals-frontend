@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
-import org.joda.time.{DateTime, Days}
 import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
@@ -55,9 +55,9 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     )
 
     val requesterEmail     = "test@example.com"
-    val submittedTimestamp = DateTime.now()
-    val declinedTimestamp  = DateTime.now().minus(Days.days(5))
-    val grantedTimestamp   = DateTime.now().minus(Days.days(7))
+    val submittedTimestamp = instant
+    val declinedTimestamp  = instant.minus(5, ChronoUnit.DAYS)
+    val grantedTimestamp   = instant.minus(7, ChronoUnit.DAYS)
 
     def markedSubmissionWithStatusHistoryOf(statuses: Submission.Status*) = {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
