@@ -21,6 +21,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ClientId, LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
@@ -29,7 +30,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{SellResellOrDistribute, Standard}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
 
 class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
@@ -59,8 +59,8 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
 
     val inHouseApplication = application.copy(
       access = application.access match {
-        case Standard(redirectUris, _, importantSubmissionData) => Standard(redirectUris, Some(SellResellOrDistribute("No")), importantSubmissionData)
-        case other                                              => other
+        case std @ Access.Standard(redirectUris, _, _, _, _, importantSubmissionData) => std.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No")))
+        case other                                                                    => other
       }
     )
     val fakeRequest        = FakeRequest().withCSRFToken

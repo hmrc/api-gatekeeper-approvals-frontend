@@ -18,7 +18,9 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
+import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
@@ -36,8 +38,8 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
     val applicationId              = ApplicationId.random
     val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock, ApplicationCommandConnectorMock.aMock)
 
-    val responsibleIndividual = ResponsibleIndividual("bob", LaxEmailAddress("bob@example.com"))
-    val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, instant, Submission.Id.random, 0))
+    val responsibleIndividual = ResponsibleIndividual(FullName("bob"), LaxEmailAddress("bob@example.com"))
+    val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, now, SubmissionId.random, 0))
 
     val importantSubmissionData = ImportantSubmissionData(
       Some("http://example.com"),
@@ -47,13 +49,13 @@ class ApplicationServiceSpec extends AsyncHmrcSpec {
       PrivacyPolicyLocations.InDesktopSoftware,
       termsOfUseAcceptances
     )
-    val standardAccess          = Standard(importantSubmissionData = Some(importantSubmissionData))
+    val standardAccess          = Access.Standard(importantSubmissionData = Some(importantSubmissionData))
     val application             = anApplication().copy(access = standardAccess)
 
     val submissionReview = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
 
     val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
-    val standardAccessWithoutTOUAgreement          = Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
+    val standardAccessWithoutTOUAgreement          = Access.Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
     val applicationWithoutTOUAgreement             = anApplication().copy(access = standardAccessWithoutTOUAgreement)
     val submissionReviewWithoutTOUAgreement        = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
   }

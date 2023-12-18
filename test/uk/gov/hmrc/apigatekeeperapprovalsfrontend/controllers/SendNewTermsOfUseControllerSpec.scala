@@ -24,7 +24,9 @@ import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
+import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{ImportantSubmissionData, PrivacyPolicyLocations, ResponsibleIndividual, TermsAndConditionsLocations}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -66,11 +68,14 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
-    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
+    val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(
-      access = Standard(
+      access = Access.Standard(
         List.empty,
+        None,
+        None,
+        Set.empty,
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
@@ -126,7 +131,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
     "return 400 when app not Standard" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(access = Privileged()))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(access = Access.Privileged()))
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST

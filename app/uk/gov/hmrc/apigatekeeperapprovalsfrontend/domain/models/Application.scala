@@ -20,7 +20,9 @@ import java.time.Instant
 
 import enumeratum.{EnumEntry, PlayEnum}
 
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models._
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ImportantSubmissionData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
 
 case class ApplicationState(
@@ -78,18 +80,18 @@ case class Application(
     clientId: ClientId,
     name: String,
     collaborators: Set[Collaborator],
-    access: Access = Standard(List.empty, None, None),
+    access: Access = Access.Standard(List.empty, None, None),
     state: ApplicationState = ApplicationState(name = State.TESTING)
   ) {
 
   lazy val importantSubmissionData: Option[ImportantSubmissionData] = access match {
-    case Standard(_, _, Some(submissionData)) => Some(submissionData)
-    case _                                    => None
+    case Access.Standard(_, _, _, _, _, Some(submissionData)) => Some(submissionData)
+    case _                                                    => None
   }
 
-  lazy val sellResellOrDistribute = access match {
-    case Standard(_, sellResellOrDistribute, _) => sellResellOrDistribute
-    case _                                      => None
+  lazy val sellResellOrDistribute: Option[SellResellOrDistribute] = access match {
+    case Access.Standard(_, _, _, _, sellResellOrDistribute, _) => sellResellOrDistribute
+    case _                                                      => None
   }
 
   lazy val isInHouseSoftware = sellResellOrDistribute.fold(false)(_ == SellResellOrDistribute("No"))

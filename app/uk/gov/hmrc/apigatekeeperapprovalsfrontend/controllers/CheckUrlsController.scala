@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -60,7 +61,7 @@ class CheckUrlsController @Inject() (
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
-      case std @ Standard(_, _, Some(importantSubmissionData)) =>
+      case std @ Access.Standard(_, _, _, _, _, Some(importantSubmissionData)) =>
         val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
@@ -76,7 +77,7 @@ class CheckUrlsController @Inject() (
             )
           )
         )
-      case _                                                   => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                                   => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }
 
