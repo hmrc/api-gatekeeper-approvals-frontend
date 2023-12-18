@@ -39,7 +39,7 @@ case class ImportantSubmissionData(
   )
 
 object ImportantSubmissionData {
-  implicit val format = Json.format[ImportantSubmissionData]
+  implicit val format: Format[ImportantSubmissionData] = Json.format[ImportantSubmissionData]
 }
 
 sealed trait Access {
@@ -63,21 +63,21 @@ case class Ropc(scopes: Set[String] = Set.empty) extends Access {
 }
 
 object Standard {
-  implicit val format = Json.format[Standard]
+  implicit val format: OFormat[Standard] = Json.format[Standard]
 }
 
 object Privileged {
-  implicit val format = Json.format[Privileged]
+  implicit val format: OFormat[Privileged] = Json.format[Privileged]
 }
 
 object Ropc {
-  implicit val format = Json.format[Ropc]
+  implicit val format: OFormat[Ropc] = Json.format[Ropc]
 }
 
 object Access {
   import uk.gov.hmrc.play.json.Union
 
-  implicit val formatAccess = Union.from[Access]("accessType")
+  implicit val formatAccess: OFormat[Access] = Union.from[Access]("accessType")
     .and[Standard](STANDARD.toString)
     .and[Privileged](PRIVILEGED.toString)
     .and[Ropc](ROPC.toString)

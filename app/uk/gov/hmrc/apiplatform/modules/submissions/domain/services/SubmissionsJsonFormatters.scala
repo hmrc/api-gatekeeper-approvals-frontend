@@ -42,27 +42,27 @@ trait BaseSubmissionsJsonFormatters extends GroupOfQuestionnairesJsonFormatters 
     case _                         => JsError("Failed to parse QuestionnaireState value")
   }
 
-  implicit val questionnaireProgressFormat = Json.format[QuestionnaireProgress]
+  implicit val questionnaireProgressFormat: Format[QuestionnaireProgress] = Json.format[QuestionnaireProgress]
 
   implicit val answersToQuestionsFormat: OFormat[Map[Question.Id, Option[ActualAnswer]]] = implicitly
 
-  implicit val questionIdsOfInterestFormat = Json.format[QuestionIdsOfInterest]
+  implicit val questionIdsOfInterestFormat: Format[QuestionIdsOfInterest] = Json.format[QuestionIdsOfInterest]
 }
 
 trait SubmissionsJsonFormatters extends BaseSubmissionsJsonFormatters {
   import Submission.Status._
 
-  implicit val rejectedStatusFormat                     = Json.format[Declined]
-  implicit val acceptedStatusFormat                     = Json.format[Granted]
-  implicit val acceptedWithWarningsStatusFormat         = Json.format[GrantedWithWarnings]
-  implicit val failedStatusFormat                       = Json.format[Failed]
-  implicit val warningsStatusFormat                     = Json.format[Warnings]
-  implicit val pendingResponsibleIndividualStatusFormat = Json.format[PendingResponsibleIndividual]
-  implicit val submittedStatusFormat                    = Json.format[Submitted]
-  implicit val answeringStatusFormat                    = Json.format[Answering]
-  implicit val createdStatusFormat                      = Json.format[Created]
+  implicit val rejectedStatusFormat: OFormat[Declined]                                         = Json.format[Declined]
+  implicit val acceptedStatusFormat: OFormat[Granted]                                          = Json.format[Granted]
+  implicit val acceptedWithWarningsStatusFormat: OFormat[GrantedWithWarnings]                  = Json.format[GrantedWithWarnings]
+  implicit val failedStatusFormat: OFormat[Failed]                                             = Json.format[Failed]
+  implicit val warningsStatusFormat: OFormat[Warnings]                                         = Json.format[Warnings]
+  implicit val pendingResponsibleIndividualStatusFormat: OFormat[PendingResponsibleIndividual] = Json.format[PendingResponsibleIndividual]
+  implicit val submittedStatusFormat: OFormat[Submitted]                                       = Json.format[Submitted]
+  implicit val answeringStatusFormat: OFormat[Answering]                                       = Json.format[Answering]
+  implicit val createdStatusFormat: OFormat[Created]                                           = Json.format[Created]
 
-  implicit val submissionStatus = Union.from[Submission.Status]("Submission.StatusType")
+  implicit val submissionStatus: OFormat[Submission.Status] = Union.from[Submission.Status]("Submission.StatusType")
     .and[Declined]("declined")
     .and[Granted]("granted")
     .and[GrantedWithWarnings]("grantedWithWarnings")
@@ -74,10 +74,10 @@ trait SubmissionsJsonFormatters extends BaseSubmissionsJsonFormatters {
     .and[Created]("created")
     .format
 
-  implicit val submissionInstanceFormat = Json.format[Submission.Instance]
-  implicit val submissionFormat         = Json.format[Submission]
-  implicit val extendedSubmissionFormat = Json.format[ExtendedSubmission]
-  implicit val markedSubmissionFormat   = Json.format[MarkedSubmission]
+  implicit val submissionInstanceFormat: Format[Submission.Instance] = Json.format[Submission.Instance]
+  implicit val submissionFormat: Format[Submission]                  = Json.format[Submission]
+  implicit val extendedSubmissionFormat: Format[ExtendedSubmission]  = Json.format[ExtendedSubmission]
+  implicit val markedSubmissionFormat: Format[MarkedSubmission]      = Json.format[MarkedSubmission]
 }
 
 object SubmissionsJsonFormatters extends SubmissionsJsonFormatters

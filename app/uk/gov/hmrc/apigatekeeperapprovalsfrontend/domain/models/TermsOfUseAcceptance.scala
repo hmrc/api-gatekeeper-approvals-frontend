@@ -25,7 +25,7 @@ case class TermsOfUseAcceptance(responsibleIndividual: ResponsibleIndividual, da
 
 object TermsOfUseAcceptance {
   import JodaWrites.JodaDateTimeWrites
-  implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
+  implicit val utcReads: Reads[DateTime] = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
 
-  implicit val format = Json.format[TermsOfUseAcceptance]
+  implicit val format: Format[TermsOfUseAcceptance] = Json.format[TermsOfUseAcceptance]
 }

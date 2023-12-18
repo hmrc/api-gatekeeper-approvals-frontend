@@ -20,8 +20,9 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiIdentifier
 
 object ApplicationWithSubscriptionData {
   import play.api.libs.json.Json
+  import play.api.libs.json.Reads
 
-  implicit val applicationWithSubscriptionData = Json.reads[ApplicationWithSubscriptionData]
+  implicit val applicationWithSubscriptionData: Reads[ApplicationWithSubscriptionData] = Json.reads[ApplicationWithSubscriptionData]
 }
 
 case class ApplicationWithSubscriptionData(

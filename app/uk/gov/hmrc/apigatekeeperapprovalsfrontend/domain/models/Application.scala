@@ -30,11 +30,12 @@ case class ApplicationState(
   )
 
 object ApplicationState {
+  import play.api.libs.json.Format
   import play.api.libs.json.Json
   import play.api.libs.json.JodaReads._
   import play.api.libs.json.JodaWrites._
 
-  implicit val format = Json.format[ApplicationState]
+  implicit val format: Format[ApplicationState] = Json.format[ApplicationState]
 
   val testing = ApplicationState(State.TESTING, None)
 
@@ -96,8 +97,8 @@ case class Application(
 }
 
 object Application {
-  import play.api.libs.json.Json
+  import play.api.libs.json._
 
-  implicit val applicationReads  = Json.reads[Application]
-  implicit val applicationWrites = Json.writes[Application]
+  implicit val applicationReads: Reads[Application]   = Json.reads[Application]
+  implicit val applicationWrites: Writes[Application] = Json.writes[Application]
 }

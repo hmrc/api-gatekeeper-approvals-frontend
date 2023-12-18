@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services._
@@ -35,16 +35,16 @@ object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
 
   case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, escalatedTo: Option[String] = None)
-  implicit val writesApprovedRequest = Json.writes[GrantedRequest]
+  implicit val writesApprovedRequest: Writes[GrantedRequest] = Json.writes[GrantedRequest]
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesDeclinedRequest = Json.writes[DeclinedRequest]
+  implicit val writesDeclinedRequest: Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
 
   case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesTouUpliftRequest = Json.writes[TouUpliftRequest]
+  implicit val writesTouUpliftRequest: Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
 
   case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
-  implicit val writesTouGrantedRequest = Json.writes[TouGrantedRequest]
+  implicit val writesTouGrantedRequest: Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
 
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }

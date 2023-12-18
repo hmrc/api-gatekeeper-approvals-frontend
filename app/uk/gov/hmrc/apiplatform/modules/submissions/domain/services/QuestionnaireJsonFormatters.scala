@@ -22,9 +22,9 @@ trait QuestionnaireJsonFormatters extends QuestionJsonFormatters with AskWhenJso
   import play.api.libs.json._
   import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-  implicit val jsonFormatQuestionItem = Json.format[QuestionItem]
+  implicit val jsonFormatQuestionItem: Format[QuestionItem] = Json.format[QuestionItem]
 
-  implicit val jsonFormatquestionnaire = Json.format[Questionnaire]
+  implicit val jsonFormatquestionnaire: Format[Questionnaire] = Json.format[Questionnaire]
 }
 
 object QuestionnaireJsonFormatters extends QuestionnaireJsonFormatters

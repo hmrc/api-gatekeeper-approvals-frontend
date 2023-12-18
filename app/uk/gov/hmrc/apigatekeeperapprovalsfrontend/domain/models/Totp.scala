@@ -16,22 +16,22 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 
 case class Totp(secret: String, id: String)
 
 object Totp {
-  implicit val format = Json.format[Totp]
+  implicit val format: Format[Totp] = Json.format[Totp]
 }
 
 case class TotpId(production: String)
 
 object TotpId {
-  implicit val format = Json.format[TotpId]
+  implicit val format: Format[TotpId] = Json.format[TotpId]
 }
 
 case class TotpSecret(production: String)
 
 object TotpSecret {
-  implicit val format = Json.format[TotpSecret]
+  implicit val format: Format[TotpSecret] = Json.format[TotpSecret]
 }

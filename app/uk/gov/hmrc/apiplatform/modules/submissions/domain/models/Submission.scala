@@ -21,6 +21,7 @@ import java.util.UUID
 
 import cats.data.NonEmptyList
 
+import play.api.libs.json.Format
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 sealed trait QuestionnaireState
@@ -66,7 +67,7 @@ object Submission {
   case class Id(value: String) extends AnyVal
 
   object Id {
-    implicit val format = play.api.libs.json.Json.valueFormat[Id]
+    implicit val format: Format[Id] = play.api.libs.json.Json.valueFormat[Id]
 
     def random: Id = Id(UUID.randomUUID().toString())
   }

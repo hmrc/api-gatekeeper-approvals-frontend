@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import play.api.libs.json.Format
+
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.utils.EnumJson
 
 object AccessType extends Enumeration {
   type AccessType = Value
   val STANDARD, PRIVILEGED, ROPC = Value
 
-  implicit val formatAccessType = EnumJson.enumFormat(AccessType)
+  implicit val formatAccessType: Format[AccessType] = EnumJson.enumFormat(AccessType)
 }
