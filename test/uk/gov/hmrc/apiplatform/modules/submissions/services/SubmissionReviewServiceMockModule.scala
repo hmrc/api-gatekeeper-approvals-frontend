@@ -19,6 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.services
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
@@ -98,6 +99,6 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
   }
 
   object SubmissionReviewServiceMock extends BaseSubmissionReviewServiceMock {
-    val aMock = mock[SubmissionReviewService](withSettings.lenient())
+    val aMock = mock[SubmissionReviewService](withSettings.strictness(Strictness.LENIENT))
   }
 }

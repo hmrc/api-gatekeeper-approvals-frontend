@@ -7,6 +7,9 @@ object AppDependencies {
 
   lazy val bootstrapPlayVersion = "7.19.0"
   lazy val mongoVersion = "0.74.0"
+  val apiDomainVersion = "0.11.0"
+  val commonDomainVersion = "0.10.0"
+  val appDomainVersion = "0.21.0"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"         % bootstrapPlayVersion,
@@ -19,16 +22,18 @@ object AppDependencies {
     "com.typesafe.play"       %% "play-json"                          % "2.9.2",
     "com.typesafe.play"       %% "play-json-joda"                     % "2.9.2",
     "uk.gov.hmrc"             %% "internal-auth-client-play-28"       % "1.2.0",
-    "uk.gov.hmrc"             %% "api-platform-application-domain"    % "0.21.0",
-    "uk.gov.hmrc"             %% "api-platform-api-domain"            % "0.7.0"
+    "uk.gov.hmrc"             %% "api-platform-application-domain"    % appDomainVersion,
+    "uk.gov.hmrc"             %% "api-platform-api-domain"            % apiDomainVersion
   )
 
   val test = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-test-play-28"             % bootstrapPlayVersion,
-    "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"            % mongoVersion,
-    "org.jsoup"               %  "jsoup"                              % "1.13.1",
-    "org.mockito"             %% "mockito-scala-scalatest"            % "1.17.22",
-    "com.vladsch.flexmark"    %  "flexmark-all"                       % "0.36.8",
-    "com.github.tomakehurst"  %  "wiremock-jre8-standalone"           % "2.31.0"
+    "uk.gov.hmrc"                 %% "bootstrap-test-play-28"            % bootstrapPlayVersion,
+    "uk.gov.hmrc.mongo"           %% "hmrc-mongo-test-play-28"           % mongoVersion,
+    "org.jsoup"                   %  "jsoup"                             % "1.13.1",
+    "org.mockito"                 %% "mockito-scala-scalatest"           % "1.17.29",
+    "org.scalatest"               %% "scalatest"                         % "3.2.17",
+    "com.vladsch.flexmark"        %  "flexmark-all"                      % "0.36.8",
+    "com.github.tomakehurst"      %  "wiremock-jre8-standalone"          % "2.31.0",
+    "uk.gov.hmrc"                 %% "api-platform-test-common-domain"   % commonDomainVersion,
   ).map(_ % "test, it")
 }

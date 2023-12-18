@@ -20,6 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 import cats.data.OptionT
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -53,6 +54,6 @@ trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatch
   }
 
   object ApplicationActionServiceMock extends BaseApplicationActionServiceMock {
-    val aMock = mock[ApplicationActionService](withSettings.lenient())
+    val aMock = mock[ApplicationActionService](withSettings.strictness(Strictness.LENIENT))
   }
 }

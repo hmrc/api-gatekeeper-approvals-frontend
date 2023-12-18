@@ -18,6 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
 import scala.concurrent.Future.successful
 
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -40,6 +41,6 @@ trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSu
   }
 
   object SubscriptionServiceMock extends BaseSubscriptionServiceMock {
-    val aMock = mock[SubscriptionService](withSettings.lenient())
+    val aMock = mock[SubscriptionService](withSettings.strictness(Strictness.LENIENT))
   }
 }
