@@ -240,6 +240,7 @@ termsofuse.status = Status
 
 termsofusehistory.pagetitle = HMRC API Gatekeeper - Terms of use history
 termsofusehistory.title = Terms of use history
+termsofusehistory.dueon = Due on
 termsofusehistory.managesubmission = Manage submission
 termsofusehistory.viewanswers = View submitted answers
 termsofusehistory.applicationdetails = Application details

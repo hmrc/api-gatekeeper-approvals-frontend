@@ -44,6 +44,8 @@
         @{viewModel.applicationName}
       </h1>
 
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-8">@{messages("termsofusehistory.dueon")} @{viewModel.dueDate}</h2>
+
       @if(viewModel.isInHouseSoftware) {
         <p class="govuk-body govuk-!-margin-bottom-1">@{messages("termsofusehistory.inhouse")}.</p>
       }
