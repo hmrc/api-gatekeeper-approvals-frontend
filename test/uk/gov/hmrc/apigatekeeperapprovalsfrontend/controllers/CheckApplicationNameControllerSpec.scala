@@ -25,7 +25,6 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationState
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckApplicationNamePage
 
 class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
@@ -60,7 +59,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp   = application.copy(state = ApplicationState.deleted("delete-user@example.com"))
+      val deletedApp   = application.copy(state = application.state.toDeleted(now).copy(requestedByName = Some("delete-user@example.com")))
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)

@@ -25,7 +25,10 @@ import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocations, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
+import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, State}
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{ImportantSubmissionData, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -39,7 +42,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmiss
   GrantedInstanceDetails,
   ViewModel
 }
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
@@ -73,22 +75,25 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
-    val responsibleIndividual                                             = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
+    val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(
-      access = Standard(
+      access = Access.Standard(
         List.empty,
+        None,
+        None,
+        Set.empty,
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
-      state = ApplicationState(name = State.PENDING_GATEKEEPER_APPROVAL)
+      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, now)
     )
   }
 
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(name = State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION, None, None, None, now)))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
       val result = controller.page(applicationId)(fakeRequest)

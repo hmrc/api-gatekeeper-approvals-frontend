@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json, OFormat}
 
 sealed trait TextValidation
 
@@ -27,11 +27,11 @@ object TextValidation {
 
   import uk.gov.hmrc.play.json.Union
 
-  implicit val formatAsUrl      = Json.format[Url.type]
-  implicit val formatMatchRegex = Json.format[MatchRegex]
-  implicit val formatIsEmail    = Json.format[Email.type]
+  implicit val formatAsUrl: OFormat[Url.type]        = Json.format[Url.type]
+  implicit val formatMatchRegex: OFormat[MatchRegex] = Json.format[MatchRegex]
+  implicit val formatIsEmail: OFormat[Email.type]    = Json.format[Email.type]
 
-  implicit val formatTextValidation = Union.from[TextValidation]("validationType")
+  implicit val formatTextValidation: Format[TextValidation] = Union.from[TextValidation]("validationType")
     .and[Url.type]("url")
     .and[MatchRegex]("regex")
     .and[Email.type]("email")

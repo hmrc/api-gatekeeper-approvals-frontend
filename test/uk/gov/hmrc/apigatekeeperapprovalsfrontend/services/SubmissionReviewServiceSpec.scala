@@ -30,7 +30,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
   trait Setup extends SubmissionReviewRepoMockModule with SubmissionReviewTestData with ApplicationTestData {
     val underTest = new SubmissionReviewService(SubmissionReviewRepoMock.aMock)
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
   "findOrCreateReview" should {

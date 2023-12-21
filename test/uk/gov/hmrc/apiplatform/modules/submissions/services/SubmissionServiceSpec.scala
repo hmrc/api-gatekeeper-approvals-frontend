@@ -32,7 +32,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, As
 class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
 
   trait Setup {
-    implicit val hc                                    = HeaderCarrier()
+    implicit val hc: HeaderCarrier                     = HeaderCarrier()
     val applicationId                                  = ApplicationId.random
     val mockSubmissionsConnector: SubmissionsConnector = mock[SubmissionsConnector]
     val requestedBy                                    = "bob@example.com"

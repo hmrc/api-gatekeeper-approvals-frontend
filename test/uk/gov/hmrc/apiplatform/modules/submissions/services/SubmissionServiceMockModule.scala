@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future.successful
 
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -230,6 +231,6 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
   }
 
   object SubmissionServiceMock extends BaseSubmissionServiceMock {
-    val aMock = mock[SubmissionService](withSettings.lenient())
+    val aMock = mock[SubmissionService](withSettings.strictness(Strictness.LENIENT))
   }
 }

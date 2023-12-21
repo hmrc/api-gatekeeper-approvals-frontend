@@ -20,12 +20,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.apiplatform.modules.applications.domain.models.{PrivacyPolicyLocation, PrivacyPolicyLocations, TermsAndConditionsLocation, TermsAndConditionsLocations}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
+import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 
 class CheckUrlsControllerSpec extends AbstractControllerSpec {
@@ -44,11 +45,14 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    val responsibleIndividual = ResponsibleIndividual("Bob Example", LaxEmailAddress("bob@example.com"))
+    val responsibleIndividual = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = anApplication(applicationId).copy(access =
-      Standard(
+      Access.Standard(
         List.empty,
+        None,
+        None,
+        Set.empty,
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       )
@@ -59,8 +63,11 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
         termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocations.InDesktopSoftware
       ) = {
       anApplication(applicationId).copy(access =
-        Standard(
+        Access.Standard(
           List.empty,
+          None,
+          None,
+          Set.empty,
           Some(SellResellOrDistribute("Yes")),
           Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, termsAndConditionsLocation, privacyPolicyLocation, List.empty))
         )
@@ -122,7 +129,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp = appWithData().copy(state = ApplicationState.deleted("delete-user@example.com"))
+      val deletedApp = appWithData().copy(state = application.state.toDeleted(now).copy(requestedByName = Some("delete-user@example.com")))
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)

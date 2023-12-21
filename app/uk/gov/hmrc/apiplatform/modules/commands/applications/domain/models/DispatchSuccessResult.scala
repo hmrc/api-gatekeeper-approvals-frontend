@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
@@ -24,5 +24,5 @@ case class DispatchSuccessResult(applicationResponse: Application)
 
 object DispatchSuccessResult {
 
-  implicit val format = Json.format[DispatchSuccessResult]
+  implicit val format: Format[DispatchSuccessResult] = Json.format[DispatchSuccessResult]
 }

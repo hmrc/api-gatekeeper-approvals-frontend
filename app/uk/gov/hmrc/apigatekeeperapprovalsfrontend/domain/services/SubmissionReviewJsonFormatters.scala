@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import org.joda.time.DateTimeZone
-
 import play.api.libs.json._
 import uk.gov.hmrc.play.json.Union
 
@@ -25,14 +23,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview._
+  implicit val ReviewNotStartedStatusFormat: OFormat[Status.NotStarted.type] = Json.format[Status.NotStarted.type]
+  implicit val ReviewInProgressStatusFormat: OFormat[Status.InProgress.type] = Json.format[Status.InProgress.type]
+  implicit val ReviewCompletedStatusFormat: OFormat[Status.Completed.type]   = Json.format[Status.Completed.type]
 
-  implicit val utcReads = JodaReads.DefaultJodaDateTimeReads.map(dt => dt.withZone(DateTimeZone.UTC))
-
-  implicit val ReviewNotStartedStatusFormat = Json.format[Status.NotStarted.type]
-  implicit val ReviewInProgressStatusFormat = Json.format[Status.InProgress.type]
-  implicit val ReviewCompletedStatusFormat  = Json.format[Status.Completed.type]
-
-  implicit val reviewStatus = Union.from[Status]("Review.StatusType")
+  implicit val reviewStatus: OFormat[Status] = Union.from[Status]("Review.StatusType")
     .and[Status.NotStarted.type]("notstarted")
     .and[Status.InProgress.type]("inprogress")
     .and[Status.Completed.type]("completed")
@@ -41,7 +36,7 @@ trait SubmissionReviewJsonFormatters {
   implicit val actionKeyReads: KeyReads[Action]   = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
   implicit val actionKeyWrites: KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
 
-  implicit val submissionReviewFormat = Json.format[SubmissionReview]
+  implicit val submissionReviewFormat: Format[SubmissionReview] = Json.format[SubmissionReview]
 }
 
 object SubmissionReviewJsonFormatters extends SubmissionReviewJsonFormatters

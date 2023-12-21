@@ -19,6 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.services
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
 
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
@@ -70,6 +71,6 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
   }
 
   object ApplicationServiceMock extends BaseApplicationServiceMock {
-    val aMock = mock[ApplicationService](withSettings.lenient())
+    val aMock = mock[ApplicationService](withSettings.strictness(Strictness.LENIENT))
   }
 }

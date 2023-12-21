@@ -18,6 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories
 
 import scala.concurrent.Future.successful
 
+import org.mockito.quality.Strictness
 import org.mockito.verification.VerificationMode
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
@@ -72,6 +73,6 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
   }
 
   object SubmissionReviewRepoMock extends BaseSubmissionReviewRepoMock {
-    val aMock = mock[SubmissionReviewRepo](withSettings.lenient())
+    val aMock = mock[SubmissionReviewRepo](withSettings.strictness(Strictness.LENIENT))
   }
 }

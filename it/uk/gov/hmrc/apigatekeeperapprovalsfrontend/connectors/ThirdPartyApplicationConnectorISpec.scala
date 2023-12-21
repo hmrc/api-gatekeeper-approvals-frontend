@@ -48,7 +48,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
   trait Setup extends ApplicationTestData {
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
   "fetch application by id" should {

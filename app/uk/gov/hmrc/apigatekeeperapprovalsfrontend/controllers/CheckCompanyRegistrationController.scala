@@ -21,13 +21,15 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.CompanyDetailsExtractor
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Standard, State, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
 
@@ -57,7 +59,7 @@ class CheckCompanyRegistrationController @Inject() (
 
     (request.application.access, companyDetails) match {
       // Should only be uplifting and checking Standard apps
-      case (std: Standard, Some(details)) if (request.submission.status.isSubmitted) =>
+      case (std: Access.Standard, Some(details)) if (request.submission.status.isSubmitted) =>
         val isDeleted = request.application.state.name == State.DELETED
         successful(
           Ok(
@@ -72,7 +74,7 @@ class CheckCompanyRegistrationController @Inject() (
             )
           )
         )
-      case _                                                                         => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                                                => successful(BadRequest(errorHandler.badRequestTemplate))
     }
   }
 

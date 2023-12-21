@@ -21,13 +21,14 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationSuccessful
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Standard, State}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{SendNewTermsOfUseConfirmPage, SendNewTermsOfUseRequestedPage}
 
@@ -78,8 +79,8 @@ class SendNewTermsOfUseController @Inject() (
     request.application.access match {
       // Should only be sending new terms of use invites to Standard apps
       // with a state of Production and not already invited
-      case std: Standard if (request.application.state.name == State.PRODUCTION) => checkNotAlreadyInvited
-      case std: Standard                                                         => successful(
+      case std: Access.Standard if (request.application.state.name == domain.models.State.PRODUCTION) => checkNotAlreadyInvited
+      case std: Access.Standard                                                                       => successful(
           BadRequest(
             errorHandler.standardErrorTemplate(
               "Application status",
@@ -88,7 +89,7 @@ class SendNewTermsOfUseController @Inject() (
             )
           )
         )
-      case _                                                                     => successful(
+      case _                                                                                          => successful(
           BadRequest(
             errorHandler.standardErrorTemplate(
               "Application access type",

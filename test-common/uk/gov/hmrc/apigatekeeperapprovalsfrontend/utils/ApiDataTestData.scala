@@ -43,7 +43,6 @@ trait ApiDataTestData {
           ApiVersionSource.OAS
         )
     ),
-    requiresTrust = false,
     isTestSupport = false,
     lastPublishedAt = None,
     List(

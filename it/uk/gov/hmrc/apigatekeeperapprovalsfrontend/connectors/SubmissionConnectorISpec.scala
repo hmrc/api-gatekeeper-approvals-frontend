@@ -54,14 +54,14 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
-    val extSubmission     = aSubmission.withIncompleteProgress()
-    val markSubmission    = markedSubmission
-    val requestedBy       = "bob@blockbusters.com"
-    val reason            = "reason"
-    val escalatedTo       = "Mr Edmund Blackadder"
-    val invitation        = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
-    val invitationWithApp = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "Petes app")
-    implicit val hc       = HeaderCarrier()
+    val extSubmission              = aSubmission.withIncompleteProgress()
+    val markSubmission             = markedSubmission
+    val requestedBy                = "bob@blockbusters.com"
+    val reason                     = "reason"
+    val escalatedTo                = "Mr Edmund Blackadder"
+    val invitation                 = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
+    val invitationWithApp          = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "Petes app")
+    implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
   "fetch latest submission by id" should {
