@@ -31,15 +31,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 
-class ApplicationServiceSpec extends AsyncHmrcSpec {
+class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
 
   trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationCommandConnectorMockModule with ApplicationTestData with FixedClock {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId              = ApplicationId.random
-    val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock, ApplicationCommandConnectorMock.aMock)
+    val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock, ApplicationCommandConnectorMock.aMock, clock)
 
     val responsibleIndividual = ResponsibleIndividual(FullName("bob"), LaxEmailAddress("bob@example.com"))
-    val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, now, SubmissionId.random, 0))
+    val termsOfUseAcceptances = List(TermsOfUseAcceptance(responsibleIndividual, instant, SubmissionId.random, 0))
 
     val importantSubmissionData = ImportantSubmissionData(
       Some("http://example.com"),

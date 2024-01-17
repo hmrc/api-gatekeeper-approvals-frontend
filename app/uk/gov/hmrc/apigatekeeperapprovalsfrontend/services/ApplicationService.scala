@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 
-import java.time.LocalDateTime
+import java.time.Clock
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
+import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ApplicationCommandConnector, ThirdPartyApplicationConnector}
@@ -31,9 +32,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 class ApplicationService @Inject() (
     thirdPartyApplicationConnector: ThirdPartyApplicationConnector,
     apmConnector: ApmConnector,
-    applicationCommandConnector: ApplicationCommandConnector
+    applicationCommandConnector: ApplicationCommandConnector,
+    val clock: Clock
   )(implicit val ec: ExecutionContext
-  ) extends CommandHandlerTypes[DispatchSuccessResult] {
+  ) extends CommandHandlerTypes[DispatchSuccessResult]
+    with ClockNow {
 
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
@@ -50,7 +53,7 @@ class ApplicationService @Inject() (
       adminsToEmail: Set[LaxEmailAddress]
     )(implicit hc: HeaderCarrier
     ): AppCmdResult = {
-    val request = ApplicationCommands.DeclineApplicationApprovalRequest(requestedBy, reasons, LocalDateTime.now)
+    val request = ApplicationCommands.DeclineApplicationApprovalRequest(requestedBy, reasons, instant())
     applicationCommandConnector.dispatch(applicationId, request, adminsToEmail)
   }
 }

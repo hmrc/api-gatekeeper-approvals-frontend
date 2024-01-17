@@ -26,8 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation, TermsOfUseInvitationState}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -94,7 +93,7 @@ class TermsOfUseHistoryController @Inject() (
       status match {
         case TermsOfUseInvitationState.REMINDER_EMAIL_SENT => "Reminder email sent"
         case TermsOfUseInvitationState.OVERDUE             => "Overdue"
-        case _                   => "Email sent"
+        case _                                             => "Email sent"
       }
     }
 
@@ -116,7 +115,7 @@ class TermsOfUseHistoryController @Inject() (
       status match {
         case TermsOfUseInvitationState.REMINDER_EMAIL_SENT => "We sent a reminder email to the admins of the application."
         case TermsOfUseInvitationState.OVERDUE             => "The terms of use have not been completed by the due date."
-        case _                   => "We invited admins of the application to agree to version 2 of the terms of use."
+        case _                                             => "We invited admins of the application to agree to version 2 of the terms of use."
       }
     }
 
@@ -148,6 +147,8 @@ class TermsOfUseHistoryController @Inject() (
       }
     }
 
+    val fmter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("UTC"))
+
     def buildModelFromSubmissionStatus(status: Submission.Status): TermsOfUseHistory = {
       TermsOfUseHistory(
         status.timestamp.asText,
@@ -156,7 +157,7 @@ class TermsOfUseHistoryController @Inject() (
         deriveSubmissionStatusDetail(status),
         deriveSubmissionEscalatedTo(status),
         Some(status),
-        status.timestamp.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("UTC")))
+        fmter.format(status.timestamp)
       )
     }
 
@@ -183,7 +184,7 @@ class TermsOfUseHistoryController @Inject() (
             buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.REMINDER_EMAIL_SENT, invite.reminderSent),
             buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.EMAIL_SENT, Some(invite.createdOn))
           )
-        case _                   => List[TermsOfUseHistory](
+        case _                                             => List[TermsOfUseHistory](
             buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.EMAIL_SENT, Some(invite.createdOn))
           )
       }

@@ -16,11 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import java.time.temporal.ChronoUnit
-import java.time.{Clock, LocalDateTime}
-
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models._
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, Collaborator, State}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, Collaborator}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ImportantSubmissionData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
 
@@ -30,7 +27,7 @@ case class Application(
     name: String,
     collaborators: Set[Collaborator],
     access: Access = Access.Standard(List.empty, None, None),
-    state: ApplicationState = ApplicationState(State.TESTING, None, None, None, LocalDateTime.now(Clock.systemUTC()).truncatedTo(ChronoUnit.MILLIS))
+    state: ApplicationState
   ) {
 
   lazy val importantSubmissionData: Option[ImportantSubmissionData] = access match {

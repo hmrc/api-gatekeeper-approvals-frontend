@@ -22,13 +22,13 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.services.SealedTraitJsonFor
 sealed trait TermsOfUseInvitationState
 
 object TermsOfUseInvitationState {
-  case object EMAIL_SENT extends TermsOfUseInvitationState 
-  case object REMINDER_EMAIL_SENT extends TermsOfUseInvitationState 
-  case object OVERDUE extends TermsOfUseInvitationState 
-  case object WARNINGS extends TermsOfUseInvitationState 
-  case object FAILED extends TermsOfUseInvitationState 
-  case object TERMS_OF_USE_V2_WITH_WARNINGS extends TermsOfUseInvitationState 
-  case object TERMS_OF_USE_V2 extends TermsOfUseInvitationState
+  case object EMAIL_SENT                    extends TermsOfUseInvitationState
+  case object REMINDER_EMAIL_SENT           extends TermsOfUseInvitationState
+  case object OVERDUE                       extends TermsOfUseInvitationState
+  case object WARNINGS                      extends TermsOfUseInvitationState
+  case object FAILED                        extends TermsOfUseInvitationState
+  case object TERMS_OF_USE_V2_WITH_WARNINGS extends TermsOfUseInvitationState
+  case object TERMS_OF_USE_V2               extends TermsOfUseInvitationState
 
   val values = Set(EMAIL_SENT, REMINDER_EMAIL_SENT, OVERDUE, WARNINGS, FAILED, TERMS_OF_USE_V2_WITH_WARNINGS, TERMS_OF_USE_V2)
 
