@@ -20,7 +20,7 @@ import java.time.Instant
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.TermsOfUseInvitationState
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState
 
 final case class TermsOfUseInvitationWithApplication(
     applicationId: ApplicationId,

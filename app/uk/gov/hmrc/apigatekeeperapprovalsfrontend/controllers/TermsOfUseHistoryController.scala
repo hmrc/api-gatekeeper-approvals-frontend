@@ -26,7 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -92,8 +92,8 @@ class TermsOfUseHistoryController @Inject() (
 
     def deriveInvitationStatusDisplayName(status: TermsOfUseInvitationState): String = {
       status match {
-        case REMINDER_EMAIL_SENT => "Reminder email sent"
-        case OVERDUE             => "Overdue"
+        case TermsOfUseInvitationState.REMINDER_EMAIL_SENT => "Reminder email sent"
+        case TermsOfUseInvitationState.OVERDUE             => "Overdue"
         case _                   => "Email sent"
       }
     }
@@ -114,8 +114,8 @@ class TermsOfUseHistoryController @Inject() (
 
     def deriveInvitationStatusDescription(status: TermsOfUseInvitationState): String = {
       status match {
-        case REMINDER_EMAIL_SENT => "We sent a reminder email to the admins of the application."
-        case OVERDUE             => "The terms of use have not been completed by the due date."
+        case TermsOfUseInvitationState.REMINDER_EMAIL_SENT => "We sent a reminder email to the admins of the application."
+        case TermsOfUseInvitationState.OVERDUE             => "The terms of use have not been completed by the due date."
         case _                   => "We invited admins of the application to agree to version 2 of the terms of use."
       }
     }
@@ -174,17 +174,17 @@ class TermsOfUseHistoryController @Inject() (
 
     def buildHistoryFromInvitation(invite: TermsOfUseInvitation): List[TermsOfUseHistory] = {
       invite.status match {
-        case OVERDUE             => List[TermsOfUseHistory](
-            buildModelFromInvitationStateAndDate(OVERDUE, Some(invite.dueBy)),
-            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
-            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+        case TermsOfUseInvitationState.OVERDUE             => List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.OVERDUE, Some(invite.dueBy)),
+            buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.EMAIL_SENT, Some(invite.createdOn))
           )
-        case REMINDER_EMAIL_SENT => List[TermsOfUseHistory](
-            buildModelFromInvitationStateAndDate(REMINDER_EMAIL_SENT, invite.reminderSent),
-            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+        case TermsOfUseInvitationState.REMINDER_EMAIL_SENT => List[TermsOfUseHistory](
+            buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.REMINDER_EMAIL_SENT, invite.reminderSent),
+            buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.EMAIL_SENT, Some(invite.createdOn))
           )
         case _                   => List[TermsOfUseHistory](
-            buildModelFromInvitationStateAndDate(EMAIL_SENT, Some(invite.createdOn))
+            buildModelFromInvitationStateAndDate(TermsOfUseInvitationState.EMAIL_SENT, Some(invite.createdOn))
           )
       }
     }
