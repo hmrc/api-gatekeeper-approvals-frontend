@@ -16,17 +16,18 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, Collaborator, State}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
-trait ApplicationTestData {
+trait ApplicationTestData extends FixedClock {
 
   def anApplication(
       id: ApplicationId = ApplicationId.random,
       clientId: ClientId = ClientId.random,
       name: String = "app name",
       collaborators: Set[Collaborator] = Set.empty
-    ) = Application(id, clientId, name, collaborators)
+    ) = Application(id, clientId, name, collaborators, state = ApplicationState(State.TESTING, None, None, None, instant))
 }

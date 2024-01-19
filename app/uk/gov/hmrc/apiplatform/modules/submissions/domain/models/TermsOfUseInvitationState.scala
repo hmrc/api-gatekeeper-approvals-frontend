@@ -17,13 +17,24 @@
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
 import play.api.libs.json.Format
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.SealedTraitJsonFormatting
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.utils.EnumJson
+sealed trait TermsOfUseInvitationState
 
-object TermsOfUseInvitationState extends Enumeration {
-  type TermsOfUseInvitationState = Value
+object TermsOfUseInvitationState {
+  case object EMAIL_SENT                    extends TermsOfUseInvitationState
+  case object REMINDER_EMAIL_SENT           extends TermsOfUseInvitationState
+  case object OVERDUE                       extends TermsOfUseInvitationState
+  case object WARNINGS                      extends TermsOfUseInvitationState
+  case object FAILED                        extends TermsOfUseInvitationState
+  case object TERMS_OF_USE_V2_WITH_WARNINGS extends TermsOfUseInvitationState
+  case object TERMS_OF_USE_V2               extends TermsOfUseInvitationState
 
-  val EMAIL_SENT, REMINDER_EMAIL_SENT, OVERDUE, WARNINGS, FAILED, TERMS_OF_USE_V2_WITH_WARNINGS, TERMS_OF_USE_V2 = Value
+  val values = Set(EMAIL_SENT, REMINDER_EMAIL_SENT, OVERDUE, WARNINGS, FAILED, TERMS_OF_USE_V2_WITH_WARNINGS, TERMS_OF_USE_V2)
 
-  implicit val format: Format[TermsOfUseInvitationState] = EnumJson.enumFormat(TermsOfUseInvitationState)
+  def apply(text: String): Option[TermsOfUseInvitationState] = TermsOfUseInvitationState.values.find(_.toString() == text.toUpperCase)
+
+  def unsafeApply(text: String): TermsOfUseInvitationState = apply(text).getOrElse(throw new RuntimeException(s"$text is not a valid Terms of use state"))
+
+  implicit val format: Format[TermsOfUseInvitationState] = SealedTraitJsonFormatting.createFormatFor[TermsOfUseInvitationState]("Terms of use state", apply)
 }

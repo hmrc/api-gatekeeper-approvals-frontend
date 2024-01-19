@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
@@ -30,6 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullNam
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, State}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{ImportantSubmissionData, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -49,7 +49,8 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
   trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule
-      with LdapAuthorisationServiceMockModule {
+      with LdapAuthorisationServiceMockModule
+      with FixedClock {
 
     val page            = mock[ApplicationSubmissionsPage]
     when(page.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
@@ -67,9 +68,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     )
 
     val requesterEmail     = "test@example.com"
-    val submittedTimestamp = LocalDateTime.now(ZoneOffset.UTC)
-    val declinedTimestamp  = LocalDateTime.now(ZoneOffset.UTC).minusDays(5)
-    val grantedTimestamp   = LocalDateTime.now(ZoneOffset.UTC).minusDays(7)
+    val submittedTimestamp = instant
+    val declinedTimestamp  = instant.minus(Duration.ofDays(5))
+    val grantedTimestamp   = instant.minus(Duration.ofDays(7))
 
     def markedSubmissionWithStatusHistoryOf(statuses: Submission.Status*) = {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
@@ -86,21 +87,24 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
-      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, now)
+      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, instant)
     )
   }
 
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
+
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION, None, None, None, now)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state =
+        ApplicationState(State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION, None, None, None, instant)
+      ))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
 
       verify(page).apply(viewModelCaptor)(*, *)
-      viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, DateTimeFormatter.ofPattern("dd MMMM yyyy").format(submittedTimestamp)))
+      viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, formatDMY(submittedTimestamp)))
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe None
       viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(LaxEmailAddress("bob@example.com"))
@@ -125,7 +129,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
       viewModelCaptor.value.isDeleted shouldBe false
       viewModelCaptor.value.declinedInstances shouldBe List(
-        DeclinedInstanceDetails(DateTimeFormatter.ofPattern("dd MMMM yyyy").format(declinedTimestamp), 0)
+        DeclinedInstanceDetails(formatDMY(declinedTimestamp), 0)
       )
     }
 
@@ -143,7 +147,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.currentSubmission shouldBe None
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe Some(
-        GrantedInstanceDetails(DateTimeFormatter.ofPattern("dd MMMM yyyy").format(grantedTimestamp))
+        GrantedInstanceDetails(formatDMY(grantedTimestamp))
       )
     }
 

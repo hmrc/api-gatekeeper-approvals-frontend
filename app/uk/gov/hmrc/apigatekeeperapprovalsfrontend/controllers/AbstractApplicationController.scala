@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId}
+import java.time.{Instant, ZoneId}
 import scala.concurrent.ExecutionContext
 
 import play.api.mvc._
@@ -38,9 +38,9 @@ abstract class AbstractApplicationController(
     with EitherTHelper[Result]
     with ApplicationLogger {
 
-  implicit class TimestampSyntax(datetime: LocalDateTime) {
+  implicit class TimestampSyntax(datetime: Instant) {
     val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
-    def asText    = datetime.format(formatter)
+    def asText    = formatter.format(datetime)
   }
 
 }

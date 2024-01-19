@@ -6,19 +6,17 @@ import sbt._
 object AppDependencies {
 
   lazy val bootstrapPlayVersion = "7.19.0"
-  lazy val mongoVersion = "0.74.0"
+  lazy val mongoVersion = "1.7.0"
   val apiDomainVersion = "0.11.0"
   val commonDomainVersion = "0.10.0"
-  val appDomainVersion = "0.32.0"
+  val appDomainVersion = "0.33.0"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"         % bootstrapPlayVersion,
     "uk.gov.hmrc"             %% "play-frontend-hmrc"                 % "7.14.0-play-28",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-28"                 % mongoVersion,
     "uk.gov.hmrc"             %% "http-metrics"                       % "2.7.0",
-    "org.typelevel"           %% "cats-core"                          % "2.6.1",
-    "com.beachape"            %% "enumeratum"                         % "1.7.0",
-    "com.beachape"            %% "enumeratum-play"                    % "1.7.0",
+    "org.typelevel"           %% "cats-core"                          % "2.10.0",
     "com.typesafe.play"       %% "play-json"                          % "2.9.2",
     "uk.gov.hmrc"             %% "internal-auth-client-play-28"       % "1.2.0",
     "uk.gov.hmrc"             %% "api-platform-application-domain"    % appDomainVersion,

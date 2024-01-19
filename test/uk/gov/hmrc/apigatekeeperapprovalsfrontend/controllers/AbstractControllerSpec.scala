@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
+
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -68,5 +71,8 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     val fakeSubmitCheckedRequest       = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")
     val fakeSubmitComebackLaterRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")
     val brokenRequest                  = fakeRequest.withFormUrlEncodedBody("submit-action" -> "bobbins")
+
+    def formatDMY(i: Instant): String = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(i)
+
   }
 }

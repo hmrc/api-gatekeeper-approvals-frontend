@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
@@ -25,11 +25,12 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborators
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, Collaborators, State}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, CommandFailure, CommandFailures, DispatchRequest, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{Actors, UserId, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -38,15 +39,21 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WireMock
 class ApplicationCommandConnectorSpec
     extends AsyncHmrcSpec
     with WireMockSugar
-    with GuiceOneAppPerSuite {
+    with GuiceOneAppPerSuite
+    with FixedClock {
 
-  def anApplicationResponse(createdOn: LocalDateTime = LocalDateTime.now(), lastAccess: LocalDateTime = LocalDateTime.now()): Application = {
+  def anApplicationResponse(
+      createdOn: LocalDateTime = LocalDateTime.now(),
+      lastAccess: Instant = instant,
+      state: ApplicationState = ApplicationState(State.TESTING, None, None, None, instant)
+    ): Application = {
     Application(
       ApplicationId.random,
       ClientId("clientid"),
       "appName",
       Set.empty,
-      Access.Standard()
+      Access.Standard(),
+      state
     )
   }
 
@@ -61,7 +68,7 @@ class ApplicationCommandConnectorSpec
   val emailAddressToRemove = "toRemove@example.com".toLaxEmail
   val gatekeeperUserName   = "maxpower"
   val collaborator         = Collaborators.Administrator(UserId.random, emailAddressToRemove)
-  val command              = ApplicationCommands.RemoveCollaborator(Actors.GatekeeperUser(gatekeeperUserName), collaborator, LocalDateTime.now())
+  val command              = ApplicationCommands.RemoveCollaborator(Actors.GatekeeperUser(gatekeeperUserName), collaborator, instant)
 
   val adminsToEmail = Set("admin1@example.com", "admin2@example.com").map(_.toLaxEmail)
   val url           = s"/applications/${applicationId}/dispatch"

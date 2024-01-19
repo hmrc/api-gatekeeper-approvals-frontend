@@ -76,7 +76,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
-      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, now)
+      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, instant)
     )
   }
 

@@ -159,7 +159,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "render checklist template with a deleted application" in new LivePageSetup {
-      val deletedApplication = application.copy(state = application.state.toDeleted(now).copy(requestedByName = Some("deletee@example.com")))
+      val deletedApplication = application.copy(state = application.state.toDeleted(instant).copy(requestedByName = Some("deletee@example.com")))
       setupForSuccessWith(passMarkedSubmission, true, true, deletedApplication)
       application.isInHouseSoftware shouldBe false
 

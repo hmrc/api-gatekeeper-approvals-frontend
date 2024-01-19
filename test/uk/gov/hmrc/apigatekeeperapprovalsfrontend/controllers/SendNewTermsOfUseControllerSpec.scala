@@ -79,14 +79,14 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
       ),
-      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, now)
+      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, instant)
     )
   }
 
   "page" should {
     "return 200 when standard app" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, now)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, instant)))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
@@ -100,7 +100,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
     "return 400 when app already has submissions" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, now)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, instant)))
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(appWithImportantData.id)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
@@ -111,7 +111,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
     "return 400 when app already invited" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, now)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, instant)))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(appWithImportantData.id)
 

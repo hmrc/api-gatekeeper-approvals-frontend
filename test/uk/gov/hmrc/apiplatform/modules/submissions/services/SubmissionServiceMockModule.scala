@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
 import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.{Duration, Instant}
 import scala.concurrent.Future.successful
 
 import org.mockito.quality.Strictness
@@ -34,6 +34,9 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
   trait BaseSubmissionServiceMock {
     def aMock: SubmissionService
+
+    // We need an instant that is quite recent so we can't use the FixedNow data.
+    private val anInstant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
     object FetchLatestMarkedSubmission {
 
@@ -76,20 +79,26 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
-        val now                 = LocalDateTime.now(ZoneOffset.UTC)
         val submittedSubmission =
-          (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(now.minusDays(8), "user"))(aSubmission)
+          (Submission.addStatusHistory(Submission.Status.Answering(anInstant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
+            anInstant.minus(Duration.ofDays(8)),
+            "user"
+          ))(aSubmission)
         val response            = Some(submittedSubmission)
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val now               = LocalDateTime.now(ZoneOffset.UTC)
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(
-          now.minusDays(9),
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(anInstant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
+          anInstant.minus(Duration.ofDays(9)),
           "user"
-        ) andThen Submission.warnings(now.minusDays(8), "user") andThen Submission.grantWithWarnings(now.minusDays(5), "user", "Warnings", None) andThen Submission.grant(
-          now.minusDays(2),
+        ) andThen Submission.warnings(anInstant.minus(Duration.ofDays(8)), "user") andThen Submission.grantWithWarnings(
+          anInstant.minus(Duration.ofDays(5)),
+          "user",
+          "Warnings",
+          None
+        ) andThen Submission.grant(
+          anInstant.minus(Duration.ofDays(2)),
           "user",
           None,
           None
@@ -99,12 +108,16 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId: ApplicationId) = {
-        val now               = LocalDateTime.now(ZoneOffset.UTC)
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(now.minusDays(10), true)) andThen Submission.submit(
-          now.minusDays(9),
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(anInstant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
+          anInstant.minus(Duration.ofDays(9)),
           "user"
-        ) andThen Submission.warnings(now.minusDays(8), "user") andThen Submission.grantWithWarnings(now.minusDays(5), "user", "Warnings", None) andThen Submission.grant(
-          now.minusDays(2),
+        ) andThen Submission.warnings(anInstant.minus(Duration.ofDays(8)), "user") andThen Submission.grantWithWarnings(
+          anInstant.minus(Duration.ofDays(5)),
+          "user",
+          "Warnings",
+          None
+        ) andThen Submission.grant(
+          anInstant.minus(Duration.ofDays(2)),
           "user",
           None,
           None

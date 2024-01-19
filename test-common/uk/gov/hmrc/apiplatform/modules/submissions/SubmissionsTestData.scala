@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.{Duration, Instant}
 import scala.util.Random
 
 import cats.data.NonEmptyList
@@ -26,34 +26,34 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen.Context.Keys
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-trait StatusTestDataHelper {
+trait StatusTestDataHelper extends FixedClock {
 
   implicit class StatusHistorySyntax(submission: Submission) {
 
     def hasCompletelyAnsweredWith(answers: Submission.AnswersToQuestions): Submission = {
       (
-        Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true)) andThen
+        Submission.addStatusHistory(Submission.Status.Answering(instant, true)) andThen
           Submission.updateLatestAnswersTo(answers)
       )(submission)
     }
 
     def hasCompletelyAnswered: Submission = {
-      Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), true))(submission)
+      Submission.addStatusHistory(Submission.Status.Answering(instant, true))(submission)
     }
 
     def answeringWith(answers: Submission.AnswersToQuestions): Submission = {
       (
-        Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), false)) andThen
+        Submission.addStatusHistory(Submission.Status.Answering(instant, false)) andThen
           Submission.updateLatestAnswersTo(answers)
       )(submission)
     }
 
     def answering: Submission = {
-      Submission.addStatusHistory(Submission.Status.Answering(LocalDateTime.now(ZoneOffset.UTC), false))(submission)
+      Submission.addStatusHistory(Submission.Status.Answering(instant, false))(submission)
     }
 
     def submitted: Submission = {
-      Submission.submit(LocalDateTime.now(ZoneOffset.UTC), "bob@example.com")(submission)
+      Submission.submit(instant, "bob@example.com")(submission)
     }
   }
 }
@@ -94,11 +94,13 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
     AskWhen.Context.Keys.IN_HOUSE_SOFTWARE -> "No",
     AskWhen.Context.Keys.VAT_OR_ITSA       -> "No"
   )
-  val aSubmission                      = Submission.create("bob@example.com", submissionId, applicationId, now, testGroups, testQuestionIdsOfInterest, standardContext)
+  val aSubmission                      = Submission.create("bob@example.com", submissionId, applicationId, instant, testGroups, testQuestionIdsOfInterest, standardContext)
 
   val altSubmissionId = Submission.Id.random
   require(altSubmissionId != submissionId)
-  val altSubmission   = Submission.create("bob@example.com", altSubmissionId, applicationId, now.plusSeconds(100), testGroups, testQuestionIdsOfInterest, standardContext)
+
+  val altSubmission =
+    Submission.create("bob@example.com", altSubmissionId, applicationId, instant.plus(Duration.ofSeconds(100)), testGroups, testQuestionIdsOfInterest, standardContext)
 
   val completedSubmissionId = Submission.Id.random
   require(completedSubmissionId != submissionId)
@@ -113,11 +115,11 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
   val createdSubmission   = aSubmission
   val answeringSubmission = createdSubmission.answeringWith(completeAnswersToQuestions)
   val answeredSubmission  = createdSubmission.hasCompletelyAnsweredWith(completeAnswersToQuestions)
-  val submittedSubmission = Submission.submit(now, "bob@example.com")(answeredSubmission)
-  val warningsSubmission  = Submission.warnings(now, "bob@example.com")(submittedSubmission)
-  val failedSubmission    = Submission.fail(now, "bob@example.com")(submittedSubmission)
-  val declinedSubmission  = Submission.decline(now, gatekeeperUserName, reasons)(submittedSubmission)
-  val grantedSubmission   = Submission.grant(now, gatekeeperUserName, None, None)(submittedSubmission)
+  val submittedSubmission = Submission.submit(instant, "bob@example.com")(answeredSubmission)
+  val warningsSubmission  = Submission.warnings(instant, "bob@example.com")(submittedSubmission)
+  val failedSubmission    = Submission.fail(instant, "bob@example.com")(submittedSubmission)
+  val declinedSubmission  = Submission.decline(instant, gatekeeperUserName, reasons)(submittedSubmission)
+  val grantedSubmission   = Submission.grant(instant, gatekeeperUserName, None, None)(submittedSubmission)
 
   def buildSubmissionWithQuestions(appId: ApplicationId = ApplicationId.random): Submission = {
     val subId = Submission.Id.random
@@ -166,7 +168,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
       "bob@example.com",
       subId,
       appId,
-      LocalDateTime.now(ZoneOffset.UTC),
+      instant,
       questionnaireGroups,
       QuestionIdsOfInterest(
         questionName.id,
@@ -317,7 +319,7 @@ trait MarkedSubmissionsTestData extends SubmissionsTestData with AnsweringQuesti
   val failMarkedSubmission = markedSubmission
   val warnMarkedSubmission = markAsWarn()(createdSubmission, 3)
 
-  def markAsPass(now: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC), requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
+  def markAsPass(now: Instant = instant, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
     val answers = answersForGroups(Pass)(submission.groups)
     val marks   = answers.map { case (q, a) => q -> Pass }
 
@@ -326,7 +328,7 @@ trait MarkedSubmissionsTestData extends SubmissionsTestData with AnsweringQuesti
     MarkedSubmission(newSubmission, marks)
   }
 
-  def markAsWarn(now: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC), requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
+  def markAsWarn(now: Instant = instant, requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
     val answers = answersForGroups(Warn)(submission.groups)
     val marks   = answers.take(warnCount).map { case (q, _) => q -> Warn } ++ answers.drop(warnCount).map { case (q, _) => q -> Pass }
 
