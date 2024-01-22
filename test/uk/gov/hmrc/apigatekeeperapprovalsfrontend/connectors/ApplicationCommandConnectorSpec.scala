@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import java.time.{Instant, LocalDateTime}
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
@@ -43,7 +43,7 @@ class ApplicationCommandConnectorSpec
     with FixedClock {
 
   def anApplicationResponse(
-      createdOn: LocalDateTime = LocalDateTime.now(),
+      createdOn: Instant = instant,
       lastAccess: Instant = instant,
       state: ApplicationState = ApplicationState(State.TESTING, None, None, None, instant)
     ): Application = {
