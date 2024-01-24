@@ -16,7 +16,11 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.domain.services
 
+import java.time.Instant
+
 import play.api.libs.json._
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.InstantJsonFormatter.WithTimeZone.instantWithTimeZoneWrites
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.InstantJsonFormatter.lenientInstantReads
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.play.json.Union
 
@@ -49,6 +53,8 @@ trait BaseSubmissionsJsonFormatters extends GroupOfQuestionnairesJsonFormatters 
 
 trait SubmissionsJsonFormatters extends BaseSubmissionsJsonFormatters {
   import Submission.Status._
+
+  implicit val dateFormat: Format[Instant] = Format(lenientInstantReads, instantWithTimeZoneWrites)
 
   implicit val rejectedStatusFormat: OFormat[Declined]                                         = Json.format[Declined]
   implicit val acceptedStatusFormat: OFormat[Granted]                                          = Json.format[Granted]
