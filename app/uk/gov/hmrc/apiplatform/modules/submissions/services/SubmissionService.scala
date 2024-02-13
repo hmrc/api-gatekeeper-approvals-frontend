@@ -97,4 +97,13 @@ class SubmissionService @Inject() (
     ): Future[Either[String, Application]] = {
     submissionConnector.grantForTouUplift(applicationId, requestedBy, comments, escalatedTo)
   }
+
+  def resetForTouUplift(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      reasons: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
+    submissionConnector.resetForTouUplift(applicationId, requestedBy, reasons)
+  }
 }
