@@ -70,12 +70,13 @@
         @if(history == viewModel.historyEntries.head) {
           <p class="govuk-body">
             @{ 
-              (request.role.isUser, history.status.toUpperCase()) match {
-                case (true, "FAILED")                        => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
-                case (true, "WARNINGS")                      => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
-                case (true, "TERMS OF USE V2 WITH WARNINGS") => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
-                case (true, "TERMS OF USE V2")               => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseAnswersController.page(viewModel.applicationId).url}>{messages("termsofusehistory.viewanswers")}</a>
-                case _                                       => 
+              (request.role.isUser, request.role.isSuperUser, history.status.toUpperCase()) match {
+                case (true, _,    "FAILED")                         => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
+                case (true, _,    "WARNINGS")                       => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
+                case (true, _,    "TERMS OF USE V2 WITH WARNINGS")  => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
+                case (true, true, "PENDING RESPONSIBLE INDIVIDUAL") => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.page(viewModel.applicationId).url}>{messages("termsofusehistory.resetsubmission")}</a>
+                case (true, _,    "TERMS OF USE V2")                => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseAnswersController.page(viewModel.applicationId).url}>{messages("termsofusehistory.viewanswers")}</a>
+                case _                                              => 
               }
             }
           </p>

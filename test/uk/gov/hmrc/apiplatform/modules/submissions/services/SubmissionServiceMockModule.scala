@@ -241,6 +241,19 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
     }
+
+    object ResetForTouUplift {
+
+      def thenReturn(applicationId: ApplicationId, application: Application) = {
+        val response = Right(application)
+        when(aMock.resetForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+      }
+
+      def thenReturnError(applicationId: ApplicationId) = {
+        val response = Left("error")
+        when(aMock.resetForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+      }
+    }
   }
 
   object SubmissionServiceMock extends BaseSubmissionServiceMock {

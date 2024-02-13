@@ -15,13 +15,14 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseResetController.{ProvideNotesForm, ViewModel}
+@import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(form: Form[ProvideNotesForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[ProvideNotesForm], model: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
 
 @layout(pageTitle = Some(messages("termsofusereset.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>
@@ -40,10 +41,15 @@
     <div id="notes-hint" class="govuk-hint">
       @{messages("termsofusereset.note.1")}
     </div>
+    <div id="notes-hint" class="govuk-hint">
+      @{messages("termsofusereset.note.2")}
+    </div>
     <textarea class="govuk-textarea @if(form.errors("reasons").nonEmpty) {govuk-textarea--error}" id="notes" name="notes" rows="5" aria-describedby="notes-hint">@form.data.get("notes")</textarea>
 
-    <button class="govuk-button" data-module="govuk-button">
-      @{messages("termsofusereset.button.continue")}
-    </button>
+    @if(request.role.isSuperUser) {
+      <button class="govuk-button" data-module="govuk-button">
+        @{messages("termsofusereset.button.continue")}
+      </button>
+    }
   }
 }
