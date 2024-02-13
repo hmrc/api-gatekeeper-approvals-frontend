@@ -17,15 +17,15 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import play.api.http.Status._
-import play.api.Configuration
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application => PlayApplication}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+
+import play.api.http.Status._
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application => PlayApplication, Configuration, Mode}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.Mode
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 
 class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions {
 

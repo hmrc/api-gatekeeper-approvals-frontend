@@ -4,7 +4,6 @@ import com.typesafe.sbt.digest.Import._
 import com.typesafe.sbt.uglify.Import._
 import net.ground5hark.sbt.concat.Import._
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "api-gatekeeper-approvals-frontend"
 
@@ -18,7 +17,8 @@ ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 scalaVersion := "2.13.12"
  
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(
     majorVersion                     := 0,
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
@@ -52,6 +52,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(ScoverageSettings(): _*)
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
+  .settings(scalafixConfigSettings(IntegrationTest))
   .settings(
     routesImport ++= Seq(
       "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._",
@@ -84,5 +85,5 @@ commands ++= Seq(
   Command.command("clean-and-test") { state => "clean" :: "compile" :: "run-all-tests" :: state },
 
   // Coverage does not need compile !
-  Command.command("pre-commit") { state => "scalafmtAll" :: "scalafixAll" :: "clean" :: "coverage" :: "run-all-tests" :: "coverageOff" :: "coverageAggregate" :: state }
+  Command.command("pre-commit") { state => "clean" :: "scalafmtAll" :: "scalafixAll" :: "coverage" :: "run-all-tests" :: "coverageOff" :: "coverageAggregate" :: state }
 )
