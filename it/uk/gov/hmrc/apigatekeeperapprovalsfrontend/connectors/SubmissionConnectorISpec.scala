@@ -347,4 +347,27 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       }
     }
   }
+
+  "reset application for ToU" should {
+    val url = s"/approvals/application/${applicationId.value}/reset-tou"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(TouUpliftRequest(requestedBy, reason))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(anApplication(id = applicationId))
+          )
+      )
+
+      val result = await(connector.resetForTouUplift(applicationId, requestedBy, reason))
+
+      result match {
+        case Right(app: Application) => app.id shouldBe applicationId
+        case _                       => fail("Expected an Application, got something else.")
+      }
+    }
+  }
 }

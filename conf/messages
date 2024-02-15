@@ -243,6 +243,7 @@ termsofusehistory.title = Terms of use history
 termsofusehistory.dueon = Due on
 termsofusehistory.managesubmission = Manage submission
 termsofusehistory.viewanswers = View submitted answers
+termsofusehistory.resetsubmission = Reset submission
 termsofusehistory.applicationdetails = Application details
 termsofusehistory.viewapplicationdetails = Review or manage application details
 termsofusehistory.inhouse = This request is from an in-house developer
@@ -283,6 +284,17 @@ termsofusenotes.title = Note all the reasons
 termsofusenotes.note.1 = The notes are saved on the Terms of Use history page for the submission.
 termsofusenotes.note.2 = Include what action the organisation has taken to resolve the warnings.
 termsofusenotes.button.continue = Save and continue
+
+termsofusereset.pagetitle = HMRC API Gatekeeper - Reset terms of use submission
+termsofusereset.title = Note the reasons for resetting this submission
+termsofusereset.note.1 = The submission will be reset back to 'Email sent' and the user will have to re-submit.
+termsofusereset.note.2 = The notes are saved on the Terms of Use history page for the submission.
+termsofusereset.button.continue = Save and continue
+
+termsofuseresetconfirmation.pagetitle = HMRC API Gatekeeper - Reset terms of use submission confirmation
+termsofuseresetconfirmation.title = Reset terms of use submission
+termsofuseresetconfirmation.text = The submission has been successfully reset back to 'Email sent'
+termsofuseresetconfirmation.back = Back to Terms of use
 
 termsofuseadmins.title = Copy email addresses and email the team admins
 termsofuseadmins.pagetitle = HMRC API Gatekeeper - Copy email addresses

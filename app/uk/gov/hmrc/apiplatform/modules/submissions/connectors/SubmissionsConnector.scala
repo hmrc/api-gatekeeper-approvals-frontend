@@ -196,4 +196,22 @@ class SubmissionsConnector @Inject() (
         .map(_.leftMap(failed(_)))
     }
   }
+
+  def resetForTouUplift(
+      applicationId: ApplicationId,
+      requestedBy: String,
+      reasons: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, Application]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to reset application ${applicationId}: ${err}"
+
+    metrics.record(api) {
+      http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
+        s"$serviceBaseUrl/approvals/application/${applicationId}/reset-tou",
+        TouUpliftRequest(requestedBy, reasons)
+      )
+        .map(_.leftMap(failed(_)))
+    }
+  }
 }
