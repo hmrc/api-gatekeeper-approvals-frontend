@@ -26,5 +26,5 @@ object AppDependencies {
     "org.jsoup"                   %  "jsoup"                             % "1.15.4",
     "org.mockito"                 %% "mockito-scala-scalatest"           % "1.17.29",
     "uk.gov.hmrc"                 %% "api-platform-test-common-domain"   % commonDomainVersion
-  ).map(_ % "test, it")
+  ).map(_ % "test")
 }
