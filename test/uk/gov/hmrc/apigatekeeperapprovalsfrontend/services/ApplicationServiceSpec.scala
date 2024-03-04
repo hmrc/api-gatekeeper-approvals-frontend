@@ -25,7 +25,6 @@ import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ApplicationCommandConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
@@ -52,12 +51,12 @@ class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
     val standardAccess          = Access.Standard(importantSubmissionData = Some(importantSubmissionData))
     val application             = anApplication().copy(access = standardAccess)
 
-    val submissionReview = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
+    val submissionReview = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
 
     val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
     val standardAccessWithoutTOUAgreement          = Access.Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
     val applicationWithoutTOUAgreement             = anApplication().copy(access = standardAccessWithoutTOUAgreement)
-    val submissionReviewWithoutTOUAgreement        = SubmissionReview(Submission.Id.random, 0, true, false, false, false)
+    val submissionReviewWithoutTOUAgreement        = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
   }
 
   "fetchByApplicationId" should {

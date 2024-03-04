@@ -35,13 +35,13 @@ object CompanyDetailsExtractor {
   def apply(submission: Submission): Option[CompanyRegistrationDetails] = {
 
     def extractSingleChoiceAnswer(a: ActualAnswer): Option[String] = a match {
-      case SingleChoiceAnswer(ta) => Some(ta)
-      case _                      => None
+      case ActualAnswer.SingleChoiceAnswer(ta) => Some(ta)
+      case _                                   => None
     }
 
     def extractTextAnswer(a: ActualAnswer): Option[String] = a match {
-      case TextAnswer(ta) => Some(ta)
-      case _              => None
+      case ActualAnswer.TextAnswer(ta) => Some(ta)
+      case _                           => None
     }
 
     def questionsToAsk(questionnaire: Questionnaire, context: AskWhen.Context, answersToQuestions: AnswersToQuestions): List[Question.Id] = {

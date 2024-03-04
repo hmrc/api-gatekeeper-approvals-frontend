@@ -22,11 +22,9 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 class AnswerQuestionsJsonFormatterSpec extends HmrcSpec {
 
-  import AnswersJsonFormatters._
-
   "Can format" should {
     "work for text answers" in {
-      val answer: ActualAnswer = TextAnswer("Bobby")
+      val answer: ActualAnswer = ActualAnswer.TextAnswer("Bobby")
       val text                 = Json.prettyPrint(Json.toJson(answer))
       text shouldBe """{
                       |  "value" : "Bobby",
@@ -38,7 +36,7 @@ class AnswerQuestionsJsonFormatterSpec extends HmrcSpec {
     }
 
     "work for single choice answers" in {
-      val answer: ActualAnswer = SingleChoiceAnswer("Bobby")
+      val answer: ActualAnswer = ActualAnswer.SingleChoiceAnswer("Bobby")
       val text                 = Json.prettyPrint(Json.toJson(answer))
       text shouldBe """{
                       |  "value" : "Bobby",
@@ -47,7 +45,7 @@ class AnswerQuestionsJsonFormatterSpec extends HmrcSpec {
     }
 
     "work for multiple choice answers" in {
-      val answer: ActualAnswer = MultipleChoiceAnswer(Set("Bobby", "Freddy"))
+      val answer: ActualAnswer = ActualAnswer.MultipleChoiceAnswer(Set("Bobby", "Freddy"))
       val text                 = Json.prettyPrint(Json.toJson(answer))
       text shouldBe """{
                       |  "values" : [ "Bobby", "Freddy" ],
@@ -56,14 +54,14 @@ class AnswerQuestionsJsonFormatterSpec extends HmrcSpec {
     }
 
     "work for AcknowledgedAnswer" in {
-      val answer: ActualAnswer = AcknowledgedAnswer
+      val answer: ActualAnswer = ActualAnswer.AcknowledgedAnswer
       Json.prettyPrint(Json.toJson(answer)) shouldBe """{
                                                        |  "answerType" : "acknowledged"
                                                        |}""".stripMargin
     }
 
     "work for NoAnswers" in {
-      val answer: ActualAnswer = NoAnswer
+      val answer: ActualAnswer = ActualAnswer.NoAnswer
       Json.prettyPrint(Json.toJson(answer)) shouldBe """{
                                                        |  "answerType" : "noAnswer"
                                                        |}""".stripMargin

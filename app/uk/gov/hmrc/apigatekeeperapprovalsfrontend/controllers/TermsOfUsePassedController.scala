@@ -56,7 +56,7 @@ class TermsOfUsePassedController @Inject() (
 
   def answersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
-      request.markedAnswers.get(id).map(_ == Pass).getOrElse(false)
+      request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
     val isDeleted                        = request.application.state.name == State.DELETED
 

@@ -49,7 +49,7 @@
             @{messages(answer.answer)}
           </td>
           <td class="govuk-table__cell govuk-table__cell--numeric">
-            @{ if (answer.status == Fail) {
+            @{ if (answer.status == Mark.Fail) {
                 <strong class="govuk-tag govuk-tag--red"> {messages("termsofusefailedlist.status.failed")} </strong>
               } else {
                 <strong class="govuk-tag govuk-tag--yellow"> {messages("termsofusefailedlist.status.warning")} </strong>

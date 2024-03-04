@@ -4,9 +4,9 @@ object AppDependencies {
 
   lazy val bootstrapPlayVersion = "8.4.0"
   lazy val mongoVersion = "1.7.0"
-  val apiDomainVersion = "0.13.0"
-  val commonDomainVersion = "0.11.0"
-  val appDomainVersion = "0.35.0"
+  val apiDomainVersion = "0.15.0"
+  val commonDomainVersion = "0.13.0"
+  val appDomainVersion = "0.37.0"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-30"         % bootstrapPlayVersion,
@@ -14,7 +14,6 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-30"                 % mongoVersion,
     "uk.gov.hmrc"             %% "http-metrics"                       % "2.8.0",
     "org.typelevel"           %% "cats-core"                          % "2.10.0",
-    "com.typesafe.play"       %% "play-json"                          % "2.9.4",
     "uk.gov.hmrc"             %% "internal-auth-client-play-30"       % "1.10.0",
     "uk.gov.hmrc"             %% "api-platform-application-domain"    % appDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-api-domain"            % apiDomainVersion

@@ -22,8 +22,8 @@ import org.mockito.quality.Strictness
 import org.mockito.verification.VerificationMode
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
@@ -58,7 +58,7 @@ trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersS
       def thenReturn(review: SubmissionReview) =
         when(aMock.find(eqTo(review.submissionId), eqTo(review.instanceIndex))).thenReturn(successful(Some(review)))
 
-      def thenFindNone(submissionId: Submission.Id, instanceIndex: Int) =
+      def thenFindNone(submissionId: SubmissionId, instanceIndex: Int) =
         when(aMock.find(eqTo(submissionId), eqTo(instanceIndex))).thenReturn(successful(None))
     }
 

@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.OptionT
 
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
@@ -34,7 +34,7 @@ class SubmissionReviewService @Inject() (
   ) {
 
   def findOrCreateReview(
-      submissionId: Submission.Id,
+      submissionId: SubmissionId,
       instanceIndex: Int,
       isSuccessful: Boolean,
       hasWarnings: Boolean,
@@ -50,11 +50,11 @@ class SubmissionReviewService @Inject() (
       .flatMap(_.fold(createANewReview)(r => successful(r)))
   }
 
-  def findReview(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def findReview(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     repo.find(submissionId, instanceIndex)
   }
 
-  def updateDeclineReasons(reasons: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def updateDeclineReasons(reasons: String)(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
         originalReview <- OptionT(repo.find(submissionId, instanceIndex))
@@ -65,7 +65,7 @@ class SubmissionReviewService @Inject() (
       .value
   }
 
-  def updateGrantWarnings(warnings: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def updateGrantWarnings(warnings: String)(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
         originalReview <- OptionT(repo.find(submissionId, instanceIndex))
@@ -76,7 +76,7 @@ class SubmissionReviewService @Inject() (
       .value
   }
 
-  def updateEscalatedTo(escalatedTo: String)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def updateEscalatedTo(escalatedTo: String)(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
         originalReview <- OptionT(repo.find(submissionId, instanceIndex))
@@ -87,7 +87,7 @@ class SubmissionReviewService @Inject() (
       .value
   }
 
-  def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
         originalReview <- OptionT(repo.find(submissionId, instanceIndex))

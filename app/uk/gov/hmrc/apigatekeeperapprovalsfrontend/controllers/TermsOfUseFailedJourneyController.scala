@@ -45,8 +45,8 @@ object TermsOfUseFailedJourneyController {
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
   case class AnswersViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean, submissionStatus: Submission.Status) {
-    lazy val hasFails: Boolean = answers.exists(_.status == Fail)
-    lazy val hasWarns: Boolean = answers.exists(_.status == Warn)
+    lazy val hasFails: Boolean = answers.exists(_.status == Mark.Fail)
+    lazy val hasWarns: Boolean = answers.exists(_.status == Mark.Warn)
 
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsandwarns" else "failsonly" }
     else "warnsonly"
@@ -114,11 +114,11 @@ class TermsOfUseFailedJourneyController @Inject() (
         AnswerDetails(
           question.wording.value,
           ActualAnswersAsText(answer),
-          request.markedAnswers.getOrElse(question.id, Pass)
+          request.markedAnswers.getOrElse(question.id, Mark.Pass)
         )
     }
       .toList
-      .filter(_.status != Pass)
+      .filter(_.status != Mark.Pass)
 
     val isSuccessful = !request.markedSubmission.isFail
     val hasWarnings  = request.markedSubmission.isWarn
@@ -162,11 +162,11 @@ class TermsOfUseFailedJourneyController @Inject() (
         AnswerDetails(
           question.wording.value,
           ActualAnswersAsText(answer),
-          request.markedAnswers.getOrElse(question.id, Pass)
+          request.markedAnswers.getOrElse(question.id, Mark.Pass)
         )
     }
       .toList
-      .filter(_.status != Pass)
+      .filter(_.status != Mark.Pass)
 
     successful(Ok(termsOfUseFailedPage(
       AnswersViewModel(

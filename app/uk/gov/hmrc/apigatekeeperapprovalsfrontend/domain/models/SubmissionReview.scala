@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
 object SubmissionReview {
   sealed trait Status
@@ -67,13 +67,13 @@ object SubmissionReview {
   }
 
   private def apply(
-      submissionId: Submission.Id,
+      submissionId: SubmissionId,
       instanceIndex: Int,
       requiredActions: List[Action]
     ): SubmissionReview =
     SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
 
-  def apply(submissionId: Submission.Id, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
+  def apply(submissionId: SubmissionId, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
     val alternativeActions: List[Action] =
       (isSuccessful, hasWarnings) match {
         case (true, false) => List.empty
@@ -122,7 +122,7 @@ object SubmissionReview {
 }
 
 case class SubmissionReview private (
-    submissionId: Submission.Id,
+    submissionId: SubmissionId,
     instanceIndex: Int,
     declineReasons: String,
     grantWarnings: String,

@@ -22,8 +22,8 @@ import scala.concurrent.Future.successful
 import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
@@ -47,18 +47,18 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
       }
 
       def thenReturnNone() = {
-        when(aMock.findReview(*[Submission.Id], *)).thenReturn(successful(None))
+        when(aMock.findReview(*[SubmissionId], *)).thenReturn(successful(None))
       }
     }
 
     object UpdateActionStatus {
 
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateActionStatus(*, *)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
+        when(aMock.updateActionStatus(*, *)(*[SubmissionId], *)).thenReturn(Future.successful(Some(review)))
       }
 
       def thenReturn(action: SubmissionReview.Action, status: SubmissionReview.Status, review: SubmissionReview) = {
-        when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*[Submission.Id], *)).thenReturn(Future.successful(Some(review.copy(requiredActions =
+        when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*[SubmissionId], *)).thenReturn(Future.successful(Some(review.copy(requiredActions =
           review.requiredActions + (action -> status)
         ))))
       }
@@ -67,33 +67,33 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
     object UpdateDeclineReasons {
 
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateDeclineReasons(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
+        when(aMock.updateDeclineReasons(*)(*[SubmissionId], *)).thenReturn(Future.successful(Some(review)))
       }
 
       def thenReturnError() = {
-        when(aMock.updateDeclineReasons(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
+        when(aMock.updateDeclineReasons(*)(*[SubmissionId], *)).thenReturn(Future.successful(None))
       }
     }
 
     object UpdateGrantWarnings {
 
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateGrantWarnings(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
+        when(aMock.updateGrantWarnings(*)(*[SubmissionId], *)).thenReturn(Future.successful(Some(review)))
       }
 
       def thenReturnError() = {
-        when(aMock.updateGrantWarnings(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
+        when(aMock.updateGrantWarnings(*)(*[SubmissionId], *)).thenReturn(Future.successful(None))
       }
     }
 
     object UpdateEscalatedTo {
 
       def thenReturn(review: SubmissionReview) = {
-        when(aMock.updateEscalatedTo(*)(*[Submission.Id], *)).thenReturn(Future.successful(Some(review)))
+        when(aMock.updateEscalatedTo(*)(*[SubmissionId], *)).thenReturn(Future.successful(Some(review)))
       }
 
       def thenReturnError() = {
-        when(aMock.updateEscalatedTo(*)(*[Submission.Id], *)).thenReturn(Future.successful(None))
+        when(aMock.updateEscalatedTo(*)(*[SubmissionId], *)).thenReturn(Future.successful(None))
       }
     }
   }

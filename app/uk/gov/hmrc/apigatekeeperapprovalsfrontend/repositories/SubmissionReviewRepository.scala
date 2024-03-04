@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
@@ -38,13 +38,13 @@ class SubmissionReviewRepo @Inject() (mongo: MongoComponent)(implicit ec: Execut
       )
     ) {
 
-  def filterBy(submissionId: Submission.Id, instanceIndex: Int) =
+  def filterBy(submissionId: SubmissionId, instanceIndex: Int) =
     Filters.and(
       Filters.equal("submissionId", submissionId.value),
       Filters.equal("instanceIndex", instanceIndex)
     )
 
-  def find(submissionId: Submission.Id, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def find(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     collection.find(
       filter = filterBy(submissionId, instanceIndex)
     ).headOption()
