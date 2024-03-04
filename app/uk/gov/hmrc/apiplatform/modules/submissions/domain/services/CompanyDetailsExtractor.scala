@@ -23,15 +23,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CompanyRegistratio
 
 object CompanyDetailsExtractor {
 
-  object DeriveContext {
-
-    object Keys {
-      val VAT_OR_ITSA             = "VAT_OR_ITSA"
-      val IN_HOUSE_SOFTWARE       = "IN_HOUSE_SOFTWARE"       // Stored on Application
-      val NEW_TERMS_OF_USE_UPLIFT = "NEW_TERMS_OF_USE_UPLIFT" // Application already in production, rather than a production credentials request
-    }
-  }
-
   def apply(submission: Submission): Option[CompanyRegistrationDetails] = {
 
     def extractSingleChoiceAnswer(a: ActualAnswer): Option[String] = a match {
@@ -55,7 +46,7 @@ object CompanyDetailsExtractor {
       // Note that the question is dependent upon your previous answer (i.e. you'll be asked for a
       // VAT number if you answered the 'Identify your Organisation' question 'VAT registration number')
       val registrationQuestionnaire   = submission.findQuestionnaireContaining(registrationTypeQuestionId).get
-      val simpleContext               = Map(DeriveContext.Keys.IN_HOUSE_SOFTWARE -> "Yes", DeriveContext.Keys.VAT_OR_ITSA -> "No")
+      val simpleContext               = Map(AskWhen.Context.Keys.IN_HOUSE_SOFTWARE -> "Yes", AskWhen.Context.Keys.VAT_OR_ITSA -> "No")
       val registrationQuestions       = questionsToAsk(registrationQuestionnaire, simpleContext, submission.latestInstance.answersToQuestions)
       val registrationValueQuestionId = registrationQuestions.dropWhile(_ != registrationTypeQuestionId).tail.headOption
       submission.latestInstance.answersToQuestions.get(registrationValueQuestionId.get) flatMap extractTextAnswer
