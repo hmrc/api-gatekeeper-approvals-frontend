@@ -25,7 +25,7 @@ import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Fail
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Mark
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
@@ -65,7 +65,7 @@ class TermsOfUseReasonsController @Inject() (
   import TermsOfUseReasonsController._
 
   def provideReasonsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Fail)
+    val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
     val hasWarnings = request.markedSubmission.isWarn
     successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
   }
@@ -82,7 +82,7 @@ class TermsOfUseReasonsController @Inject() (
     }
 
     def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
-      val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Fail)
+      val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
       val hasWarnings = request.markedSubmission.isWarn
       successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
     }

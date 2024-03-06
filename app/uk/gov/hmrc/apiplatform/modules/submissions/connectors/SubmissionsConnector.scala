@@ -22,7 +22,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services._
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
@@ -55,10 +54,11 @@ class SubmissionsConnector @Inject() (
     val config: SubmissionsConnector.Config,
     val metrics: ConnectorMetrics
   )(implicit val ec: ExecutionContext
-  ) extends SubmissionsJsonFormatters {
+  ) {
 
   import SubmissionsConnector._
   import config._
+  import Submission._
 
   val api = API("third-party-application-submissions")
 

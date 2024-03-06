@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AcknowledgedAnswer, NoAnswer, Submission}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{ActualAnswer, Submission}
 
 class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
 
@@ -30,9 +30,9 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
     )(aSubmission)
 
     val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions +
-      (DevelopmentPractices.question1.id -> NoAnswer) +
-      (DevelopmentPractices.question2.id -> AcknowledgedAnswer) +
-      (DevelopmentPractices.question3.id -> NoAnswer))(aSubmission)
+      (DevelopmentPractices.question1.id -> ActualAnswer.NoAnswer) +
+      (DevelopmentPractices.question2.id -> ActualAnswer.AcknowledgedAnswer) +
+      (DevelopmentPractices.question3.id -> ActualAnswer.NoAnswer))(aSubmission)
   }
 
   "SubmissionQuestionsAndAnswers" should {

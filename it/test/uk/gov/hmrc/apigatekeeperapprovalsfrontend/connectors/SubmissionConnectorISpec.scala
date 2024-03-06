@@ -27,8 +27,7 @@ import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.{GrantedRequest, TouGrantedRequest, TouUpliftRequest}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.SubmissionsJsonFormatters
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -36,6 +35,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData {
+
+  import Submission._
 
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,
@@ -51,7 +52,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       .in(Mode.Test)
       .build()
 
-  trait Setup extends SubmissionsJsonFormatters with ProgressTestDataHelper {
+  trait Setup extends ProgressTestDataHelper {
     val connector = app.injector.instanceOf[SubmissionsConnector]
 
     val extSubmission              = aSubmission.withIncompleteProgress()
