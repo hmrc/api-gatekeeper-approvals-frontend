@@ -27,7 +27,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationWithApplication
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitationState, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
@@ -76,12 +77,24 @@ class TermsOfUseInvitationController @Inject() (
   import TermsOfUseInvitationController._
 
   def page = loggedInOnly() { implicit request =>
+    def deriveTermsOfUseStatusDisplayName(status: TermsOfUseInvitationState): String = {
+      status match {
+        case EMAIL_SENT                    => "Email sent"
+        case REMINDER_EMAIL_SENT           => "Reminder email sent"
+        case OVERDUE                       => "Overdue"
+        case WARNINGS                      => "Warnings"
+        case FAILED                        => "Failed"
+        case TERMS_OF_USE_V2_WITH_WARNINGS => "Terms of use V2 with warnings"
+        case TERMS_OF_USE_V2               => "Terms of use V2"
+      }
+    }
+
     def buildViewModel(invite: TermsOfUseInvitationWithApplication): ViewModel = {
       ViewModel(
         invite.applicationId,
         invite.applicationName,
         DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.lastUpdated),
-        invite.status.toString()
+        deriveTermsOfUseStatusDisplayName(invite.status)
       )
     }
 
