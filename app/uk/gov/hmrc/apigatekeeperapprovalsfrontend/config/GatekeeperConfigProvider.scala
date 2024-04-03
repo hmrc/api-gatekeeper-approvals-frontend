@@ -25,6 +25,7 @@ class GatekeeperConfigProvider @Inject() (config: ServicesConfig) extends Provid
 
   override def get(): GatekeeperConfig =
     GatekeeperConfig(
-      config.baseUrl("api-gatekeeper-frontend")
+      config.baseUrl("api-gatekeeper-frontend"),
+      config.baseUrl("api-gatekeeper-apis-frontend")
     )
 }
