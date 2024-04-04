@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.config
 
-case class GatekeeperConfig(gatekeeperBaseUrl: String) {
+case class GatekeeperConfig(gatekeeperBaseUrl: String, gatekeeperApisBaseUrl: String) {
+  lazy val apisPageUri         = s"${gatekeeperApisBaseUrl}/api-gatekeeper-apis"
   lazy val applicationsPageUri = s"${gatekeeperBaseUrl}/api-gatekeeper/applications"
   lazy val developersPageUri   = s"${gatekeeperBaseUrl}/api-gatekeeper/developers"
   lazy val emailsPageUri       = s"${gatekeeperBaseUrl}/api-gatekeeper/emails"
