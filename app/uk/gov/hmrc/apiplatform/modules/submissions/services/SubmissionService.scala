@@ -16,21 +16,29 @@
 
 package uk.gov.hmrc.apiplatform.modules.submissions.services
 
+import java.time.Clock
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import cats.data.NonEmptyList
+
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, CommandFailure, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
 class SubmissionService @Inject() (
-    submissionConnector: SubmissionsConnector
+    submissionConnector: SubmissionsConnector,
+    applicationCommandConnector: ApplicationCommandConnector,
+    val clock: Clock
   )(implicit val ec: ExecutionContext
-  ) {
+  ) extends ClockNow {
 
   def fetchLatestSubmission(appId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = submissionConnector.fetchLatestSubmission(appId)
 
@@ -38,10 +46,9 @@ class SubmissionService @Inject() (
     submissionConnector.fetchLatestMarkedSubmission(applicationId)
   }
 
-  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
-    for {
-      app <- submissionConnector.grant(applicationId, requestedBy)
-    } yield app
+  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
+    val cmd = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant(), None, None)
+    applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
   def grantWithWarnings(
@@ -50,10 +57,9 @@ class SubmissionService @Inject() (
       warnings: String,
       escalatedTo: Option[String]
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
-    for {
-      app <- submissionConnector.grantWithWarnings(applicationId, requestedBy, warnings, escalatedTo)
-    } yield app
+    ): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
+    val cmd = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant(), Some(warnings), escalatedTo)
+    applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
   def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
