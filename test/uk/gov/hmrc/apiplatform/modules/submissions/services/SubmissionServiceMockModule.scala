@@ -20,9 +20,11 @@ import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
 import scala.concurrent.Future.successful
 
+import cats.data.NonEmptyList
 import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailures, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
@@ -134,12 +136,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object Grant {
 
       def thenReturn(applicationId: ApplicationId, application: Application) = {
-        val response = Right(application)
+        val response = Right(DispatchSuccessResult(application))
         when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
-        val response = Left("error")
+        val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
         when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
     }
@@ -147,12 +149,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object GrantWithWarnings {
 
       def thenReturn(applicationId: ApplicationId, application: Application) = {
-        val response = Right(application)
+        val response = Right(DispatchSuccessResult(application))
         when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
-        val response = Left("error")
+        val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
         when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
       }
     }

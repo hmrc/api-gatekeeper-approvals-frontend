@@ -20,9 +20,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import cats.data.EitherT
+import cats.data.{EitherT, NonEmptyList}
 
 import play.api.mvc.{MessagesControllerComponents, _}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -67,10 +68,15 @@ class ConfirmYourDecisionController @Inject() (
   }
 
   private def grantAccess(applicationId: ApplicationId)(implicit request: MarkedSubmissionApplicationRequest[AnyContent]) = {
+
+    def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
+      val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
+      InternalServerError(errString)
+    }
     (
       for {
-        review      <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
-        application <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(InternalServerError(_))
+        review <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
+        _      <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(handleCommandFailures)
       } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
     ).fold(identity(_), identity(_))
   }

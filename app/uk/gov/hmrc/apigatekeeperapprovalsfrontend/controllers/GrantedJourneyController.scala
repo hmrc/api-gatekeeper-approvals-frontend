@@ -20,11 +20,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import cats.data.EitherT
+import cats.data.{EitherT, NonEmptyList}
 
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.CommandFailures
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.CommandFailures.GenericFailure
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -78,18 +80,19 @@ class GrantedJourneyController @Inject() (
     def handleValidForm(form: ProvideWarningsForm) = {
       (
         for {
-          review      <- EitherT.fromOptionF(
-                           submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index),
-                           "There was a problem updating the grant warnings on the submission review"
-                         )
-          application <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings, review.escalatedTo))
+          review <- EitherT.fromOptionF(
+                      submissionReviewService.updateGrantWarnings(form.warnings)(request.submission.id, request.submission.latestInstance.index),
+                      NonEmptyList.one(GenericFailure("There was a problem updating the grant warnings on the submission review"))
+                    )
+          _      <- EitherT(submissionService.grantWithWarnings(applicationId, request.name.get, form.warnings, review.escalatedTo))
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
       )
         .value
         .map {
-          case Right(value) => value
-          case Left(err)    => {
-            logger.warn(s"Error granting access for application $applicationId: $err")
+          case Right(value)   => value
+          case Left(failures) => {
+            val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
+            logger.warn(s"Error granting access for application $applicationId: $errString")
             InternalServerError(errorHandler.internalServerErrorTemplate)
           }
         }

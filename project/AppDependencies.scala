@@ -6,7 +6,7 @@ object AppDependencies {
   lazy val mongoVersion = "1.7.0"
   val apiDomainVersion = "0.15.0"
   val commonDomainVersion = "0.13.0"
-  val appDomainVersion = "0.45.0"
+  val appDomainVersion = "0.50.0"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-30"         % bootstrapPlayVersion,

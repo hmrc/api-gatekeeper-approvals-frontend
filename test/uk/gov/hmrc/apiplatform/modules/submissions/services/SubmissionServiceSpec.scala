@@ -20,25 +20,29 @@ import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
 
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 
 class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
 
-  trait Setup {
-    implicit val hc: HeaderCarrier                     = HeaderCarrier()
-    val applicationId                                  = ApplicationId.random
-    val mockSubmissionsConnector: SubmissionsConnector = mock[SubmissionsConnector]
-    val requestedBy                                    = "bob@example.com"
-    val app                                            = anApplication(applicationId)
+  trait Setup extends FixedClock {
+    implicit val hc: HeaderCarrier                                   = HeaderCarrier()
+    val applicationId                                                = ApplicationId.random
+    val mockSubmissionsConnector: SubmissionsConnector               = mock[SubmissionsConnector]
+    val mockApplicationCommandConnector: ApplicationCommandConnector = mock[ApplicationCommandConnector]
+    val requestedBy                                                  = "bob@example.com"
+    val app                                                          = anApplication(applicationId)
 
-    val underTest = new SubmissionService(mockSubmissionsConnector)
+    val underTest = new SubmissionService(mockSubmissionsConnector, mockApplicationCommandConnector, clock)
   }
 
   "fetchLatestSubmission" should {
@@ -58,20 +62,22 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
   }
 
   "grant" should {
-    "call submission connector correctly" in new Setup {
-      when(mockSubmissionsConnector.grant(eqTo(applicationId), eqTo(requestedBy))(*)).thenReturn(successful(Right(app)))
+    "call application command connector correctly" in new Setup {
+      val cmd    = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant, None, None)
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
       val result = await(underTest.grant(applicationId, requestedBy))
-      result shouldBe Right(app)
+      result shouldBe Right(DispatchSuccessResult(app))
     }
   }
 
   "grantWithWarnings" should {
-    "call submission connector correctly" in new Setup {
+    "call application command connector correctly" in new Setup {
       val warnings = "warn"
       val manager  = "manager"
-      when(mockSubmissionsConnector.grantWithWarnings(eqTo(applicationId), eqTo(requestedBy), eqTo(warnings), eqTo(Some(manager)))(*)).thenReturn(successful(Right(app)))
+      val cmd      = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant, Some(warnings), Some(manager))
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
       val result   = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(manager)))
-      result shouldBe Right(app)
+      result shouldBe Right(DispatchSuccessResult(app))
     }
   }
 
