@@ -20,16 +20,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
+import cats.data.NonEmptyList
+
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseNotesPage
 
@@ -65,16 +67,18 @@ class TermsOfUseNotesController @Inject() (
 
   def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
-      def failure(err: String) = BadRequest(
+      def failure(errs: NonEmptyList[CommandFailure]) = BadRequest(
         errorHandler.standardErrorTemplate(
           "Terms of use grant",
           "Error granting terms of use",
-          err
+          errs.toList.map(error => CommandFailures.describe(error)).mkString(", ")
         )
       )
-      val success              = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
+      val success                                     = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
 
-      submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None).map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
+      submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None).map((esu: Either[NonEmptyList[CommandFailure], DispatchSuccessResult]) =>
+        esu.fold(err => failure(err), _ => success)
+      )
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {
