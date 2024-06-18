@@ -137,9 +137,10 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "grantForTouUplift" should {
     "call submission connector correctly" in new Setup {
-      when(mockSubmissionsConnector.grantForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(Right(app)))
-      val result = await(underTest.grantForTouUplift(applicationId, "requestedBy", "Notes", Some("Mr Supervisor")))
-      result shouldBe Right(app)
+      val cmd    = ApplicationCommands.GrantTermsOfUseApproval(requestedBy, instant, "reasons", Some("Mr Supervisor"))
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
+      val result = await(underTest.grantForTouUplift(applicationId, requestedBy, "reasons", Some("Mr Supervisor")))
+      result shouldBe Right(DispatchSuccessResult(app))
     }
   }
 }

@@ -90,8 +90,20 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       status(result) shouldBe Status.BAD_REQUEST
     }
 
-    "return 400 if failed to save" in new Setup {
-      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
+    "return 400 if wrong name of field" in new Setup {
+      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("wrong-name" -> "submission looks bad")
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.action(applicationId)(fakeReasonsRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "return 400 if failed to grant" in new Setup {
+      val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "submission looks bad")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)

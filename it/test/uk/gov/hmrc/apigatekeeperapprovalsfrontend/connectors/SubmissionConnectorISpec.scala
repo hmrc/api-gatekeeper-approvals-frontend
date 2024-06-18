@@ -133,28 +133,6 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     }
   }
 
-  "grant application" should {
-    val url = s"/approvals/application/${applicationId.value}/grant"
-
-    "return an application on success" in new Setup {
-      stubFor(
-        post(urlEqualTo(url))
-          .withJsonRequestBody(GrantedRequest(requestedBy, None))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
-          )
-      )
-
-      await(connector.grant(applicationId, requestedBy)) match {
-        case Right(app: Application) => app.id shouldBe applicationId
-        case _                       => fail()
-      }
-
-    }
-  }
-
   "invite application for terms of use" should {
     val url = s"/terms-of-use/application/${applicationId.value}"
 
@@ -278,28 +256,6 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EMAIL_SENT")))
 
       result.size shouldBe 0
-    }
-  }
-
-  "grant application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/grant-tou"
-
-    "return an application on success" in new Setup {
-      stubFor(
-        post(urlEqualTo(url))
-          .withJsonRequestBody(TouGrantedRequest(requestedBy, reason, Some(escalatedTo)))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
-          )
-      )
-
-      await(connector.grantForTouUplift(applicationId, requestedBy, reason, Some(escalatedTo))) match {
-        case Right(app: Application) => app.id shouldBe applicationId
-        case _                       => fail()
-      }
-
     }
   }
 

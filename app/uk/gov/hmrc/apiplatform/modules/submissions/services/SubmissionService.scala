@@ -100,8 +100,9 @@ class SubmissionService @Inject() (
       comments: String,
       escalatedTo: Option[String]
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
-    submissionConnector.grantForTouUplift(applicationId, requestedBy, comments, escalatedTo)
+    ): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
+    val cmd = ApplicationCommands.GrantTermsOfUseApproval(requestedBy, instant(), comments, escalatedTo)
+    applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
   def resetForTouUplift(

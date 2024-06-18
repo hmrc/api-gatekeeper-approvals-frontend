@@ -68,47 +68,12 @@ class SubmissionsConnector @Inject() (
     }
   }
 
-  def fetchLatestExtenedSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
-    metrics.record(api) {
-      http.GET[Option[ExtendedSubmission]](s"$serviceBaseUrl/submissions/application/${applicationId}/extended")
-    }
-  }
-
   def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
     val url = s"$serviceBaseUrl/submissions/marked/application/${id}"
 
     metrics.record(api) {
       http.GET[Option[MarkedSubmission]](url)
-    }
-  }
-
-  def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Application]] = {
-    import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId}: ${err}"
-
-    metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](s"$serviceBaseUrl/approvals/application/${applicationId}/grant", GrantedRequest(requestedBy, None))
-        .map(_.leftMap(failed(_)))
-    }
-  }
-
-  def grantWithWarnings(
-      applicationId: ApplicationId,
-      requestedBy: String,
-      warnings: String,
-      escalatedTo: Option[String]
-    )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
-    import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId}: ${err}"
-
-    metrics.record(api) {
-      http.POST[GrantedRequest, Either[UpstreamErrorResponse, Application]](
-        s"$serviceBaseUrl/approvals/application/${applicationId}/grant",
-        GrantedRequest(requestedBy, warnings.some, escalatedTo)
-      )
-        .map(_.leftMap(failed(_)))
     }
   }
 
@@ -155,25 +120,6 @@ class SubmissionsConnector @Inject() (
       http.POST[TouUpliftRequest, Either[UpstreamErrorResponse, Application]](
         s"$serviceBaseUrl/approvals/application/${applicationId}/grant-with-warn-tou",
         TouUpliftRequest(requestedBy, warnings)
-      )
-        .map(_.leftMap(failed(_)))
-    }
-  }
-
-  def grantForTouUplift(
-      applicationId: ApplicationId,
-      requestedBy: String,
-      reasons: String,
-      escalatedTo: Option[String]
-    )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
-    import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to grant application ${applicationId}: ${err}"
-
-    metrics.record(api) {
-      http.POST[TouGrantedRequest, Either[UpstreamErrorResponse, Application]](
-        s"$serviceBaseUrl/approvals/application/${applicationId}/grant-tou",
-        TouGrantedRequest(requestedBy, reasons, escalatedTo)
       )
         .map(_.leftMap(failed(_)))
     }
