@@ -161,14 +161,14 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
     object TermsOfUseInvite {
 
-      def thenReturn(applicationId: ApplicationId) = {
-        val response = Right(TermsOfUseInvitationSuccessful)
-        when(aMock.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(response))
+      def thenReturn(applicationId: ApplicationId, application: Application) = {
+        val response = Right(DispatchSuccessResult(application))
+        when(aMock.termsOfUseInvite(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
-        val response = Left("error")
-        when(aMock.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(response))
+        val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
+        when(aMock.termsOfUseInvite(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
     }
 

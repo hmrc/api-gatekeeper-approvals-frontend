@@ -168,7 +168,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionServiceMock.TermsOfUseInvite.thenReturn(applicationId)
+      SubmissionServiceMock.TermsOfUseInvite.thenReturn(applicationId, application)
 
       val result = controller.action(applicationId)(fakeYesRequest)
 

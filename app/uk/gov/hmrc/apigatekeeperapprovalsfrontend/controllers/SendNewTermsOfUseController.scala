@@ -20,12 +20,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
+import cats.data.NonEmptyList
+
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationSuccessful
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -105,20 +107,25 @@ class SendNewTermsOfUseController @Inject() (
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     def inviteTermsOfUse = {
-      def failure(err: String) = BadRequest(
-        errorHandler.standardErrorTemplate(
-          "Terms of use invite",
-          "Error inviting for terms of use",
-          err
+      def failure(failures: NonEmptyList[CommandFailure]) = {
+        val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
+        BadRequest(
+          errorHandler.standardErrorTemplate(
+            "Terms of use invite",
+            "Error inviting for terms of use",
+            errString
+          )
         )
-      )
-      val success              = Ok(
+      }
+      val success                                         = Ok(
         sendNewTermsOfUseRequestedPage(
           SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
         )
       )
 
-      submissionService.termsOfUseInvite(applicationId).map((esu: Either[String, TermsOfUseInvitationSuccessful]) => esu.fold(err => failure(err), _ => success))
+      submissionService.termsOfUseInvite(applicationId, request.name.get).map((esu: Either[NonEmptyList[CommandFailure], DispatchSuccessResult]) =>
+        esu.fold(err => failure(err), _ => success)
+      )
     }
 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("invite-admins").flatMap(_.headOption) match {
