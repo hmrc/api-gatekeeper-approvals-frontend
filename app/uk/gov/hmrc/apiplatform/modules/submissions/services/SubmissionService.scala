@@ -62,8 +62,9 @@ class SubmissionService @Inject() (
     applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
-  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
-    submissionConnector.termsOfUseInvite(applicationId)
+  def termsOfUseInvite(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
+    val cmd = ApplicationCommands.SendTermsOfUseInvitation(requestedBy, instant())
+    applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
   def fetchTermsOfUseInvitation(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[TermsOfUseInvitation]] = {

@@ -26,7 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
@@ -83,9 +83,10 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "termsOfUseInvite" should {
     "call submission connector correctly" in new Setup {
-      when(mockSubmissionsConnector.termsOfUseInvite(eqTo(applicationId))(*)).thenReturn(successful(Right(TermsOfUseInvitationSuccessful)))
-      val result = await(underTest.termsOfUseInvite(applicationId))
-      result shouldBe Right(TermsOfUseInvitationSuccessful)
+      val cmd    = ApplicationCommands.SendTermsOfUseInvitation(requestedBy, instant)
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
+      val result = await(underTest.termsOfUseInvite(applicationId, requestedBy))
+      result shouldBe Right(DispatchSuccessResult(app))
     }
   }
 
