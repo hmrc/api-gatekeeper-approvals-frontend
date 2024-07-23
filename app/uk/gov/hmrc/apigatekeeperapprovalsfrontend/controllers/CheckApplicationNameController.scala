@@ -64,7 +64,7 @@ class CheckApplicationNameController @Inject() (
             )
           )
         )
-      case _                                                               => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                               => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 

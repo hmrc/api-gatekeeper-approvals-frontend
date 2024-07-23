@@ -22,7 +22,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(form: Form[ProvideEscalatedToForm], model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[ProvideEscalatedToForm], model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(pageTitle = Some(messages("escalatedtouser.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>

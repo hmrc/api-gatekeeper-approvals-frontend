@@ -23,15 +23,18 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, _}
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, InternalServerException, StringContextOps}
 
 @Singleton
 class ApplicationCommandConnector @Inject() (
-    val http: HttpClient,
+    val http: HttpClientV2,
     val config: ApmConnector.Config
   )(implicit val ec: ExecutionContext
   ) extends CommandHandlerTypes[DispatchSuccessResult]
     with ApplicationLogger {
+
+  val serviceBaseUrl = config.serviceBaseUrl
 
   def dispatch(
       applicationId: ApplicationId,
@@ -45,10 +48,6 @@ class ApplicationCommandConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
     import play.api.http.Status._
 
-    val serviceBaseUrl = config.serviceBaseUrl
-
-    def baseApplicationUrl(applicationId: ApplicationId) = s"$serviceBaseUrl/applications/${applicationId}"
-
     def parseWithLogAndThrow[T](input: String)(implicit reads: Reads[T]): T = {
       Json.parse(input).validate[T] match {
         case JsSuccess(t, _) => t
@@ -57,12 +56,12 @@ class ApplicationCommandConnector @Inject() (
           throw new InternalServerException("Failed parsing response to dispatch")
       }
     }
-    val url                                                                 = s"${baseApplicationUrl(applicationId)}/dispatch"
-    val request                                                             = DispatchRequest(command, adminsToEmail)
-    val extraHeaders                                                        = Seq.empty[(String, String)]
+
     import cats.syntax.either._
 
-    http.PATCH[DispatchRequest, HttpResponse](url, request, extraHeaders)
+    http.patch(url"$serviceBaseUrl/applications/$applicationId/dispatch")
+      .withBody(Json.toJson(DispatchRequest(command, adminsToEmail)))
+      .execute[HttpResponse]
       .map(response =>
         response.status match {
           case OK          => parseWithLogAndThrow[DispatchSuccessResult](response.body).asRight[Failures]

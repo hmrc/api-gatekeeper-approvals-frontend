@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -60,22 +60,27 @@ class CheckSandboxController @Inject() (
 
   def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val isDeleted = request.application.state.name == State.DELETED
-    for {
-      linkedSubordinateApplication <- applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId)
-      apiSubscriptions             <- subscriptionService.fetchSubscriptionsByApplicationId(applicationId)
-    } yield linkedSubordinateApplication.fold[Result](NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi))))(sandboxApplication =>
-      Ok(checkSandboxPage(
+
+    (
+      for {
+        linkedSubordinateApplication <- fromOptionM(
+                                          applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId),
+                                          errorHandler.notFoundTemplate(Request(request, request.messagesApi)).map(NotFound(_))
+                                        )
+        apiSubscriptions             <- liftF(subscriptionService.fetchSubscriptionsByApplicationId(applicationId))
+      } yield Ok(checkSandboxPage(
         ViewModel(
           request.application.name,
           applicationId,
-          sandboxApplication.name,
-          sandboxApplication.id,
-          sandboxApplication.clientId.value,
+          linkedSubordinateApplication.name,
+          linkedSubordinateApplication.id,
+          linkedSubordinateApplication.clientId.value,
           apiSubscriptions.map(_.name).mkString(", "),
           isDeleted
         )
       ))
     )
+      .merge
   }
 
   def checkSandboxAction(applicationId: ApplicationId): Action[AnyContent] =

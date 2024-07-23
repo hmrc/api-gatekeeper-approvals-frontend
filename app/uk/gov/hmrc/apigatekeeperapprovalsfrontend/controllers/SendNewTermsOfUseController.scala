@@ -22,11 +22,12 @@ import scala.concurrent.Future.successful
 
 import cats.data.NonEmptyList
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures, DispatchSuccessResult}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -56,50 +57,43 @@ class SendNewTermsOfUseController @Inject() (
 
     def checkNotAlreadyInvited = {
       // Check no existing submissions and not already invited
-      val success = Ok(
+      val success = successful(Ok(
         sendNewTermsOfUseConfirmPage(
           SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
         )
-      )
-      val failed  = BadRequest(
+      ))
+
+      lazy val failed =
         errorHandler.standardErrorTemplate(
           "Application submission",
           "Application already invited",
           "The application has already been invited or has submissions"
-        )
-      )
+        ).map(BadRequest(_))
       (
         for {
-          existingSubmission <- liftF(submissionService.fetchLatestSubmission(applicationId))
-          existingInvitation <- liftF(submissionService.fetchTermsOfUseInvitation(applicationId))
-          result             <- cond((existingSubmission.isEmpty && existingInvitation.isEmpty), success, failed)
+          existingSubmission <- submissionService.fetchLatestSubmission(applicationId)
+          existingInvitation <- submissionService.fetchTermsOfUseInvitation(applicationId)
+          result             <- if (existingSubmission.isEmpty && existingInvitation.isEmpty) success else failed
         } yield result
       )
-        .fold[Result](identity, identity)
     }
 
     request.application.access match {
       // Should only be sending new terms of use invites to Standard apps
       // with a state of Production and not already invited
       case std: Access.Standard if (request.application.state.name == domain.models.State.PRODUCTION) => checkNotAlreadyInvited
-      case std: Access.Standard                                                                       => successful(
-          BadRequest(
-            errorHandler.standardErrorTemplate(
-              "Application status",
-              "Invalid application status",
-              "The application must have Production status"
-            )
-          )
-        )
-      case _                                                                                          => successful(
-          BadRequest(
-            errorHandler.standardErrorTemplate(
-              "Application access type",
-              "Invalid application access type",
-              "The application must be of Standard access type"
-            )
-          )
-        )
+      case std: Access.Standard                                                                       =>
+        errorHandler.standardErrorTemplate(
+          "Application status",
+          "Invalid application status",
+          "The application must have Production status"
+        ).map(BadRequest(_))
+      case _                                                                                          =>
+        errorHandler.standardErrorTemplate(
+          "Application access type",
+          "Invalid application access type",
+          "The application must be of Standard access type"
+        ).map(BadRequest(_))
     }
   }
 
@@ -109,23 +103,25 @@ class SendNewTermsOfUseController @Inject() (
     def inviteTermsOfUse = {
       def failure(failures: NonEmptyList[CommandFailure]) = {
         val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
-        BadRequest(
-          errorHandler.standardErrorTemplate(
-            "Terms of use invite",
-            "Error inviting for terms of use",
-            errString
-          )
-        )
+        errorHandler.standardErrorTemplate(
+          "Terms of use invite",
+          "Error inviting for terms of use",
+          errString
+        ).map(BadRequest(_))
       }
-      val success                                         = Ok(
+
+      lazy val success = Ok(
         sendNewTermsOfUseRequestedPage(
           SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
         )
       )
 
-      submissionService.termsOfUseInvite(applicationId, request.name.get).map((esu: Either[NonEmptyList[CommandFailure], DispatchSuccessResult]) =>
-        esu.fold(err => failure(err), _ => success)
-      )
+      val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
+
+      E.fromEitherF(submissionService.termsOfUseInvite(applicationId, request.name.get))
+        .map(_ => success)
+        .leftSemiflatMap(err => failure(err))
+        .merge
     }
 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("invite-admins").flatMap(_.headOption) match {

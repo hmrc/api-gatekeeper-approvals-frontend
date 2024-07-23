@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future.successful
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
@@ -26,10 +24,11 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.MappedApiDefinitions
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiContextData, ApiIdentifierData, ApplicationId}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, ApplicationTestData, AsyncHmrcSpec}
 
 class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
@@ -43,33 +42,58 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       )
       .build()
 
-  trait Setup {
+  trait Setup extends HttpClientMockModule with ApplicationTestData with ApiDataTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val httpClient                 = mock[HttpClient]
-    val urlBase                    = "http://example.com"
-    val appId                      = ApplicationId.random
 
-    val connector = new ApmConnector(httpClient, ApmConnector.Config(urlBase), new NoopConnectorMetrics())
+    val urlBase = "http://example.com"
+    val appId   = ApplicationId.random
+    val app     = anApplication(appId)
 
-    def assertHttpClientWasCalledWithUrl(expectedUrl: String, expectedParams: Seq[(String, String)] = Seq()) =
-      verify(httpClient).GET(eqTo(expectedUrl), eqTo(expectedParams), *[Seq[(String, String)]])(*, *, *)
+    val connector = new ApmConnector(HttpClientMock.aMock, ApmConnector.Config(urlBase), new NoopConnectorMetrics())
   }
 
-  "the Apm Connector" should {
-    "call the correct endpoint for fetchLinkedSubordinateApplicationById" in new Setup {
-      connector.fetchLinkedSubordinateApplicationById(appId)
-      assertHttpClientWasCalledWithUrl(s"$urlBase/applications/${appId.value}/linked-subordinate")
+  "fetchLinkedSubordinateApplicationById" should {
+    "call the correct endpoint and return the application" in new Setup {
+      HttpClientMock.Get.thenReturn(Some(app))
+
+      val result = await(connector.fetchLinkedSubordinateApplicationById(appId))
+
+      result shouldBe Some(app)
+      HttpClientMock.Get.verifyUrl(url"$urlBase/applications/${appId.value}/linked-subordinate")
     }
 
-    "call the correct endpoint for fetchSubscribableApisForApplication" in new Setup {
-      when(httpClient.GET[MappedApiDefinitions](*, *, *)(*, *, *)).thenReturn(successful(MappedApiDefinitions(Map())))
-      connector.fetchSubscribableApisForApplication(appId)
-      assertHttpClientWasCalledWithUrl(s"$urlBase/api-definitions", Seq("applicationId" -> appId.toString()))
-    }
+    "return None if the application was not found" in new Setup {
+      HttpClientMock.Get.thenReturn(None)
 
-    "call the correct endpoint for fetchApplicationWithSubscriptionData" in new Setup {
-      connector.fetchApplicationWithSubscriptionData(appId)
-      assertHttpClientWasCalledWithUrl(s"$urlBase/applications/${appId.value}")
+      val result = await(connector.fetchLinkedSubordinateApplicationById(appId))
+
+      result shouldBe None
+    }
+  }
+
+  "fetchSubscribableApisForApplication" should {
+    "call the correct endpoint and return a list of definitions" in new Setup {
+      val apiContext    = ApiContextData.contextA
+      val apiDefinition = anApiData("service", "api name", apiContext.value)
+      HttpClientMock.Get.thenReturn(MappedApiDefinitions(Map(apiContext -> apiDefinition)))
+
+      val result = await(connector.fetchSubscribableApisForApplication(appId))
+
+      result shouldBe List(apiDefinition)
+      HttpClientMock.Get.verifyUrl(url"$urlBase/api-definitions?applicationId=$appId")
+    }
+  }
+
+  "fetchApplicationWithSubscriptionData" should {
+    "call the correct endpoint and return the application with subscription data" in new Setup {
+      val subs        = Set(ApiIdentifierData.identifierA, ApiIdentifierData.identifierB)
+      val appWithSubs = ApplicationWithSubscriptionData(app, subs)
+      HttpClientMock.Get.thenReturn(Some(appWithSubs))
+
+      val result = await(connector.fetchApplicationWithSubscriptionData(appId))
+
+      result shouldBe Some(appWithSubs)
+      HttpClientMock.Get.verifyUrl(url"$urlBase/applications/${appId.value}")
     }
   }
 

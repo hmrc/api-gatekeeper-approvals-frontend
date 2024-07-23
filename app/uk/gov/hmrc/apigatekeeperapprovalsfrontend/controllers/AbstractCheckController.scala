@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc._
@@ -38,10 +39,10 @@ abstract class AbstractCheckController(
 
   type Fn = (SubmissionReview.Status) => (SubmissionId, Int) => Future[Option[SubmissionReview]]
 
-  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[_]): Result = {
+  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[_]): Future[Result] = {
     val description = SubmissionReview.Action.toText(reviewAction)
     logger.error(s"$description : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
-    BadRequest(errorHandler.badRequestTemplate)
+    errorHandler.badRequestTemplate.map(BadRequest(_))
   }
 
   def deriveStatusFromAction(formAction: String): Option[SubmissionReview.Status] = formAction match {
@@ -60,9 +61,15 @@ abstract class AbstractCheckController(
 
     (
       for {
-        formAction <- fromOption(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption), log("No submit-action found in request"))
-        newStatus  <- fromOption(deriveStatusFromAction(formAction), log("Invalid submit-action found in request"))
-        _          <- fromOptionF(
+        formAction <- fromOptionM(
+                        successful(request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption)),
+                        log("No submit-action found in request")
+                      )
+        newStatus  <- fromOptionM(
+                        successful(deriveStatusFromAction(formAction)),
+                        log("Invalid submit-action found in request")
+                      )
+        _          <- fromOptionM(
                         submissionReviewService.updateActionStatus(reviewAction, newStatus)(request.submission.id, request.submission.latestInstance.index),
                         log("Failed to find existing review")
                       )

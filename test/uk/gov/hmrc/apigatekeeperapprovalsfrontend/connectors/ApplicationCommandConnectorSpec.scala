@@ -31,7 +31,8 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.Stri
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{Actors, UserId, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WireMockSugar}
@@ -75,7 +76,7 @@ class ApplicationCommandConnectorSpec
 
   class Setup(proxyEnabled: Boolean = false) {
 
-    val httpClient = app.injector.instanceOf[HttpClient]
+    val httpClient = app.injector.instanceOf[HttpClientV2]
 
     val config    = ApmConnector.Config(wireMockUrl)
     val connector = new ApplicationCommandConnector(httpClient, config) {}

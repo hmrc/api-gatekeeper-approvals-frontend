@@ -72,11 +72,11 @@ class TermsOfUseReasonsController @Inject() (
 
   def provideReasonsAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideReasonsForm) = {
-      submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId))
+      submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
+        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId)))
         case None        => {
           logger.warn("Persisting reasons failed")
-          BadRequest(errorHandler.badRequestTemplate)
+          errorHandler.badRequestTemplate.map(BadRequest(_))
         }
       }
     }

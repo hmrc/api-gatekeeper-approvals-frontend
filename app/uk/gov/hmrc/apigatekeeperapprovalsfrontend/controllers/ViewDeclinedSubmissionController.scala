@@ -63,7 +63,7 @@ class ViewDeclinedSubmissionController @Inject() (
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
-      successful(BadRequest(errorHandler.badRequestTemplate(request)))
+      errorHandler.badRequestTemplate(request).map(BadRequest(_))
     )(instance => {
       (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
         case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
@@ -79,7 +79,7 @@ class ViewDeclinedSubmissionController @Inject() (
           ))))
         case _                                                                                                                        =>
           logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
-          successful(BadRequest(errorHandler.badRequestTemplate(request)))
+          errorHandler.badRequestTemplate(request).map(BadRequest(_))
       }
     })
 

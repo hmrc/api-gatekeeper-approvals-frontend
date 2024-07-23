@@ -25,7 +25,7 @@ import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.{GrantedRequest, TouGrantedRequest, TouUpliftRequest}
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.TouUpliftRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}

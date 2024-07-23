@@ -21,7 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationWithSubscriptionData}
@@ -32,7 +33,7 @@ object ApmConnector {
 
 @Singleton
 class ApmConnector @Inject() (
-    httpClient: HttpClient,
+    httpClient: HttpClientV2,
     config: ApmConnector.Config,
     val metrics: ConnectorMetrics
   )(implicit val ec: ExecutionContext
@@ -43,11 +44,10 @@ class ApmConnector @Inject() (
   val api = API("api-platform-microservice")
 
   def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
-    import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Option[Application]](s"$serviceBaseUrl/applications/$id/linked-subordinate")
+      httpClient.get(url"$serviceBaseUrl/applications/$id/linked-subordinate").execute[Option[Application]]
     }
   }
 
@@ -55,7 +55,8 @@ class ApmConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[MappedApiDefinitions](s"$serviceBaseUrl/api-definitions", Seq("applicationId" -> id.toString()))
+      httpClient.get(url"$serviceBaseUrl/api-definitions?applicationId=$id")
+        .execute[MappedApiDefinitions]
         .map(_.wrapped.values.toList)
     }
   }
@@ -64,7 +65,7 @@ class ApmConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.GET[Option[ApplicationWithSubscriptionData]](s"$serviceBaseUrl/applications/$id")
+      httpClient.get(url"$serviceBaseUrl/applications/$id").execute[Option[ApplicationWithSubscriptionData]]
     }
   }
 }

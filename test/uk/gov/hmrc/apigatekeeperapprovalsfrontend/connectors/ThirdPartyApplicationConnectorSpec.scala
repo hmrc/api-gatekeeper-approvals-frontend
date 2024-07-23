@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -25,9 +24,9 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
 
 class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
@@ -41,23 +40,32 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
       )
       .build()
 
-  trait Setup {
+  trait Setup extends HttpClientMockModule with ApplicationTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val httpClient                 = mock[HttpClient]
-    val urlBase                    = "http://example.com"
-    val appId                      = ApplicationId.random
 
-    val connector = new ThirdPartyApplicationConnector(httpClient, ThirdPartyApplicationConnector.Config(urlBase), new NoopConnectorMetrics())
+    val urlBase = "http://example.com"
+    val appId   = ApplicationId.random
+    val app     = anApplication(appId)
 
-    def assertHttpClientWasCalledWithUrl(expectedUrl: String) =
-      verify(httpClient).GET(eqTo(expectedUrl), *[Seq[(String, String)]], *[Seq[(String, String)]])(*, *, *)
+    val connector = new ThirdPartyApplicationConnector(HttpClientMock.aMock, ThirdPartyApplicationConnector.Config(urlBase), new NoopConnectorMetrics())
   }
 
   "fetchApplicationById" should {
-    "call the correct endpoint" in new Setup {
-      connector.fetchApplicationById(appId)
+    "call the correct endpoint and return the application" in new Setup {
+      HttpClientMock.Get.thenReturn(Some(app))
 
-      assertHttpClientWasCalledWithUrl(s"$urlBase/application/${appId.value}")
+      val result = await(connector.fetchApplicationById(appId))
+
+      result shouldBe Some(app)
+      HttpClientMock.Get.verifyUrl(url"$urlBase/application/$appId")
+    }
+
+    "return None if the application was not found" in new Setup {
+      HttpClientMock.Get.thenReturn(None)
+
+      val result = await(connector.fetchApplicationById(appId))
+
+      result shouldBe None
     }
   }
 }

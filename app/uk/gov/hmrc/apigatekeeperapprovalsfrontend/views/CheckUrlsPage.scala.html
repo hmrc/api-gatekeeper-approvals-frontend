@@ -20,7 +20,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @contactRequester(messageId: String) = @{
   <p class="govuk-body">

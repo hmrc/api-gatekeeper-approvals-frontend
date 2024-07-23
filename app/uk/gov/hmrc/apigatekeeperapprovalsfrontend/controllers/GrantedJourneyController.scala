@@ -88,12 +88,12 @@ class GrantedJourneyController @Inject() (
         } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
       )
         .value
-        .map {
-          case Right(value)   => value
+        .flatMap {
+          case Right(value)   => successful(value)
           case Left(failures) => {
             val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
             logger.warn(s"Error granting access for application $applicationId: $errString")
-            InternalServerError(errorHandler.internalServerErrorTemplate)
+            errorHandler.internalServerErrorTemplate.map(InternalServerError(_))
           }
         }
     }
@@ -112,11 +112,11 @@ class GrantedJourneyController @Inject() (
   def provideEscalatedToAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideEscalatedToForm) = {
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index)
-        .map {
-          case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url)
+        .flatMap {
+          case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url))
           case None        => {
             logger.warn(s"Error updating submission review for application $applicationId: There was a problem updating the escalated to on the submission review")
-            InternalServerError(errorHandler.internalServerErrorTemplate)
+            errorHandler.internalServerErrorTemplate.map(InternalServerError(_))
           }
         }
     }

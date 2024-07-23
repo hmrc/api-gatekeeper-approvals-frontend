@@ -90,7 +90,7 @@ class ProductionAccessController @Inject() (
         ))))
       case _                                                                                                                                               =>
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
-        successful(BadRequest(errorHandler.badRequestTemplate(request)))
+        errorHandler.badRequestTemplate(request).map(BadRequest(_))
     }
 
   }

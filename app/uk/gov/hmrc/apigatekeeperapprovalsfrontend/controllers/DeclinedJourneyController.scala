@@ -69,11 +69,11 @@ class DeclinedJourneyController @Inject() (
 
   def provideReasonsAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
-      submissionReviewService.updateDeclineReasons(form.reasons)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId))
+      submissionReviewService.updateDeclineReasons(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
+        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId)))
         case None        => {
           logger.warn("Persisting decline reasons failed")
-          BadRequest(errorHandler.badRequestTemplate)
+          errorHandler.badRequestTemplate.map(BadRequest(_))
         }
       }
     }
