@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 
 abstract class AsyncHmrcSpec extends HmrcSpec with DefaultAwaitTimeout with FutureAwaits {}

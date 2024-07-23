@@ -18,8 +18,9 @@ package uk.gov.hmrc.apiplatform.modules.submissions.config
 
 import javax.inject.{Inject, Provider, Singleton}
 
-import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 
 @Singleton
 class SubmissionsConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[SubmissionsConnector.Config] {

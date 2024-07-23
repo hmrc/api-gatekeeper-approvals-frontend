@@ -19,6 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 import scala.concurrent.Future
 
 import play.api.mvc._
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
