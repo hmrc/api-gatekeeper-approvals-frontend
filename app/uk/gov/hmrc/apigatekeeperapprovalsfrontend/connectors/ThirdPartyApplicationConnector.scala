@@ -19,10 +19,12 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
+
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
@@ -33,7 +35,7 @@ object ThirdPartyApplicationConnector {
 
 @Singleton
 class ThirdPartyApplicationConnector @Inject() (
-    httpClient: HttpClient,
+    httpClient: HttpClientV2,
     config: ThirdPartyApplicationConnector.Config,
     val metrics: ConnectorMetrics
   )(implicit val ec: ExecutionContext
@@ -46,7 +48,7 @@ class ThirdPartyApplicationConnector @Inject() (
     import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
 
     metrics.record(api) {
-      httpClient.GET[Option[Application]](s"$serviceBaseUrl/application/${id}")
+      httpClient.get(url"$serviceBaseUrl/application/$id").execute[Option[Application]]
     }
   }
 }

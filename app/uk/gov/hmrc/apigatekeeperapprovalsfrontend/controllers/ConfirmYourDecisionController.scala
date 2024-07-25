@@ -23,6 +23,7 @@ import scala.concurrent.Future.successful
 import cats.data.{EitherT, NonEmptyList}
 
 import play.api.mvc.{MessagesControllerComponents, _}
+
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService

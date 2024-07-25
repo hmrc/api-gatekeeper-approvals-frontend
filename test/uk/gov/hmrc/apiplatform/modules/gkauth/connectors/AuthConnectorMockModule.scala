@@ -20,12 +20,13 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.auth.core.retrieve.{Name, ~}
+import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
+
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles._
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationPredicateForGatekeeperRole
-import uk.gov.hmrc.auth.core.retrieve.{Name, ~}
-import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 
 trait StrideAuthConnectorMockModule {
   self: MockitoSugar with ArgumentMatchersSugar =>

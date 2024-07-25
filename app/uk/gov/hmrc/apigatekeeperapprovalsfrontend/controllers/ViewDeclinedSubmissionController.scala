@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.MessagesControllerComponents
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
@@ -63,7 +64,7 @@ class ViewDeclinedSubmissionController @Inject() (
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
-      successful(BadRequest(errorHandler.badRequestTemplate(request)))
+      errorHandler.badRequestTemplate(request).map(BadRequest(_))
     )(instance => {
       (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
         case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
@@ -79,7 +80,7 @@ class ViewDeclinedSubmissionController @Inject() (
           ))))
         case _                                                                                                                        =>
           logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
-          successful(BadRequest(errorHandler.badRequestTemplate(request)))
+          errorHandler.badRequestTemplate(request).map(BadRequest(_))
       }
     })
 

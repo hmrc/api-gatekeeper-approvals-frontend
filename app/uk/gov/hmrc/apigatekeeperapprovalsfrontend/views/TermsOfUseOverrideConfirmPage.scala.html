@@ -21,7 +21,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: OverrideViewModel)(implicit request: Request[_], messages: Messages)
+@(model: OverrideViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(pageTitle = Some(messages("termsofuseoverrideconfirm.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>

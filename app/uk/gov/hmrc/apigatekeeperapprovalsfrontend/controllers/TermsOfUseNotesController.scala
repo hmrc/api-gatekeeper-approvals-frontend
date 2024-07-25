@@ -25,11 +25,13 @@ import cats.data.NonEmptyList
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures, DispatchSuccessResult}
+import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
+
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
-import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
@@ -67,18 +69,21 @@ class TermsOfUseNotesController @Inject() (
 
   def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
-      def failure(errs: NonEmptyList[CommandFailure]) = BadRequest(
+      def failure(errs: NonEmptyList[CommandFailure]) =
         errorHandler.standardErrorTemplate(
           "Terms of use grant",
           "Error granting terms of use",
           errs.toList.map(error => CommandFailures.describe(error)).mkString(", ")
-        )
-      )
-      val success                                     = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
+        ).map(BadRequest(_))
 
-      submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None).map((esu: Either[NonEmptyList[CommandFailure], DispatchSuccessResult]) =>
-        esu.fold(err => failure(err), _ => success)
-      )
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
+
+      val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
+
+      E.fromEitherF(submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None))
+        .map(_ => success)
+        .leftSemiflatMap(err => failure(err))
+        .merge
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {

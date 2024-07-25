@@ -23,12 +23,13 @@ import scala.concurrent.Future.successful
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
@@ -66,16 +67,21 @@ class TermsOfUseResetController @Inject() (
 
   def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
-      def failure(err: String) = BadRequest(
+      def failure(err: String) =
         errorHandler.standardErrorTemplate(
           "Terms of use reset",
           "Error resetting of use",
           err
-        )
-      )
-      val success              = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId))
+        ).map(BadRequest(_))
 
-      submissionService.resetForTouUplift(applicationId, request.name.get, form.notes).map((esu: Either[String, Application]) => esu.fold(err => failure(err), _ => success))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId))
+
+      val E = EitherTHelper.make[String]
+
+      E.fromEitherF(submissionService.resetForTouUplift(applicationId, request.name.get, form.notes))
+        .map(_ => success)
+        .leftSemiflatMap(err => failure(err))
+        .merge
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {

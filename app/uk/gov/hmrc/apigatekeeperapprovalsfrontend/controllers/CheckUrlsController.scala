@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
@@ -78,7 +79,7 @@ class CheckUrlsController @Inject() (
             )
           )
         )
-      case _                                                                   => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                                   => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 

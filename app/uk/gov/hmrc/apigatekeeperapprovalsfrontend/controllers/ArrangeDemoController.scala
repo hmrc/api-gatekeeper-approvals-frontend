@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -72,7 +73,7 @@ class ArrangeDemoController @Inject() (
             )
           )
         )
-      case _                                                                                                                            => successful(BadRequest(errorHandler.badRequestTemplate))
+      case _                                                                                                                            => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 

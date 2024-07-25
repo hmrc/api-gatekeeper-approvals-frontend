@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.mvc.MessagesRequest
 import play.api.mvc.Results.Forbidden
+
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView

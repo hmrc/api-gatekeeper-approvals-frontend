@@ -26,7 +26,7 @@
   hmrcScripts: HmrcScripts
 )
 
-@(pageTitle: Option[String] = None, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: Option[String] = None, beforeContent: Option[Html] = None)(contentBlock: Html)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @scriptElem = {
   @hmrcScripts()
@@ -39,7 +39,7 @@
     <div id="logged-in-user">
       <p class="govuk-body-s govuk-!-margin-top-4">
         @{
-          request match {
+          requestHeader match {
             case loggedInRequest: LoggedInRequest[_] => loggedInRequest.name.getOrElse("")
             case _                                   => ""
           }

@@ -20,6 +20,7 @@ import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc._
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
@@ -48,7 +49,7 @@ trait ApplicationActionBuilders {
         import cats.implicits._
 
         applicationActionService.process(applicationId, request)
-          .toRight(NotFound(errorHandler.notFoundTemplate(Request(request, request.messagesApi)))).value
+          .toRightF(errorHandler.notFoundTemplate(Request(request, request.messagesApi)).map(NotFound(_))).value
       }
     }
   }
@@ -62,7 +63,7 @@ trait ApplicationActionBuilders {
 
         (
           for {
-            submission <- E.fromOptionF(submissionService.fetchLatestMarkedSubmission(request.application.id), NotFound(errorHandler.notFoundTemplate(request)))
+            submission <- E.fromOptionM(submissionService.fetchLatestMarkedSubmission(request.application.id), errorHandler.notFoundTemplate(request).map(NotFound(_)))
           } yield new MarkedSubmissionApplicationRequest(submission, request)
         )
           .value

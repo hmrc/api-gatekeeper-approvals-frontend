@@ -19,7 +19,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(model: ViewModel)(implicit request: Request[_], messages: Messages)
+@(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @renderInUKWithCompanyRegistrationNumber = {
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">@{messages("checkcompanyregistration.inukwithregnum.text1")}</p>

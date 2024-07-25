@@ -25,6 +25,7 @@ import cats.data.{EitherT, NonEmptyList}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{MessagesControllerComponents, _}
+
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{Collaborator, State}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -219,11 +220,11 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def overrideApproverAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ApproverForm) = {
-      submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId))
+      submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).flatMap {
+        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId)))
         case None        => {
           logger.warn(s"Failed to save escalated to in submission review for applicationId: ${applicationId}")
-          BadRequest(errorHandler.badRequestTemplate)
+          errorHandler.badRequestTemplate.map(BadRequest(_))
         }
       }
     }
@@ -241,11 +242,11 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def overrideNotesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
-      submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).map {
-        case Some(value) => Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId))
+      submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).flatMap {
+        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId)))
         case None        => {
           logger.warn(s"Failed to save reasons in submission review for applicationId: ${applicationId}")
-          BadRequest(errorHandler.badRequestTemplate)
+          errorHandler.badRequestTemplate.map(BadRequest(_))
         }
       }
     }

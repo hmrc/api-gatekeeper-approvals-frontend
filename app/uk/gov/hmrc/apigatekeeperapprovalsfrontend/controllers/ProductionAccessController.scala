@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.mvc.MessagesControllerComponents
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
@@ -90,7 +91,7 @@ class ProductionAccessController @Inject() (
         ))))
       case _                                                                                                                                               =>
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
-        successful(BadRequest(errorHandler.badRequestTemplate(request)))
+        errorHandler.badRequestTemplate(request).map(BadRequest(_))
     }
 
   }
