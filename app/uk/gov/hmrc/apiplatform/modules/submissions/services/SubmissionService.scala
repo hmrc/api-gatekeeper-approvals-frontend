@@ -24,6 +24,7 @@ import cats.data.NonEmptyList
 
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, CommandFailure, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
@@ -31,7 +32,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnect
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
 class SubmissionService @Inject() (
@@ -86,7 +86,7 @@ class SubmissionService @Inject() (
       requestedBy: String,
       reasons: String
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
     submission.latestInstance.status match {
       // if current submission state is Warnings, then grant with warnings
       case _: Submission.Status.Warnings => submissionConnector.grantWithWarningsForTouUplift(applicationId, requestedBy, reasons)
@@ -112,7 +112,7 @@ class SubmissionService @Inject() (
       requestedBy: String,
       reasons: String
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
     submissionConnector.resetForTouUplift(applicationId, requestedBy, reasons)
   }
 }

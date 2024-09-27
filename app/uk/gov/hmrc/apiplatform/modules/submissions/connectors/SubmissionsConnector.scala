@@ -25,11 +25,11 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
 object SubmissionsConnector {
 
@@ -113,14 +113,14 @@ class SubmissionsConnector @Inject() (
       requestedBy: String,
       warnings: String
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant with warnings application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.post(url"$serviceBaseUrl/approvals/application/${applicationId}/grant-with-warn-tou")
         .withBody(Json.toJson(TouUpliftRequest(requestedBy, warnings)))
-        .execute[Either[UpstreamErrorResponse, Application]]
+        .execute[Either[UpstreamErrorResponse, ApplicationWithCollaborators]]
         .map(_.leftMap(failed(_)))
     }
   }
@@ -130,14 +130,14 @@ class SubmissionsConnector @Inject() (
       requestedBy: String,
       reasons: String
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.post(url"$serviceBaseUrl/approvals/application/${applicationId}/decline-tou")
         .withBody(Json.toJson(TouUpliftRequest(requestedBy, reasons)))
-        .execute[Either[UpstreamErrorResponse, Application]]
+        .execute[Either[UpstreamErrorResponse, ApplicationWithCollaborators]]
         .map(_.leftMap(failed(_)))
     }
   }
@@ -147,14 +147,14 @@ class SubmissionsConnector @Inject() (
       requestedBy: String,
       reasons: String
     )(implicit hc: HeaderCarrier
-    ): Future[Either[String, Application]] = {
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to reset application ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.post(url"$serviceBaseUrl/approvals/application/${applicationId}/reset-tou")
         .withBody(Json.toJson(TouUpliftRequest(requestedBy, reasons)))
-        .execute[Either[UpstreamErrorResponse, Application]]
+        .execute[Either[UpstreamErrorResponse, ApplicationWithCollaborators]]
         .map(_.leftMap(failed(_)))
     }
   }

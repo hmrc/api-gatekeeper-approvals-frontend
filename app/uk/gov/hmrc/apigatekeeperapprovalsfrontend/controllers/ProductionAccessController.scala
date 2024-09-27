@@ -22,6 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.MessagesControllerComponents
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
@@ -35,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ProductionAccessPag
 object ProductionAccessController {
 
   case class ViewModel(
-      appName: String,
+      appName: ApplicationName,
       applicationId: ApplicationId,
       submitterEmail: String,
       submittedDate: String,

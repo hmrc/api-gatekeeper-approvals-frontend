@@ -22,7 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{MessagesControllerComponents, _}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
@@ -45,7 +45,7 @@ object ApplicationSubmissionsController {
 
   case class ViewModel(
       applicationId: ApplicationId,
-      appName: String,
+      appName: ApplicationName,
       applicationDetailsUrl: String,
       currentSubmission: Option[CurrentSubmittedInstanceDetails],
       declinedInstances: List[DeclinedInstanceDetails],
@@ -72,6 +72,7 @@ class ApplicationSubmissionsController @Inject() (
   import ApplicationSubmissionsController._
   import cats.data.OptionT
   import cats.implicits._
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
 
   def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
@@ -119,10 +120,10 @@ class ApplicationSubmissionsController @Inject() (
       request.application.importantSubmissionData.map(i => i.responsibleIndividual.emailAddress)
 
     val pendingResponsibleIndividualVerification =
-      request.application.state.name == State.PENDING_RESPONSIBLE_INDIVIDUAL_VERIFICATION
+      request.application.state.isPendingResponsibleIndividualVerification
 
     val isDeleted =
-      request.application.state.name == State.DELETED
+      request.application.state.isDeleted
 
     successful(Ok(applicationSubmissionsPage(
       ViewModel(

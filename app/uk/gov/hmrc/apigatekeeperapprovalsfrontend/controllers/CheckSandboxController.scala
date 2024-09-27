@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -35,9 +35,9 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 object CheckSandboxController {
 
   case class ViewModel(
-      appName: String,
+      appName: ApplicationName,
       applicationId: ApplicationId,
-      sandboxAppName: String,
+      sandboxAppName: ApplicationName,
       sandboxAppId: ApplicationId,
       sandboxClientId: String,
       apiSubscriptions: String,
@@ -60,7 +60,7 @@ class CheckSandboxController @Inject() (
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val isDeleted = request.application.state.name == State.DELETED
+    val isDeleted = request.application.state.isDeleted
 
     (
       for {

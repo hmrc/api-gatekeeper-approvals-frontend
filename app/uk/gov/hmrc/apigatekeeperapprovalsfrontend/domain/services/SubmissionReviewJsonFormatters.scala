@@ -23,14 +23,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview._
-  implicit val ReviewNotStartedStatusFormat: OFormat[Status.NotStarted.type] = Json.format[Status.NotStarted.type]
-  implicit val ReviewInProgressStatusFormat: OFormat[Status.InProgress.type] = Json.format[Status.InProgress.type]
-  implicit val ReviewCompletedStatusFormat: OFormat[Status.Completed.type]   = Json.format[Status.Completed.type]
 
   implicit val reviewStatus: OFormat[Status] = Union.from[Status]("Review.StatusType")
-    .and[Status.NotStarted.type]("notstarted")
-    .and[Status.InProgress.type]("inprogress")
-    .and[Status.Completed.type]("completed")
+    .andType[Status.NotStarted.type]("notstarted", () => Status.NotStarted)
+    .andType[Status.InProgress.type]("inprogress", () => Status.InProgress)
+    .andType[Status.Completed.type]("completed", () => Status.Completed)
     .format
 
   implicit val actionKeyReads: KeyReads[Action]   = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))

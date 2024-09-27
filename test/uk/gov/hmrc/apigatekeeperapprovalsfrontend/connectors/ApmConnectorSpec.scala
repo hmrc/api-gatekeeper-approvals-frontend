@@ -26,12 +26,12 @@ import play.api.{Application, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.MappedApiDefinitions
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiContextData, ApiIdentifierData, ApplicationId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiIdentifierFixture, ApplicationId}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, ApplicationTestData, AsyncHmrcSpec}
 
-class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
+class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApiIdentifierFixture {
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
@@ -74,9 +74,8 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   "fetchSubscribableApisForApplication" should {
     "call the correct endpoint and return a list of definitions" in new Setup {
-      val apiContext    = ApiContextData.contextA
-      val apiDefinition = anApiData("service", "api name", apiContext.value)
-      HttpClientMock.Get.thenReturn(MappedApiDefinitions(Map(apiContext -> apiDefinition)))
+      val apiDefinition = anApiData("service", "api name", apiContextOne.value)
+      HttpClientMock.Get.thenReturn(MappedApiDefinitions(Map(apiContextOne -> apiDefinition)))
 
       val result = await(connector.fetchSubscribableApisForApplication(appId))
 
@@ -87,7 +86,7 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
 
   "fetchApplicationWithSubscriptionData" should {
     "call the correct endpoint and return the application with subscription data" in new Setup {
-      val subs        = Set(ApiIdentifierData.identifierA, ApiIdentifierData.identifierB)
+      val subs        = Set(apiIdentifierOne, apiIdentifierTwo)
       val appWithSubs = ApplicationWithSubscriptionData(app, subs)
       HttpClientMock.Get.thenReturn(Some(appWithSubs))
 
@@ -97,5 +96,4 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
       HttpClientMock.Get.verifyUrl(url"$urlBase/applications/${appId.value}")
     }
   }
-
 }

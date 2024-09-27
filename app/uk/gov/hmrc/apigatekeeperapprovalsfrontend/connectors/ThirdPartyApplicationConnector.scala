@@ -24,9 +24,8 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 object ThirdPartyApplicationConnector {
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
@@ -44,11 +43,11 @@ class ThirdPartyApplicationConnector @Inject() (
   val serviceBaseUrl = config.serviceBaseUrl
   val api            = API("third-party-application")
 
-  def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
-    import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application._
+  def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
+    import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators._
 
     metrics.record(api) {
-      httpClient.get(url"$serviceBaseUrl/application/$id").execute[Option[Application]]
+      httpClient.get(url"$serviceBaseUrl/application/$id").execute[Option[ApplicationWithCollaborators]]
     }
   }
 }

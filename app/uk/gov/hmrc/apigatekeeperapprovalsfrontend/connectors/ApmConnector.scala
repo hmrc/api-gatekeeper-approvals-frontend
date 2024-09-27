@@ -24,9 +24,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, ApplicationWithSubscriptionData}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
 
 object ApmConnector {
   case class Config(serviceBaseUrl: String)
@@ -44,11 +45,11 @@ class ApmConnector @Inject() (
 
   val api = API("api-platform-microservice")
 
-  def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+  def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.get(url"$serviceBaseUrl/applications/$id/linked-subordinate").execute[Option[Application]]
+      httpClient.get(url"$serviceBaseUrl/applications/$id/linked-subordinate").execute[Option[ApplicationWithCollaborators]]
     }
   }
 

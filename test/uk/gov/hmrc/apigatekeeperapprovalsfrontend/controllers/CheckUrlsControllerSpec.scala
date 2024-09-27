@@ -48,22 +48,23 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
 
     val responsibleIndividual = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
-    val appWithImportantData = anApplication(applicationId).copy(access =
-      Access.Standard(
-        List.empty,
-        None,
-        None,
-        Set.empty,
-        Some(SellResellOrDistribute("Yes")),
-        Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
+    val appWithImportantData = anApplication(applicationId)
+      .withAccess(
+        Access.Standard(
+          List.empty,
+          None,
+          None,
+          Set.empty,
+          Some(SellResellOrDistribute("Yes")),
+          Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
+        )
       )
-    )
 
     def appWithData(
         privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocations.InDesktopSoftware,
         termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocations.InDesktopSoftware
       ) = {
-      anApplication(applicationId).copy(access =
+      anApplication(applicationId).withAccess(
         Access.Standard(
           List.empty,
           None,
@@ -130,7 +131,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp = appWithData().copy(state = application.state.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
+      val deletedApp = appWithData().modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)

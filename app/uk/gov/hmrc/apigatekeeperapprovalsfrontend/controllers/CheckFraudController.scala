@@ -22,7 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -33,7 +33,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckFraudPage
 
 object CheckFraudController {
-  case class ViewModel(appName: String, applicationId: ApplicationId, isDeleted: Boolean)
+  case class ViewModel(appName: ApplicationName, applicationId: ApplicationId, isDeleted: Boolean)
 }
 
 @Singleton
@@ -49,7 +49,7 @@ class CheckFraudController @Inject() (
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val isDeleted = request.application.state.name == State.DELETED
+    val isDeleted = request.application.state.isDeleted
     successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
   }
 

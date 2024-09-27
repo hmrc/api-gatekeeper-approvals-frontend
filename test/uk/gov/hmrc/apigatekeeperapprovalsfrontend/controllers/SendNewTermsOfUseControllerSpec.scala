@@ -27,7 +27,7 @@ import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, State}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{ImportantSubmissionData, PrivacyPolicyLocations, ResponsibleIndividual, TermsAndConditionsLocations}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -71,23 +71,22 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
     val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
-    val appWithImportantData = anApplication(applicationId).copy(
-      access = Access.Standard(
+    val appWithImportantData = anApplication(applicationId)
+      .withAccess(Access.Standard(
         List.empty,
         None,
         None,
         Set.empty,
         Some(SellResellOrDistribute("Yes")),
         Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
-      ),
-      state = ApplicationState(State.PENDING_GATEKEEPER_APPROVAL, None, None, None, instant)
-    )
+      ))
+      .withState(ApplicationStateData.pendingGatekeeperApproval)
   }
 
   "page" should {
     "return 200 when standard app" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, instant)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.production))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
@@ -101,7 +100,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
     "return 400 when app already has submissions" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, instant)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.production))
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(appWithImportantData.id)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
@@ -112,7 +111,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
     "return 400 when app already invited" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(state = ApplicationState(State.PRODUCTION, None, None, None, instant)))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.production))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(appWithImportantData.id)
 
@@ -132,7 +131,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
     "return 400 when app not Standard" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.copy(access = Access.Privileged()))
+      ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withAccess(Access.Privileged()))
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST

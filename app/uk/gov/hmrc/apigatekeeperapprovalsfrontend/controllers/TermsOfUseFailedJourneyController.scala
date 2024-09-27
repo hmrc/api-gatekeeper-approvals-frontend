@@ -26,7 +26,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{MessagesControllerComponents, _}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{Collaborator, State}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -40,13 +40,13 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 object TermsOfUseFailedJourneyController {
 
-  case class ViewModel(applicationId: ApplicationId, appName: String)
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName)
 
-  case class OverrideViewModel(applicationId: ApplicationId, appName: String, escalatedTo: String, notes: String)
+  case class OverrideViewModel(applicationId: ApplicationId, appName: ApplicationName, escalatedTo: String, notes: String)
 
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class AnswersViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean, submissionStatus: Submission.Status) {
+  case class AnswersViewModel(applicationId: ApplicationId, appName: ApplicationName, answers: List[AnswerDetails], isDeleted: Boolean, submissionStatus: Submission.Status) {
     lazy val hasFails: Boolean = answers.exists(_.status == Mark.Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Mark.Warn)
 
@@ -54,7 +54,7 @@ object TermsOfUseFailedJourneyController {
     else "warnsonly"
   }
 
-  case class EmailsViewModel(applicationId: ApplicationId, appName: String, adminsToEmail: Set[Collaborator] = Set.empty)
+  case class EmailsViewModel(applicationId: ApplicationId, appName: ApplicationName, adminsToEmail: Set[Collaborator] = Set.empty)
 
   case class ApproverForm(firstName: String, lastName: String)
 
@@ -101,7 +101,7 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def listPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
-    val isDeleted = request.application.state.name == State.DELETED
+    val isDeleted = request.application.state.isDeleted
 
     val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {
@@ -149,7 +149,7 @@ class TermsOfUseFailedJourneyController @Inject() (
 
   def answersWithWarningsOrFails(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
-    val isDeleted = request.application.state.name == State.DELETED
+    val isDeleted = request.application.state.isDeleted
 
     val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {

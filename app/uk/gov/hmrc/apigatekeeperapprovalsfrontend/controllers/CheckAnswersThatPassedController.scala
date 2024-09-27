@@ -24,7 +24,7 @@ import cats.data.NonEmptyList
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
@@ -39,7 +39,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatPas
 object CheckAnswersThatPassedController {
   case class AnswerDetails(question: String, answer: String)
   case class Section(heading: String, answerDetails: NonEmptyList[AnswerDetails])
-  case class ViewModel(applicationId: ApplicationId, appName: String, sections: List[Section], isDeleted: Boolean)
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, sections: List[Section], isDeleted: Boolean)
 }
 
 @Singleton
@@ -60,7 +60,7 @@ class CheckAnswersThatPassedController @Inject() (
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
-    val isDeleted                        = request.application.state.name == State.DELETED
+    val isDeleted                        = request.application.state.isDeleted
 
     val groupedPassedQuestionsIds =
       request.submission.groups

@@ -26,6 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
@@ -37,7 +38,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{SendNewTermsOfUseConfirmPage, SendNewTermsOfUseRequestedPage}
 
 object SendNewTermsOfUseController {
-  case class ViewModel(appName: String, applicationId: ApplicationId, applicationDetailsUrl: String)
+  case class ViewModel(appName: ApplicationName, applicationId: ApplicationId, applicationDetailsUrl: String)
 }
 
 @Singleton

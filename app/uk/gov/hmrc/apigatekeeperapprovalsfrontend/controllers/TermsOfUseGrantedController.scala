@@ -22,6 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -31,7 +32,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionServ
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
 
 object TermsOfUseGrantedController {
-  case class ViewModel(appName: String, applicationId: ApplicationId)
+  case class ViewModel(appName: ApplicationName, applicationId: ApplicationId)
 }
 
 @Singleton

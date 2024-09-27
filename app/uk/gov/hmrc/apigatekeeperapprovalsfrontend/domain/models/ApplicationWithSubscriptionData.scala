@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiIdentifier
 
 object ApplicationWithSubscriptionData {
@@ -26,6 +27,6 @@ object ApplicationWithSubscriptionData {
 }
 
 case class ApplicationWithSubscriptionData(
-    application: Application,
+    application: ApplicationWithCollaborators,
     subscriptions: Set[ApiIdentifier]
   )

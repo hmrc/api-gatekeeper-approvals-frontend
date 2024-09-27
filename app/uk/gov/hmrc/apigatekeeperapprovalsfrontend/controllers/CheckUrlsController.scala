@@ -23,7 +23,7 @@ import scala.concurrent.Future.successful
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -37,7 +37,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 object CheckUrlsController {
 
   case class ViewModel(
-      appName: String,
+      appName: ApplicationName,
       applicationId: ApplicationId,
       organisationUrl: Option[String],
       privacyPolicyLocation: PrivacyPolicyLocation,
@@ -64,7 +64,7 @@ class CheckUrlsController @Inject() (
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
       case std @ Access.Standard(_, _, _, _, _, Some(importantSubmissionData)) =>
-        val isDeleted = request.application.state.name == domain.models.State.DELETED
+        val isDeleted = request.application.state.isDeleted
         successful(
           Ok(
             checkUrlsPage(

@@ -25,8 +25,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 
-import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.SellResellOrDistribute
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationNameData, Collaborator}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ClientId, LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
@@ -59,14 +59,14 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     val errorHandler     = app.injector.instanceOf[ErrorHandler]
 
     val application =
-      anApplication(applicationId, ClientId.random, "app name", Set(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random)))
+      anApplication(
+        applicationId,
+        ClientId.random,
+        ApplicationNameData.one,
+        Set(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random))
+      )
 
-    val inHouseApplication = application.copy(
-      access = application.access match {
-        case std @ Access.Standard(redirectUris, _, _, _, _, importantSubmissionData) => std.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No")))
-        case other                                                                    => other
-      }
-    )
+    val inHouseApplication = application.modifyStdAccess(_.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No"))))
     val fakeRequest        = FakeRequest().withCSRFToken
 
     val fakeSubmitCheckedRequest       = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")

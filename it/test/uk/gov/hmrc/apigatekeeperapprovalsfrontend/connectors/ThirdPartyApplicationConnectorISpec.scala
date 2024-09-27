@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationNameData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
@@ -54,7 +55,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
 
   "fetch application by id" should {
     val url     = s"/application/${applicationId.value}"
-    val appName = "app name"
+    val appName = ApplicationNameData.one
 
     "return an application" in new Setup {
       stubFor(
@@ -66,11 +67,10 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
           )
       )
 
-      val result = await(connector.fetchApplicationById(applicationId))
+      val result = await(connector.fetchApplicationById(applicationId)).value
 
-      result shouldBe defined
-      result.get.id shouldBe applicationId
-      result.get.name shouldBe appName
+      result.id shouldBe applicationId
+      result.name shouldBe appName
     }
 
     "return None if the application cannot be found" in new Setup {

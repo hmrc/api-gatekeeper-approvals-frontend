@@ -50,13 +50,13 @@ class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
       termsOfUseAcceptances
     )
     val standardAccess          = Access.Standard(importantSubmissionData = Some(importantSubmissionData))
-    val application             = anApplication().copy(access = standardAccess)
+    val application             = anApplication().withAccess(standardAccess)
 
     val submissionReview = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
 
     val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
     val standardAccessWithoutTOUAgreement          = Access.Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
-    val applicationWithoutTOUAgreement             = anApplication().copy(access = standardAccessWithoutTOUAgreement)
+    val applicationWithoutTOUAgreement             = anApplication().withAccess(standardAccessWithoutTOUAgreement)
     val submissionReviewWithoutTOUAgreement        = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
   }
 
