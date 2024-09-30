@@ -21,11 +21,11 @@ object AppDependencies {
   )
 
   val test = Seq(
-    "uk.gov.hmrc"                 %% "bootstrap-test-play-30"                 % bootstrapPlayVersion,
-    "uk.gov.hmrc.mongo"           %% "hmrc-mongo-test-play-30"                % mongoVersion,
-    "org.jsoup"                   %  "jsoup"                                  % "1.15.4",
-    "org.mockito"                 %% "mockito-scala-scalatest"                % "1.17.29",
-    "uk.gov.hmrc"                 %% "api-platform-common-domain-fixtures"    % commonDomainVersion,   // Override transitive dep
-    "uk.gov.hmrc"                 %% "api-platform-test-application-domain"   % appDomainVersion
+    "uk.gov.hmrc"                 %% "bootstrap-test-play-30"                     % bootstrapPlayVersion,
+    "uk.gov.hmrc.mongo"           %% "hmrc-mongo-test-play-30"                    % mongoVersion,
+    "org.jsoup"                   %  "jsoup"                                      % "1.15.4",
+    "org.mockito"                 %% "mockito-scala-scalatest"                    % "1.17.29",
+    "uk.gov.hmrc"                 %% "api-platform-common-domain-fixtures"        % commonDomainVersion,   // Override transitive dep
+    "uk.gov.hmrc"                 %% "api-platform-application-domain-fixtures"   % appDomainVersion
   ).map(_ % "test")
 }

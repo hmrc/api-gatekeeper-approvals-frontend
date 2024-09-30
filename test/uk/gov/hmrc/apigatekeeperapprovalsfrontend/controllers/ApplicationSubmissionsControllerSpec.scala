@@ -25,10 +25,8 @@ import org.mockito.captor.ArgCaptor
 import play.api.http.Status
 import play.api.test.Helpers._
 
-import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
-import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{ImportantSubmissionData, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -44,8 +42,10 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmiss
   ViewModel
 }
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ResponsibleIndividual
 
-class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
+class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with ApplicationWithCollaboratorsFixtures {
 
   trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule
@@ -79,17 +79,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
     }
     val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
-    val appWithImportantData = anApplication(applicationId)
-      .withAccess(
-        Access.Standard(
-          List.empty,
-          None,
-          None,
-          Set.empty,
-          Some(SellResellOrDistribute("Yes")),
-          Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
-        )
-      )
+    val appWithImportantData = 
+      standardApp
+      .withAccess(stdAccess.withDesktopSoftware)
       .withState(ApplicationStateData.pendingGatekeeperApproval)
   }
 
@@ -107,7 +99,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, formatDMY(submittedTimestamp)))
       viewModelCaptor.value.declinedInstances shouldBe List()
       viewModelCaptor.value.grantedInstance shouldBe None
-      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(LaxEmailAddress("bob@example.com"))
+      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(responsibleIndividualOne.emailAddress)
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe true
       viewModelCaptor.value.isDeleted shouldBe false
     }
@@ -125,7 +117,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec {
       verify(page).apply(viewModelCaptor)(*, *)
       viewModelCaptor.value.currentSubmission shouldBe None
       viewModelCaptor.value.grantedInstance shouldBe None
-      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(LaxEmailAddress("bob@example.com"))
+      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(responsibleIndividualOne.emailAddress)
       viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
       viewModelCaptor.value.isDeleted shouldBe false
       viewModelCaptor.value.declinedInstances shouldBe List(

@@ -24,12 +24,13 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models._
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.ApmConnectorMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, AsyncHmrcSpec}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
-class SubscriptionServiceSpec extends AsyncHmrcSpec {
+class SubscriptionServiceSpec extends AsyncHmrcSpec with ApplicationWithCollaboratorsFixtures {
 
   trait Setup extends ApmConnectorMockModule with ApiDataTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val applicationId              = ApplicationId.random
+    val applicationId              = applicationIdOne
     val context1                   = ApiContext("context1")
     val context2                   = ApiContext("context2")
     val context3                   = ApiContext("context3")

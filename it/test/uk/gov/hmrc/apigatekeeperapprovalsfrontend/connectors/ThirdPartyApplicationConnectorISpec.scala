@@ -24,12 +24,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationNameData
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
-class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions {
+class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with ApplicationWithCollaboratorsFixtures {
 
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,
@@ -45,7 +43,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
       .in(Mode.Test)
       .build()
 
-  private val applicationId = ApplicationId.random
+  private val applicationId = applicationIdOne
 
   trait Setup extends ApplicationTestData {
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
@@ -55,7 +53,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
 
   "fetch application by id" should {
     val url     = s"/application/${applicationId.value}"
-    val appName = ApplicationNameData.one
+    val appName = appNameOne
 
     "return an application" in new Setup {
       stubFor(
@@ -63,7 +61,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId, name = appName))
+              .withJsonBody(anApplication.withName(appName))
           )
       )
 

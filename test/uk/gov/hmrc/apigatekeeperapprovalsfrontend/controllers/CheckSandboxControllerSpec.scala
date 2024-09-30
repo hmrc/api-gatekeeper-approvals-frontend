@@ -28,7 +28,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckSandboxPage
 
 class CheckSandboxControllerSpec extends AbstractControllerSpec with SubmissionsTestData {
@@ -38,7 +37,6 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       with ApplicationServiceMockModule
       with SubmissionReviewServiceMockModule
       with SubscriptionServiceMockModule
-      with ApplicationTestData
       with StrideAuthorisationServiceMockModule {
 
     val checkSandboxPage = app.injector.instanceOf[CheckSandboxPage]

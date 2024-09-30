@@ -26,17 +26,24 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.SellResellOrDistribute
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationNameData, Collaborator}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ClientId, LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec, WithCSRFAddToken}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRFAddToken}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 
-class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with WithCSRFAddToken with SubmissionsTestData {
+class AbstractControllerSpec
+    extends AsyncHmrcSpec
+    with GuiceOneAppPerSuite
+    with WithCSRFAddToken
+    with ApplicationWithCollaboratorsFixtures
+    with SubmissionsTestData {
 
   override def fakeApplication() =
     new GuiceApplicationBuilder()
@@ -50,7 +57,7 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
       extends ApplicationActionServiceMockModule
       with SubmissionServiceMockModule
       with SubmissionReviewServiceMockModule
-      with ApplicationTestData {
+ {
 
     val config           = app.injector.instanceOf[GatekeeperConfig]
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
@@ -58,13 +65,7 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     val mcc              = app.injector.instanceOf[MessagesControllerComponents]
     val errorHandler     = app.injector.instanceOf[ErrorHandler]
 
-    val application =
-      anApplication(
-        applicationId,
-        ClientId.random,
-        ApplicationNameData.one,
-        Set(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random))
-      )
+    val application = standardApp.withCollaborators(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random))
 
     val inHouseApplication = application.modifyStdAccess(_.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No"))))
     val fakeRequest        = FakeRequest().withCSRFToken
@@ -74,6 +75,5 @@ class AbstractControllerSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with
     val brokenRequest                  = fakeRequest.withFormUrlEncodedBody("submit-action" -> "bobbins")
 
     def formatDMY(i: Instant): String = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(i)
-
   }
 }

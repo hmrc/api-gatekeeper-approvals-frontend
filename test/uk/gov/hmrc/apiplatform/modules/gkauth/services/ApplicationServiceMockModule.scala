@@ -27,9 +27,9 @@ import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
-trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
+trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationWithCollaboratorsFixtures {
 
   trait BaseApplicationServiceMock {
     val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
@@ -41,7 +41,7 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
     object FetchByApplicationId {
 
       def thenReturn(applicationId: ApplicationId) = {
-        val response = Some(anApplication(id = applicationId))
+        val response = Some(standardApp.withId(applicationId))
         when(aMock.fetchByApplicationId(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
@@ -54,7 +54,7 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
 
       def thenReturn(subordinateApplicationId: ApplicationId) = {
         when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
-          .thenReturn(successful(Some(anApplication(id = subordinateApplicationId))))
+          .thenReturn(successful(Some(standardApp.withId(subordinateApplicationId))))
       }
     }
 

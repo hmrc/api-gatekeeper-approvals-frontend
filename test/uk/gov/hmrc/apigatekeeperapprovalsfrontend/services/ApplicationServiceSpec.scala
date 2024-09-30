@@ -29,13 +29,14 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ApplicationCommandConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
 class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
 
-  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationCommandConnectorMockModule with ApplicationTestData with FixedClock {
+  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationCommandConnectorMockModule with ApplicationWithCollaboratorsFixtures with FixedClock {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val applicationId              = ApplicationId.random
+    val applicationId              = applicationIdOne
     val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock, ApplicationCommandConnectorMock.aMock, clock)
 
     val responsibleIndividual = ResponsibleIndividual(FullName("bob"), LaxEmailAddress("bob@example.com"))
@@ -50,13 +51,13 @@ class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
       termsOfUseAcceptances
     )
     val standardAccess          = Access.Standard(importantSubmissionData = Some(importantSubmissionData))
-    val application             = anApplication().withAccess(standardAccess)
+    val application             = standardApp.withState(appStateTesting).withAccess(standardAccess)
 
     val submissionReview = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
 
     val importantSubmissionDataWithoutTOUAgreement = importantSubmissionData.copy(termsOfUseAcceptances = List.empty)
     val standardAccessWithoutTOUAgreement          = Access.Standard(importantSubmissionData = Some(importantSubmissionDataWithoutTOUAgreement))
-    val applicationWithoutTOUAgreement             = anApplication().withAccess(standardAccessWithoutTOUAgreement)
+    val applicationWithoutTOUAgreement             = standardApp.withState(appStateTesting).withAccess(standardAccessWithoutTOUAgreement)
     val submissionReviewWithoutTOUAgreement        = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
   }
 

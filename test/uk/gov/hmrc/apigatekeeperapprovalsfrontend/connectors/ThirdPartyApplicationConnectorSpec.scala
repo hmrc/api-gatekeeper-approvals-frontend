@@ -25,11 +25,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
-
-class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
+class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApplicationWithCollaboratorsFixtures {
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
@@ -41,12 +40,12 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
       )
       .build()
 
-  trait Setup extends HttpClientMockModule with ApplicationTestData {
+  trait Setup extends HttpClientMockModule {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val urlBase = "http://example.com"
-    val appId   = ApplicationId.random
-    val app     = anApplication(appId)
+    val appId   = applicationIdOne
+    val app     = standardApp.withState(appStateTesting)
 
     val connector = new ThirdPartyApplicationConnector(HttpClientMock.aMock, ThirdPartyApplicationConnector.Config(urlBase), new NoopConnectorMetrics())
   }

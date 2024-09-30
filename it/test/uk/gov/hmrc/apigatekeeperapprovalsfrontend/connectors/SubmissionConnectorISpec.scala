@@ -270,7 +270,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
+              .withJsonBody(anApplication)
           )
       )
 
@@ -293,7 +293,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
+              .withJsonBody(anApplication)
           )
       )
 
@@ -316,7 +316,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
+              .withJsonBody(anApplication)
           )
       )
 

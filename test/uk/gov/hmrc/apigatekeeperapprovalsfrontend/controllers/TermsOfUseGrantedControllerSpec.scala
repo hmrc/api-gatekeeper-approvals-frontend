@@ -25,7 +25,6 @@ import org.mockito.captor.ArgCaptor
 import play.api.http.Status
 import play.api.test.Helpers._
 
-import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.{Access, SellResellOrDistribute}
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
@@ -68,17 +67,8 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     }
     val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
-    val appWithImportantData = anApplication(applicationId)
-      .withAccess(
-        Access.Standard(
-          List.empty,
-          None,
-          None,
-          Set.empty,
-          Some(SellResellOrDistribute("Yes")),
-          Some(ImportantSubmissionData(None, responsibleIndividual, Set.empty, TermsAndConditionsLocations.InDesktopSoftware, PrivacyPolicyLocations.InDesktopSoftware, List.empty))
-        )
-      )
+    val appWithImportantData = standardApp
+      .withAccess(stdAccess.withDesktopSoftware)
       .withState(ApplicationStateData.pendingGatekeeperApproval)
   }
 
