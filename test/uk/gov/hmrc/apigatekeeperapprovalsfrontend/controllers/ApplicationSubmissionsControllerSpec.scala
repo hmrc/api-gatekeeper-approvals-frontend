@@ -26,7 +26,8 @@ import play.api.http.Status
 import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationStateData, ApplicationWithCollaboratorsFixtures}
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ResponsibleIndividual
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -42,8 +43,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmiss
   ViewModel
 }
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
-import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ResponsibleIndividual
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with ApplicationWithCollaboratorsFixtures {
 
@@ -79,10 +78,10 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
     val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
-    val appWithImportantData = 
+    val appWithImportantData =
       standardApp
-      .withAccess(stdAccess.withDesktopSoftware)
-      .withState(ApplicationStateData.pendingGatekeeperApproval)
+        .withAccess(stdAccess.withDesktopSoftware)
+        .withState(ApplicationStateData.pendingGatekeeperApproval)
   }
 
   "page" should {

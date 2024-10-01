@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
@@ -29,12 +30,12 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ApplicationCommandConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec}
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
 
-  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationCommandConnectorMockModule with ApplicationWithCollaboratorsFixtures with FixedClock {
+  trait Setup extends ThirdPartyApplicationConnectorMockModule with ApmConnectorMockModule with ApplicationCommandConnectorMockModule with ApplicationWithCollaboratorsFixtures
+      with FixedClock {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId              = applicationIdOne
     val service                    = new ApplicationService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock, ApplicationCommandConnectorMock.aMock, clock)

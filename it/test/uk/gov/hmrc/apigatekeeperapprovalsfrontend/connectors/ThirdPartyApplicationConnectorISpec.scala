@@ -24,8 +24,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 
 class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with ApplicationWithCollaboratorsFixtures {
 
@@ -45,7 +46,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
 
   private val applicationId = applicationIdOne
 
-  trait Setup extends ApplicationTestData {
+  trait Setup {
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -61,7 +62,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication.withName(appName))
+              .withJsonBody(standardApp.withName(appName))
           )
       )
 

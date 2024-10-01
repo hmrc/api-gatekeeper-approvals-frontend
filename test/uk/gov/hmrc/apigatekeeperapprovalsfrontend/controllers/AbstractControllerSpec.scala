@@ -26,17 +26,15 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.SellResellOrDistribute
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaboratorsFixtures, Collaborator}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthConfig
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationActionServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRFAddToken}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 
 class AbstractControllerSpec
     extends AsyncHmrcSpec
@@ -56,8 +54,7 @@ class AbstractControllerSpec
   trait AbstractSetup
       extends ApplicationActionServiceMockModule
       with SubmissionServiceMockModule
-      with SubmissionReviewServiceMockModule
- {
+      with SubmissionReviewServiceMockModule {
 
     val config           = app.injector.instanceOf[GatekeeperConfig]
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]

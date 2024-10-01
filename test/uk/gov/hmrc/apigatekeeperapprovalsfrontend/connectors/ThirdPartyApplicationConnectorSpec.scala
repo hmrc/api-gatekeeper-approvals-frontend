@@ -25,8 +25,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
+
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApplicationWithCollaboratorsFixtures {
 

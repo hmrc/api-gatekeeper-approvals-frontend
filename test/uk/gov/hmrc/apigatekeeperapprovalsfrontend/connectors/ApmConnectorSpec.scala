@@ -26,11 +26,11 @@ import play.api.{Application, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.MappedApiDefinitions
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiIdentifierFixtures
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, AsyncHmrcSpec}
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
 class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApiIdentifierFixtures with ApplicationWithCollaboratorsFixtures {
 

@@ -23,11 +23,11 @@ import play.api.mvc.MessagesRequest
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, LoggedInRequest}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.ApplicationServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
 class ApplicationActionServiceSpec extends AsyncHmrcSpec with ApplicationWithCollaboratorsFixtures {
 

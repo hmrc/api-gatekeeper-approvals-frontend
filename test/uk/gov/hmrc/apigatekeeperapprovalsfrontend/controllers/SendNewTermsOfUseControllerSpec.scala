@@ -65,10 +65,11 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       val latestInstance = markedSubmission.submission.latestInstance.copy(statusHistory = NonEmptyList.fromList(statuses.toList).get)
       markedSubmission.copy(submission = markedSubmission.submission.copy(instances = NonEmptyList.of(latestInstance)))
     }
+
     val appWithImportantData =
       standardApp
-      .withState(ApplicationStateData.pendingGatekeeperApproval)
-      .withAccess(stdAccess.withDesktopSoftware)
+        .withState(ApplicationStateData.pendingGatekeeperApproval)
+        .withAccess(stdAccess.withDesktopSoftware)
   }
 
   "page" should {

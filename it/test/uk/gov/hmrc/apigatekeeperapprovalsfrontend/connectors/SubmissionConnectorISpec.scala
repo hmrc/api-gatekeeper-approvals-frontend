@@ -33,9 +33,9 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvit
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 
-class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData {
+class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
 
   import Submission._
 
@@ -270,7 +270,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication)
+              .withJsonBody(standardApp.withState(appStateTesting))
           )
       )
 
@@ -293,7 +293,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication)
+              .withJsonBody(standardApp.withState(appStateTesting))
           )
       )
 
@@ -316,7 +316,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication)
+              .withJsonBody(standardApp.withState(appStateTesting))
           )
       )
 
