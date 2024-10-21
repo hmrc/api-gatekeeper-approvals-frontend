@@ -80,7 +80,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
     val appWithImportantData =
       standardApp
-        .withAccess(stdAccess.withDesktopSoftware)
+        .withAccess(standardAccess.withDesktopSoftware)
         .withState(ApplicationStateData.pendingGatekeeperApproval)
   }
 

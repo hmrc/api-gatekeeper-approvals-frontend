@@ -50,7 +50,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
 
     val appWithImportantData = standardApp
       .withState(appStateTesting)
-      .withAccess(stdAccess.withDesktopSoftware)
+      .withAccess(standardAccess.withDesktopSoftware)
 
     def appWithData(
         privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocations.InDesktopSoftware,
@@ -59,7 +59,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       standardApp
         .withState(appStateTesting)
         .withAccess(
-          stdAccess
+          standardAccess
             .withDesktopSoftware
             .withTermsAndConditionsLocation(termsAndConditionsLocation)
             .withPrivacyPolicyLocation(privacyPolicyLocation)

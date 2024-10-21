@@ -68,7 +68,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     val responsibleIndividual                                             = ResponsibleIndividual(FullName("Bob Example"), LaxEmailAddress("bob@example.com"))
 
     val appWithImportantData = standardApp
-      .withAccess(stdAccess.withDesktopSoftware)
+      .withAccess(standardAccess.withDesktopSoftware)
       .withState(ApplicationStateData.pendingGatekeeperApproval)
   }
 

@@ -51,8 +51,8 @@ class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
       PrivacyPolicyLocations.InDesktopSoftware,
       termsOfUseAcceptances
     )
-    val standardAccess          = Access.Standard(importantSubmissionData = Some(importantSubmissionData))
-    val application             = standardApp.withState(appStateTesting).withAccess(standardAccess)
+    val saWithSubmissionData    = Access.Standard(importantSubmissionData = Some(importantSubmissionData))
+    val application             = standardApp.withState(appStateTesting).withAccess(saWithSubmissionData)
 
     val submissionReview = SubmissionReview(SubmissionId.random, 0, true, false, false, false)
 

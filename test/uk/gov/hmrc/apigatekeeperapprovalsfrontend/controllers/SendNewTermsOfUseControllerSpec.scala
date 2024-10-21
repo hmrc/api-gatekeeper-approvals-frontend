@@ -69,7 +69,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     val appWithImportantData =
       standardApp
         .withState(ApplicationStateData.pendingGatekeeperApproval)
-        .withAccess(stdAccess.withDesktopSoftware)
+        .withAccess(standardAccess.withDesktopSoftware)
   }
 
   "page" should {
