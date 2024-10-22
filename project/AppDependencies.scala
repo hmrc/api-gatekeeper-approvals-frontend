@@ -4,9 +4,8 @@ object AppDependencies {
 
   lazy val bootstrapPlayVersion = "9.0.0"
   lazy val mongoVersion = "2.1.0"
-  val apiDomainVersion = "0.17.0"
-  val commonDomainVersion = "0.15.0"
-  val appDomainVersion = "0.56.0"
+  val apiDomainVersion = "0.19.1"
+  val appDomainVersion = "0.61.16"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-30"         % bootstrapPlayVersion,
@@ -20,10 +19,10 @@ object AppDependencies {
   )
 
   val test = Seq(
-    "uk.gov.hmrc"                 %% "bootstrap-test-play-30"            % bootstrapPlayVersion,
-    "uk.gov.hmrc.mongo"           %% "hmrc-mongo-test-play-30"           % mongoVersion,
-    "org.jsoup"                   %  "jsoup"                             % "1.15.4",
-    "org.mockito"                 %% "mockito-scala-scalatest"           % "1.17.29",
-    "uk.gov.hmrc"                 %% "api-platform-test-common-domain"   % commonDomainVersion
+    "uk.gov.hmrc"                 %% "bootstrap-test-play-30"                     % bootstrapPlayVersion,
+    "uk.gov.hmrc.mongo"           %% "hmrc-mongo-test-play-30"                    % mongoVersion,
+    "org.jsoup"                   %  "jsoup"                                      % "1.15.4",
+    "org.mockito"                 %% "mockito-scala-scalatest"                    % "1.17.29",
+    "uk.gov.hmrc"                 %% "api-platform-application-domain-fixtures"   % appDomainVersion
   ).map(_ % "test")
 }

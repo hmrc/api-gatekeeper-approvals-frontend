@@ -24,6 +24,7 @@ import cats.data.{EitherT, NonEmptyList}
 
 import play.api.mvc.{MessagesControllerComponents, _}
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -35,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ConfirmYourDecisionPage
 
 object ConfirmYourDecisionController {
-  case class ViewModel(applicationId: ApplicationId, appName: String, isFailed: Boolean)
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, isFailed: Boolean)
 }
 
 @Singleton

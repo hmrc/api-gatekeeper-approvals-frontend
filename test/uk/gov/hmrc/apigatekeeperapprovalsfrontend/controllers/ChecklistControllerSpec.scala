@@ -23,16 +23,18 @@ import org.mockito.captor.ArgCaptor
 import play.api.http.Status
 import play.api.test.Helpers._
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.ViewModel
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.{Application, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMockModule
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
 
   trait BaseSetup extends AbstractSetup
       with SubscriptionServiceMockModule
@@ -52,7 +54,12 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.aMock
     )
 
-    def setupForSuccessWith(markedSubmission: MarkedSubmission, requiresFraudCheck: Boolean = false, requiresDemo: Boolean = false, anApplication: Application = application) = {
+    def setupForSuccessWith(
+        markedSubmission: MarkedSubmission,
+        requiresFraudCheck: Boolean = false,
+        requiresDemo: Boolean = false,
+        anApplication: ApplicationWithCollaborators = application
+      ) = {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(anApplication)
 
@@ -160,7 +167,7 @@ class ChecklistControllerSpec extends AbstractControllerSpec {
     }
 
     "render checklist template with a deleted application" in new LivePageSetup {
-      val deletedApplication = application.copy(state = application.state.toDeleted(instant).copy(requestedByName = Some("deletee@example.com")))
+      val deletedApplication = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("deletee@example.com")))
       setupForSuccessWith(passMarkedSubmission, true, true, deletedApplication)
       application.isInHouseSoftware shouldBe false
 

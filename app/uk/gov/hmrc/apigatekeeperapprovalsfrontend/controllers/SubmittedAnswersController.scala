@@ -22,6 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.MessagesControllerComponents
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -36,7 +37,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPag
 object SubmittedAnswersController {
 
   case class ViewModel(
-      appName: String,
+      appName: ApplicationName,
       applicationId: ApplicationId,
       index: Int,
       questionAnswerGroups: List[QuestionAndAnswerGroup],

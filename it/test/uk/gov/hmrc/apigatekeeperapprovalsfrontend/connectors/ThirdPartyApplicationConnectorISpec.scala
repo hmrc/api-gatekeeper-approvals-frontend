@@ -24,11 +24,11 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 
-class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions {
+class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with ApplicationWithCollaboratorsFixtures {
 
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,
@@ -44,9 +44,9 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
       .in(Mode.Test)
       .build()
 
-  private val applicationId = ApplicationId.random
+  private val applicationId = applicationIdOne
 
-  trait Setup extends ApplicationTestData {
+  trait Setup {
     val connector = app.injector.instanceOf[ThirdPartyApplicationConnector]
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -54,7 +54,7 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
 
   "fetch application by id" should {
     val url     = s"/application/${applicationId.value}"
-    val appName = "app name"
+    val appName = appNameOne
 
     "return an application" in new Setup {
       stubFor(
@@ -62,15 +62,14 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId, name = appName))
+              .withJsonBody(standardApp.withName(appName))
           )
       )
 
-      val result = await(connector.fetchApplicationById(applicationId))
+      val result = await(connector.fetchApplicationById(applicationId)).value
 
-      result shouldBe defined
-      result.get.id shouldBe applicationId
-      result.get.name shouldBe appName
+      result.id shouldBe applicationId
+      result.name shouldBe appName
     }
 
     "return None if the application cannot be found" in new Setup {

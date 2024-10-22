@@ -24,6 +24,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -35,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 object TermsOfUseResetController {
 
-  case class ViewModel(applicationId: ApplicationId, appName: String)
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName)
 
   case class ProvideNotesForm(notes: String)
 

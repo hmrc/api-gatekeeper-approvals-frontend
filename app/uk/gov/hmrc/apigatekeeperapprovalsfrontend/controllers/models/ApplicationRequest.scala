@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-
 class ApplicationRequest[A](
-    val application: Application,
+    val application: ApplicationWithCollaborators,
     val loggedInRequest: LoggedInRequest[A]
   ) extends LoggedInRequest[A](loggedInRequest.name, loggedInRequest.role, loggedInRequest)

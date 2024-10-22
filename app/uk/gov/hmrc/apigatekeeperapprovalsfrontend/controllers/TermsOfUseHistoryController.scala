@@ -23,6 +23,7 @@ import scala.concurrent.ExecutionContext
 
 import play.api.mvc.MessagesControllerComponents
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationName, ApplicationWithCollaborators}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
@@ -32,7 +33,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
@@ -40,7 +40,7 @@ object TermsOfUseHistoryController {
 
   case class ViewModel(
       applicationId: ApplicationId,
-      applicationName: String,
+      applicationName: ApplicationName,
       historyEntries: List[TermsOfUseHistory],
       applicationDetailsUrl: String,
       isInHouseSoftware: Boolean,
@@ -229,7 +229,7 @@ class TermsOfUseHistoryController @Inject() (
       submission.context.get(AskWhen.Context.Keys.IN_HOUSE_SOFTWARE).contains("Yes")
     }
 
-    def buildViewModel(invite: TermsOfUseInvitation, application: Application, submission: Option[Submission]): ViewModel = {
+    def buildViewModel(invite: TermsOfUseInvitation, application: ApplicationWithCollaborators, submission: Option[Submission]): ViewModel = {
       submission match {
         case Some(sub) => {
           ViewModel(

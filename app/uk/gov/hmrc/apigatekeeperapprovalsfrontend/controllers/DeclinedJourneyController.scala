@@ -25,7 +25,7 @@ import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Collaborator
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -36,7 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionSer
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 object DeclinedJourneyController {
-  case class ViewModel(applicationId: ApplicationId, appName: String, adminsToEmail: Set[Collaborator] = Set.empty)
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, adminsToEmail: Set[Collaborator] = Set.empty)
 
   case class ProvideReasonsForm(reasons: String)
 

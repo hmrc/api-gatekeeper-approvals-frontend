@@ -27,15 +27,13 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
-import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, Collaborators, State}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, ApplicationWithCollaborators, Collaborators, CoreApplicationData, State}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, CommandFailure, CommandFailures, DispatchRequest, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{Actors, UserId, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WireMockSugar}
 
 class ApplicationCommandConnectorSpec
@@ -48,14 +46,14 @@ class ApplicationCommandConnectorSpec
       createdOn: Instant = instant,
       lastAccess: Instant = instant,
       state: ApplicationState = ApplicationState(State.TESTING, None, None, None, instant)
-    ): Application = {
-    Application(
-      ApplicationId.random,
-      ClientId("clientid"),
-      "appName",
-      Set.empty,
-      Access.Standard(),
-      state
+    ): ApplicationWithCollaborators = {
+    ApplicationWithCollaborators(
+      details = CoreApplicationData.Standard.one.copy(
+        createdOn = createdOn,
+        lastAccess = Some(lastAccess),
+        state = state
+      ),
+      collaborators = Set.empty
     )
   }
 

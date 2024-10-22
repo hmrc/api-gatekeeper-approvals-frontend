@@ -26,16 +26,16 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.TouUpliftRequest
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, WireMockExtensions}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 
-class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData with ApplicationTestData {
+class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
 
   import Submission._
 
@@ -270,15 +270,15 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
+              .withJsonBody(standardApp.withState(appStateTesting))
           )
       )
 
       val result = await(connector.grantWithWarningsForTouUplift(applicationId, requestedBy, reason))
 
       result match {
-        case Right(app: Application) => app.id shouldBe applicationId
-        case _                       => fail("Expected an Application, got something else.")
+        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
+        case _                                        => fail("Expected an Application, got something else.")
       }
     }
   }
@@ -293,15 +293,15 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
+              .withJsonBody(standardApp.withState(appStateTesting))
           )
       )
 
       val result = await(connector.declineForTouUplift(applicationId, requestedBy, reason))
 
       result match {
-        case Right(app: Application) => app.id shouldBe applicationId
-        case _                       => fail("Expected an Application, got something else.")
+        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
+        case _                                        => fail("Expected an Application, got something else.")
       }
     }
   }
@@ -316,15 +316,15 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withJsonBody(anApplication(id = applicationId))
+              .withJsonBody(standardApp.withState(appStateTesting))
           )
       )
 
       val result = await(connector.resetForTouUplift(applicationId, requestedBy, reason))
 
       result match {
-        case Right(app: Application) => app.id shouldBe applicationId
-        case _                       => fail("Expected an Application, got something else.")
+        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
+        case _                                        => fail("Expected an Application, got something else.")
       }
     }
   }

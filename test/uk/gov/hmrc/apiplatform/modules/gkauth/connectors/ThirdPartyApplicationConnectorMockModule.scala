@@ -20,12 +20,11 @@ import scala.concurrent.Future.successful
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, State}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, ClientId}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with FixedClock {
 
@@ -36,7 +35,7 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
 
       def thenReturn() = {
         when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) =>
-          successful(Some(Application(appId, ClientId.random, "app name", Set.empty, state = ApplicationState(State.TESTING, None, None, None, instant))))
+          successful(Some(ApplicationWithCollaborators(CoreApplicationData.Standard.one.copy(id = appId, state = ApplicationStateData.testing), Set.empty)))
         )
       }
     }

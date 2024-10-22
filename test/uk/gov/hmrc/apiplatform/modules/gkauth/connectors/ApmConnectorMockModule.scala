@@ -21,13 +21,13 @@ import scala.concurrent.Future.successful
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiIdentifier, ApplicationId}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApplicationTestData
 
-trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationTestData {
+trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationWithCollaboratorsFixtures {
 
   trait BaseApmConnectorMock {
     def aMock: ApmConnector
@@ -35,7 +35,7 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
     object FetchLinkedSubordinateApplicationById {
 
       def thenReturn(subordinateApplicationId: ApplicationId) =
-        when(aMock.fetchLinkedSubordinateApplicationById(*[ApplicationId])(*)).thenReturn(successful(Some(anApplication(subordinateApplicationId))))
+        when(aMock.fetchLinkedSubordinateApplicationById(*[ApplicationId])(*)).thenReturn(successful(Some(standardApp.withId(subordinateApplicationId))))
     }
 
     object FetchSubscribableApisForApplication {
@@ -49,7 +49,7 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
 
       def thenReturn(apiIdentifiers: ApiIdentifier*) =
         when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(
-          successful(Some(ApplicationWithSubscriptionData(anApplication(), apiIdentifiers.toSet)))
+          successful(Some(ApplicationWithSubscriptionData(standardApp, apiIdentifiers.toSet)))
         )
       def thenReturnNothing                          = when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(successful(None))
     }

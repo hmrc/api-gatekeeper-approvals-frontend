@@ -25,6 +25,7 @@ import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Mark
@@ -36,7 +37,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseReasonsPa
 
 object TermsOfUseReasonsController {
 
-  case class ViewModel(applicationId: ApplicationId, appName: String, hasFails: Boolean, hasWarns: Boolean) {
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, hasFails: Boolean, hasWarns: Boolean) {
 
     lazy val messageKey: String = if (hasFails) { if (hasWarns) "failsandwarns" else "failsonly" }
     else "warnsonly"

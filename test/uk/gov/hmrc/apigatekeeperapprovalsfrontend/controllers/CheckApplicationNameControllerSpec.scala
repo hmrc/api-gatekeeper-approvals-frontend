@@ -60,7 +60,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with a deleted application" in new Setup {
-      val deletedApp   = application.copy(state = application.state.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
+      val deletedApp   = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)

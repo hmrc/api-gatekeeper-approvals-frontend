@@ -22,6 +22,7 @@ import scala.concurrent.Future.successful
 
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
@@ -31,17 +32,17 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvit
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationWithApplication}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApplicationTestData, AsyncHmrcSpec}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationTestData {
+class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationWithCollaboratorsFixtures {
 
   trait Setup extends FixedClock {
     implicit val hc: HeaderCarrier                                   = HeaderCarrier()
-    val applicationId                                                = ApplicationId.random
+    val applicationId                                                = applicationIdOne
     val mockSubmissionsConnector: SubmissionsConnector               = mock[SubmissionsConnector]
     val mockApplicationCommandConnector: ApplicationCommandConnector = mock[ApplicationCommandConnector]
     val requestedBy                                                  = "bob@example.com"
-    val app                                                          = anApplication(applicationId)
+    val app                                                          = standardApp.withState(appStateTesting)
 
     val underTest = new SubmissionService(mockSubmissionsConnector, mockApplicationCommandConnector, clock)
   }

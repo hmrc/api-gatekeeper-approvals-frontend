@@ -22,7 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -40,7 +40,7 @@ object ChecklistController {
     lazy val isEmpty = items.isEmpty
   }
   case class ChecklistItem(labelMsgId: String, url: String, uid: String, status: SubmissionReview.Status)
-  case class ViewModel(applicationId: ApplicationId, appName: String, topMsgId: String, sections: List[ChecklistSection], isInHouseSoftware: Boolean, isDeleted: Boolean)
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, topMsgId: String, sections: List[ChecklistSection], isInHouseSoftware: Boolean, isDeleted: Boolean)
 }
 
 @Singleton
@@ -55,6 +55,7 @@ class ChecklistController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
   import ChecklistController._
+  import Implicits._
 
   type RequiredActions = Map[SubmissionReview.Action, SubmissionReview.Status]
 
@@ -89,7 +90,7 @@ class ChecklistController @Inject() (
       case FAILED                  => "checklist.requestfailed"
     }
     val isInHouseSoftware: Boolean = request.application.isInHouseSoftware
-    val isDeleted                  = request.application.state.name == domain.models.State.DELETED
+    val isDeleted                  = request.application.state.isDeleted
 
     for {
       review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)

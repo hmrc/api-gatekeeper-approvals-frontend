@@ -22,7 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{MessagesControllerComponents, _}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
@@ -37,7 +37,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckAnswersThatFai
 object CheckAnswersThatFailedController {
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class ViewModel(applicationId: ApplicationId, appName: String, answers: List[AnswerDetails], isDeleted: Boolean) {
+  case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, answers: List[AnswerDetails], isDeleted: Boolean) {
     lazy val hasFails: Boolean = answers.exists(_.status == Mark.Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Mark.Warn)
 
@@ -62,7 +62,7 @@ class CheckAnswersThatFailedController @Inject() (
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
-    val isDeleted = request.application.state.name == State.DELETED
+    val isDeleted = request.application.state.isDeleted
 
     val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {

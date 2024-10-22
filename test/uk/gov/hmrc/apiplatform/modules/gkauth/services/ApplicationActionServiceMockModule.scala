@@ -23,11 +23,11 @@ import cats.data.OptionT
 import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 
 trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -37,7 +37,7 @@ trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatch
 
     object Process {
 
-      def thenReturn[A](application: Application) = {
+      def thenReturn[A](application: ApplicationWithCollaborators) = {
         import cats.implicits._
 
         when(aMock.process[A](eqTo(application.id), *)(*))

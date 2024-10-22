@@ -22,12 +22,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ApplicationCommandConnector, ThirdPartyApplicationConnector}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Application
 
 @Singleton
 class ApplicationService @Inject() (
@@ -39,11 +39,11 @@ class ApplicationService @Inject() (
   ) extends CommandHandlerTypes[DispatchSuccessResult]
     with ClockNow {
 
-  def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+  def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
   }
 
-  def fetchLinkedSubordinateApplicationByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+  def fetchLinkedSubordinateApplicationByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
     apmConnector.fetchLinkedSubordinateApplicationById(applicationId)
   }
 

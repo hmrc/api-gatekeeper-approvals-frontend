@@ -23,7 +23,7 @@ import scala.concurrent.Future.successful
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.State
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -37,7 +37,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ArrangeDemoPage
 object ArrangeDemoController {
 
   case class ViewModel(
-      appName: String,
+      appName: ApplicationName,
       applicationId: ApplicationId,
       email: String,
       isDeleted: Boolean
@@ -60,7 +60,7 @@ class ArrangeDemoController @Inject() (
     (request.application.access, request.submission.latestInstance.statusHistory.find(_.isSubmitted)) match {
       // Should only be uplifting and checking Standard apps
       case (std: Access.Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if (request.submission.status.isSubmitted) =>
-        val isDeleted = request.application.state.name == State.DELETED
+        val isDeleted = request.application.state.isDeleted
         successful(
           Ok(
             arrangeDemoPage(
