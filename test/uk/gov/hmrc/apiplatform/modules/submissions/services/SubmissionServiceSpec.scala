@@ -146,4 +146,20 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
       result shouldBe Right(DispatchSuccessResult(app))
     }
   }
+
+  "resetForTouUplift" should {
+    "call submission connector correctly" in new Setup {
+      when(mockSubmissionsConnector.resetForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.resetForTouUplift(applicationId, "requestedBy", "reasons"))
+      result shouldBe Right(app)
+    }
+  }
+
+  "deleteTouUplift" should {
+    "call submission connector correctly" in new Setup {
+      when(mockSubmissionsConnector.deleteTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(Right(app)))
+      val result = await(underTest.deleteTouUplift(applicationId, "requestedBy"))
+      result shouldBe Right(app)
+    }
+  }
 }

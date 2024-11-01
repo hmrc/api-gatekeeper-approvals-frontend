@@ -94,6 +94,16 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
     }
 
+    "redirect back to main ToU page if no form" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+
+      val result = controller.action(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
+    }
+
     "return 400 if failed to delete" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "yes")
 
@@ -104,6 +114,17 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
+    }
+  }
+
+  "confirmationPage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+
+      val result = controller.confirmationPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
     }
   }
 }
