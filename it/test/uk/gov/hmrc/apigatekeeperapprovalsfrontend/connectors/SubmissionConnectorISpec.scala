@@ -328,4 +328,27 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       }
     }
   }
+
+  "delete submission for ToU" should {
+    val url = s"/approvals/application/${applicationId.value}/delete-tou"
+
+    "return an application on success" in new Setup {
+      stubFor(
+        post(urlEqualTo(url))
+          .withJsonRequestBody(SubmissionsConnector.TouDeleteRequest(requestedBy))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withJsonBody(standardApp.withState(appStateTesting))
+          )
+      )
+
+      val result = await(connector.deleteTouUplift(applicationId, requestedBy))
+
+      result match {
+        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
+        case _                                        => fail("Expected an Application, got something else.")
+      }
+    }
+  }
 }

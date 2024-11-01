@@ -70,7 +70,7 @@ class TermsOfUseDeleteController @Inject() (
 
       val E = EitherTHelper.make[String]
 
-      E.fromEitherF(submissionService.resetForTouUplift(applicationId, request.name.get, ""))
+      E.fromEitherF(submissionService.deleteTouUplift(applicationId, request.name.get))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge

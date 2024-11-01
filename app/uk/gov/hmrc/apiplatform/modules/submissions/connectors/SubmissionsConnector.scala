@@ -47,6 +47,9 @@ object SubmissionsConnector {
   case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
   implicit val writesTouGrantedRequest: Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
 
+  case class TouDeleteRequest(gatekeeperUserName: String)
+  implicit val writesTouDeleteRequest: Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
+
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
 
@@ -154,6 +157,22 @@ class SubmissionsConnector @Inject() (
     metrics.record(api) {
       http.post(url"$serviceBaseUrl/approvals/application/${applicationId}/reset-tou")
         .withBody(Json.toJson(TouUpliftRequest(requestedBy, reasons)))
+        .execute[Either[UpstreamErrorResponse, ApplicationWithCollaborators]]
+        .map(_.leftMap(failed(_)))
+    }
+  }
+
+  def deleteTouUplift(
+      applicationId: ApplicationId,
+      requestedBy: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to delete submission for application ${applicationId}: ${err}"
+
+    metrics.record(api) {
+      http.post(url"$serviceBaseUrl/approvals/application/${applicationId}/delete-tou")
+        .withBody(Json.toJson(TouDeleteRequest(requestedBy)))
         .execute[Either[UpstreamErrorResponse, ApplicationWithCollaborators]]
         .map(_.leftMap(failed(_)))
     }
