@@ -244,6 +244,7 @@ termsofusehistory.dueon = Due on
 termsofusehistory.managesubmission = Manage submission
 termsofusehistory.viewanswers = View submitted answers
 termsofusehistory.resetsubmission = Reset submission
+termsofusehistory.deletesubmission = Delete submission
 termsofusehistory.applicationdetails = Application details
 termsofusehistory.viewapplicationdetails = Review or manage application details
 termsofusehistory.inhouse = This request is from an in-house developer
@@ -295,6 +296,16 @@ termsofuseresetconfirmation.pagetitle = HMRC API Gatekeeper - Reset terms of use
 termsofuseresetconfirmation.title = Reset terms of use submission
 termsofuseresetconfirmation.text = The submission has been successfully reset back to 'Email sent'
 termsofuseresetconfirmation.back = Back to Terms of use
+
+termsofusedelete.pagetitle = HMRC API Gatekeeper - Delete terms of use submission
+termsofusedelete.title = Are you sure that you want to delete the submission data for this application?
+termsofusedelete.note.1 = The submission data will be deleted and the user will have to re-start the terms of use submission process from the beginning.
+termsofusedelete.button.continue = Continue
+
+termsofusedeleteconfirmation.pagetitle = HMRC API Gatekeeper - Delete terms of use submission confirmation
+termsofusedeleteconfirmation.title = Delete terms of use submission
+termsofusedeleteconfirmation.text = The submission has been successfully deleted
+termsofusedeleteconfirmation.back = Back to Terms of use
 
 termsofuseadmins.title = Copy email addresses and email the team admins
 termsofuseadmins.pagetitle = HMRC API Gatekeeper - Copy email addresses
