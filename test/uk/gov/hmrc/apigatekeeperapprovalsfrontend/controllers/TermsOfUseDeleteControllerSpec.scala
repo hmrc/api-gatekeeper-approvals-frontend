@@ -49,6 +49,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.page(applicationId)(fakeRequest)
 
@@ -62,6 +63,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.DeleteTouUplift.thenReturn(applicationId, application)
 
       val result = controller.action(applicationId)(fakeYesNoRequest)
@@ -75,6 +77,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.action(applicationId)(fakeYesNoRequest)
 
@@ -87,6 +90,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.action(applicationId)(fakeYesNoRequest)
 
@@ -97,6 +101,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "redirect back to main ToU page if no form" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.action(applicationId)(fakeRequest)
 
@@ -109,6 +114,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.DeleteTouUplift.thenReturnError(applicationId)
 
       val result = controller.action(applicationId)(fakeYesNoRequest)
@@ -121,6 +127,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
       val result = controller.confirmationPage(applicationId)(fakeRequest)
 

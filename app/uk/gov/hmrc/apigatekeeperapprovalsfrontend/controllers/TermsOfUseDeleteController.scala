@@ -53,11 +53,11 @@ class TermsOfUseDeleteController @Inject() (
 
   import TermsOfUseDeleteController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseDeletePage(ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def deleteSubmission() = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
