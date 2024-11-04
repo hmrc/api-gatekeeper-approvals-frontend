@@ -75,12 +75,15 @@
                 case (true, _,    "WARNINGS")                       => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listPage(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
                 case (true, _,    "TERMS OF USE V2 WITH WARNINGS")  => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedController.page(viewModel.applicationId).url}>{messages("termsofusehistory.managesubmission")}</a>
                 case (true, true, "PENDING RESPONSIBLE INDIVIDUAL") => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.page(viewModel.applicationId).url}>{messages("termsofusehistory.resetsubmission")}</a>
-                case (true, true, "IN PROGRESS")                    => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.page(viewModel.applicationId).url}>{messages("termsofusehistory.deletesubmission")}</a>
-                case (true, true, "EMAIL SENT")                     => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.page(viewModel.applicationId).url}>{messages("termsofusehistory.deletesubmission")}</a>
-                case (true, true, "REMINDER EMAIL SENT")            => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.page(viewModel.applicationId).url}>{messages("termsofusehistory.deletesubmission")}</a>
-                case (true, true, "OVERDUE")                        => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.page(viewModel.applicationId).url}>{messages("termsofusehistory.deletesubmission")}</a>
                 case (true, _,    "TERMS OF USE V2")                => <a class="govuk-link govuk-link--no-visited-state" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseAnswersController.page(viewModel.applicationId).url}>{messages("termsofusehistory.viewanswers")}</a>
                 case _                                              => 
+              }
+            }
+            &nbsp;
+            @{ 
+              (request.role.isUser, request.role.isSuperUser, viewModel.hasSubmission) match {
+                case (true, true, true) => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.page(viewModel.applicationId).url}>{messages("termsofusehistory.deletesubmission")}</a>
+                case _                  => 
               }
             }
           </p>

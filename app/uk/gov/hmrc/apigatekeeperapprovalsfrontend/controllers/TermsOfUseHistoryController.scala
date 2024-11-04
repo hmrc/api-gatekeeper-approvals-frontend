@@ -44,6 +44,7 @@ object TermsOfUseHistoryController {
       historyEntries: List[TermsOfUseHistory],
       applicationDetailsUrl: String,
       isInHouseSoftware: Boolean,
+      hasSubmission: Boolean,
       dueDate: String
     )
 
@@ -238,6 +239,7 @@ class TermsOfUseHistoryController @Inject() (
             buildHistoryFromSubmissionAndInvitation(sub, invite).sortBy(_.dateAsString).reverse,
             gatekeeperApplicationUrl,
             isInHouseSoftware(sub),
+            submission.isDefined,
             DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.dueBy)
           )
         }
@@ -248,6 +250,7 @@ class TermsOfUseHistoryController @Inject() (
             buildHistoryFromInvitation(invite).sortBy(_.dateAsString).reverse,
             gatekeeperApplicationUrl,
             false,
+            submission.isDefined,
             DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault()).format(invite.dueBy)
           )
         }

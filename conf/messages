@@ -298,9 +298,9 @@ termsofuseresetconfirmation.text = The submission has been successfully reset ba
 termsofuseresetconfirmation.back = Back to Terms of use
 
 termsofusedelete.pagetitle = HMRC API Gatekeeper - Delete terms of use submission
-termsofusedelete.title = Are you sure that you want to delete the submission data for this application?
-termsofusedelete.note.1 = The submission data will be deleted and the user will have to re-start the terms of use submission process from the beginning.
-termsofusedelete.button.continue = Continue
+termsofusedelete.title = Are you sure that you want to delete the terms of use submission data for this application?
+termsofusedelete.note.1 = The submission data will be deleted and the user will have to re-start the terms of use submission process from the beginning.  Note that this is irreversible.
+termsofusedelete.button.continue = Delete
 
 termsofusedeleteconfirmation.pagetitle = HMRC API Gatekeeper - Delete terms of use submission confirmation
 termsofusedeleteconfirmation.title = Delete terms of use submission
