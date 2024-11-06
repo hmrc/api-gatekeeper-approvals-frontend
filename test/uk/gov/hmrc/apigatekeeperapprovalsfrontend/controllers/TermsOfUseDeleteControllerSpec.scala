@@ -72,7 +72,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(applicationId).url
     }
 
-    "redirect back to main ToU page if select no" in new Setup {
+    "redirect back to ToU history page if select no" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "no")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
@@ -82,10 +82,10 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
     }
 
-    "redirect back to main ToU page if select nothing" in new Setup {
+    "redirect back to ToU history page if select nothing" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
@@ -95,10 +95,10 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
     }
 
-    "redirect back to main ToU page if no form" in new Setup {
+    "redirect back to ToU history page if no form" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
@@ -106,7 +106,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       val result = controller.action(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
     }
 
     "return 400 if failed to delete" in new Setup {
