@@ -84,5 +84,8 @@ POST       /terms-of-use/:id/override-confirm                        uk.gov.hmrc
 GET        /terms-of-use/:id/reset                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseResetController.page(id: ApplicationId)
 POST       /terms-of-use/:id/reset                                   uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseResetController.action(id: ApplicationId)
 GET        /terms-of-use/:id/reset-confirm                           uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseResetController.confirmationPage(id: ApplicationId)
+GET        /terms-of-use/:id/delete                                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseDeleteController.page(id: ApplicationId)
+POST       /terms-of-use/:id/delete                                  uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseDeleteController.action(id: ApplicationId)
+GET        /terms-of-use/:id/delete-confirm                          uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseDeleteController.confirmationPage(id: ApplicationId)
 
 GET        /assets/*file                                             controllers.Assets.versioned(path = "/public", file: Asset)

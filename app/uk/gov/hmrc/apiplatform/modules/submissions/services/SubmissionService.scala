@@ -115,4 +115,12 @@ class SubmissionService @Inject() (
     ): Future[Either[String, ApplicationWithCollaborators]] = {
     submissionConnector.resetForTouUplift(applicationId, requestedBy, reasons)
   }
+
+  def deleteTouUplift(
+      applicationId: ApplicationId,
+      requestedBy: String
+    )(implicit hc: HeaderCarrier
+    ): Future[Either[String, ApplicationWithCollaborators]] = {
+    submissionConnector.deleteTouUplift(applicationId, requestedBy)
+  }
 }

@@ -79,6 +79,13 @@
                 case _                                              => 
               }
             }
+            &nbsp;
+            @{ 
+              (request.role.isUser, request.role.isSuperUser, viewModel.hasSubmission) match {
+                case (true, true, true) => <a role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-2" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.page(viewModel.applicationId).url}>{messages("termsofusehistory.deletesubmission")}</a>
+                case _                  => 
+              }
+            }
           </p>
 
           @if(viewModel.historyEntries.size > 1) {
