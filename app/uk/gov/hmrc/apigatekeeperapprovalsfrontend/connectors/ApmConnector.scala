@@ -24,10 +24,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaborators, ApplicationWithSubscriptions}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
 
 object ApmConnector {
   case class Config(serviceBaseUrl: String)
@@ -63,11 +61,11 @@ class ApmConnector @Inject() (
     }
   }
 
-  def fetchApplicationWithSubscriptionData(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithSubscriptionData]] = {
+  def fetchApplicationWithSubscriptionData(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithSubscriptions]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
 
     metrics.record(api) {
-      httpClient.get(url"$serviceBaseUrl/applications/$id").execute[Option[ApplicationWithSubscriptionData]]
+      httpClient.get(url"$serviceBaseUrl/applications/$id").execute[Option[ApplicationWithSubscriptions]]
     }
   }
 }
