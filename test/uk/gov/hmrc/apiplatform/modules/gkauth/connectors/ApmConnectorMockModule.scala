@@ -48,7 +48,7 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
 
       def thenReturn(apiIdentifiers: ApiIdentifier*) =
         when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(
-          successful(Some(standardApp.withSubscriptions(apiIdentifiers.toSet)))
+          successful(Some(standardApp.withSubscriptions(apiIdentifiers.toSet).withFieldValues(Map.empty)))
         )
       def thenReturnNothing                          = when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(successful(None))
     }
