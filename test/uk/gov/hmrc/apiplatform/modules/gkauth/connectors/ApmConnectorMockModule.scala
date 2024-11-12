@@ -25,7 +25,6 @@ import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Applicati
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiIdentifier, ApplicationId}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
 
 trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationWithCollaboratorsFixtures {
 
@@ -49,7 +48,7 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
 
       def thenReturn(apiIdentifiers: ApiIdentifier*) =
         when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(
-          successful(Some(ApplicationWithSubscriptionData(standardApp, apiIdentifiers.toSet)))
+          successful(Some(standardApp.withSubscriptions(apiIdentifiers.toSet)))
         )
       def thenReturnNothing                          = when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(successful(None))
     }

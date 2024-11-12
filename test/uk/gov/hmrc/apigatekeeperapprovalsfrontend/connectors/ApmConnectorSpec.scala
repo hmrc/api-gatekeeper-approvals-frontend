@@ -29,7 +29,6 @@ import uk.gov.hmrc.apiplatform.modules.apis.domain.models.MappedApiDefinitions
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiIdentifierFixtures
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ApplicationWithSubscriptionData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, AsyncHmrcSpec}
 
 class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApiIdentifierFixtures with ApplicationWithCollaboratorsFixtures {
@@ -47,10 +46,9 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApiId
   trait Setup extends HttpClientMockModule with ApiDataTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val urlBase = "http://example.com"
-    val appId   = applicationIdOne
-    val app     = standardApp.withState(appStateTesting)
-
+    val urlBase   = "http://example.com"
+    val appId     = applicationIdOne
+    val app       = standardApp.withState(appStateTesting)
     val connector = new ApmConnector(HttpClientMock.aMock, ApmConnector.Config(urlBase), new NoopConnectorMetrics())
   }
 
@@ -88,12 +86,12 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApiId
   "fetchApplicationWithSubscriptionData" should {
     "call the correct endpoint and return the application with subscription data" in new Setup {
       val subs        = Set(apiIdentifierOne, apiIdentifierTwo)
-      val appWithSubs = ApplicationWithSubscriptionData(app, subs)
-      HttpClientMock.Get.thenReturn(Some(appWithSubs))
+      val apmResponse = app.withSubscriptions(subs)
+      HttpClientMock.Get.thenReturn(Some(apmResponse))
 
       val result = await(connector.fetchApplicationWithSubscriptionData(appId))
 
-      result shouldBe Some(appWithSubs)
+      result shouldBe Some(apmResponse)
       HttpClientMock.Get.verifyUrl(url"$urlBase/applications/${appId.value}")
     }
   }
