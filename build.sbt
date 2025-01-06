@@ -25,15 +25,9 @@ lazy val microservice = Project(appName, file("."))
         (baseDirectory.value / "app" / "assets" / "javascripts") ** "*.js"
       )
     ),
-    uglifyCompressOptions := Seq(
-      "unused=false",
-      "dead_code=true"
-    ),
-    uglify / includeFilter := GlobFilter("apis-*.js"),
     pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(
-      concat,
-      uglify
+      concat
     )
   )
   .settings(
