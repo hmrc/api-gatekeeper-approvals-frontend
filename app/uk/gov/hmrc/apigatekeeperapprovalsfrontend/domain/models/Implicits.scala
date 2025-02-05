@@ -25,13 +25,13 @@ object Implicits {
   implicit class ApplicationSyntax(app: ApplicationWithCollaborators) {
 
     def importantSubmissionData: Option[ImportantSubmissionData] = app.details.access match {
-      case Access.Standard(_, _, _, _, _, Some(submissionData)) => Some(submissionData)
-      case _                                                    => None
+      case Access.Standard(_, _, _, _, _, _, Some(submissionData)) => Some(submissionData)
+      case _                                                       => None
     }
 
     def sellResellOrDistribute: Option[SellResellOrDistribute] = app.details.access match {
-      case Access.Standard(_, _, _, _, sellResellOrDistribute, _) => sellResellOrDistribute
-      case _                                                      => None
+      case Access.Standard(_, _, _, _, _, sellResellOrDistribute, _) => sellResellOrDistribute
+      case _                                                         => None
     }
 
     def isInHouseSoftware = sellResellOrDistribute.fold(false)(_ == SellResellOrDistribute("No"))
@@ -40,13 +40,13 @@ object Implicits {
   implicit class CoreApplicationSyntax(app: CoreApplication) {
 
     def importantSubmissionData: Option[ImportantSubmissionData] = app.access match {
-      case Access.Standard(_, _, _, _, _, Some(submissionData)) => Some(submissionData)
-      case _                                                    => None
+      case Access.Standard(_, _, _, _, _, _, Some(submissionData)) => Some(submissionData)
+      case _                                                       => None
     }
 
     def sellResellOrDistribute: Option[SellResellOrDistribute] = app.access match {
-      case Access.Standard(_, _, _, _, sellResellOrDistribute, _) => sellResellOrDistribute
-      case _                                                      => None
+      case Access.Standard(_, _, _, _, _, sellResellOrDistribute, _) => sellResellOrDistribute
+      case _                                                         => None
     }
 
     def isInHouseSoftware = sellResellOrDistribute.fold(false)(_ == SellResellOrDistribute("No"))

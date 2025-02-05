@@ -63,7 +63,7 @@ class CheckUrlsController @Inject() (
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
-      case std @ Access.Standard(_, _, _, _, _, Some(importantSubmissionData)) =>
+      case std @ Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
         val isDeleted = request.application.state.isDeleted
         successful(
           Ok(
@@ -79,7 +79,7 @@ class CheckUrlsController @Inject() (
             )
           )
         )
-      case _                                                                   => errorHandler.badRequestTemplate.map(BadRequest(_))
+      case _                                                                      => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 
