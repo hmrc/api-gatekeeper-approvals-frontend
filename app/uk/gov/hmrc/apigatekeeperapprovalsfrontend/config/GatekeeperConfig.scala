@@ -21,6 +21,6 @@ case class GatekeeperConfig(gatekeeperBaseUrl: String, gatekeeperApisBaseUrl: St
   lazy val applicationsPageUri = s"${gatekeeperBaseUrl}/api-gatekeeper/applications"
   lazy val developersPageUri   = s"${gatekeeperBaseUrl}/api-gatekeeper/developers"
   lazy val emailsPageUri       = s"${gatekeeperBaseUrl}/api-gatekeeper/emails"
-  lazy val pendingUri          = s"${gatekeeperBaseUrl}/api-gatekeeper/pending"
+  lazy val pendingUri          = s"${gatekeeperBaseUrl}/api-gatekeeper/api-approvals"
   lazy val xmlUri              = s"${gatekeeperBaseUrl}/api-gatekeeper/xml-organisations"
 }
