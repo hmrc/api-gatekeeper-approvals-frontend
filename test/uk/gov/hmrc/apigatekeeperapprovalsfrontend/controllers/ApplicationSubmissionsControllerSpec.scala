@@ -20,7 +20,6 @@ import java.time.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
-import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -36,12 +35,6 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.{Declined, Granted, Submitted}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ApplicationSubmissionsController.{
-  CurrentSubmittedInstanceDetails,
-  DeclinedInstanceDetails,
-  GrantedInstanceDetails,
-  ViewModel
-}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ApplicationSubmissionsPage
 
 class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with ApplicationWithCollaboratorsFixtures {
@@ -52,9 +45,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       with LdapAuthorisationServiceMockModule
       with FixedClock {
 
-    val page            = mock[ApplicationSubmissionsPage]
-    when(page.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
-    val viewModelCaptor = ArgCaptor[ViewModel]
+    val page = app.injector.instanceOf[ApplicationSubmissionsPage]
 
     val controller = new ApplicationSubmissionsController(
       config,
@@ -93,14 +84,14 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-
-      verify(page).apply(viewModelCaptor)(*, *)
-      viewModelCaptor.value.currentSubmission shouldBe Some(CurrentSubmittedInstanceDetails(requesterEmail, formatDMY(submittedTimestamp)))
-      viewModelCaptor.value.declinedInstances shouldBe List()
-      viewModelCaptor.value.grantedInstance shouldBe None
-      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(responsibleIndividualOne.emailAddress)
-      viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe true
-      viewModelCaptor.value.isDeleted shouldBe false
+      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include("The responsible individual has not verified yet, so you can only decline this request.")
+      contentAsString(result) shouldNot include("Production access granted")
+      contentAsString(result) shouldNot include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) should include("Decline request")
+      contentAsString(result) shouldNot include("Check the request")
+      contentAsString(result) should include(requesterEmail)
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
@@ -112,16 +103,13 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-
-      verify(page).apply(viewModelCaptor)(*, *)
-      viewModelCaptor.value.currentSubmission shouldBe None
-      viewModelCaptor.value.grantedInstance shouldBe None
-      viewModelCaptor.value.responsibleIndividualEmail shouldBe Some(responsibleIndividualOne.emailAddress)
-      viewModelCaptor.value.pendingResponsibleIndividualVerification shouldBe false
-      viewModelCaptor.value.isDeleted shouldBe false
-      viewModelCaptor.value.declinedInstances shouldBe List(
-        DeclinedInstanceDetails(formatDMY(declinedTimestamp), 0)
-      )
+      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) shouldNot include("Production access granted")
+      contentAsString(result) should include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) shouldNot include("Decline request")
+      contentAsString(result) should include("Check")
+      contentAsString(result) should include(formatDMY(declinedTimestamp))
     }
 
     "return 200 when submission has been granted" in new Setup {
@@ -133,13 +121,13 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-
-      verify(page).apply(viewModelCaptor)(*, *)
-      viewModelCaptor.value.currentSubmission shouldBe None
-      viewModelCaptor.value.declinedInstances shouldBe List()
-      viewModelCaptor.value.grantedInstance shouldBe Some(
-        GrantedInstanceDetails(formatDMY(grantedTimestamp))
-      )
+      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include("Production access granted")
+      contentAsString(result) shouldNot include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) shouldNot include("Decline request")
+      contentAsString(result) should include("Check")
+      contentAsString(result) should include(formatDMY(grantedTimestamp))
     }
 
     "return 404 if no marked application is found" in new Setup {

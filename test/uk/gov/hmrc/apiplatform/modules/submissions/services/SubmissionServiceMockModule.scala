@@ -205,7 +205,15 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object SearchTermsOfUseInvitations {
 
       def thenReturn() = {
-        val response = List(TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "app name"))
+        val response = List(
+          TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "app name 1"),
+          TermsOfUseInvitationWithApplication(applicationIdTwo, Instant.now, Instant.now, Instant.now, None, WARNINGS, "app name 2"),
+          TermsOfUseInvitationWithApplication(applicationIdThree, Instant.now, Instant.now, Instant.now, None, TERMS_OF_USE_V2, "app name 3"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), REMINDER_EMAIL_SENT, "app name 4"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), OVERDUE, "app name 5"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, None, TERMS_OF_USE_V2_WITH_WARNINGS, "app name 6"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, None, FAILED, "app name 7")
+        )
         when(aMock.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(response))
       }
 

@@ -158,4 +158,18 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       intercept[RuntimeException](await(controller.emailAddressesAction(applicationId)(fakeRequest))).getMessage shouldBe "Application id not found"
     }
   }
+
+  "declined page" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.declinedPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(application.name.value)
+      contentAsString(result) should include("You have declined this request")
+    }
+  }
 }

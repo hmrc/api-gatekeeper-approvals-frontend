@@ -20,7 +20,6 @@ import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
-import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -33,7 +32,6 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.ViewModel
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
 
 class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
@@ -42,16 +40,14 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
 
-    val firstPage       = mock[TermsOfUseGrantedPage]
-    when(firstPage.apply(*[ViewModel])(*, *)).thenReturn(play.twirl.api.HtmlFormat.empty)
-    val viewModelCaptor = ArgCaptor[ViewModel]
+    val termsOfUseGrantedPage = app.injector.instanceOf[TermsOfUseGrantedPage]
 
     val controller = new TermsOfUseGrantedController(
       config,
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
-      firstPage,
+      termsOfUseGrantedPage,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock
     )
@@ -80,10 +76,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-
-      verify(firstPage).apply(viewModelCaptor)(*, *)
-      viewModelCaptor.value.applicationId shouldBe appWithImportantData.id
-      viewModelCaptor.value.appName shouldBe appWithImportantData.name
+      contentAsString(result) should include(appWithImportantData.name.value)
     }
 
     "return 404 if no application is found" in new Setup {
