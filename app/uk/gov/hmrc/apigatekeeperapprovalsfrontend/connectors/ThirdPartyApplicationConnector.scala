@@ -38,7 +38,7 @@ class ThirdPartyApplicationConnector @Inject() (
     config: ThirdPartyApplicationConnector.Config,
     val metrics: ConnectorMetrics
   )(implicit val ec: ExecutionContext
-  ) extends CommonResponseHandlers {
+  ) {
 
   val serviceBaseUrl = config.serviceBaseUrl
   val api            = API("third-party-application")

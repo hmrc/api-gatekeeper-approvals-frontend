@@ -36,9 +36,6 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
   trait BaseSubmissionServiceMock {
     def aMock: SubmissionService
 
-    // We need an instant that is quite recent so we can't use the FixedNow data.
-    private val anInstant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
-
     object FetchLatestMarkedSubmission {
 
       def thenReturn(applicationId: ApplicationId) = {
@@ -79,10 +76,15 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
+      def thenReturn(applicationId: ApplicationId, submission: Submission) = {
+        val response = Some(submission)
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+      }
+
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
         val submittedSubmission =
-          (Submission.addStatusHistory(Submission.Status.Answering(anInstant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
-            anInstant.minus(Duration.ofDays(8)),
+          (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
+            instant.minus(Duration.ofDays(8)),
             "user"
           ))(aSubmission)
         val response            = Some(submittedSubmission)
@@ -90,16 +92,16 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(anInstant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
-          anInstant.minus(Duration.ofDays(9)),
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
+          instant.minus(Duration.ofDays(9)),
           "user"
-        ) andThen Submission.warnings(anInstant.minus(Duration.ofDays(8)), "user") andThen Submission.grantWithWarnings(
-          anInstant.minus(Duration.ofDays(5)),
+        ) andThen Submission.warnings(instant.minus(Duration.ofDays(8)), "user") andThen Submission.grantWithWarnings(
+          instant.minus(Duration.ofDays(5)),
           "user",
           "Warnings",
           None
         ) andThen Submission.grant(
-          anInstant.minus(Duration.ofDays(2)),
+          instant.minus(Duration.ofDays(2)),
           "user",
           None,
           None
@@ -109,16 +111,16 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       }
 
       def thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId: ApplicationId) = {
-        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(anInstant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
-          anInstant.minus(Duration.ofDays(9)),
+        val grantedSubmission = (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(10)), true)) andThen Submission.submit(
+          instant.minus(Duration.ofDays(9)),
           "user"
-        ) andThen Submission.warnings(anInstant.minus(Duration.ofDays(8)), "user") andThen Submission.grantWithWarnings(
-          anInstant.minus(Duration.ofDays(5)),
+        ) andThen Submission.warnings(instant.minus(Duration.ofDays(8)), "user") andThen Submission.grantWithWarnings(
+          instant.minus(Duration.ofDays(5)),
           "user",
           "Warnings",
           None
         ) andThen Submission.grant(
-          anInstant.minus(Duration.ofDays(2)),
+          instant.minus(Duration.ofDays(2)),
           "user",
           None,
           None
@@ -143,6 +145,9 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
         when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
       }
+
+      def verifyCalled(applicationId: ApplicationId) =
+        verify(aMock).grant(eqTo(applicationId), *)(*)
     }
 
     object GrantWithWarnings {
@@ -174,14 +179,26 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     object FetchTermsOfUseInvitation {
 
       def thenReturn(applicationId: ApplicationId) = {
-        val now      = Instant.now
-        val response = Some(TermsOfUseInvitation(applicationId, now.minus(20, ChronoUnit.DAYS), now.minus(20, ChronoUnit.DAYS), now.plus(20, ChronoUnit.DAYS), None, EMAIL_SENT))
+        val response = Some(TermsOfUseInvitation(
+          applicationId,
+          instant.minus(20, ChronoUnit.DAYS),
+          instant.minus(20, ChronoUnit.DAYS),
+          instant.plus(20, ChronoUnit.DAYS),
+          Some(instant.minus(10, ChronoUnit.DAYS)),
+          EMAIL_SENT
+        ))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 
       def thenReturn(applicationId: ApplicationId, status: TermsOfUseInvitationState) = {
-        val now      = Instant.now
-        val response = Some(TermsOfUseInvitation(applicationId, now.minus(20, ChronoUnit.DAYS), now.minus(20, ChronoUnit.DAYS), now.plus(20, ChronoUnit.DAYS), None, status))
+        val response = Some(TermsOfUseInvitation(
+          applicationId,
+          instant.minus(20, ChronoUnit.DAYS),
+          instant.minus(20, ChronoUnit.DAYS),
+          instant.plus(20, ChronoUnit.DAYS),
+          Some(instant.plus(10, ChronoUnit.DAYS)),
+          status
+        ))
         when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
       }
 

@@ -132,6 +132,17 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       contentAsString(result) should include("This application has been deleted")
     }
 
+    "return 400 for no important submission data" in new Setup {
+      val noImportantSubData = standardApp.withAccess(standardAccess)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(noImportantSubData)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
+
+      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
     "return 404" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)

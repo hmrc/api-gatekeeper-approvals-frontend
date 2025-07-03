@@ -55,6 +55,11 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
           .thenReturn(successful(Some(standardApp.withId(subordinateApplicationId))))
       }
+
+      def thenReturnNone() = {
+        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
+          .thenReturn(successful(None))
+      }
     }
 
     object DeclineApplicationApprovalRequest {
