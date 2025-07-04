@@ -24,7 +24,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.MarkedSubmission
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{ActualAnswer, MarkedSubmission, Submission}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckCompanyRegistrationPage
@@ -56,6 +56,68 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
+      contentAsString(result) should include("VAT registration number")
+      contentAsString(result) should include("123456789")
+    }
+
+    "return 200 with outside UK org" in new Setup {
+      val registrationTypeQuestionId = submittedSubmission.questionIdsOfInterest.identifyYourOrganisationId
+      val outsideUKOrg               = Submission.updateLatestAnswersTo(
+        submittedSubmission.latestInstance.answersToQuestions
+          + (registrationTypeQuestionId -> ActualAnswer.SingleChoiceAnswer("My organisation is outside the UK and doesn't have any of these"))
+      )(submittedSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(outsideUKOrg, markedAnswers))
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should not include ("This application has been deleted")
+      contentAsString(result) should include("Organisation is outside the UK")
+      contentAsString(result) should include("Email the requester and ask for evidence of official registration in their country.")
+    }
+
+    "return 200 with in UK with none of these org" in new Setup {
+      val registrationTypeQuestionId = submittedSubmission.questionIdsOfInterest.identifyYourOrganisationId
+      val inUKWithNoRegOrg           = Submission.updateLatestAnswersTo(
+        submittedSubmission.latestInstance.answersToQuestions
+          + (registrationTypeQuestionId -> ActualAnswer.SingleChoiceAnswer("My organisation is in the UK and doesn't have any of these"))
+      )(submittedSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(inUKWithNoRegOrg, markedAnswers))
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should not include ("This application has been deleted")
+      contentAsString(result) should include("UK organisation with no evidence of official registration")
+      contentAsString(result) should include("Organisations in the UK must provide evidence of official registration.")
+      contentAsString(result) should include("Not having evidence of official registration in the UK is a fail.")
+    }
+
+    "return 200 with in UK with company number org" in new Setup {
+      val registrationTypeQuestionId = submittedSubmission.questionIdsOfInterest.identifyYourOrganisationId
+      val companyNumberQuestionId    = OrganisationDetails.question2a.id
+      val inUKWithCompanyNumOrg      = Submission.updateLatestAnswersTo(
+        submittedSubmission.latestInstance.answersToQuestions
+          + (registrationTypeQuestionId -> ActualAnswer.SingleChoiceAnswer("My organisation is in the UK and doesn't have any of these"))
+          + (companyNumberQuestionId    -> ActualAnswer.TextAnswer("AB1234567"))
+      )(submittedSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(inUKWithCompanyNumOrg, markedAnswers))
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should not include ("This application has been deleted")
+      contentAsString(result) should include("Company registration number")
+      contentAsString(result) should include("AB1234567")
     }
 
     "return 200 with a deleted application" in new Setup {

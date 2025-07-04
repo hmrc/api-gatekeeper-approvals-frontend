@@ -95,7 +95,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when grant decision is grant without warnings" in new Setup {
-      val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
+      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
@@ -103,23 +103,81 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
 
-      val result = controller.action(applicationId)(fakeDeclineRequest)
+      val result = controller.action(applicationId)(fakeGrantRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url
+      SubmissionServiceMock.Grant.verifyCalled(applicationId)
+    }
+
+    "redirect to correct page when grant decision is grant with warnings with failed submission" in new Setup {
+      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant-with-warnings")
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
+      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
+
+      val result = controller.action(applicationId)(fakeGrantRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId).url
+    }
+
+    "redirect to correct page when grant decision is grant with warnings with no failed submission" in new Setup {
+      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant-with-warnings")
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(passMarkedSubmission)
+      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
+      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
+
+      val result = controller.action(applicationId)(fakeGrantRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url
     }
 
     "return redirect back to page when grant decision is something we don't understand" in new Setup {
-      val brokenDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "bobbins")
+      val brokenGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "bobbins")
 
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(brokenDeclineRequest)
+      val result = controller.action(applicationId)(brokenGrantRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId).url
+    }
+
+    "return 400 if can't find submission review" in new Setup {
+      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindReview.thenReturnNone()
+
+      val result = controller.action(applicationId)(fakeGrantRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+
+    "return 500 if grant fails" in new Setup {
+      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
+      SubmissionServiceMock.Grant.thenReturnError(applicationId)
+
+      val result = controller.action(applicationId)(fakeGrantRequest)
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
     }
   }
 }

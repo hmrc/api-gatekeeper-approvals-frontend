@@ -107,4 +107,16 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       status(result) shouldBe Status.BAD_REQUEST
     }
   }
+
+  "confirmationPage" should {
+    "return 200" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.confirmationPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+  }
 }

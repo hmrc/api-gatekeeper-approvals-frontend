@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import java.time.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status.OK
@@ -23,6 +24,7 @@ import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
@@ -59,7 +61,10 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
+      contentAsString(result) should not include ("This application has been deleted")
       contentAsString(result) should not include ("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
     }
 
     "return Ok (200) for Stride users with an application and a created submission" in new Setup {
@@ -72,6 +77,84 @@ class TermsOfUseHistoryControllerSpec
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should not include ("In progress")
+    }
+
+    "return Ok (200) for Stride users with an application and a pending RI submission" in new Setup {
+      val submission = (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(10)), true))
+        andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
+        andThen Submission.pendingResponsibleIndividual(instant, "user"))(aSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should not include ("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Pending responsible individual")
+    }
+
+    "return Ok (200) for Stride users with an application and a warning submission" in new Setup {
+      val submission = (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(15)), true))
+        andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
+        andThen Submission.warnings(instant, "user"))(aSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should not include ("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Warnings")
+    }
+
+    "return Ok (200) for Stride users with an application and a failed submission" in new Setup {
+      val submission = (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(15)), true))
+        andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
+        andThen Submission.fail(instant, "user"))(aSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should not include ("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Failed")
+    }
+
+    "return Ok (200) for Stride users with an application and a granted with warnings submission" in new Setup {
+      val submission = (Submission.addStatusHistory(Submission.Status.Answering(instant.minus(Duration.ofDays(15)), true))
+        andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
+        andThen Submission.grantWithWarnings(instant, "user", "Warning comments", None))(aSubmission)
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
+      SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsString(result) should not include ("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Terms of use V2 with warnings")
     }
 
     "return Ok (200) for Stride users with an application and a granted submission" in new Setup {
@@ -85,6 +168,9 @@ class TermsOfUseHistoryControllerSpec
       status(result) shouldBe OK
       contentAsString(result) should not include ("This request is from an in-house developer")
       contentAsString(result) should include("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Terms of use V2")
     }
 
     "return Ok (200) for Stride users with an application and a granted submission with in-house developer context" in new Setup {
@@ -98,6 +184,9 @@ class TermsOfUseHistoryControllerSpec
       status(result) shouldBe OK
       contentAsString(result) should include("This request is from an in-house developer")
       contentAsString(result) should include("View submitted answers")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Terms of use V2")
     }
 
     "return Ok (200) for Stride users with an application but no submission" in new Setup {
@@ -109,6 +198,7 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
+      contentAsString(result) should include("Email sent")
     }
 
     "return Ok (200) for Stride users with an application but no submission with reminder sent" in new Setup {
@@ -121,7 +211,9 @@ class TermsOfUseHistoryControllerSpec
 
       status(result) shouldBe OK
       contentAsString(result) should include("Reminder email sent")
-      contentAsString(result) should include("Unknown")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("Reminder email sent")
+      contentAsString(result) should not include ("In progress")
     }
 
     "return Ok (200) for Stride users with an application but no submission overdue" in new Setup {
@@ -134,6 +226,10 @@ class TermsOfUseHistoryControllerSpec
 
       status(result) shouldBe OK
       contentAsString(result) should include("Overdue")
+      contentAsString(result) should include("Email sent")
+      contentAsString(result) should include("Reminder email sent")
+      contentAsString(result) should include("Overdue")
+      contentAsString(result) should not include ("In progress")
     }
 
     "return Ok (200) for LDAP users with an application and a submitted submission" in new Setup {
@@ -154,6 +250,15 @@ class TermsOfUseHistoryControllerSpec
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
+    }
+
+    "return unauthorised (401) when not authorised" in new Setup {
+      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
+      LdapAuthorisationServiceMock.Auth.notAuthorised
+
+      val result = controller.page(applicationId)(fakeRequest)
+
+      status(result) shouldBe UNAUTHORIZED
     }
   }
 }

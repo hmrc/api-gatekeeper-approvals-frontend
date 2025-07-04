@@ -73,6 +73,36 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       contentAsString(result) should not include ("This application has been deleted")
     }
 
+    "return 200 with deleted app" in new Setup {
+      val deletedApp               = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
+      val subordinateApplicationId = ApplicationId.random
+
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(deletedApp)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
+      ApplicationServiceMock.FetchLinkedSubordinateApplicationByApplicationId.thenReturn(subordinateApplicationId)
+      SubscriptionServiceMock.FetchSubscriptionsByApplicationId.thenReturn(
+        ("serviceName1", "name1", "context1"),
+        ("serviceName2", "name2", "context2")
+      )
+
+      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("This application has been deleted")
+    }
+
+    "return 404 when subordinate app not found" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+      SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
+      ApplicationServiceMock.FetchLinkedSubordinateApplicationByApplicationId.thenReturnNone()
+
+      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
+    }
+
     "return 404 if no application is found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
