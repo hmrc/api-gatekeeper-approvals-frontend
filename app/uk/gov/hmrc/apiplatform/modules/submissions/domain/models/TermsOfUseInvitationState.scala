@@ -35,7 +35,5 @@ object TermsOfUseInvitationState {
 
   def apply(text: String): Option[TermsOfUseInvitationState] = TermsOfUseInvitationState.values.find(_.toString() == text.toUpperCase)
 
-  def unsafeApply(text: String): TermsOfUseInvitationState = apply(text).getOrElse(throw new RuntimeException(s"$text is not a valid Terms of use state"))
-
   implicit val format: Format[TermsOfUseInvitationState] = SealedTraitJsonFormatting.createFormatFor[TermsOfUseInvitationState]("Terms of use state", apply)
 }
