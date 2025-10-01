@@ -2,11 +2,11 @@ import sbt.*
 
 object AppDependencies {
 
-  lazy val bootstrapPlayVersion = "9.18.0"
+  lazy val bootstrapPlayVersion = "9.19.0"
   lazy val mongoVersion         = "2.7.0"
   val apiDomainVersion          = "0.20.0"
   val appDomainVersion          = "0.87.0"
-  val playfrontendVersion       = "12.6.0"
+  val playfrontendVersion       = "12.14.0"
   val mockitoScalaVersion       = "2.0.0"
 
   val compile = Seq(
