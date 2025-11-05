@@ -25,7 +25,7 @@ import cats.data.NonEmptyList
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
@@ -60,7 +60,7 @@ class TermsOfUseNotesController @Inject() (
     val submissionService: SubmissionService,
     termsOfUseNotesPage: TermsOfUseNotesPage
   )(implicit override val ec: ExecutionContext
-  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUnsafeDefaultFormBinding {
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
   import TermsOfUseNotesController._
 

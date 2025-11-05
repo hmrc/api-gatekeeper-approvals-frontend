@@ -25,7 +25,7 @@ import cats.data.{EitherT, NonEmptyList}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.CommandFailures
@@ -71,7 +71,7 @@ class GrantedJourneyController @Inject() (
     provideEscalatedToForGrantingPage: ProvideEscalatedToForGrantingPage,
     applicationApprovedPage: ApplicationApprovedPage
   )(implicit override val ec: ExecutionContext
-  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUnsafeDefaultFormBinding {
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
   import GrantedJourneyController._
 
   def provideWarningsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
