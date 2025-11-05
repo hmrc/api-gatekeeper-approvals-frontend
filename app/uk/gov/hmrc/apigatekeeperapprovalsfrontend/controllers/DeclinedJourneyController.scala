@@ -23,7 +23,7 @@ import scala.concurrent.Future.successful
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -60,7 +60,7 @@ class DeclinedJourneyController @Inject() (
     adminsToEmailPage: AdminsToEmailPage,
     submissionReviewService: SubmissionReviewService
   )(implicit override val ec: ExecutionContext
-  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUnsafeDefaultFormBinding {
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
   import DeclinedJourneyController._
 

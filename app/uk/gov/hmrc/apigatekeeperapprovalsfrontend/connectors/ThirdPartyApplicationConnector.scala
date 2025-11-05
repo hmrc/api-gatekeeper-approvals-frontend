@@ -47,7 +47,7 @@ class ThirdPartyApplicationConnector @Inject() (
     import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators._
 
     metrics.record(api) {
-      httpClient.get(url"$serviceBaseUrl/application/$id").execute[Option[ApplicationWithCollaborators]]
+      httpClient.get(url"$serviceBaseUrl/query?applicationId=$id").execute[Option[ApplicationWithCollaborators]]
     }
   }
 }
