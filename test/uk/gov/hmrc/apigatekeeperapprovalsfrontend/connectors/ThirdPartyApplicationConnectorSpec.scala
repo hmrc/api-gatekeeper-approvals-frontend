@@ -58,7 +58,7 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
       val result = await(connector.fetchApplicationById(appId))
 
       result shouldBe Some(app)
-      HttpClientMock.Get.verifyUrl(url"$urlBase/application/$appId")
+      HttpClientMock.Get.verifyUrl(url"$urlBase/query?applicationId=$appId")
     }
 
     "return None if the application was not found" in new Setup {
