@@ -65,7 +65,7 @@ class AbstractControllerSpec
     val application = standardApp.withCollaborators(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random))
 
     val inHouseApplication = application.modifyStdAccess(_.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No"))))
-    val fakeRequest        = FakeRequest().withCSRFToken
+    val fakeRequest        = FakeRequest().withMethod("POST").withCSRFToken
 
     val fakeSubmitCheckedRequest       = fakeRequest.withFormUrlEncodedBody("submit-action" -> "checked")
     val fakeSubmitComebackLaterRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")

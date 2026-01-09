@@ -53,12 +53,12 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
   }
 
   "fetch application by id" should {
-    val url     = s"/application/${applicationId.value}"
     val appName = appNameOne
 
     "return an application" in new Setup {
       stubFor(
-        get(urlEqualTo(url))
+        get(urlPathEqualTo("/query"))
+          .withQueryParam("applicationId", equalTo(applicationId.toString()))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -74,7 +74,8 @@ class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec 
 
     "return None if the application cannot be found" in new Setup {
       stubFor(
-        get(urlEqualTo(url))
+        get(urlPathEqualTo("/query"))
+          .withQueryParam("applicationId", equalTo(applicationId.toString()))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
