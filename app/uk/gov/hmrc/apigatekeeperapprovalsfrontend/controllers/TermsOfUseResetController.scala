@@ -62,11 +62,11 @@ class TermsOfUseResetController @Inject() (
 
   import TermsOfUseResetController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -93,7 +93,7 @@ class TermsOfUseResetController @Inject() (
 
   }
 
-  def confirmationPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def confirmationPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
   }
 }

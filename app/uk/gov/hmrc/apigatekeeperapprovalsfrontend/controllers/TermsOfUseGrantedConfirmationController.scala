@@ -49,7 +49,7 @@ class TermsOfUseGrantedConfirmationController @Inject() (
 
   import TermsOfUseGrantedConfirmationController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseGrantedConfirmationPage(ViewModel(applicationId, request.application.name))))
   }
 }

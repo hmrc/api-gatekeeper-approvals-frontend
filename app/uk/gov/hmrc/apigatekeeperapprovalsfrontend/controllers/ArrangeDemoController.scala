@@ -56,7 +56,7 @@ class ArrangeDemoController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     (request.application.access, request.submission.latestInstance.statusHistory.find(_.isSubmitted)) match {
       // Should only be uplifting and checking Standard apps
       case (std: Access.Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if (request.submission.status.isSubmitted) =>

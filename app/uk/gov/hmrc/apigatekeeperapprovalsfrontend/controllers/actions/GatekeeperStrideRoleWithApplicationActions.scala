@@ -22,22 +22,23 @@ import play.api.mvc._
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest}
 
 trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBuilders {
   self: GatekeeperBaseController =>
 
-  private val userRoleActionRefiner = gatekeeperRoleActionRefiner(GatekeeperRoles.USER)
+  private def loggedInThruStrideRoleWithApplication: (GatekeeperStrideRole) => (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    (role) => roleWithApplication(gatekeeperRoleActionRefiner(role)) _
 
-  def loggedInThruStrideWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplication(userRoleActionRefiner) _
+  private def loggedInThruStrideRoleWithApplicationAndSubmission
+      : (GatekeeperStrideRole) => (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    (role) => roleWithApplicationAndSubmission(gatekeeperRoleActionRefiner(role)) _
 
-  def loggedInThruStrideWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmission(userRoleActionRefiner) _
+  def strideAdvancedUserWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    loggedInThruStrideRoleWithApplication(GatekeeperRoles.ADVANCEDUSER)
 
-  def loggedInThruStrideWithApplicationAndSubmissionAndInstance
-      : (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmissionAndInstance(userRoleActionRefiner) _
+  def strideAdvancedUserWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    loggedInThruStrideRoleWithApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)
 }

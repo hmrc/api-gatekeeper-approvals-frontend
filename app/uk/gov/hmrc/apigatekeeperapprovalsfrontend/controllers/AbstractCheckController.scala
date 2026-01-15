@@ -56,7 +56,7 @@ abstract class AbstractCheckController(
       reviewAction: SubmissionReview.Action
     )(
       applicationId: ApplicationId
-    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    ): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(reviewAction) _
 

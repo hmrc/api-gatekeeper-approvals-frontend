@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
+import play.api.mvc.{Action, ActionRefiner, AnyContent, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
@@ -44,6 +44,24 @@ trait GatekeeperStrideAuthorisationActions {
         strideAuthorisationService.refineStride(minimumRoleRequired)(msgRequest)
       }
     }
+
+  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperStrideRole)(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      gatekeeperRoleActionRefiner(minimumRoleRequired).invokeBlock(request, block)
+    }
+
+  def anyStrideUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.USER)(block)
+
+  def atLeastAdvancedUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.ADVANCEDUSER)(block)
+
+  def atLeastSuperUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.SUPERUSER)(block)
+
+  def adminOnlyAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.ADMIN)(block)
+
 }
 
 trait GatekeeperAuthorisationActions {

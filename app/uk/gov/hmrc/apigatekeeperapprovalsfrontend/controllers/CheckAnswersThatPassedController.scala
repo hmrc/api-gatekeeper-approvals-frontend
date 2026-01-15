@@ -56,7 +56,7 @@ class CheckAnswersThatPassedController @Inject() (
 
   import CheckAnswersThatPassedController._
 
-  def checkAnswersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkAnswersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
