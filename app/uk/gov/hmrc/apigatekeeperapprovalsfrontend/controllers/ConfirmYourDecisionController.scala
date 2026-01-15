@@ -53,11 +53,11 @@ class ConfirmYourDecisionController @Inject() (
 
   import ConfirmYourDecisionController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name, request.markedSubmission.isFail))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
       case Some("decline")                                                   => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
       case Some("grant-with-warnings") if (!request.markedSubmission.isFail) =>

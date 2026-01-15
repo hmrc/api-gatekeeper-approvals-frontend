@@ -64,11 +64,11 @@ class DeclinedJourneyController @Inject() (
 
   import DeclinedJourneyController._
 
-  def provideReasonsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def provideReasonsAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
       submissionReviewService.updateDeclineReasons(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
         case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId)))
@@ -86,17 +86,17 @@ class DeclinedJourneyController @Inject() (
     DeclinedJourneyController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def declinedPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def declinedPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name))))
   }
 
-  def emailAddressesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
     successful(Ok(adminsToEmailPage(ViewModel(applicationId, request.application.name, adminsToEmail))))
   }
 
-  def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
     val requiresDemo       = SubmissionRequiresDemo(request.submission)
     val adminsToEmail      = request.application.collaborators.filter(_.role.isAdministrator).map(_.emailAddress)

@@ -99,7 +99,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, false, false)
   }
 
-  def listPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def listPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
     val isDeleted = request.application.state.isDeleted
 
@@ -140,14 +140,14 @@ class TermsOfUseFailedJourneyController @Inject() (
     )
   }
 
-  def listAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def listAction(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
       case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
       case _                => successful(Redirect(routes.TermsOfUseInvitationController.page))
     }
   }
 
-  def answersWithWarningsOrFails(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def answersWithWarningsOrFails(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
     val isDeleted = request.application.state.isDeleted
 
@@ -181,13 +181,13 @@ class TermsOfUseFailedJourneyController @Inject() (
     )))
   }
 
-  def emailAddressesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
     successful(Ok(termsOfUseAdminsPage(EmailsViewModel(applicationId, request.application.name, adminsToEmail))))
   }
 
-  def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
 
     for {
@@ -203,22 +203,22 @@ class TermsOfUseFailedJourneyController @Inject() (
     } yield ok
   }
 
-  def failOverridePage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def failOverridePage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseFailOverridePage(ViewModel(applicationId, request.application.name))))
   }
 
-  def failOverrideAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def failOverrideAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
       case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
       case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
     }
   }
 
-  def overrideApproverPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideApproverPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def overrideApproverAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideApproverAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ApproverForm) = {
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).flatMap {
         case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId)))
@@ -236,11 +236,11 @@ class TermsOfUseFailedJourneyController @Inject() (
     TermsOfUseFailedJourneyController.approverForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def overrideNotesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideNotesPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def overrideNotesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideNotesAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).flatMap {
         case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId)))
@@ -258,7 +258,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     TermsOfUseFailedJourneyController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def overrideConfirmPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideConfirmPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     (
       for {
         review      <- fromOptionF(
@@ -273,7 +273,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     ).fold(identity(_), identity(_))
   }
 
-  def overrideConfirmAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideConfirmAction(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
       val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
       InternalServerError(errString)
@@ -289,7 +289,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     ).fold(identity(_), identity(_))
   }
 
-  def confirmationPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def confirmationPage(applicationId: ApplicationId) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseConfirmationPage(ViewModel(applicationId, request.application.name))))
   }
 }
