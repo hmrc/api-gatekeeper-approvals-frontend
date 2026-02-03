@@ -27,8 +27,8 @@ object SubmissionQuestionsAndAnswers {
   }
 
   def isDisplayable(answer: ActualAnswer) = answer match {
-    case ActualAnswer.NoAnswer | ActualAnswer.AcknowledgedAnswer => false
-    case _                                                       => true
+    case ActualAnswer.AcknowledgedAnswer => false
+    case _                               => true
   }
 
   def apply(submission: Submission, instance: Submission.Instance): List[QuestionAndAnswerGroup] = {

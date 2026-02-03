@@ -30,9 +30,9 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
     )(aSubmission)
 
     val submissionWithNonDisplayableDevPracticesAnswers = Submission.updateLatestAnswersTo(completeAnswersToQuestions +
-      (DevelopmentPractices.question1.id -> ActualAnswer.NoAnswer) +
+      (DevelopmentPractices.question1.id -> ActualAnswer.AcknowledgedAnswer) +
       (DevelopmentPractices.question2.id -> ActualAnswer.AcknowledgedAnswer) +
-      (DevelopmentPractices.question3.id -> ActualAnswer.NoAnswer))(aSubmission)
+      (DevelopmentPractices.question3.id -> ActualAnswer.AcknowledgedAnswer))(aSubmission)
   }
 
   "SubmissionQuestionsAndAnswers" should {
@@ -40,7 +40,7 @@ class SubmissionQuestionsAndAnswersSpec extends HmrcSpec {
       val result = SubmissionQuestionsAndAnswers(submissionWithAnswers, submissionWithAnswers.latestInstance)
 
       result.length shouldBe 3
-      result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 5
+      result.find(_.heading == "Customers authorising your software").value.questionsAndAnswers.length shouldBe 6
       result.find(_.heading == "Organisation details").value.questionsAndAnswers.length shouldBe 6
       result.find(_.heading == "Development practices").value.questionsAndAnswers.length shouldBe 3
     }
