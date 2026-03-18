@@ -54,7 +54,7 @@ class ApplicationService @Inject() (
       adminsToEmail: Set[LaxEmailAddress]
     )(implicit hc: HeaderCarrier
     ): AppCmdResult = {
-    val request = ApplicationCommands.DeclineApplicationApprovalRequest(requestedBy, reasons, instant())
+    val request = ApplicationCommands.DeclineApplicationApprovalRequest(requestedBy, reasons, instant)
     applicationCommandConnector.dispatch(applicationId, request, adminsToEmail)
   }
 }

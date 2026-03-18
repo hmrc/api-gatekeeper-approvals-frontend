@@ -277,8 +277,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.grantWithWarningsForTouUplift(applicationId, requestedBy, reason))
 
       result match {
-        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
-        case _                                        => fail("Expected an Application, got something else.")
+        case Right(resultApp: ApplicationWithCollaborators) => resultApp.id shouldBe applicationId
+        case _                                              => fail("Expected an Application, got something else.")
       }
     }
   }
@@ -300,8 +300,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.declineForTouUplift(applicationId, requestedBy, reason))
 
       result match {
-        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
-        case _                                        => fail("Expected an Application, got something else.")
+        case Right(resultApp: ApplicationWithCollaborators) => resultApp.id shouldBe applicationId
+        case _                                              => fail("Expected an Application, got something else.")
       }
     }
   }
@@ -323,8 +323,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.resetForTouUplift(applicationId, requestedBy, reason))
 
       result match {
-        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
-        case _                                        => fail("Expected an Application, got something else.")
+        case Right(resultApp: ApplicationWithCollaborators) => resultApp.id shouldBe applicationId
+        case _                                              => fail("Expected an Application, got something else.")
       }
     }
   }
@@ -346,8 +346,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       val result = await(connector.deleteTouUplift(applicationId, requestedBy))
 
       result match {
-        case Right(app: ApplicationWithCollaborators) => app.id shouldBe applicationId
-        case _                                        => fail("Expected an Application, got something else.")
+        case Right(resultApp: ApplicationWithCollaborators) => resultApp.id shouldBe applicationId
+        case _                                              => fail("Expected an Application, got something else.")
       }
     }
   }
