@@ -82,17 +82,4 @@ class ApmConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApiId
       HttpClientMock.Get.verifyUrl(url"$urlBase/api-definitions?applicationId=$appId")
     }
   }
-
-  "fetchApplicationWithSubscriptionData" should {
-    "call the correct endpoint and return the application with subscription data" in new Setup {
-      val subs        = Set(apiIdentifierOne, apiIdentifierTwo)
-      val apmResponse = app.withSubscriptions(subs)
-      HttpClientMock.Get.thenReturn(Some(apmResponse))
-
-      val result = await(connector.fetchApplicationWithSubscriptionData(appId))
-
-      result shouldBe Some(apmResponse)
-      HttpClientMock.Get.verifyUrl(url"$urlBase/applications/${appId.value}")
-    }
-  }
 }

@@ -21,10 +21,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
+import uk.gov.hmrc.apiplatform.modules.applications.query.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.query.domain.services.QueryParamsToQueryStringMap
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 object ThirdPartyApplicationConnector {
@@ -48,6 +50,19 @@ class ThirdPartyApplicationConnector @Inject() (
 
     metrics.record(api) {
       httpClient.get(url"$serviceBaseUrl/query?applicationId=$id").execute[Option[ApplicationWithCollaborators]]
+    }
+  }
+
+  def query[T](qry: ApplicationQuery)(implicit hc: HeaderCarrier, rds: HttpReads[T]): Future[T] = {
+
+    val qryStringMap = QueryParamsToQueryStringMap.toQuery(qry).map {
+      case (k, vs) => k -> vs.mkString
+    }
+
+    metrics.record(api) {
+      httpClient
+        .get(url"${serviceBaseUrl}/query?$qryStringMap")
+        .execute[T]
     }
   }
 }

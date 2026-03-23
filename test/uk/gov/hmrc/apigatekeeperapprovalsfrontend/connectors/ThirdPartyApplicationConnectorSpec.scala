@@ -25,11 +25,17 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaboratorsFixtures, ApplicationWithSubscriptions}
+import uk.gov.hmrc.apiplatform.modules.applications.query.domain.models.ApplicationQuery
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiIdentifierFixtures
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite with ApplicationWithCollaboratorsFixtures {
+class ThirdPartyApplicationConnectorSpec
+    extends AsyncHmrcSpec
+    with GuiceOneAppPerSuite
+    with ApplicationWithCollaboratorsFixtures
+    with ApiIdentifierFixtures {
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
@@ -69,4 +75,18 @@ class ThirdPartyApplicationConnectorSpec extends AsyncHmrcSpec with GuiceOneAppP
       result shouldBe None
     }
   }
+
+  "query" should {
+    "call the correct endpoint and return the application with subscription data" in new Setup {
+      val subs     = Set(apiIdentifierOne, apiIdentifierTwo)
+      val response = app.withSubscriptions(subs)
+      HttpClientMock.Get.thenReturn(Some(response))
+
+      val result = await(connector.query[Option[ApplicationWithSubscriptions]](ApplicationQuery.ById(appId, Nil, true)))
+
+      result shouldBe Some(response)
+      HttpClientMock.Get.verifyUrl(url"$urlBase/query?applicationId=${appId.value.toString}&wantSubscriptions=")
+    }
+  }
+
 }

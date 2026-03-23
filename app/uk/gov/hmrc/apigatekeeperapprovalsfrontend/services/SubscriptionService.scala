@@ -25,20 +25,24 @@ import cats.data.OptionT
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithSubscriptions
+import uk.gov.hmrc.apiplatform.modules.applications.query.domain.models.ApplicationQuery
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApmConnector, ThirdPartyApplicationConnector}
 
 @Singleton
 class SubscriptionService @Inject() (
+    tpaConnector: ThirdPartyApplicationConnector,
     apmConnector: ApmConnector
   )(implicit val ec: ExecutionContext
   ) {
 
   def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinition]] = {
+    import uk.gov.hmrc.http.HttpReads.Implicits._
     (
       for {
-        applicationWithSubscriptions <- OptionT(apmConnector.fetchApplicationWithSubscriptionData(applicationId))
+        applicationWithSubscriptions <- OptionT(tpaConnector.query[Option[ApplicationWithSubscriptions]](ApplicationQuery.ById(applicationId, Nil, true)))
         subscribableApis             <- OptionT.liftF(apmConnector.fetchSubscribableApisForApplication(applicationId))
         applicationSubscriptions      = applicationWithSubscriptions.subscriptions.flatMap(apiDefinition => subscribableApis.find(_.context == apiDefinition.context))
       } yield applicationSubscriptions
