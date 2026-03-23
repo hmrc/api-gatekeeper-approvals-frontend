@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
-import scala.concurrent.Future.successful
+import scala.concurrent.Future.{failed, successful}
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.query.domain.models.ApplicationQuery
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 
@@ -37,6 +38,21 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
         when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) =>
           successful(Some(ApplicationWithCollaborators(CoreApplicationData.Standard.one.copy(id = appId, state = ApplicationStateData.testing), Set.empty)))
         )
+      }
+    }
+
+    object Query {
+
+      def returns[T](results: T) = {
+        when(aMock.query[T](*)(*, *)).thenReturn(successful(results))
+      }
+
+      def returnsFor[T](query: ApplicationQuery)(results: T) = {
+        when(aMock.query[T](eqTo(query))(*, *)).thenReturn(successful(results))
+      }
+
+      def fails(err: Throwable) = {
+        when(aMock.query(*)(*, *)).thenReturn(failed(err))
       }
     }
   }
