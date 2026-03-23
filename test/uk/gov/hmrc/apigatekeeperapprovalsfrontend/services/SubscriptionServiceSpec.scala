@@ -22,13 +22,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apiplatform.modules.common.domain.models._
-import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.ApmConnectorMockModule
+import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.{ApmConnectorMockModule, ThirdPartyApplicationConnectorMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{ApiDataTestData, AsyncHmrcSpec}
 
 class SubscriptionServiceSpec extends AsyncHmrcSpec with ApplicationWithCollaboratorsFixtures {
 
-  trait Setup extends ApmConnectorMockModule with ApiDataTestData {
+  trait Setup extends ApmConnectorMockModule with ThirdPartyApplicationConnectorMockModule with ApiDataTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val applicationId              = applicationIdOne
     val context1                   = ApiContext("context1")
@@ -39,16 +39,18 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec with ApplicationWithCollabor
     val apiData2                   = anApiData("serviceName2", "name2", context2.value)
     val apiData3                   = anApiData("serviceName3", "name3", context3.value)
 
-    val service = new SubscriptionService(ApmConnectorMock.aMock)
+    val application = standardApp.withSubscriptions(Set(
+      ApiIdentifier(context1, ApiVersionNbr("1.0")),
+      ApiIdentifier(context2, ApiVersionNbr("2.0")),
+      ApiIdentifier(context3, ApiVersionNbr("3.0"))
+    ))
+
+    val service = new SubscriptionService(ThirdPartyApplicationConnectorMock.aMock, ApmConnectorMock.aMock)
   }
 
   "fetchSubscriptionsByApplicationId" should {
     "return correct apis for application" in new Setup {
-      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier(context1, ApiVersionNbr("1.0")),
-        ApiIdentifier(context2, ApiVersionNbr("2.0")),
-        ApiIdentifier(context3, ApiVersionNbr("3.0"))
-      )
+      ThirdPartyApplicationConnectorMock.Query.returns(Some(application))
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturn(List(
         apiData1,
         apiData2,
@@ -59,17 +61,13 @@ class SubscriptionServiceSpec extends AsyncHmrcSpec with ApplicationWithCollabor
     }
 
     "return empty set if no application is found" in new Setup {
-      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturnNothing
+      ThirdPartyApplicationConnectorMock.Query.returns(None)
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))
       result shouldBe Set()
     }
 
     "return empty set if no subscribable apis are found" in new Setup {
-      ApmConnectorMock.FetchApplicationWithSubscriptionData.thenReturn(
-        ApiIdentifier(context1, ApiVersionNbr("1.0")),
-        ApiIdentifier(context2, ApiVersionNbr("2.0")),
-        ApiIdentifier(context3, ApiVersionNbr("3.0"))
-      )
+      ThirdPartyApplicationConnectorMock.Query.returns(Some(application))
       ApmConnectorMock.FetchSubscribableApisForApplication.thenReturnNothing
       val result = await(service.fetchSubscriptionsByApplicationId(applicationId))
       result shouldBe Set()
