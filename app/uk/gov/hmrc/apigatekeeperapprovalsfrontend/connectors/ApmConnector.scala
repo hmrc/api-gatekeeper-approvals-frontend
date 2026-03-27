@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaborators, ApplicationWithSubscriptionFields}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 object ApmConnector {
@@ -58,14 +58,6 @@ class ApmConnector @Inject() (
       httpClient.get(url"$serviceBaseUrl/api-definitions?applicationId=$id")
         .execute[MappedApiDefinitions]
         .map(_.wrapped.values.toList)
-    }
-  }
-
-  def fetchApplicationWithSubscriptionData(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithSubscriptionFields]] = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
-
-    metrics.record(api) {
-      httpClient.get(url"$serviceBaseUrl/applications/$id").execute[Option[ApplicationWithSubscriptionFields]]
     }
   }
 }

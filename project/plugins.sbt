@@ -10,9 +10,8 @@ addSbtPlugin("com.github.sbt"      % "sbt-concat"            % "1.0.0")
 addSbtPlugin("com.github.sbt"      % "sbt-digest"            % "2.0.0")
 addSbtPlugin("com.github.sbt"      % "sbt-gzip"              % "2.0.0")
 addSbtPlugin("org.scoverage"       % "sbt-scoverage"         % "2.4.4")
-addSbtPlugin("org.scalastyle"      % "scalastyle-sbt-plugin" % "1.0.0")
-addSbtPlugin("org.scalameta"       % "sbt-scalafmt"          % "2.5.2")
-addSbtPlugin("ch.epfl.scala"       % "sbt-scalafix"          % "0.14.5")
-addSbtPlugin("ch.epfl.scala"       % "sbt-bloop"             % "2.0.10")
+addSbtPlugin("org.scalameta"       % "sbt-scalafmt"          % "2.5.6")
+addSbtPlugin("ch.epfl.scala"       % "sbt-scalafix"          % "0.14.6")
+addSbtPlugin("ch.epfl.scala"       % "sbt-bloop"             % "2.0.19")
 
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always

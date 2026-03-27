@@ -22,7 +22,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiIdentifier, ApplicationId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
 
@@ -42,15 +42,6 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
       def thenReturn(apiDefinitions: List[ApiDefinition]) =
         when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(apiDefinitions))
       def thenReturnNothing                               = when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(List()))
-    }
-
-    object FetchApplicationWithSubscriptionData {
-
-      def thenReturn(apiIdentifiers: ApiIdentifier*) =
-        when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(
-          successful(Some(standardApp.withSubscriptions(apiIdentifiers.toSet).withFieldValues(Map.empty)))
-        )
-      def thenReturnNothing                          = when(aMock.fetchApplicationWithSubscriptionData(*[ApplicationId])(*)).thenReturn(successful(None))
     }
   }
 

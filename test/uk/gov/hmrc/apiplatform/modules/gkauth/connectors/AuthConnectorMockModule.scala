@@ -45,9 +45,10 @@ trait StrideAuthConnectorMockModule {
       private lazy val predicateAdminRole     = StrideAuthorisationPredicateForGatekeeperRole(strideAuthRoles)(ADMIN)
 
       def returnsFor(userRole: GatekeeperStrideRole, name: Name = defaultName) = userRole match {
-        case ADMIN     => returnsAdminEnrolledUserWhenSufficient(name)
-        case SUPERUSER => returnsSuperuserEnrolledUserWhenSufficient(name)
-        case USER      => returnsUserEnrolledUserWhenSufficient(name)
+        case ADMIN        => returnsAdminEnrolledUserWhenSufficient(name)
+        case SUPERUSER    => returnsSuperuserEnrolledUserWhenSufficient(name)
+        case ADVANCEDUSER => returnsUserEnrolledUserWhenSufficient(name)
+        case USER         => returnsUserEnrolledUserWhenSufficient(name)
       }
 
       def returnsAdminEnrolledUserWhenSufficient(name: Name = defaultName) = {

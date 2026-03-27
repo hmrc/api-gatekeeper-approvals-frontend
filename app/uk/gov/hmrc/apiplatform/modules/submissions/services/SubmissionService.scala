@@ -48,7 +48,7 @@ class SubmissionService @Inject() (
   }
 
   def grant(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
-    val cmd = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant(), None, None)
+    val cmd = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant, None, None)
     applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
@@ -59,12 +59,12 @@ class SubmissionService @Inject() (
       escalatedTo: Option[String]
     )(implicit hc: HeaderCarrier
     ): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
-    val cmd = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant(), Some(warnings), escalatedTo)
+    val cmd = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant, Some(warnings), escalatedTo)
     applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
   def termsOfUseInvite(applicationId: ApplicationId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
-    val cmd = ApplicationCommands.SendTermsOfUseInvitation(requestedBy, instant())
+    val cmd = ApplicationCommands.SendTermsOfUseInvitation(requestedBy, instant)
     applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
@@ -103,7 +103,7 @@ class SubmissionService @Inject() (
       escalatedTo: Option[String]
     )(implicit hc: HeaderCarrier
     ): Future[Either[NonEmptyList[CommandFailure], DispatchSuccessResult]] = {
-    val cmd = ApplicationCommands.GrantTermsOfUseApproval(requestedBy, instant(), comments, escalatedTo)
+    val cmd = ApplicationCommands.GrantTermsOfUseApproval(requestedBy, instant, comments, escalatedTo)
     applicationCommandConnector.dispatch(applicationId, cmd, Set.empty)
   }
 
