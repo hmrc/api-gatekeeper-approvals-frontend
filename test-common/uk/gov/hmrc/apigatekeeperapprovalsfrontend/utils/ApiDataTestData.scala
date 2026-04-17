@@ -36,7 +36,7 @@ trait ApiDataTestData {
         ApiVersion(
           ApiVersionNbr("1.0"),
           ApiStatus.STABLE,
-          ApiAccess.PUBLIC,
+          ApiAccessType.PUBLIC,
           List(Endpoint("/sa/{utr}/status", s"Get $serviceName", HttpMethod.GET, AuthType.USER)),
           endpointsEnabled = true,
           None,
