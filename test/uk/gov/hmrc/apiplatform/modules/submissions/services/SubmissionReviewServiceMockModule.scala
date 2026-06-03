@@ -20,7 +20,10 @@ import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
 import org.mockito.quality.Strictness
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
@@ -28,7 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
-trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionReviewTestData {
+trait SubmissionReviewServiceMockModule extends MockitoSugar with SubmissionReviewTestData {
 
   trait BaseSubmissionReviewServiceMock {
     def aMock: SubmissionReviewService

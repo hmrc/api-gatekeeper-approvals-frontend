@@ -27,7 +27,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
 
@@ -37,27 +37,26 @@ object TermsOfUseGrantedController {
 
 @Singleton
 class TermsOfUseGrantedController @Inject() (
-    config: GatekeeperConfig,
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     errorHandler: ErrorHandler,
     termsOfUseGrantedPage: TermsOfUseGrantedPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(
       termsOfUseGrantedPage(
-        TermsOfUseGrantedController.ViewModel(request.application.name, applicationId)
+        TermsOfUseGrantedController.ViewModel(request.application.name, request.application.id)
       )
     ))
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant").flatMap(_.headOption) match {
-      case Some("yes") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(applicationId)))
+      case Some("yes") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(rawApplicationId)))
       case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page))
     }
   }

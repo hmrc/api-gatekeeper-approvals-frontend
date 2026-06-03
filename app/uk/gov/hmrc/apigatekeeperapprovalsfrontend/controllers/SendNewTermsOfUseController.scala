@@ -51,10 +51,11 @@ class SendNewTermsOfUseController @Inject() (
     sendNewTermsOfUseRequestedPage: SendNewTermsOfUseRequestedPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val applicationId            = ApplicationId(rawApplicationId)
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     def checkNotAlreadyInvited = {
@@ -83,8 +84,8 @@ class SendNewTermsOfUseController @Inject() (
     request.application.access match {
       // Should only be sending new terms of use invites to Standard apps
       // with a state of Production and not already invited
-      case std: Access.Standard if (request.application.state.name == domain.models.State.PRODUCTION) => checkNotAlreadyInvited
-      case std: Access.Standard                                                                       =>
+      case _: Access.Standard if (request.application.state.name == domain.models.State.Production) => checkNotAlreadyInvited
+      case _: Access.Standard                                                                       =>
         errorHandler.standardErrorTemplate(
           "Application status",
           "Invalid application status",
@@ -99,7 +100,8 @@ class SendNewTermsOfUseController @Inject() (
     }
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val applicationId            = ApplicationId(rawApplicationId)
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     def inviteTermsOfUse = {

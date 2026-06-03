@@ -35,12 +35,12 @@ abstract class AbstractCheckController(
     mcc: MessagesControllerComponents,
     errorHandler: ErrorHandler,
     submissionReviewService: SubmissionReviewService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   type Fn = (SubmissionReview.Status) => (SubmissionId, Int) => Future[Option[SubmissionReview]]
 
-  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[_]): Future[Result] = {
+  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[?]): Future[Result] = {
     val description = SubmissionReview.Action.toText(reviewAction)
     logger.error(s"$description : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
     errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -55,10 +55,11 @@ abstract class AbstractCheckController(
   def updateActionStatus(
       reviewAction: SubmissionReview.Action
     )(
-      applicationId: ApplicationId
-    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
-    val log = logBadRequest(reviewAction) _
+      rawApplicationId: java.util.UUID
+    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+    val ok            = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId.value))
+    val log           = logBadRequest(reviewAction)
 
     (
       for {

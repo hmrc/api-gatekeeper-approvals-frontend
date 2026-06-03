@@ -68,7 +68,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
         ("serviceName2", "name2", "context2")
       )
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(applicationId)(using fakeRequest)
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
     }
@@ -87,7 +87,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
         ("serviceName2", "name2", "context2")
       )
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(applicationId)(using fakeRequest)
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
     }
@@ -99,7 +99,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.FetchLinkedSubordinateApplicationByApplicationId.thenReturnNone()
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(applicationId)(using fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -107,7 +107,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(applicationId)(using fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }

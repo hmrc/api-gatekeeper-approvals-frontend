@@ -26,9 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
-
-class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with ApplicationWithCollaboratorsFixtures {
+class ThirdPartyApplicationConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with ApplicationWithCollaboratorsFixtures {
 
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,

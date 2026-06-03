@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, InternalServerException, S
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, _}
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
+import cats.syntax.either._
 
 @Singleton
 class ApplicationCommandConnector @Inject() (
@@ -44,7 +45,6 @@ class ApplicationCommandConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): AppCmdResult = {
 
-    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
     import play.api.libs.json._
     import uk.gov.hmrc.http.HttpReads.Implicits._
     import play.api.http.Status._
@@ -58,16 +58,24 @@ class ApplicationCommandConnector @Inject() (
       }
     }
 
-    import cats.syntax.either._
+    import play.api.libs.ws.JsonBodyWritables._
+
 
     http.patch(url"$serviceBaseUrl/applications/$applicationId/dispatch")
       .withBody(Json.toJson(DispatchRequest(command, adminsToEmail)))
       .execute[HttpResponse]
       .map(response =>
         response.status match {
-          case OK          => parseWithLogAndThrow[DispatchSuccessResult](response.body).asRight[Failures]
-          case BAD_REQUEST => logger.error("BAD REQUEST: " + response.body); parseWithLogAndThrow[Failures](response.body).asLeft[DispatchSuccessResult]
-          case status      =>
+          case OK =>
+            parseWithLogAndThrow[DispatchSuccessResult](response.body).asRight[Failures]
+
+          case BAD_REQUEST =>
+            import uk.gov.hmrc.apiplatform.modules.common.services.NonEmptyListFormatters.given
+
+            logger.error("BAD REQUEST: " + response.body)
+            (parseWithLogAndThrow[Failures](response.body)).asLeft[DispatchSuccessResult]
+
+          case status =>
             logger.error(s"Dispatch failed with status code: $status")
             throw new InternalServerException(s"Failed calling dispatch $status")
         }

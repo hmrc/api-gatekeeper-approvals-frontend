@@ -62,7 +62,7 @@ class AbstractControllerSpec
     val mcc              = app.injector.instanceOf[MessagesControllerComponents]
     val errorHandler     = app.injector.instanceOf[ErrorHandler]
 
-    val application = standardApp.withCollaborators(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random))
+    val application = standardApp.withCollaborators(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Role.Administrator, UserId.random))
 
     val inHouseApplication = application.modifyStdAccess(_.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No"))))
     val fakeRequest        = FakeRequest().withMethod("POST").withCSRFToken

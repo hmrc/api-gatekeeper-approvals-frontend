@@ -53,17 +53,17 @@ class TermsOfUseAnswersController @Inject() (
     termsOfUseAnswersPage: TermsOfUseAnswersPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
 
   import TermsOfUseAnswersController._
 
-  def page(applicationId: ApplicationId) = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID) = loggedInWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
     val instance   = request.submission.latestInstance
     val index      = instance.index
 
-    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance)))))
+    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, request.application.id, index, SubmissionQuestionsAndAnswers(submission, instance)))))
   }
 }

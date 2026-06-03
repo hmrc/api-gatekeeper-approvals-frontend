@@ -52,7 +52,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Grant production access")
@@ -63,7 +63,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Grant production access and email with warnings")
@@ -74,7 +74,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }

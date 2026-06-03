@@ -49,7 +49,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      val result = controller.checkFraudPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -61,7 +61,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      val result = controller.checkFraudPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -72,7 +72,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      val result = controller.checkFraudPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -108,7 +108,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkFraudAction(applicationId)(fakeRequest)
+      val result = controller.checkFraudAction(applicationId)(using fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

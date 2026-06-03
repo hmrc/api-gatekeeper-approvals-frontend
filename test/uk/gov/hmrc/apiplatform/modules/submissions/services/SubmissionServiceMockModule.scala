@@ -22,7 +22,10 @@ import scala.concurrent.Future.successful
 
 import cats.data.NonEmptyList
 import org.mockito.quality.Strictness
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailures, DispatchSuccessResult}
@@ -31,7 +34,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
-trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData {
+trait SubmissionServiceMockModule extends MockitoSugar with MarkedSubmissionsTestData {
 
   trait BaseSubmissionServiceMock {
     def aMock: SubmissionService
@@ -40,11 +43,11 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(markedSubmission)
-        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturn(submission: MarkedSubmission) = {
-        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(Some(submission)))
+        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(using *)).thenReturn(successful(Some(submission)))
       }
 
       def thenReturnIncludingAnUnknownQuestion(applicationId: ApplicationId) = {
@@ -52,20 +55,20 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
         val submissionWithUnknownQuestion   = aSubmission.answeringWith(answersIncludingUnknownQuestion)
 
         val response = Some(MarkedSubmission(submissionWithUnknownQuestion, markedAnswers))
-        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturnWith(applicationId: ApplicationId, submission: Submission) = {
         val response = Some(MarkedSubmission(submission, markedAnswers))
-        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturnWith(applicationId: ApplicationId, submission: MarkedSubmission) = {
-        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(*)).thenReturn(successful(Some(submission)))
+        when(aMock.fetchLatestMarkedSubmission(eqTo(applicationId))(using *)).thenReturn(successful(Some(submission)))
       }
 
       def thenNotFound() = {
-        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
+        when(aMock.fetchLatestMarkedSubmission(*[ApplicationId])(using *)).thenReturn(successful(None))
       }
     }
 
@@ -73,12 +76,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(aSubmission)
-        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturn(applicationId: ApplicationId, submission: Submission) = {
         val response = Some(submission)
-        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenSubmitted(applicationId: ApplicationId) = {
@@ -88,7 +91,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
             "user"
           ))(aSubmission)
         val response            = Some(submittedSubmission)
-        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenGranted(applicationId: ApplicationId) = {
@@ -107,7 +110,7 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
           None
         ))(aSubmission)
         val response          = Some(grantedSubmission)
-        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId: ApplicationId) = {
@@ -126,11 +129,11 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
           None
         ))(aSubmission)
         val response          = Some(grantedSubmission.copy(context = simpleContext))
-        when(aMock.fetchLatestSubmission(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchLatestSubmission(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
-        when(aMock.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(None))
+        when(aMock.fetchLatestSubmission(*[ApplicationId])(using *)).thenReturn(successful(None))
       }
     }
 
@@ -138,28 +141,28 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(DispatchSuccessResult(application))
-        when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.grant(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
-        when(aMock.grant(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.grant(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
       }
 
       def verifyCalled(applicationId: ApplicationId) =
-        verify(aMock).grant(eqTo(applicationId), *)(*)
+        verify(aMock).grant(eqTo(applicationId), *)(using *)
     }
 
     object GrantWithWarnings {
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(DispatchSuccessResult(application))
-        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
-        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarnings(eqTo(applicationId), *, *, *)(using *)).thenReturn(successful(response))
       }
     }
 
@@ -167,12 +170,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(DispatchSuccessResult(application))
-        when(aMock.termsOfUseInvite(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.termsOfUseInvite(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
-        when(aMock.termsOfUseInvite(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.termsOfUseInvite(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
       }
     }
 
@@ -185,9 +188,9 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
           instant.minus(20, ChronoUnit.DAYS),
           instant.plus(20, ChronoUnit.DAYS),
           Some(instant.minus(10, ChronoUnit.DAYS)),
-          EMAIL_SENT
+          EmailSent
         ))
-        when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenReturn(applicationId: ApplicationId, status: TermsOfUseInvitationState) = {
@@ -199,23 +202,23 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
           Some(instant.plus(10, ChronoUnit.DAYS)),
           status
         ))
-        when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchTermsOfUseInvitation(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
-        when(aMock.fetchTermsOfUseInvitation(*[ApplicationId])(*)).thenReturn(successful(None))
+        when(aMock.fetchTermsOfUseInvitation(*[ApplicationId])(using *)).thenReturn(successful(None))
       }
     }
 
     object FetchTermsOfUseInvitations {
 
       def thenReturn() = {
-        val response = List(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT))
-        when(aMock.fetchTermsOfUseInvitations()(*)).thenReturn(successful(response))
+        val response = List(TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent))
+        when(aMock.fetchTermsOfUseInvitations()(using *)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
-        when(aMock.fetchTermsOfUseInvitations()(*)).thenReturn(successful(List.empty))
+        when(aMock.fetchTermsOfUseInvitations()(using *)).thenReturn(successful(List.empty))
       }
     }
 
@@ -223,35 +226,35 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn() = {
         val response = List(
-          TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "app name 1"),
+          TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent, "app name 1"),
           TermsOfUseInvitationWithApplication(applicationIdTwo, Instant.now, Instant.now, Instant.now, None, WARNINGS, "app name 2"),
           TermsOfUseInvitationWithApplication(applicationIdThree, Instant.now, Instant.now, Instant.now, None, TERMS_OF_USE_V2, "app name 3"),
-          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), REMINDER_EMAIL_SENT, "app name 4"),
-          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), OVERDUE, "app name 5"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), ReminderEmailSent, "app name 4"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), Overdue, "app name 5"),
           TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, None, TERMS_OF_USE_V2_WITH_WARNINGS, "app name 6"),
           TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, None, FAILED, "app name 7")
         )
-        when(aMock.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(response))
+        when(aMock.searchTermsOfUseInvitations(*)(using *)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
-        when(aMock.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(List.empty))
+        when(aMock.searchTermsOfUseInvitations(*)(using *)).thenReturn(successful(List.empty))
       }
 
       def verifyCalled(params: Seq[(String, String)]) =
-        verify(aMock).searchTermsOfUseInvitations(eqTo(params))(*)
+        verify(aMock).searchTermsOfUseInvitations(eqTo(params))(using *)
     }
 
     object GrantWithWarningsOrDeclineForTouUplift {
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(application)
-        when(aMock.grantWithWarningsOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarningsOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.grantWithWarningsOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantWithWarningsOrDeclineForTouUplift(eqTo(applicationId), *, *, *)(using *)).thenReturn(successful(response))
       }
     }
 
@@ -259,12 +262,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(DispatchSuccessResult(application))
-        when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left(NonEmptyList.one(CommandFailures.GenericFailure("error")))
-        when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(*)).thenReturn(successful(response))
+        when(aMock.grantForTouUplift(eqTo(applicationId), *, *, *)(using *)).thenReturn(successful(response))
       }
     }
 
@@ -272,12 +275,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(application)
-        when(aMock.resetForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+        when(aMock.resetForTouUplift(eqTo(applicationId), *, *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
         val response = Left("error")
-        when(aMock.resetForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(response))
+        when(aMock.resetForTouUplift(eqTo(applicationId), *, *)(using *)).thenReturn(successful(response))
       }
     }
 
@@ -285,12 +288,11 @@ trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def thenReturn(applicationId: ApplicationId, application: ApplicationWithCollaborators) = {
         val response = Right(application)
-        when(aMock.deleteTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.deleteTouUplift(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
-        val response = Left("error")
-        when(aMock.deleteTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(response))
+        when(aMock.deleteTouUplift(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
       }
     }
   }

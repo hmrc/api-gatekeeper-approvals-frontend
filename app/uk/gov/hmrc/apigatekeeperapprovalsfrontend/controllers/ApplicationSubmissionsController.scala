@@ -66,7 +66,7 @@ class ApplicationSubmissionsController @Inject() (
     errorHandler: ErrorHandler,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
 
   import ApplicationSubmissionsController._
@@ -74,7 +74,8 @@ class ApplicationSubmissionsController @Inject() (
   import cats.implicits._
   import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
 
-  def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+  def whichPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
+    val applicationId            = request.application.id
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission =>
@@ -90,10 +91,11 @@ class ApplicationSubmissionsController @Inject() (
     )
       .fold(
         Redirect(gatekeeperApplicationUrl)
-      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))
+      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId.value)))
   }
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId            = ApplicationId(rawApplicationId)
     val appName                  = request.application.name
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
 

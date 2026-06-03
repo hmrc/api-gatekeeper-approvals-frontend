@@ -21,7 +21,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
@@ -57,7 +56,7 @@ class ApmConnector @Inject() (
     metrics.record(api) {
       httpClient.get(url"$serviceBaseUrl/api-definitions?applicationId=$id")
         .execute[MappedApiDefinitions]
-        .map(_.wrapped.values.toList)
+        .map(_.values.toList)
     }
   }
 }

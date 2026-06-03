@@ -19,11 +19,14 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 import java.net.URL
 import scala.concurrent.Future
 
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.{when, verify}
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
-trait HttpClientMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait HttpClientMockModule extends MockitoSugar {
 
   trait BaseHttpClientMockModule {
     def aMock: HttpClientV2
@@ -32,12 +35,12 @@ trait HttpClientMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object Get {
 
       def thenReturn[T](response: T) = {
-        when(aMock.get(*)(*)).thenReturn(requestBuilderMock)
-        when(requestBuilderMock.execute[T](*, *)).thenReturn(Future.successful(response))
+        when(aMock.get(*)(using *)).thenReturn(requestBuilderMock)
+        when(requestBuilderMock.execute[T](using *, *)).thenReturn(Future.successful(response))
       }
 
       def verifyUrl(url: URL) = {
-        verify(aMock).get(eqTo(url))(*)
+        verify(aMock).get(eqTo(url))(using *)
       }
     }
   }

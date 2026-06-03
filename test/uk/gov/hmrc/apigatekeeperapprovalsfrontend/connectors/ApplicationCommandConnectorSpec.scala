@@ -29,12 +29,13 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, ApplicationWithCollaborators, Collaborators, CoreApplicationData, State}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, CommandFailure, CommandFailures, DispatchRequest, DispatchSuccessResult}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax.toLaxEmail
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{Actors, UserId, _}
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WireMockSugar}
+import play.api.libs.json.Json
 
 class ApplicationCommandConnectorSpec
     extends AsyncHmrcSpec
@@ -45,7 +46,7 @@ class ApplicationCommandConnectorSpec
   def anApplicationResponse(
       createdOn: Instant = instant,
       lastAccess: Instant = instant,
-      state: ApplicationState = ApplicationState(State.TESTING, None, None, None, instant)
+      state: ApplicationState = ApplicationState(State.Testing, None, None, None, instant)
     ): ApplicationWithCollaborators = {
     ApplicationWithCollaborators(
       details = CoreApplicationData.Standard.one.copy(
@@ -86,24 +87,26 @@ class ApplicationCommandConnectorSpec
     "send a correct command" in new Setup {
       stubFor(
         patch(urlPathEqualTo(url))
-          .withJsonRequestBody(DispatchRequest(command, adminsToEmail))
+          .withRequestBody(equalTo(Json.toJson(DispatchRequest(command, adminsToEmail)).toString))
           .willReturn(
             aResponse()
-              .withJsonBody(DispatchSuccessResult(anApplicationResponse()))
+              .withBody(Json.toJson(DispatchSuccessResult(anApplicationResponse())).toString)
               .withStatus(OK)
           )
       )
       await(connector.dispatch(applicationId, command, adminsToEmail)).isRight shouldBe true
     }
 
+    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters.given
+
     "send a correct command and handle command failure" in new Setup {
       val failures = NonEmptyList.one[CommandFailure](CommandFailures.ApplicationNotFound)
       stubFor(
         patch(urlPathEqualTo(url))
-          .withJsonRequestBody(DispatchRequest(command, adminsToEmail))
+          .withRequestBody(equalTo(Json.toJson(DispatchRequest(command, adminsToEmail)).toString))
           .willReturn(
             aResponse()
-              .withJsonBody(failures)
+              .withBody(Json.toJson(failures).toString)
               .withStatus(BAD_REQUEST)
           )
       )
@@ -113,7 +116,7 @@ class ApplicationCommandConnectorSpec
     "send a correct command and handle general failure" in new Setup {
       stubFor(
         patch(urlPathEqualTo(url))
-          .withJsonRequestBody(DispatchRequest(command, adminsToEmail))
+          .withRequestBody(equalTo(Json.toJson(DispatchRequest(command, adminsToEmail)).toString))
           .willReturn(
             aResponse()
               .withStatus(IM_A_TEAPOT)

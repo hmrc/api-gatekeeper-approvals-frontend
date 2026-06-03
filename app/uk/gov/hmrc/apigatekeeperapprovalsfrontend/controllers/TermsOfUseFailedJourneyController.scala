@@ -62,7 +62,7 @@ object TermsOfUseFailedJourneyController {
     mapping(
       "first-name" -> nonEmptyText,
       "last-name"  -> nonEmptyText
-    )(ApproverForm.apply)(ApproverForm.unapply)
+    )(ApproverForm.apply)(x => Some((x.firstName, x.lastName)))
   )
 
   case class ProvideNotesForm(notes: String)
@@ -70,7 +70,7 @@ object TermsOfUseFailedJourneyController {
   val provideNotesForm: Form[ProvideNotesForm] = Form(
     mapping(
       "notes" -> nonEmptyText
-    )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
+    )(ProvideNotesForm.apply)(x => Some(x.notes))
   )
 }
 
@@ -90,7 +90,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     termsOfUseOverrideConfirmPage: TermsOfUseOverrideConfirmPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   import TermsOfUseFailedJourneyController._
@@ -99,9 +99,10 @@ class TermsOfUseFailedJourneyController @Inject() (
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, false, false)
   }
 
-  def listPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName   = request.application.name
-    val isDeleted = request.application.state.isDeleted
+  def listPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = ApplicationId(rawApplicationId)
+    val appName       = request.application.name
+    val isDeleted     = request.application.state.isDeleted
 
     val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {
@@ -126,7 +127,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     val hasWarnings  = request.markedSubmission.isWarn
 
     for {
-      review <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
+      _ <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
     } yield Ok(
       termsOfUseFailedListPage(
         AnswersViewModel(
@@ -140,16 +141,17 @@ class TermsOfUseFailedJourneyController @Inject() (
     )
   }
 
-  def listAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def listAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
-      case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
+      case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(rawApplicationId)))
       case _                => successful(Redirect(routes.TermsOfUseInvitationController.page))
     }
   }
 
-  def answersWithWarningsOrFails(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName   = request.application.name
-    val isDeleted = request.application.state.isDeleted
+  def answersWithWarningsOrFails(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+    val appName       = request.application.name
+    val isDeleted     = request.application.state.isDeleted
 
     val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {
@@ -181,14 +183,16 @@ class TermsOfUseFailedJourneyController @Inject() (
     )))
   }
 
-  def emailAddressesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
-    successful(Ok(termsOfUseAdminsPage(EmailsViewModel(applicationId, request.application.name, adminsToEmail))))
+    successful(Ok(termsOfUseAdminsPage(EmailsViewModel(request.application.id, request.application.name, adminsToEmail))))
   }
 
-  def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
+  def emailAddressesAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = ApplicationId(rawApplicationId)
+
+    val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId.value))
 
     for {
       review <- submissionReviewService.findOrCreateReview(
@@ -203,25 +207,29 @@ class TermsOfUseFailedJourneyController @Inject() (
     } yield ok
   }
 
-  def failOverridePage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseFailOverridePage(ViewModel(applicationId, request.application.name))))
+  def failOverridePage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseFailOverridePage(ViewModel(request.application.id, request.application.name))))
   }
 
-  def failOverrideAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def failOverrideAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
-      case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
-      case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
+      case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId.value)))
+      case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId.value)))
     }
   }
 
-  def overrideApproverPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(applicationId, request.application.name))))
+  def overrideApproverPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(request.application.id, request.application.name))))
   }
 
-  def overrideApproverAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideApproverAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+
     def handleValidForm(form: ApproverForm) = {
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId)))
+        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId.value)))
         case None        => {
           logger.warn(s"Failed to save escalated to in submission review for applicationId: ${applicationId}")
           errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -236,14 +244,16 @@ class TermsOfUseFailedJourneyController @Inject() (
     TermsOfUseFailedJourneyController.approverForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def overrideNotesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
+  def overrideNotesPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))
   }
 
-  def overrideNotesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideNotesAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+
     def handleValidForm(form: ProvideNotesForm) = {
       submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId)))
+        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId.value)))
         case None        => {
           logger.warn(s"Failed to save reasons in submission review for applicationId: ${applicationId}")
           errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -258,7 +268,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     TermsOfUseFailedJourneyController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def overrideConfirmPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideConfirmPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     (
       for {
         review      <- fromOptionF(
@@ -269,11 +279,13 @@ class TermsOfUseFailedJourneyController @Inject() (
                          review.escalatedTo,
                          BadRequest("Unable to get escalatedTo in submission review")
                        )
-      } yield Ok(termsOfUseOverrideConfirmPage(OverrideViewModel(applicationId, request.application.name, escalatedTo, review.grantWarnings)))
+      } yield Ok(termsOfUseOverrideConfirmPage(OverrideViewModel(request.application.id, request.application.name, escalatedTo, review.grantWarnings)))
     ).fold(identity(_), identity(_))
   }
 
-  def overrideConfirmAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def overrideConfirmAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+
     def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
       val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
       InternalServerError(errString)
@@ -285,11 +297,11 @@ class TermsOfUseFailedJourneyController @Inject() (
                     BadRequest("Unable to find submission review")
                   )
         _      <- EitherT(submissionService.grantForTouUplift(applicationId, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(handleCommandFailures)
-      } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(applicationId).url)
+      } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(applicationId.value).url)
     ).fold(identity(_), identity(_))
   }
 
-  def confirmationPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmationPage(ViewModel(applicationId, request.application.name))))
+  def confirmationPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseConfirmationPage(ViewModel(request.application.id, request.application.name))))
   }
 }

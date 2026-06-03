@@ -19,14 +19,17 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.services
 import scala.concurrent.Future.successful
 
 import org.mockito.quality.Strictness
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.ApiDataTestData
 
-trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData with ApiDataTestData {
+trait SubscriptionServiceMockModule extends MockitoSugar with MarkedSubmissionsTestData with ApiDataTestData {
 
   trait BaseSubscriptionServiceMock {
     def aMock: SubscriptionService
@@ -35,7 +38,7 @@ trait SubscriptionServiceMockModule extends MockitoSugar with ArgumentMatchersSu
 
       def thenReturn(apiDefinitions: (String, String, String)*) = {
         val definitions = apiDefinitions.map(t => anApiData(t._1, t._2, t._3)).toSet
-        when(aMock.fetchSubscriptionsByApplicationId(*[ApplicationId])(*)).thenReturn(successful(definitions))
+        when(aMock.fetchSubscriptionsByApplicationId(*[ApplicationId])(using *)).thenReturn(successful(definitions))
       }
     }
   }

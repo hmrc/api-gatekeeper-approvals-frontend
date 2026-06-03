@@ -52,7 +52,7 @@ class TermsOfUseInvitationControllerSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
-      val result = controller.page()(fakeRequest)
+      val result = controller.page()(using fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -66,14 +66,14 @@ class TermsOfUseInvitationControllerSpec
       val result = controller.page()(request)
 
       status(result) shouldBe OK
-      SubmissionServiceMock.SearchTermsOfUseInvitations.verifyCalled(Seq("status" -> "EMAIL_SENT", "status" -> "OVERDUE"))
+      SubmissionServiceMock.SearchTermsOfUseInvitations.verifyCalled(Seq("status" -> "EmailSent", "status" -> "Overdue"))
     }
 
     "return Unauthorised (401) when user not logged in" in new Setup {
       StrideAuthorisationServiceMock.Auth.invalidBearerToken()
       LdapAuthorisationServiceMock.Auth.notAuthorised
 
-      val result = controller.page()(fakeRequest)
+      val result = controller.page()(using fakeRequest)
 
       status(result) shouldBe UNAUTHORIZED
     }

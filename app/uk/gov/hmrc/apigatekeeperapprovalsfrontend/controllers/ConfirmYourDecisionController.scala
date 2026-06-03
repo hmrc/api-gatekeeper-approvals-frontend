@@ -48,24 +48,25 @@ class ConfirmYourDecisionController @Inject() (
     val submissionService: SubmissionService,
     confirmYourDecisionPage: ConfirmYourDecisionPage,
     submissionReviewService: SubmissionReviewService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   import ConfirmYourDecisionController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name, request.markedSubmission.isFail))))
+  def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(confirmYourDecisionPage(ViewModel(request.application.id, request.application.name, request.markedSubmission.isFail))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
-      case Some("decline")                                                   => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
+      case Some("decline")                                                   => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId.value)))
       case Some("grant-with-warnings") if (!request.markedSubmission.isFail) =>
-        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
+        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId.value)))
       case Some("grant-with-warnings") if (request.markedSubmission.isFail)  =>
-        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId)))
+        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId.value)))
       case Some("grant")                                                     => grantAccess(applicationId)
-      case _                                                                 => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
+      case _                                                                 => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId.value)))
     }
   }
 
@@ -77,9 +78,9 @@ class ConfirmYourDecisionController @Inject() (
     }
     (
       for {
-        review <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
+        _ <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
         _      <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(handleCommandFailures)
-      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
+      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId.value).url)
     ).fold(identity(_), identity(_))
   }
 

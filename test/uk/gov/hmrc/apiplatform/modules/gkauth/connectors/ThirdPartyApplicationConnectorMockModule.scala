@@ -18,7 +18,10 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
 import scala.concurrent.Future.{failed, successful}
 
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.applications.query.domain.models.ApplicationQuery
@@ -27,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ThirdPartyApplicationConnector
 
-trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with FixedClock {
+trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with FixedClock {
 
   trait BaseThirdPartyApplicationConnectorMock {
     def aMock: ThirdPartyApplicationConnector
@@ -35,7 +38,7 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
     object FetchApplicationById {
 
       def thenReturn() = {
-        when(aMock.fetchApplicationById(*[ApplicationId])(*)).thenAnswer((appId: ApplicationId) =>
+        when(aMock.fetchApplicationById(*[ApplicationId])(using *)).thenAnswer((appId: ApplicationId) =>
           successful(Some(ApplicationWithCollaborators(CoreApplicationData.Standard.one.copy(id = appId, state = ApplicationStateData.testing), Set.empty)))
         )
       }
@@ -44,15 +47,15 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with Argumen
     object Query {
 
       def returns[T](results: T) = {
-        when(aMock.query[T](*)(*, *)).thenReturn(successful(results))
+        when(aMock.query[T](*)(using *, *)).thenReturn(successful(results))
       }
 
       def returnsFor[T](query: ApplicationQuery)(results: T) = {
-        when(aMock.query[T](eqTo(query))(*, *)).thenReturn(successful(results))
+        when(aMock.query[T](eqTo(query))(using *, *)).thenReturn(successful(results))
       }
 
       def fails(err: Throwable) = {
-        when(aMock.query(*)(*, *)).thenReturn(failed(err))
+        when(aMock.query(*)(using *, *)).thenReturn(failed(err))
       }
     }
   }

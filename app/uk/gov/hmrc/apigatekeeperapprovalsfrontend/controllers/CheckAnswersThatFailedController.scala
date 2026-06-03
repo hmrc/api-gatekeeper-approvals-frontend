@@ -55,14 +55,15 @@ class CheckAnswersThatFailedController @Inject() (
     checkAnswersThatFailedPage: CheckAnswersThatFailedPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   import CheckAnswersThatFailedController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName   = request.application.name
-    val isDeleted = request.application.state.isDeleted
+  def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+    val appName       = request.application.name
+    val isDeleted     = request.application.state.isDeleted
 
     val questionsAndAnswers: Map[Question, ActualAnswer] =
       request.submission.latestInstance.answersToQuestions.map {
@@ -97,5 +98,7 @@ class CheckAnswersThatFailedController @Inject() (
     )
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings)(applicationId)
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = {
+    updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings)(rawApplicationId)
+  }
 }

@@ -43,7 +43,7 @@ object DeclinedJourneyController {
   val provideReasonsForm: Form[ProvideReasonsForm] = Form(
     mapping(
       "reasons" -> nonEmptyText
-    )(ProvideReasonsForm.apply)(ProvideReasonsForm.unapply)
+    )(ProvideReasonsForm.apply)(x => Some(x.reasons))
   )
 }
 
@@ -59,19 +59,21 @@ class DeclinedJourneyController @Inject() (
     provideReasonsForDecliningPage: ProvideReasonsForDecliningPage,
     adminsToEmailPage: AdminsToEmailPage,
     submissionReviewService: SubmissionReviewService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
   import DeclinedJourneyController._
 
-  def provideReasonsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(applicationId, request.application.name))))
+  def provideReasonsPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(request.application.id, request.application.name))))
   }
 
-  def provideReasonsAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = ApplicationId(rawApplicationId)
+
     def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
       submissionReviewService.updateDeclineReasons(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId)))
+        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId.value)))
         case None        => {
           logger.warn("Persisting decline reasons failed")
           errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -86,21 +88,22 @@ class DeclinedJourneyController @Inject() (
     DeclinedJourneyController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def declinedPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name))))
+  def declinedPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(applicationDeclinedPage(ViewModel(request.application.id, request.application.name))))
   }
 
-  def emailAddressesPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
-    successful(Ok(adminsToEmailPage(ViewModel(applicationId, request.application.name, adminsToEmail))))
+    successful(Ok(adminsToEmailPage(ViewModel(request.application.id, request.application.name, adminsToEmail))))
   }
 
-  def emailAddressesAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def emailAddressesAction(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId      = ApplicationId(rawApplicationId)
     val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
     val requiresDemo       = SubmissionRequiresDemo(request.submission)
     val adminsToEmail      = request.application.collaborators.filter(_.role.isAdministrator).map(_.emailAddress)
-    val ok                 = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
+    val ok                 = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId.value))
 
     for {
       review <- submissionReviewService.findOrCreateReview(
@@ -111,7 +114,7 @@ class DeclinedJourneyController @Inject() (
                   requiresFraudCheck,
                   requiresDemo
                 )
-      result <- applicationService.declineApplicationApprovalRequest(applicationId, request.name.get, review.declineReasons, adminsToEmail)
+      _ <- applicationService.declineApplicationApprovalRequest(applicationId, request.name.get, review.declineReasons, adminsToEmail)
     } yield ok
   }
 }

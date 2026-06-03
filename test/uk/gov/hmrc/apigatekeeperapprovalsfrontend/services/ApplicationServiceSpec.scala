@@ -47,8 +47,8 @@ class ApplicationServiceSpec extends AsyncHmrcSpec with FixedClock {
       Some("http://example.com"),
       responsibleIndividual,
       serverLocations = Set.empty,
-      TermsAndConditionsLocations.InDesktopSoftware,
-      PrivacyPolicyLocations.InDesktopSoftware,
+      TermsAndConditionsLocation.InDesktopSoftware,
+      PrivacyPolicyLocation.InDesktopSoftware,
       termsOfUseAcceptances
     )
     val saWithSubmissionData    = Access.Standard(importantSubmissionData = Some(importantSubmissionData))

@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
 
 object ViewDeclinedSubmissionController {
@@ -53,25 +53,24 @@ class ViewDeclinedSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
     viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
     errorHandler: ErrorHandler,
-    submissionReviewService: SubmissionReviewService,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   import ViewDeclinedSubmissionController._
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID, index: Int) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
-      errorHandler.badRequestTemplate(request).map(BadRequest(_))
+      errorHandler.badRequestTemplate(using request).map(BadRequest(_))
     )(instance => {
       (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
         case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
           successful(Ok(viewDeclinedSubmissionPage(ViewModel(
             appName,
-            applicationId,
+            request.application.id,
             requestedBy,
             submittedTimestamp.asText,
             declinedName,
@@ -81,7 +80,7 @@ class ViewDeclinedSubmissionController @Inject() (
           ))))
         case _                                                                                                                        =>
           logger.warn("Unexpectedly could not find a submitted status for an instance with a declined status")
-          errorHandler.badRequestTemplate(request).map(BadRequest(_))
+          errorHandler.badRequestTemplate(using request).map(BadRequest(_))
       }
     })
 

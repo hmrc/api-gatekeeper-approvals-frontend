@@ -28,7 +28,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EmailSent
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitation, TermsOfUseInvitationWithApplication}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
@@ -49,7 +49,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "fetchLatestSubmission" should {
     "successfully fetch latest submission" in new Setup {
-      when(mockSubmissionsConnector.fetchLatestSubmission(*[ApplicationId])(*)).thenReturn(successful(Some(aSubmission)))
+      when(mockSubmissionsConnector.fetchLatestSubmission(*[ApplicationId])(using *)).thenReturn(successful(Some(aSubmission)))
       val result = await(underTest.fetchLatestSubmission(applicationId))
       result shouldBe Some(aSubmission)
     }
@@ -57,7 +57,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "fetchLatestMarkedSubmission" should {
     "successfully fetch latest marked submission" in new Setup {
-      when(mockSubmissionsConnector.fetchLatestMarkedSubmission(*[ApplicationId])(*)).thenReturn(successful(Some(markedSubmission)))
+      when(mockSubmissionsConnector.fetchLatestMarkedSubmission(*[ApplicationId])(using *)).thenReturn(successful(Some(markedSubmission)))
       val result = await(underTest.fetchLatestMarkedSubmission(applicationId))
       result shouldBe Some(markedSubmission)
     }
@@ -66,7 +66,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
   "grant" should {
     "call application command connector correctly" in new Setup {
       val cmd    = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant, None, None)
-      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(using *)).thenReturn(successful(Right(DispatchSuccessResult(app))))
       val result = await(underTest.grant(applicationId, requestedBy))
       result shouldBe Right(DispatchSuccessResult(app))
     }
@@ -77,7 +77,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
       val warnings = "warn"
       val manager  = "manager"
       val cmd      = ApplicationCommands.GrantApplicationApprovalRequest(requestedBy, instant, Some(warnings), Some(manager))
-      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(using *)).thenReturn(successful(Right(DispatchSuccessResult(app))))
       val result   = await(underTest.grantWithWarnings(applicationId, requestedBy, warnings, Some(manager)))
       result shouldBe Right(DispatchSuccessResult(app))
     }
@@ -86,7 +86,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
   "termsOfUseInvite" should {
     "call submission connector correctly" in new Setup {
       val cmd    = ApplicationCommands.SendTermsOfUseInvitation(requestedBy, instant)
-      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(using *)).thenReturn(successful(Right(DispatchSuccessResult(app))))
       val result = await(underTest.termsOfUseInvite(applicationId, requestedBy))
       result shouldBe Right(DispatchSuccessResult(app))
     }
@@ -94,8 +94,8 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "fetchTermsOfUseInvitation" should {
     "call submission connector correctly" in new Setup {
-      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
-      when(mockSubmissionsConnector.fetchTermsOfUseInvitation(eqTo(applicationId))(*)).thenReturn(successful(Some(invite)))
+      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent)
+      when(mockSubmissionsConnector.fetchTermsOfUseInvitation(eqTo(applicationId))(using *)).thenReturn(successful(Some(invite)))
       val result = await(underTest.fetchTermsOfUseInvitation(applicationId))
       result shouldBe Some(invite)
     }
@@ -103,8 +103,8 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "fetchTermsOfUseInvitations" should {
     "call submission connector correctly" in new Setup {
-      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
-      when(mockSubmissionsConnector.fetchTermsOfUseInvitations()(*)).thenReturn(successful(List(invite)))
+      val invite = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent)
+      when(mockSubmissionsConnector.fetchTermsOfUseInvitations()(using *)).thenReturn(successful(List(invite)))
       val result = await(underTest.fetchTermsOfUseInvitations())
       result shouldBe List(invite)
     }
@@ -112,22 +112,22 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "searchTermsOfUseInvitations" should {
     "call submission connector correctly" in new Setup {
-      val invite = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "app name")
-      when(mockSubmissionsConnector.searchTermsOfUseInvitations(*)(*)).thenReturn(successful(List(invite)))
-      val result = await(underTest.searchTermsOfUseInvitations(Seq("status" -> "EMAIL_SENT")))
+      val invite = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent, "app name")
+      when(mockSubmissionsConnector.searchTermsOfUseInvitations(*)(using *)).thenReturn(successful(List(invite)))
+      val result = await(underTest.searchTermsOfUseInvitations(Seq("status" -> "EmailSent")))
       result shouldBe List(invite)
     }
   }
 
   "grantWithWarningsOrDeclineForTouUplift" should {
     "call submission connector correctly with a Failed submission" in new Setup {
-      when(mockSubmissionsConnector.declineForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
+      when(mockSubmissionsConnector.declineForTouUplift(eqTo(applicationId), *, *)(using *)).thenReturn(successful(Right(app)))
       val result = await(underTest.grantWithWarningsOrDeclineForTouUplift(applicationId, failedSubmission, "requestedBy", "reasons"))
       result shouldBe Right(app)
     }
 
     "call submission connector correctly with a Warnings submission" in new Setup {
-      when(mockSubmissionsConnector.grantWithWarningsForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
+      when(mockSubmissionsConnector.grantWithWarningsForTouUplift(eqTo(applicationId), *, *)(using *)).thenReturn(successful(Right(app)))
       val result = await(underTest.grantWithWarningsOrDeclineForTouUplift(applicationId, warningsSubmission, "requestedBy", "reasons"))
       result shouldBe Right(app)
     }
@@ -141,7 +141,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
   "grantForTouUplift" should {
     "call submission connector correctly" in new Setup {
       val cmd    = ApplicationCommands.GrantTermsOfUseApproval(requestedBy, instant, "reasons", Some("Mr Supervisor"))
-      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(*)).thenReturn(successful(Right(DispatchSuccessResult(app))))
+      when(mockApplicationCommandConnector.dispatch(eqTo(applicationId), eqTo(cmd), eqTo(Set.empty))(using *)).thenReturn(successful(Right(DispatchSuccessResult(app))))
       val result = await(underTest.grantForTouUplift(applicationId, requestedBy, "reasons", Some("Mr Supervisor")))
       result shouldBe Right(DispatchSuccessResult(app))
     }
@@ -149,7 +149,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "resetForTouUplift" should {
     "call submission connector correctly" in new Setup {
-      when(mockSubmissionsConnector.resetForTouUplift(eqTo(applicationId), *, *)(*)).thenReturn(successful(Right(app)))
+      when(mockSubmissionsConnector.resetForTouUplift(eqTo(applicationId), *, *)(using *)).thenReturn(successful(Right(app)))
       val result = await(underTest.resetForTouUplift(applicationId, "requestedBy", "reasons"))
       result shouldBe Right(app)
     }
@@ -157,7 +157,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData
 
   "deleteTouUplift" should {
     "call submission connector correctly" in new Setup {
-      when(mockSubmissionsConnector.deleteTouUplift(eqTo(applicationId), *)(*)).thenReturn(successful(Right(app)))
+      when(mockSubmissionsConnector.deleteTouUplift(eqTo(applicationId), *)(using *)).thenReturn(successful(Right(app)))
       val result = await(underTest.deleteTouUplift(applicationId, "requestedBy"))
       result shouldBe Right(app)
     }

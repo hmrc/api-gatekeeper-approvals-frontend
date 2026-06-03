@@ -18,7 +18,10 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
@@ -26,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
 
-trait ApplicationCommandConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait ApplicationCommandConnectorMockModule extends MockitoSugar {
 
   trait BaseApplicationCommandConnectorMock {
     val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
@@ -38,7 +41,7 @@ trait ApplicationCommandConnectorMockModule extends MockitoSugar with ArgumentMa
     object Dispatch {
 
       def thenReturn(app: ApplicationWithCollaborators) = {
-        when(aMock.dispatch(*[ApplicationId], *, *)(*)).thenReturn(DispatchSuccessResult(app).asSuccess)
+        when(aMock.dispatch(*[ApplicationId], *, *)(using *)).thenReturn(DispatchSuccessResult(app).asSuccess)
       }
     }
   }

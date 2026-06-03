@@ -50,12 +50,12 @@ class TermsOfUsePassedController @Inject() (
     termsOfUsePassedPage: TermsOfUsePassedPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   import TermsOfUsePassedController._
 
-  def answersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def answersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
@@ -76,14 +76,14 @@ class TermsOfUsePassedController @Inject() (
           )
         )
         .collect {
-          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail: _*))
+          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail*))
         }
 
     successful(
       Ok(
         termsOfUsePassedPage(
           TermsOfUsePassedController.ViewModel(
-            applicationId,
+            request.application.id,
             request.application.name,
             groupedPassedQuestionsIds,
             isDeleted

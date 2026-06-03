@@ -21,7 +21,10 @@ import scala.concurrent.Future
 
 import cats.data.OptionT
 import org.mockito.quality.Strictness
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -30,7 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.ApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 
-trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait ApplicationActionServiceMockModule extends MockitoSugar {
 
   trait BaseApplicationActionServiceMock {
     def aMock: ApplicationActionService
@@ -40,14 +43,16 @@ trait ApplicationActionServiceMockModule extends MockitoSugar with ArgumentMatch
       def thenReturn[A](application: ApplicationWithCollaborators) = {
         import cats.implicits._
 
-        when(aMock.process[A](eqTo(application.id), *)(*))
-          .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req)))
+        when(aMock.process[A](eqTo(application.id), *)(using *))
+          .thenAnswer( input => input match {
+            case (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req))
+          })
       }
 
       def thenNotFound[A]() = {
         import cats.implicits._
 
-        when(aMock.process[A](*[ApplicationId], *)(*))
+        when(aMock.process[A](*[ApplicationId], *)(using *))
           .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none)
       }
     }

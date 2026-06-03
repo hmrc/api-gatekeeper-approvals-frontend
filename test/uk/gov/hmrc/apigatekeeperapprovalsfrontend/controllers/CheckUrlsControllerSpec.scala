@@ -53,8 +53,8 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       .withAccess(standardAccess.withDesktopSoftware)
 
     def appWithData(
-        privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocations.InDesktopSoftware,
-        termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocations.InDesktopSoftware
+        privacyPolicyLocation: PrivacyPolicyLocation = PrivacyPolicyLocation.InDesktopSoftware,
+        termsAndConditionsLocation: TermsAndConditionsLocation = TermsAndConditionsLocation.InDesktopSoftware
       ) = {
       standardApp
         .withState(appStateTesting)
@@ -74,7 +74,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithData())
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -82,40 +82,40 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
 
     "return 200 for both privacy policy and t&c with URLs" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocations.Url("aurl"), TermsAndConditionsLocations.Url("aurl")))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl"), TermsAndConditionsLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
 
     "return 200 for only privacy policy in desktop" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocations.Url("aurl")))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
 
     "return 200 for only terms and conditions in desktop" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocations.Url("aurl")))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
 
     "return 200 for both being NoneProvided" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocations.NoneProvided, TermsAndConditionsLocations.NoneProvided))
+      ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.NoneProvided, TermsAndConditionsLocation.NoneProvided))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -126,7 +126,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -138,7 +138,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(noImportantSubData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -148,7 +148,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkUrlsPage(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -182,7 +182,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsAction(applicationIdOne)(fakeRequest)
+      val result = controller.checkUrlsAction(applicationIdOne)(using fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

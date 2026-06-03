@@ -34,7 +34,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
 object TermsOfUseInvitationController {
@@ -59,7 +59,9 @@ object TermsOfUseInvitationController {
       "failedStatus"                   -> optional(text),
       "termsOfUseV2WithWarningsStatus" -> optional(text),
       "termsOfUseV2Status"             -> optional(text)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(x =>
+      Some(x.emailSentStatus, x.overdueStatus, x.reminderEmailSentStatus, x.warningsStatus, x.failedStatus, x.termsOfUseV2WithWarningsStatus, x.termsOfUseV2Status)
+    )
   )
 }
 
@@ -72,8 +74,7 @@ class TermsOfUseInvitationController @Inject() (
     val submissionService: SubmissionService,
     val ldapAuthorisationService: LdapAuthorisationService,
     termsOfUsePage: TermsOfUsePage,
-    applicationService: ApplicationService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
   import TermsOfUseInvitationController._
 

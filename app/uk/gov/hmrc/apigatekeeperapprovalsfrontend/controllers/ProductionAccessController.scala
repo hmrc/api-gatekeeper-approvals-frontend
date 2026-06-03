@@ -56,14 +56,15 @@ class ProductionAccessController @Inject() (
     productionAccessPage: ProductionAccessPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
   import ProductionAccessController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName  = request.application.name
-    val instance = request.markedSubmission.submission.latestInstance
+  def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = ApplicationId(rawApplicationId)
+    val appName       = request.application.name
+    val instance      = request.markedSubmission.submission.latestInstance
 
     (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
       case (Granted(grantedTimestamp, grantedName, _, _), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                              =>
@@ -92,7 +93,7 @@ class ProductionAccessController @Inject() (
         ))))
       case _                                                                                                                                               =>
         logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
-        errorHandler.badRequestTemplate(request).map(BadRequest(_))
+        errorHandler.badRequestTemplate(using request).map(BadRequest(_))
     }
 
   }

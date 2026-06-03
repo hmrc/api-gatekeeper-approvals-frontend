@@ -50,7 +50,7 @@ class TermsOfUsePassedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.answersThatPassedPage(applicationId)(fakeRequest)
+      val result = controller.answersThatPassedPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -61,7 +61,7 @@ class TermsOfUsePassedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
-      val result = controller.answersThatPassedPage(applicationId)(fakeRequest)
+      val result = controller.answersThatPassedPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -72,7 +72,7 @@ class TermsOfUsePassedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.answersThatPassedPage(applicationId)(fakeRequest)
+      val result = controller.answersThatPassedPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -83,7 +83,7 @@ class TermsOfUsePassedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.answersThatPassedPage(applicationId)(fakeRequest)
+      val result = controller.answersThatPassedPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }

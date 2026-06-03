@@ -51,7 +51,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -103,7 +103,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeRequest)
+      val result = controller.action(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
@@ -129,7 +129,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.confirmationPage(applicationId)(fakeRequest)
+      val result = controller.confirmationPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }

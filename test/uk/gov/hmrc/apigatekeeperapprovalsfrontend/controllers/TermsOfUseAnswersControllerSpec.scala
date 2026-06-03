@@ -51,7 +51,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -61,7 +61,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -69,7 +69,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(applicationId)(using fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }

@@ -65,7 +65,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.listPage(applicationId)(fakeRequest)
+      val result = controller.listPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -78,7 +78,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.listPage(applicationId)(fakeRequest)
+      val result = controller.listPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -90,7 +90,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
 
-      val result = controller.listPage(applicationId)(fakeRequest)
+      val result = controller.listPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -100,7 +100,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.listPage(applicationId)(fakeRequest)
+      val result = controller.listPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -138,7 +138,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.answersWithWarningsOrFails(applicationId)(fakeRequest)
+      val result = controller.answersWithWarningsOrFails(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -150,7 +150,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.emailAddressesPage(applicationId)(fakeRequest)
+      val result = controller.emailAddressesPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) shouldNot include("LaxEmailAddress")
@@ -165,7 +165,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       SubmissionServiceMock.GrantWithWarningsOrDeclineForTouUplift.thenReturn(applicationId, application)
 
-      val result = controller.emailAddressesAction(applicationId)(fakeRequest)
+      val result = controller.emailAddressesAction(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId).url
@@ -178,7 +178,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.failOverridePage(applicationId)(fakeRequest)
+      val result = controller.failOverridePage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -220,7 +220,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.overrideApproverPage(applicationId)(fakeRequest)
+      val result = controller.overrideApproverPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -258,7 +258,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.overrideNotesPage(applicationId)(fakeRequest)
+      val result = controller.overrideNotesPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -298,7 +298,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturn(review)
 
-      val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
+      val result = controller.overrideConfirmPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -309,7 +309,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturnNone()
 
-      val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
+      val result = controller.overrideConfirmPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -320,7 +320,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturn(submissionReview)
 
-      val result = controller.overrideConfirmPage(applicationId)(fakeRequest)
+      val result = controller.overrideConfirmPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -335,7 +335,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionReviewServiceMock.FindReview.thenReturn(review)
       SubmissionServiceMock.GrantForTouUplift.thenReturn(applicationId, application)
 
-      val result = controller.overrideConfirmAction(applicationId)(fakeRequest)
+      val result = controller.overrideConfirmAction(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId).url
@@ -348,7 +348,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.confirmationPage(applicationId)(fakeRequest)
+      val result = controller.confirmationPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }

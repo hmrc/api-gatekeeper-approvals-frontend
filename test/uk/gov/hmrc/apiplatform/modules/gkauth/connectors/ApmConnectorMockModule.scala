@@ -18,7 +18,10 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
 import scala.concurrent.Future.successful
 
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
@@ -26,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApmConnector
 
-trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationWithCollaboratorsFixtures {
+trait ApmConnectorMockModule extends MockitoSugar with ApplicationWithCollaboratorsFixtures {
 
   trait BaseApmConnectorMock {
     def aMock: ApmConnector
@@ -34,14 +37,14 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar wit
     object FetchLinkedSubordinateApplicationById {
 
       def thenReturn(subordinateApplicationId: ApplicationId) =
-        when(aMock.fetchLinkedSubordinateApplicationById(*[ApplicationId])(*)).thenReturn(successful(Some(standardApp.withId(subordinateApplicationId))))
+        when(aMock.fetchLinkedSubordinateApplicationById(*[ApplicationId])(using *)).thenReturn(successful(Some(standardApp.withId(subordinateApplicationId))))
     }
 
     object FetchSubscribableApisForApplication {
 
       def thenReturn(apiDefinitions: List[ApiDefinition]) =
-        when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(apiDefinitions))
-      def thenReturnNothing                               = when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(*)).thenReturn(successful(List()))
+        when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(using *)).thenReturn(successful(apiDefinitions))
+      def thenReturnNothing                               = when(aMock.fetchSubscribableApisForApplication(*[ApplicationId])(using *)).thenReturn(successful(List()))
     }
   }
 

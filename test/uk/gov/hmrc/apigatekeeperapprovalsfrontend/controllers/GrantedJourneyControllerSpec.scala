@@ -52,7 +52,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.provideWarningsPage(applicationId)(fakeRequest)
+      val result = controller.provideWarningsPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -62,7 +62,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideWarningsPage(applicationId)(fakeRequest)
+      val result = controller.provideWarningsPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }
@@ -91,7 +91,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
       SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
 
-      val result = controller.provideWarningsAction(applicationId)(fakeRequest)
+      val result = controller.provideWarningsAction(applicationId)(using fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -103,7 +103,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
+      val result = controller.provideEscalatedToPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -113,7 +113,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
+      val result = controller.provideEscalatedToPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }
@@ -139,7 +139,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.provideEscalatedToAction(applicationId)(fakeRequest)
+      val result = controller.provideEscalatedToAction(applicationId)(using fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -151,7 +151,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.grantedPage(applicationId)(fakeRequest)
+      val result = controller.grantedPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -161,7 +161,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.grantedPage(applicationId)(fakeRequest)
+      val result = controller.grantedPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }

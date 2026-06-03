@@ -18,6 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiContext, ApiVersionNbr}
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition.Description
 
 trait ApiDataTestData {
 
@@ -27,17 +28,17 @@ trait ApiDataTestData {
       context: String
     ) = ApiDefinition(
     ServiceName(serviceName),
-    serviceBaseUrl = s"https://$serviceName.protected.mdtp",
-    name,
-    description = name,
+    serviceBaseUrl = ApiDefinition.ServiceBaseUrl(s"https://$serviceName.protected.mdtp"),
+    ApiDefinition.Name(name),
+    description = Description(name),
     ApiContext(context),
     Map(
       ApiVersionNbr("1.0") ->
         ApiVersion(
           ApiVersionNbr("1.0"),
-          ApiStatus.STABLE,
-          ApiAccessType.PUBLIC,
-          List(Endpoint("/sa/{utr}/status", s"Get $serviceName", HttpMethod.GET, AuthType.USER)),
+          ApiStatus.Stable,
+          ApiAccessType.Public,
+          List(Endpoint(Endpoint.UriPattern("/sa/{utr}/status"), Endpoint.Name(s"Get $serviceName"), HttpMethod.Get, AuthType.User, throttlingTier = ResourceThrottlingTier.Unlimited, scope = None, queryParameters = List.empty)),
           endpointsEnabled = true,
           None,
           ApiVersionSource.OAS
@@ -46,7 +47,7 @@ trait ApiDataTestData {
     isTestSupport = false,
     lastPublishedAt = None,
     List(
-      ApiCategory.SELF_ASSESSMENT
+      ApiCategory.SelfAssessment
     )
   )
 }

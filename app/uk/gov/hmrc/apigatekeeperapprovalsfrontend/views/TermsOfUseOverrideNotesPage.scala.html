@@ -28,7 +28,7 @@
 
   @ErrorSummary(form)
   
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesAction(model.applicationId), Symbol("class") -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesAction(model.applicationId.value), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <span class="govuk-caption-l">@model.appName</span>
@@ -41,7 +41,7 @@
       @{messages("termsofuseoverridenotes.note.1")} <a href="https://confluence.tools.tax.service.gov.uk/display/SDC/DRM+Terms+of+Use+guidance" target="_" class="govuk-link govuk-link--no-visited-state">@{messages("termsofuseoverridenotes.confluence.url")}</a>.
     </div>
     <div id="notes-hint2" class="govuk-hint">
-      @{messages("termsofuseoverridenotes.note.2")} <a href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.answersWithWarningsOrFails(model.applicationId).url} target="_" class="govuk-link govuk-link--no-visited-state">@{messages("termsofuseoverridenotes.fails.url")}</a>.
+      @{messages("termsofuseoverridenotes.note.2")} <a href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.answersWithWarningsOrFails(model.applicationId.value).url} target="_" class="govuk-link govuk-link--no-visited-state">@{messages("termsofuseoverridenotes.fails.url")}</a>.
     </div>
     <textarea class="govuk-textarea @if(form.errors("notes").nonEmpty) {govuk-textarea--error}" id="notes" name="notes" rows="5" aria-describedby="notes-hint">@form.data.get("notes")</textarea>
 

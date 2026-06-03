@@ -14,4 +14,6 @@ addSbtPlugin("org.scalameta"       % "sbt-scalafmt"          % "2.5.6")
 addSbtPlugin("ch.epfl.scala"       % "sbt-scalafix"          % "0.14.6")
 addSbtPlugin("ch.epfl.scala"       % "sbt-bloop"             % "2.0.19")
 
+addDependencyTreePlugin
+
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always

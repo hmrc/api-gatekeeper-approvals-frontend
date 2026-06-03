@@ -48,16 +48,17 @@ class TermsOfUseDeleteController @Inject() (
     termsOfUseConfirmPage: TermsOfUseDeleteConfirmationPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   import TermsOfUseDeleteController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    successful(Ok(termsOfUseDeletePage(ViewModel(applicationId, request.application.name))))
+  def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseDeletePage(ViewModel(request.application.id, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val applicationId      = ApplicationId(rawApplicationId)
     def deleteSubmission() = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -66,7 +67,7 @@ class TermsOfUseDeleteController @Inject() (
           err
         ).map(BadRequest(_))
 
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(applicationId))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(applicationId.value))
 
       val E = EitherTHelper.make[String]
 
@@ -78,11 +79,11 @@ class TermsOfUseDeleteController @Inject() (
 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("tou-delete").flatMap(_.headOption) match {
       case Some("yes") => deleteSubmission()
-      case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId)))
+      case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId.value)))
     }
   }
 
-  def confirmationPage(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
+  def confirmationPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseConfirmPage(ViewModel(request.application.id, request.application.name))))
   }
 }

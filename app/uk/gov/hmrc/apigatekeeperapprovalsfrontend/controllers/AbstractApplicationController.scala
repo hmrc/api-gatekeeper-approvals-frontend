@@ -33,8 +33,7 @@ abstract class AbstractApplicationController(
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     val errorHandler: ErrorHandler
-  )(implicit override val ec: ExecutionContext
-  ) extends GatekeeperBaseController(strideAuthorisationService, mcc)
+  )(implicit ec: ExecutionContext) extends GatekeeperBaseController(strideAuthorisationService, mcc)
     with GatekeeperStrideRoleWithApplicationActions
     with EitherTHelper[Result]
     with ApplicationLogger {

@@ -47,7 +47,7 @@ object TermsOfUseNotesController {
   val provideNotesForm: Form[ProvideNotesForm] = Form(
     mapping(
       "notes" -> nonEmptyText
-    )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
+    )(ProvideNotesForm.apply)(x => Some(x.notes))
   )
 }
 
@@ -59,16 +59,18 @@ class TermsOfUseNotesController @Inject() (
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService,
     termsOfUseNotesPage: TermsOfUseNotesPage
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
   import TermsOfUseNotesController._
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
+  def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = ApplicationId(rawApplicationId)
+
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(errs: NonEmptyList[CommandFailure]) =
         errorHandler.standardErrorTemplate(
@@ -77,7 +79,7 @@ class TermsOfUseNotesController @Inject() (
           errs.toList.map(error => CommandFailures.describe(error)).mkString(", ")
         ).map(BadRequest(_))
 
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId.value))
 
       val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
 

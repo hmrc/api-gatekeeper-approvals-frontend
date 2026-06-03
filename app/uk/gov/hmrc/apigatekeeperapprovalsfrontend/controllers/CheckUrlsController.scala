@@ -57,13 +57,14 @@ class CheckUrlsController @Inject() (
     checkUrlsPage: CheckUrlsPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkUrlsPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
-      case std @ Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
+      case _ @ Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
         val isDeleted = request.application.state.isDeleted
         successful(
           Ok(
@@ -83,6 +84,6 @@ class CheckUrlsController @Inject() (
     }
   }
 
-  def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckUrls)(applicationId)
+  def checkUrlsAction(rawApplicationId: java.util.UUID): Action[AnyContent] =
+    updateActionStatus(SubmissionReview.Action.CheckUrls)(rawApplicationId)
 }

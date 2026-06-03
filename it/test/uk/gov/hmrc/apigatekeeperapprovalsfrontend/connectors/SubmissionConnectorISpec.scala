@@ -29,13 +29,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.TouUpliftRequest
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EmailSent
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
-
-class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
+class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with MarkedSubmissionsTestData {
 
   import Submission._
 
@@ -61,8 +59,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     val requestedBy                = "bob@blockbusters.com"
     val reason                     = "reason"
     val escalatedTo                = "Mr Edmund Blackadder"
-    val invitation                 = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
-    val invitationWithApp          = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "Petes app")
+    val invitation                 = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent)
+    val invitationWithApp          = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent, "Petes app")
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
@@ -224,12 +222,12 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "search terms of use invitations" should {
-    val url = "/terms-of-use/search?status=EMAIL_SENT"
+    val url = "/terms-of-use/search?status=EmailSent"
 
     "return an invitation" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-          .withQueryParam("status", equalTo("EMAIL_SENT"))
+          .withQueryParam("status", equalTo("EmailSent"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -237,7 +235,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EMAIL_SENT")))
+      val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EmailSent")))
 
       result.size shouldBe 1
       result.head.applicationId shouldBe invitation.applicationId
@@ -246,7 +244,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "return empty list if no invitations found" in new Setup {
       stubFor(
         get(urlEqualTo(url))
-          .withQueryParam("status", equalTo("EMAIL_SENT"))
+          .withQueryParam("status", equalTo("EmailSent"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -254,7 +252,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
           )
       )
 
-      val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EMAIL_SENT")))
+      val result = await(connector.searchTermsOfUseInvitations(Seq("status" -> "EmailSent")))
 
       result.size shouldBe 0
     }

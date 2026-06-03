@@ -51,12 +51,14 @@ class CheckAnswersThatPassedController @Inject() (
     checkAnswersThatPassedPage: CheckAnswersThatPassedPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   import CheckAnswersThatPassedController._
 
-  def checkAnswersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkAnswersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val applicationId = request.application.id
+
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
@@ -77,7 +79,7 @@ class CheckAnswersThatPassedController @Inject() (
           )
         )
         .collect {
-          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail: _*))
+          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail*))
         }
 
     successful(
@@ -94,5 +96,5 @@ class CheckAnswersThatPassedController @Inject() (
     )
   }
 
-  def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckPassedAnswers)(applicationId)
+  def checkAnswersThatPassedAction(rawApplicationId: java.util.UUID): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckPassedAnswers)(rawApplicationId)
 }

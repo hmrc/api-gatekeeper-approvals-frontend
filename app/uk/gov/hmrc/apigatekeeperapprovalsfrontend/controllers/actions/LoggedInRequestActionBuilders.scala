@@ -37,14 +37,14 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   protected def roleWithApplication(
       refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
     )(
-      applicationId: ApplicationId
+      rawApplicationId: java.util.UUID
     )(
       block: ApplicationRequest[AnyContent] => Future[Result]
     ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-          applicationRequestRefiner(applicationId)
+          applicationRequestRefiner(ApplicationId(rawApplicationId))
       )
         .invokeBlock(request, block)
     }
@@ -52,14 +52,14 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   protected def roleWithApplicationAndSubmission(
       refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
     )(
-      applicationId: ApplicationId
+      rawApplicationId: java.util.UUID
     )(
       block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]
     ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-          applicationRequestRefiner(applicationId) andThen
+          applicationRequestRefiner(ApplicationId(rawApplicationId)) andThen
           applicationSubmissionRefiner
       )
         .invokeBlock(request, block)
@@ -68,7 +68,7 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   protected def roleWithApplicationAndSubmissionAndInstance(
       refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
     )(
-      applicationId: ApplicationId,
+      rawApplicationId: java.util.UUID,
       index: Int
     )(
       block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]
@@ -76,7 +76,7 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
     Action.async { implicit request =>
       (
         refiner andThen
-          applicationRequestRefiner(applicationId) andThen
+          applicationRequestRefiner(ApplicationId(rawApplicationId)) andThen
           applicationSubmissionRefiner andThen
           submissionInstanceRefiner(index)
       )

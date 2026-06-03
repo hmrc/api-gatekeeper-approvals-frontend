@@ -54,16 +54,16 @@ class SubmittedAnswersController @Inject() (
     submittedAnswersPage: SubmittedAnswersPage,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
-  )(implicit override val ec: ExecutionContext
+  )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
 
   import SubmittedAnswersController._
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
+  def page(rawApplicationId: java.util.UUID, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(rawApplicationId, index) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
     val instance   = request.instance
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, request.application.id, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
   }
 }

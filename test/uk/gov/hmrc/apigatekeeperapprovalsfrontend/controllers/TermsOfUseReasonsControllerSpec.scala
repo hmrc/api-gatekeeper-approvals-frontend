@@ -51,7 +51,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -61,7 +61,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(applicationId)(using fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }

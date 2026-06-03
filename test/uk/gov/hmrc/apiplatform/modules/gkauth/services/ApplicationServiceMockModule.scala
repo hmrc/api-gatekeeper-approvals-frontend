@@ -20,7 +20,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
 
 import org.mockito.quality.Strictness
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaborators, ApplicationWithCollaboratorsFixtures}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
@@ -28,7 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxE
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 
-trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationWithCollaboratorsFixtures {
+trait ApplicationServiceMockModule extends MockitoSugar with ApplicationWithCollaboratorsFixtures {
 
   trait BaseApplicationServiceMock {
     val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
@@ -41,23 +44,23 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
 
       def thenReturn(applicationId: ApplicationId) = {
         val response = Some(standardApp.withId(applicationId))
-        when(aMock.fetchByApplicationId(eqTo(applicationId))(*)).thenReturn(successful(response))
+        when(aMock.fetchByApplicationId(eqTo(applicationId))(using *)).thenReturn(successful(response))
       }
 
       def thenNotFound() = {
-        when(aMock.fetchByApplicationId(*[ApplicationId])(*)).thenReturn(successful(None))
+        when(aMock.fetchByApplicationId(*[ApplicationId])(using *)).thenReturn(successful(None))
       }
     }
 
     object FetchLinkedSubordinateApplicationByApplicationId {
 
       def thenReturn(subordinateApplicationId: ApplicationId) = {
-        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
+        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(using *))
           .thenReturn(successful(Some(standardApp.withId(subordinateApplicationId))))
       }
 
       def thenReturnNone() = {
-        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(*))
+        when(aMock.fetchLinkedSubordinateApplicationByApplicationId(*[ApplicationId])(using *))
           .thenReturn(successful(None))
       }
     }
@@ -65,13 +68,13 @@ trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSug
     object DeclineApplicationApprovalRequest {
 
       def thenReturnSuccess() = {
-        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *, *[Set[LaxEmailAddress]])(*)).thenReturn(DispatchSuccessResult(
+        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *, *[Set[LaxEmailAddress]])(using *)).thenReturn(DispatchSuccessResult(
           mock[ApplicationWithCollaborators]
         ).asSuccess)
       }
 
       def thenReturnFailure() = {
-        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *, *)(*)).thenThrow(new RuntimeException("Application id not found"))
+        when(aMock.declineApplicationApprovalRequest(*[ApplicationId], *, *, *)(using *)).thenThrow(new RuntimeException("Application id not found"))
       }
     }
   }

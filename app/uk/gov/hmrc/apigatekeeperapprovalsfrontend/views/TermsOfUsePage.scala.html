@@ -20,13 +20,13 @@
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(form: Form[FilterForm], viewModels: List[ViewModel])(implicit request: LoggedInRequest[_], messages: Messages)
+@(form: Form[FilterForm], viewModels: List[ViewModel])(implicit request: LoggedInRequest[?], messages: Messages)
 
 @buildStatus(status: String) = @{
   status.toUpperCase() match {
     case "EMAIL SENT"                     => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
     case "REMINDER EMAIL SENT"            => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
-    case "OVERDUE"                        => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
+    case "Overdue"                        => <strong class="govuk-tag govuk-tag--blue">{status}</strong>
     case "WARNINGS"                       => <strong class="govuk-tag govuk-tag--yellow">{status}</strong>
     case "FAILED"                         => <strong class="govuk-tag govuk-tag--red">{status}</strong>
     case "TERMS OF USE V2"                => <strong class="govuk-tag govuk-tag--purple">{status}</strong>
@@ -156,7 +156,7 @@
         @for(model <- viewModels) {
           <tr class="govuk-table__row">
             <td class="govuk-table__cell">
-              <a class="govuk-link govuk-link--no-visited-state" href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(model.applicationId).url}>@{model.applicationName}</a>
+              <a class="govuk-link govuk-link--no-visited-state" href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(model.applicationId.value).url}>@{model.applicationName}</a>
             </td>
             <td class="govuk-table__cell">@{model.lastUpdated}</td>
             <td class="govuk-table__cell govuk-!-text-align-right">
