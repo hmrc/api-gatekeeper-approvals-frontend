@@ -24,7 +24,7 @@ import cats.data.OptionT
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.repositories.SubmissionReviewRepo
 
 @Singleton
@@ -87,7 +87,7 @@ class SubmissionReviewService @Inject() (
       .value
   }
 
-  def updateActionStatus(action: SubmissionReview.Action, newStatus: SubmissionReview.Status)(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def updateActionStatus(action: ReviewAction, newStatus: ReviewStatus)(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
     (
       for {
         originalReview <- OptionT(repo.find(submissionId, instanceIndex))

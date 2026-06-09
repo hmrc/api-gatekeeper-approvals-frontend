@@ -23,7 +23,7 @@ import scala.concurrent.Future.successful
 import cats.data.NonEmptyList
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 

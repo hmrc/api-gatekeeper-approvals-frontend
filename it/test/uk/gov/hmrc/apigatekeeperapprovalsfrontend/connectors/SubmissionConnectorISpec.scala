@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.TouUpliftRequest
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EmailSent
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
 
@@ -59,8 +59,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     val requestedBy                = "bob@blockbusters.com"
     val reason                     = "reason"
     val escalatedTo                = "Mr Edmund Blackadder"
-    val invitation                 = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent)
-    val invitationWithApp          = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent, "Petes app")
+    val invitation                 = TermsOfUseInvitation(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT)
+    val invitationWithApp          = TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "Petes app")
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
@@ -135,7 +135,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   "invite application for terms of use" should {
     val url = s"/terms-of-use/application/${applicationId.value}"
 
-    "return TermsOfUseInvitationSuccessful on success" in new Setup {
+    "return unit on success" in new Setup {
       stubFor(
         post(urlEqualTo(url))
           .willReturn(
@@ -145,8 +145,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
       )
 
       await(connector.termsOfUseInvite(applicationId)) match {
-        case Right(_: TermsOfUseInvitationSuccessful) => succeed
-        case _                                        => fail()
+        case Right((Unit)) => succeed
+        case _             => fail()
       }
 
     }

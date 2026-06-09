@@ -22,7 +22,6 @@ import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
-
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.applications.query.domain.models.ApplicationQuery
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -41,7 +40,7 @@ trait ThirdPartyApplicationConnectorMockModule extends MockitoSugar with FixedCl
         when(aMock.fetchApplicationById(*[ApplicationId])(using *)).thenAnswer((appId: ApplicationId) =>
           successful(Some(ApplicationWithCollaborators(CoreApplicationData.Standard.one.copy(id = appId, state = ApplicationStateData.testing), Set.empty)))
         )
-      }
+      } 
     }
 
     object Query {

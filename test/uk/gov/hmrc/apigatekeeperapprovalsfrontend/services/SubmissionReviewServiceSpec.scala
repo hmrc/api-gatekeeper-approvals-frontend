@@ -67,12 +67,12 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       SubmissionReviewRepoMock.Find.thenReturn(hasFailsReview)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings, SubmissionReview.Status.InProgress)(
+      val result = await(underTest.updateActionStatus(ReviewAction.CheckFailsAndWarnings, ReviewStatus.InProgress)(
         hasFailsReview.submissionId,
         hasFailsReview.instanceIndex
       ))
 
-      result.value.requiredActions(SubmissionReview.Action.CheckFailsAndWarnings) shouldBe SubmissionReview.Status.InProgress
+      result.value.requiredActions(ReviewAction.CheckFailsAndWarnings) shouldBe ReviewStatus.InProgress
     }
 
     "set correct status in SubmissionReview for arrangedDemo" in new Setup {
@@ -80,9 +80,9 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       SubmissionReviewRepoMock.Update.thenReturn()
 
       val result =
-        await(underTest.updateActionStatus(SubmissionReview.Action.ArrangedDemo, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
+        await(underTest.updateActionStatus(ReviewAction.ArrangedDemo, ReviewStatus.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
 
-      result.value.requiredActions(SubmissionReview.Action.ArrangedDemo) shouldBe SubmissionReview.Status.InProgress
+      result.value.requiredActions(ReviewAction.ArrangedDemo) shouldBe ReviewStatus.InProgress
     }
 
     "set correct status in SubmissionReview for checkedUrls" in new Setup {
@@ -90,21 +90,21 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       SubmissionReviewRepoMock.Update.thenReturn()
 
       val result =
-        await(underTest.updateActionStatus(SubmissionReview.Action.CheckUrls, SubmissionReview.Status.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
+        await(underTest.updateActionStatus(ReviewAction.CheckUrls, ReviewStatus.InProgress)(submissionReview.submissionId, submissionReview.instanceIndex))
 
-      result.value.requiredActions(SubmissionReview.Action.CheckUrls) shouldBe SubmissionReview.Status.InProgress
+      result.value.requiredActions(ReviewAction.CheckUrls) shouldBe ReviewStatus.InProgress
     }
 
     "set correct status in SubmissionReview for checkedForSandboxTesting" in new Setup {
       SubmissionReviewRepoMock.Find.thenReturn(submissionReview)
       SubmissionReviewRepoMock.Update.thenReturn()
 
-      val result = await(underTest.updateActionStatus(SubmissionReview.Action.CheckSandboxTesting, SubmissionReview.Status.InProgress)(
+      val result = await(underTest.updateActionStatus(ReviewAction.CheckSandboxTesting, ReviewStatus.InProgress)(
         submissionReview.submissionId,
         submissionReview.instanceIndex
       ))
 
-      result.value.requiredActions(SubmissionReview.Action.CheckSandboxTesting) shouldBe SubmissionReview.Status.InProgress
+      result.value.requiredActions(ReviewAction.CheckSandboxTesting) shouldBe ReviewStatus.InProgress
     }
 
     "set correct status in SubmissionReview for checkedPassedAnswers" in new Setup {
@@ -113,9 +113,9 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec {
       SubmissionReviewRepoMock.Update.thenReturn()
 
       val result =
-        await(underTest.updateActionStatus(SubmissionReview.Action.CheckPassedAnswers, SubmissionReview.Status.InProgress)(passedReview.submissionId, passedReview.instanceIndex))
+        await(underTest.updateActionStatus(ReviewAction.CheckPassedAnswers, ReviewStatus.InProgress)(passedReview.submissionId, passedReview.instanceIndex))
 
-      result.value.requiredActions(SubmissionReview.Action.CheckPassedAnswers) shouldBe SubmissionReview.Status.InProgress
+      result.value.requiredActions(ReviewAction.CheckPassedAnswers) shouldBe ReviewStatus.InProgress
     }
   }
 

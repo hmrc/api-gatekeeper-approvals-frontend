@@ -13,7 +13,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"      % playfrontendVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"              % mongoVersion,
     "org.typelevel"     %% "cats-core"                       % "2.13.0",
-    "uk.gov.hmrc"       %% "internal-auth-client-play-30"    % "4.4.0",
+    "uk.gov.hmrc"       %% "internal-auth-client-play-30"    % "4.3.0",
     "uk.gov.hmrc"       %% "api-platform-application-domain" % appDomainVersion,
     "uk.gov.hmrc"       %% "api-platform-api-domain"         % apiDomainVersion
   )

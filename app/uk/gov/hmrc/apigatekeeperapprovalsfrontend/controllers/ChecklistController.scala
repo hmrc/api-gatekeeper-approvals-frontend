@@ -22,14 +22,14 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apiplatform.modules.submissions.services._
+import uk.gov.hmrc.apiplatform.modules.submissions.services.*
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresDemo, SubmissionRequiresFraudCheck}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
@@ -39,7 +39,7 @@ object ChecklistController {
   case class ChecklistSection(titleMsgId: String, items: List[ChecklistItem]) {
     lazy val isEmpty = items.isEmpty
   }
-  case class ChecklistItem(labelMsgId: String, url: String, uid: String, status: SubmissionReview.Status)
+  case class ChecklistItem(labelMsgId: String, url: String, uid: String, status: ReviewStatus)
   case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, topMsgId: String, sections: List[ChecklistSection], isInHouseSoftware: Boolean, isDeleted: Boolean)
 }
 
@@ -57,7 +57,7 @@ class ChecklistController @Inject() (
   import ChecklistController._
   import Implicits._
 
-  type RequiredActions = Map[SubmissionReview.Action, SubmissionReview.Status]
+  type RequiredActions = Map[ReviewAction, ReviewStatus]
 
   object AutomaticChecksResult extends Enumeration {
     type AutomaticChecksResult = Value
@@ -95,7 +95,7 @@ class ChecklistController @Inject() (
 
     for {
       review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
-      sections = buildChecklistSections(applicationId, review.requiredActions, automaticChecksResult)
+      sections = buildChecklistSections(applicationId, review.requiredActions.toMap, automaticChecksResult)
     } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, sections, isInHouseSoftware, isDeleted)))
   }
 
@@ -154,7 +154,7 @@ class ChecklistController @Inject() (
       labelMsgId: String,
       urlFn: ApplicationId => String,
       uid: String,
-      action: SubmissionReview.Action
+      action: ReviewAction
     )(
       applicationId: ApplicationId,
       requiredActions: RequiredActions
@@ -166,63 +166,63 @@ class ChecklistController @Inject() (
     "checklist.checkwarnings.linktext",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(id.value).url,
     "checkwarnings",
-    SubmissionReview.Action.CheckFailsAndWarnings
+    ReviewAction.CheckFailsAndWarnings
   )
 
   private def buildCheckFailuresAndWarningsItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkfailed.linktext",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(id.value).url,
     "checkfailed",
-    SubmissionReview.Action.CheckFailsAndWarnings
+    ReviewAction.CheckFailsAndWarnings
   )
 
   private def buildCheckApplicationNameItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.name",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckApplicationNameController.page(id.value).url,
     "checkname",
-    SubmissionReview.Action.CheckApplicationName
+    ReviewAction.CheckApplicationName
   )
 
   private def buildCheckCompanyRegistrationItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.company",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.page(id.value).url,
     "checkcompany",
-    SubmissionReview.Action.CheckCompanyRegistration
+    ReviewAction.CheckCompanyRegistration
   )
 
   private def buildCheckUrlsItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.urls",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(id.value).url,
     "checkurls",
-    SubmissionReview.Action.CheckUrls
+    ReviewAction.CheckUrls
   )
 
   private def buildCheckSandboxTestingItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.sandbox",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckSandboxController.checkSandboxPage(id.value).url,
     "checksandbox",
-    SubmissionReview.Action.CheckSandboxTesting
+    ReviewAction.CheckSandboxTesting
   )
 
   private def buildCheckFraudItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.fraud",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudPage(id.value).url,
     "checkfraud",
-    SubmissionReview.Action.CheckFraudPreventionData
+    ReviewAction.CheckFraudPreventionData
   )
 
   private def buildArrangeDemoItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.demo",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ArrangeDemoController.page(id.value).url,
     "arrangedemo",
-    SubmissionReview.Action.ArrangedDemo
+    ReviewAction.ArrangedDemo
   )
 
   private def buildAnswersThatPassedItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkpassed.linktext",
     (id) => uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(id.value).url,
     "checkpassed",
-    SubmissionReview.Action.CheckPassedAnswers
+    ReviewAction.CheckPassedAnswers
   )
 
 }

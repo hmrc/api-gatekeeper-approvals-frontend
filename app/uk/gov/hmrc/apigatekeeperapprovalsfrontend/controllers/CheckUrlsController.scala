@@ -23,14 +23,14 @@ import scala.concurrent.Future.successful
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckUrlsPage
 
@@ -64,7 +64,7 @@ class CheckUrlsController @Inject() (
     val applicationId = request.application.id
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
-      case _ @ Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
+      case _ @Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
         val isDeleted = request.application.state.isDeleted
         successful(
           Ok(
@@ -80,10 +80,10 @@ class CheckUrlsController @Inject() (
             )
           )
         )
-      case _                                                                      => errorHandler.badRequestTemplate.map(BadRequest(_))
+      case _                                                                   => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 
   def checkUrlsAction(rawApplicationId: java.util.UUID): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckUrls)(rawApplicationId)
+    updateActionStatus(ReviewAction.CheckUrls)(rawApplicationId)
 }

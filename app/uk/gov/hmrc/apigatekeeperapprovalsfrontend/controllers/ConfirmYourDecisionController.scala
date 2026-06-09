@@ -22,9 +22,9 @@ import scala.concurrent.Future.successful
 
 import cats.data.{EitherT, NonEmptyList}
 
-import play.api.mvc.{MessagesControllerComponents, _}
+import play.api.mvc.{MessagesControllerComponents, *}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -79,7 +79,7 @@ class ConfirmYourDecisionController @Inject() (
     (
       for {
         _ <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
-        _      <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(handleCommandFailures)
+        _ <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(handleCommandFailures)
       } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId.value).url)
     ).fold(identity(_), identity(_))
   }

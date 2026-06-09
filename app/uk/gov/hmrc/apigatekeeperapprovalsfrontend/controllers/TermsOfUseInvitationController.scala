@@ -22,19 +22,19 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.MessagesControllerComponents
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitationState, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
 object TermsOfUseInvitationController {
@@ -73,7 +73,7 @@ class TermsOfUseInvitationController @Inject() (
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService,
     val ldapAuthorisationService: LdapAuthorisationService,
-    termsOfUsePage: TermsOfUsePage,
+    termsOfUsePage: TermsOfUsePage
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
   import TermsOfUseInvitationController._

@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.services
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
 
-import org.mockito.ArgumentMatchers.{any as `*`}
+import org.mockito.ArgumentMatchers.any as `*`
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 

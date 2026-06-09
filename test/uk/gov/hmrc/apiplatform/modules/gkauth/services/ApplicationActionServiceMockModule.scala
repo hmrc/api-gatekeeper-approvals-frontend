@@ -25,7 +25,6 @@ import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
-
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
@@ -44,9 +43,11 @@ trait ApplicationActionServiceMockModule extends MockitoSugar {
         import cats.implicits._
 
         when(aMock.process[A](eqTo(application.id), *)(using *))
-          .thenAnswer( input => input match {
-            case (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req))
-          })
+          .thenAnswer(input =>
+            input match {
+              case (a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req))
+            }
+          )
       }
 
       def thenNotFound[A]() = {

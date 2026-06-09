@@ -55,6 +55,11 @@ lazy val microservice = Project(appName, file("."))
       "-Wconf:msg=unused import&src=html/.*:s"
     )
   )
+  .settings(
+    scalacOptions ++= Seq(
+      "-Ydebug"
+    )
+  )
 
 lazy val it = (project in file("it"))
   .enablePlugins(PlayScala)

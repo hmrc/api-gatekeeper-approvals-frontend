@@ -26,7 +26,6 @@ import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
-
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailures, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -226,11 +225,11 @@ trait SubmissionServiceMockModule extends MockitoSugar with MarkedSubmissionsTes
 
       def thenReturn() = {
         val response = List(
-          TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EmailSent, "app name 1"),
+          TermsOfUseInvitationWithApplication(applicationId, Instant.now, Instant.now, Instant.now, None, EMAIL_SENT, "app name 1"),
           TermsOfUseInvitationWithApplication(applicationIdTwo, Instant.now, Instant.now, Instant.now, None, WARNINGS, "app name 2"),
           TermsOfUseInvitationWithApplication(applicationIdThree, Instant.now, Instant.now, Instant.now, None, TERMS_OF_USE_V2, "app name 3"),
-          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), ReminderEmailSent, "app name 4"),
-          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), Overdue, "app name 5"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), REMINDER_EMAIL_SENT, "app name 4"),
+          TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, Some(Instant.now), OVERDUE, "app name 5"),
           TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, None, TERMS_OF_USE_V2_WITH_WARNINGS, "app name 6"),
           TermsOfUseInvitationWithApplication(ApplicationId.random, Instant.now, Instant.now, Instant.now, None, FAILED, "app name 7")
         )
@@ -292,12 +291,12 @@ trait SubmissionServiceMockModule extends MockitoSugar with MarkedSubmissionsTes
       }
 
       def thenReturnError(applicationId: ApplicationId) = {
-        when(aMock.deleteTouUplift(eqTo(applicationId), *)(using *)).thenReturn(successful(response))
+        when(aMock.deleteTouUplift(eqTo(applicationId), *)(using *)).thenReturn(successful(Left("Bang")))
       }
     }
   }
 
   object SubmissionServiceMock extends BaseSubmissionServiceMock {
-    val aMock = mock[SubmissionService](withSettings.strictness(Strictness.LENIENT))
+    val aMock = mock[SubmissionService] //(withSettings().strictness(Strictness.LENIENT))
   }
 }

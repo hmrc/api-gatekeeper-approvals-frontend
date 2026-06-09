@@ -18,78 +18,43 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
+case class SubmissionReview(
+    submissionId: SubmissionId,
+    instanceIndex: Int,
+    declineReasons: String,
+    grantWarnings: String,
+    escalatedTo: Option[String],
+    requiredActions: Map[ReviewAction, ReviewStatus]
+  ) {
+  lazy val isCompleted = requiredActions.values.filterNot(_ == ReviewStatus.Completed).isEmpty
+}
+
 object SubmissionReview {
-  sealed trait Status
-
-  object Status {
-    case object NotStarted extends Status
-    case object InProgress extends Status
-    case object Completed  extends Status
-  }
-
-  sealed trait Action
-
-  object Action {
-    case object CheckFailsAndWarnings    extends Action
-    case object CheckApplicationName     extends Action
-    case object CheckCompanyRegistration extends Action
-    case object CheckUrls                extends Action
-    case object CheckSandboxTesting      extends Action
-    case object CheckFraudPreventionData extends Action
-    case object ArrangedDemo             extends Action
-    case object CheckPassedAnswers       extends Action
-
-    def fromText(text: String): Option[Action] = {
-      import cats.implicits._
-      text match {
-        case "CheckFailsAndWarnings"    => CheckFailsAndWarnings.some
-        case "CheckApplicationName"     => CheckApplicationName.some
-        case "CheckCompanyRegistration" => CheckCompanyRegistration.some
-        case "CheckUrls"                => CheckUrls.some
-        case "CheckSandboxTesting"      => CheckSandboxTesting.some
-        case "CheckFraudPreventionData" => CheckFraudPreventionData.some
-        case "ArrangedDemo"             => ArrangedDemo.some
-        case "CheckPassedAnswers"       => CheckPassedAnswers.some
-        case _                          => None
-      }
-    }
-
-    def toText(action: Action) = action match {
-      case CheckFailsAndWarnings    => "CheckFailsAndWarnings"
-      case CheckApplicationName     => "CheckApplicationName"
-      case CheckCompanyRegistration => "CheckCompanyRegistration"
-      case CheckUrls                => "CheckUrls"
-      case CheckSandboxTesting      => "CheckSandboxTesting"
-      case CheckFraudPreventionData => "CheckFraudPreventionData"
-      case ArrangedDemo             => "ArrangedDemo"
-      case CheckPassedAnswers       => "CheckPassedAnswers"
-    }
-  }
 
   private def apply(
       submissionId: SubmissionId,
       instanceIndex: Int,
-      requiredActions: List[Action]
+      requiredActions: List[ReviewAction]
     ): SubmissionReview =
-    SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> Status.NotStarted)).toMap)
+    SubmissionReview(submissionId, instanceIndex, "", "", None, requiredActions.map(a => (a -> ReviewStatus.NotStarted)).toMap)
 
   def apply(submissionId: SubmissionId, instanceIndex: Int, isSuccessful: Boolean, hasWarnings: Boolean, requiresFraudCheck: Boolean, requiresDemo: Boolean): SubmissionReview = {
-    val alternativeActions: List[Action] =
+    val alternativeActions: List[ReviewAction] =
       (isSuccessful, hasWarnings) match {
         case (true, false) => List.empty
-        case (_, _)        => List(Action.CheckFailsAndWarnings)
+        case (_, _)        => List(ReviewAction.CheckFailsAndWarnings)
       }
 
-    val fraudAction = if (requiresFraudCheck) List(Action.CheckFraudPreventionData) else List()
-    val demoAction  = if (requiresDemo) List(Action.ArrangedDemo) else List()
+    val fraudAction = if (requiresFraudCheck) List(ReviewAction.CheckFraudPreventionData) else List()
+    val demoAction  = if (requiresDemo) List(ReviewAction.ArrangedDemo) else List()
 
-    val fixedActions: List[Action] =
+    val fixedActions: List[ReviewAction] =
       List(
-        Action.CheckApplicationName,
-        Action.CheckCompanyRegistration,
-        Action.CheckUrls,
-        Action.CheckSandboxTesting,
-        Action.CheckPassedAnswers
+        ReviewAction.CheckApplicationName,
+        ReviewAction.CheckCompanyRegistration,
+        ReviewAction.CheckUrls,
+        ReviewAction.CheckSandboxTesting,
+        ReviewAction.CheckPassedAnswers
       )
 
     SubmissionReview(
@@ -109,7 +74,7 @@ object SubmissionReview {
       review.copy(grantWarnings = warnings)
     }
 
-  val updateReviewActionStatus: (Action, Status) => SubmissionReview => SubmissionReview = (action, newStatus) =>
+  val updateReviewActionStatus: (ReviewAction, ReviewStatus) => SubmissionReview => SubmissionReview = (action, newStatus) =>
     review => {
       require(review.requiredActions.keySet.contains(action))
       review.copy(requiredActions = review.requiredActions + (action -> newStatus))
@@ -119,15 +84,11 @@ object SubmissionReview {
     review => {
       review.copy(escalatedTo = Some(escalated))
     }
-}
 
-case class SubmissionReview private (
-    submissionId: SubmissionId,
-    instanceIndex: Int,
-    declineReasons: String,
-    grantWarnings: String,
-    escalatedTo: Option[String],
-    requiredActions: Map[SubmissionReview.Action, SubmissionReview.Status]
-  ) {
-  lazy val isCompleted = requiredActions.values.filterNot(_ == SubmissionReview.Status.Completed).isEmpty
+  import play.api.libs.json._
+  import SubmissionId.given
+  import ReviewAction.given
+  import ReviewStatus.given
+
+  given Format[SubmissionReview] = Json.format[SubmissionReview]
 }

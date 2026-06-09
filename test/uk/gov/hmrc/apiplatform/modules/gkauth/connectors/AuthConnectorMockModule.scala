@@ -22,7 +22,6 @@ import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
-
 import uk.gov.hmrc.auth.core.retrieve.{Name, ~}
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
 

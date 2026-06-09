@@ -38,7 +38,15 @@ trait ApiDataTestData {
           ApiVersionNbr("1.0"),
           ApiStatus.Stable,
           ApiAccessType.Public,
-          List(Endpoint(Endpoint.UriPattern("/sa/{utr}/status"), Endpoint.Name(s"Get $serviceName"), HttpMethod.Get, AuthType.User, throttlingTier = ResourceThrottlingTier.Unlimited, scope = None, queryParameters = List.empty)),
+          List(Endpoint(
+            Endpoint.UriPattern("/sa/{utr}/status"),
+            Endpoint.Name(s"Get $serviceName"),
+            HttpMethod.Get,
+            AuthType.User,
+            throttlingTier = ResourceThrottlingTier.Unlimited,
+            scope = None,
+            queryParameters = List.empty
+          )),
           endpointsEnabled = true,
           None,
           ApiVersionSource.OAS

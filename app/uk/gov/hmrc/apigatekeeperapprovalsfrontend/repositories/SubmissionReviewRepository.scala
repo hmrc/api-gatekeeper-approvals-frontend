@@ -27,13 +27,12 @@ import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionReviewJsonFormatters.submissionReviewFormat
 
 @Singleton
 class SubmissionReviewRepo @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext) extends PlayMongoRepository[SubmissionReview](
       mongoComponent = mongo,
       collectionName = "submissionReview",
-      domainFormat = submissionReviewFormat,
+      domainFormat = ???, // SubmissionReviewJsonFormatters.given_Format_SubmissionReview,
       indexes = Seq(
         IndexModel(Indexes.ascending("submissionId", "instanceIndex"), IndexOptions().unique(true))
       )

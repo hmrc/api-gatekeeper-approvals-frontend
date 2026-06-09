@@ -20,19 +20,18 @@ import play.api.libs.json.Format
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.SimpleEnumJsonFormatting
 
-sealed trait TermsOfUseInvitationState
+// TODO caps
+enum TermsOfUseInvitationState {
+  case EMAIL_SENT
+  case REMINDER_EMAIL_SENT
+  case OVERDUE
+  case WARNINGS
+  case FAILED
+  case TERMS_OF_USE_V2_WITH_WARNINGS
+  case TERMS_OF_USE_V2
+}
 
 object TermsOfUseInvitationState {
-  case object EMAIL_SENT                    extends TermsOfUseInvitationState
-  case object REMINDER_EMAIL_SENT           extends TermsOfUseInvitationState
-  case object OVERDUE                       extends TermsOfUseInvitationState
-  case object WARNINGS                      extends TermsOfUseInvitationState
-  case object FAILED                        extends TermsOfUseInvitationState
-  case object TERMS_OF_USE_V2_WITH_WARNINGS extends TermsOfUseInvitationState
-  case object TERMS_OF_USE_V2               extends TermsOfUseInvitationState
-
-  val values = Set(EMAIL_SENT, REMINDER_EMAIL_SENT, OVERDUE, WARNINGS, FAILED, TERMS_OF_USE_V2_WITH_WARNINGS, TERMS_OF_USE_V2)
-
   def apply(text: String): Option[TermsOfUseInvitationState] = TermsOfUseInvitationState.values.find(_.toString() == text.toUpperCase)
 
   given Format[TermsOfUseInvitationState] = SimpleEnumJsonFormatting.createEnumFormatFor[TermsOfUseInvitationState]("Terms of use state", apply)

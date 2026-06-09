@@ -23,13 +23,13 @@ import scala.concurrent.Future.successful
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.ReviewAction
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.CheckApplicationNamePage
 
@@ -67,10 +67,10 @@ class CheckApplicationNameController @Inject() (
             )
           )
         )
-      case _                                                               => errorHandler.badRequestTemplate.map(BadRequest(_))
+      case _                                                             => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 
   def action(rawApplicationId: java.util.UUID): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckApplicationName)(rawApplicationId)
+    updateActionStatus(ReviewAction.CheckApplicationName)(rawApplicationId)
 }

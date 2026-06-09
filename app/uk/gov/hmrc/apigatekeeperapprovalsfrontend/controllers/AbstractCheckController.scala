@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -27,7 +27,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
 abstract class AbstractCheckController(
@@ -38,22 +38,22 @@ abstract class AbstractCheckController(
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  type Fn = (SubmissionReview.Status) => (SubmissionId, Int) => Future[Option[SubmissionReview]]
+  type Fn = (ReviewStatus) => (SubmissionId, Int) => Future[Option[SubmissionReview]]
 
-  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[?]): Future[Result] = {
-    val description = SubmissionReview.Action.toText(reviewAction)
+  def logBadRequest(reviewAction: ReviewAction)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[?]): Future[Result] = {
+    val description = ReviewAction.toText(reviewAction)
     logger.error(s"$description : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
     errorHandler.badRequestTemplate.map(BadRequest(_))
   }
 
-  def deriveStatusFromAction(formAction: String): Option[SubmissionReview.Status] = formAction match {
-    case "checked"         => Some(SubmissionReview.Status.Completed)
-    case "come-back-later" => Some(SubmissionReview.Status.InProgress)
+  def deriveStatusFromAction(formAction: String): Option[ReviewStatus] = formAction match {
+    case "checked"         => Some(ReviewStatus.Completed)
+    case "come-back-later" => Some(ReviewStatus.InProgress)
     case _                 => None
   }
 
   def updateActionStatus(
-      reviewAction: SubmissionReview.Action
+      reviewAction: ReviewAction
     )(
       rawApplicationId: java.util.UUID
     ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>

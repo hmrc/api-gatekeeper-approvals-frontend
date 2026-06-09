@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 import scala.concurrent.ExecutionContext
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
@@ -33,7 +33,8 @@ abstract class AbstractApplicationController(
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     val errorHandler: ErrorHandler
-  )(implicit ec: ExecutionContext) extends GatekeeperBaseController(strideAuthorisationService, mcc)
+  )(implicit ec: ExecutionContext
+  ) extends GatekeeperBaseController(strideAuthorisationService, mcc)
     with GatekeeperStrideRoleWithApplicationActions
     with EitherTHelper[Result]
     with ApplicationLogger {

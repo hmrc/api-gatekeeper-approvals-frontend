@@ -18,15 +18,15 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import scala.concurrent.ExecutionContext
 
+import cats.syntax.either.*
 import com.google.inject.{Inject, Singleton}
 
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, InternalServerException, StringContextOps}
 
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, _}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, _}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, *}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, *}
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
-import cats.syntax.either._
 
 @Singleton
 class ApplicationCommandConnector @Inject() (
@@ -59,7 +59,6 @@ class ApplicationCommandConnector @Inject() (
     }
 
     import play.api.libs.ws.JsonBodyWritables._
-
 
     http.patch(url"$serviceBaseUrl/applications/$applicationId/dispatch")
       .withBody(Json.toJson(DispatchRequest(command, adminsToEmail)))

@@ -19,37 +19,52 @@ package uk.gov.hmrc.apiplatform.modules.submissions.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import play.api.libs.json.{Json, Reads, Writes}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, *}
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.API
-import play.api.libs.ws.writeableOf_JsValue
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{API, ConnectorMetrics}
+
+case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, escalatedTo: Option[String] = None)
+
+object GrantedRequest {
+  given Writes[GrantedRequest] = Json.writes[GrantedRequest]
+}
+
+case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
+
+object DeclinedRequest {
+  given Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
+}
+
+case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
+
+object TouUpliftRequest {
+  given Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
+}
+
+case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
+
+object TouGrantedRequest {
+  given Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
+
+}
+
+case class TouDeleteRequest(gatekeeperUserName: String)
+
+object TouDeleteRequest {
+  given Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
+
+}
 
 object SubmissionsConnector {
 
   case class Config(serviceBaseUrl: String, apiKey: String)
-
-  case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, escalatedTo: Option[String] = None)
-  implicit val writesApprovedRequest: Writes[GrantedRequest] = Json.writes[GrantedRequest]
-
-  case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesDeclinedRequest: Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
-
-  case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesTouUpliftRequest: Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
-
-  case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
-  implicit val writesTouGrantedRequest: Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
-
-  case class TouDeleteRequest(gatekeeperUserName: String)
-  implicit val writesTouDeleteRequest: Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
 
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
@@ -62,8 +77,10 @@ class SubmissionsConnector @Inject() (
   )(implicit val ec: ExecutionContext
   ) {
 
+  import play.api.libs.ws.writeableOf_JsValue
   import SubmissionsConnector._
   import config._
+
   import Submission.given
 
   val api = API("third-party-application-submissions")
@@ -76,19 +93,20 @@ class SubmissionsConnector @Inject() (
 
   def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits._
+
     metrics.record(api) {
       http.get(url"$serviceBaseUrl/submissions/marked/application/$id").execute[Option[MarkedSubmission]]
     }
   }
 
-  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, TermsOfUseInvitationSuccessful]] = {
+  def termsOfUseInvite(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Either[String, Unit]] = {
     val failed = (err: UpstreamErrorResponse) => s"Failed to invite for terms of use for application with id ${applicationId}: ${err}"
 
     metrics.record(api) {
       http.post(url"$serviceBaseUrl/terms-of-use/application/$applicationId")
         .execute[ErrorOrUnit]
         .map {
-          case Right(_)  => Right(TermsOfUseInvitationSuccessful)
+          case Right(_)  => Right(())
           case Left(err) => Left(failed(err))
         }
     }

@@ -24,14 +24,13 @@ import org.mockito.ArgumentMatchers.{any as `*`, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
-
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionReviewTestData
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
 
-trait SubmissionReviewServiceMockModule extends MockitoSugar with SubmissionReviewTestData {
+trait SubmissionReviewServiceMockModule extends SubmissionReviewTestData {
 
   trait BaseSubmissionReviewServiceMock {
     def aMock: SubmissionReviewService
@@ -60,7 +59,7 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with SubmissionRevi
         when(aMock.updateActionStatus(*, *)(*[SubmissionId], *)).thenReturn(Future.successful(Some(review)))
       }
 
-      def thenReturn(action: SubmissionReview.Action, status: SubmissionReview.Status, review: SubmissionReview) = {
+      def thenReturn(action: ReviewAction, status: ReviewStatus, review: SubmissionReview) = {
         when(aMock.updateActionStatus(eqTo(action), eqTo(status))(*[SubmissionId], *)).thenReturn(Future.successful(Some(review.copy(requiredActions =
           review.requiredActions + (action -> status)
         ))))
@@ -102,6 +101,6 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with SubmissionRevi
   }
 
   object SubmissionReviewServiceMock extends BaseSubmissionReviewServiceMock {
-    val aMock = mock[SubmissionReviewService](withSettings.strictness(Strictness.LENIENT))
+    lazy val aMock = mock[SubmissionReviewService](withSettings.strictness(Strictness.LENIENT))
   }
 }
