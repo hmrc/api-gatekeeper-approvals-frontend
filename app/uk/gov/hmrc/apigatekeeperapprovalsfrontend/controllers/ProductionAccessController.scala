@@ -59,7 +59,7 @@ class ProductionAccessController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  import ProductionAccessController._
+  import ProductionAccessController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val applicationId = ApplicationId(rawApplicationId)

@@ -53,7 +53,7 @@ class TermsOfUsePassedController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUsePassedController._
+  import TermsOfUsePassedController.*
 
   def answersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {

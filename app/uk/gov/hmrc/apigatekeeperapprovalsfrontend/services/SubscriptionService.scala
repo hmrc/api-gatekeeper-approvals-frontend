@@ -39,7 +39,7 @@ class SubscriptionService @Inject() (
   ) {
 
   def fetchSubscriptionsByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Set[ApiDefinition]] = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
+    import uk.gov.hmrc.http.HttpReads.Implicits.*
     (
       for {
         applicationWithSubscriptions <- OptionT(tpaConnector.query[Option[ApplicationWithSubscriptions]](ApplicationQuery.ById(applicationId, Nil, true)))

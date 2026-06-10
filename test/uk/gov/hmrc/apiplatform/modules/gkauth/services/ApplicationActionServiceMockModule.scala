@@ -40,7 +40,7 @@ trait ApplicationActionServiceMockModule extends MockitoSugar {
     object Process {
 
       def thenReturn[A](application: ApplicationWithCollaborators) = {
-        import cats.implicits._
+        import cats.implicits.*
 
         when(aMock.process[A](eqTo(application.id), *)(using *))
           .thenAnswer(input =>
@@ -51,7 +51,7 @@ trait ApplicationActionServiceMockModule extends MockitoSugar {
       }
 
       def thenNotFound[A]() = {
-        import cats.implicits._
+        import cats.implicits.*
 
         when(aMock.process[A](*[ApplicationId], *)(using *))
           .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none)

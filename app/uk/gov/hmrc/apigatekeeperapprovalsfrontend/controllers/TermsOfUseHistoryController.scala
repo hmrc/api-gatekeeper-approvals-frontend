@@ -71,7 +71,7 @@ class TermsOfUseHistoryController @Inject() (
     termsOfUseHistoryPage: TermsOfUseHistoryPage
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
-  import TermsOfUseHistoryController._
+  import TermsOfUseHistoryController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInWithApplication(rawApplicationId) { implicit request =>
     val applicationId = ApplicationId(rawApplicationId)

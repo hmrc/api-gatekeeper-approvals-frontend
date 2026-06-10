@@ -46,7 +46,7 @@ trait ApplicationActionBuilders {
 
       override def refine[A](request: LoggedInRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val implicitRequest: Request[A] = request
-        import cats.implicits._
+        import cats.implicits.*
 
         applicationActionService.process(applicationId, request)
           .toRightF(errorHandler.notFoundTemplate(using Request(request, request.messagesApi)).map(NotFound(_))).value

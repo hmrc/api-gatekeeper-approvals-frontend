@@ -58,7 +58,7 @@ class ViewDeclinedSubmissionController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  import ViewDeclinedSubmissionController._
+  import ViewDeclinedSubmissionController.*
 
   def page(rawApplicationId: java.util.UUID, index: Int) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName = request.application.name

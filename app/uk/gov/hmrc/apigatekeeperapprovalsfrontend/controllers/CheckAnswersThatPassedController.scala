@@ -54,7 +54,7 @@ class CheckAnswersThatPassedController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import CheckAnswersThatPassedController._
+  import CheckAnswersThatPassedController.*
 
   def checkAnswersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val applicationId = request.application.id

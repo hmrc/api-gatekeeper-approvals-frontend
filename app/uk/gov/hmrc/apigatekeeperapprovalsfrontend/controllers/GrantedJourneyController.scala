@@ -72,7 +72,7 @@ class GrantedJourneyController @Inject() (
     applicationApprovedPage: ApplicationApprovedPage
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
-  import GrantedJourneyController._
+  import GrantedJourneyController.*
 
   def provideWarningsPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(provideWarningsForGrantingPage(provideWarningsForm, ViewModel(request.application.name, request.application.id))))

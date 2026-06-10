@@ -18,10 +18,10 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import java.time.Instant
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,7 +35,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, P
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with MarkedSubmissionsTestData {
 
-  import Submission._
+  import Submission.*
 
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,

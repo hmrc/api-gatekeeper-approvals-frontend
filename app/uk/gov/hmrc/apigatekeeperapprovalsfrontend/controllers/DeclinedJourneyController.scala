@@ -62,7 +62,7 @@ class DeclinedJourneyController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import DeclinedJourneyController._
+  import DeclinedJourneyController.*
 
   def provideReasonsPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(request.application.id, request.application.name))))

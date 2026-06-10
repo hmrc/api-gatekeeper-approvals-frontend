@@ -26,8 +26,6 @@ sealed trait Timer {
   def stop(): Unit
 }
 
-case class API(name: String) extends AnyVal
-
 trait ConnectorMetrics {
   def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A]
 }

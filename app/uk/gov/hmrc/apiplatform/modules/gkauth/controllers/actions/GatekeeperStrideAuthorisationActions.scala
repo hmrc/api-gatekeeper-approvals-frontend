@@ -70,7 +70,7 @@ trait GatekeeperAuthorisationActions {
             case NonFatal(_) => Left(Unauthorized(""))
           }
 
-      import cats.implicits._
+      import cats.implicits.*
       import cats.data.EitherT
       EitherT(refineStride).leftFlatMap { strideFailureResult =>
         EitherT(refineLdap).leftMap(_ => strideFailureResult)

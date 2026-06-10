@@ -30,7 +30,7 @@ enum ReviewAction {
 object ReviewAction {
 
   def fromText(text: String): Option[ReviewAction] = {
-    import cats.implicits._
+    import cats.implicits.*
     text match {
       case "CheckFailsAndWarnings"    => CheckFailsAndWarnings.some
       case "CheckApplicationName"     => CheckApplicationName.some
@@ -55,7 +55,7 @@ object ReviewAction {
     case CheckPassedAnswers       => "CheckPassedAnswers"
   }
 
-  import play.api.libs.json._
+  import play.api.libs.json.*
   given KeyReads[ReviewAction]  = key => ReviewAction.fromText(key).fold[JsResult[ReviewAction]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
   given KeyWrites[ReviewAction] = action => ReviewAction.toText(action)
 }

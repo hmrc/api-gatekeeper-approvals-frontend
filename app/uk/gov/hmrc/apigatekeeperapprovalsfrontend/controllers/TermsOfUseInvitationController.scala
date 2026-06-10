@@ -76,7 +76,7 @@ class TermsOfUseInvitationController @Inject() (
     termsOfUsePage: TermsOfUsePage
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
-  import TermsOfUseInvitationController._
+  import TermsOfUseInvitationController.*
 
   def page = loggedInOnly() { implicit request =>
     def deriveTermsOfUseStatusDisplayName(status: TermsOfUseInvitationState): String = {

@@ -54,8 +54,8 @@ class ChecklistController @Inject() (
     val submissionService: SubmissionService
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
-  import ChecklistController._
-  import Implicits._
+  import ChecklistController.*
+  import Implicits.*
 
   type RequiredActions = Map[ReviewAction, ReviewStatus]
 
@@ -71,7 +71,7 @@ class ChecklistController @Inject() (
       }
     }
   }
-  import AutomaticChecksResult._
+  import AutomaticChecksResult.*
 
   private def setupSubmissionReview(submission: Submission, isSuccessful: Boolean, hasWarnings: Boolean) = {
     val requiresFraudCheck = SubmissionRequiresFraudCheck(submission)

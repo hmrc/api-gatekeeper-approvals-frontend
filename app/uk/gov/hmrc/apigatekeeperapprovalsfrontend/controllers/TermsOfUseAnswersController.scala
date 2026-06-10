@@ -56,7 +56,7 @@ class TermsOfUseAnswersController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
 
-  import TermsOfUseAnswersController._
+  import TermsOfUseAnswersController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName    = request.application.name

@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
+package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-enum ReviewStatus:
-  case NotStarted, InProgress, Completed
-
-object ReviewStatus {
-  import play.api.libs.json.*
-  import uk.gov.hmrc.apiplatform.modules.common.domain.services.SimpleEnumJsonFormatting
-
-  def apply(text: String): Option[ReviewStatus] = ReviewStatus.values.find(_.toString.equalsIgnoreCase(text))
-
-  given Format[ReviewStatus] = SimpleEnumJsonFormatting.createStringFormatFor[ReviewStatus]("Review Status", apply, _.toString().toLowerCase())
-}
+final case class API(name: String) extends AnyVal

@@ -85,7 +85,7 @@ object SubmissionReview {
       review.copy(escalatedTo = Some(escalated))
     }
 
-  import play.api.libs.json._
+  import play.api.libs.json.*
   import SubmissionId.given
   import ReviewAction.given
   import ReviewStatus.given

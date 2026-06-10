@@ -62,7 +62,7 @@ class TermsOfUseNotesController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseNotesController._
+  import TermsOfUseNotesController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))

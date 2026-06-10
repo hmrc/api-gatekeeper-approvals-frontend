@@ -51,7 +51,7 @@ class ConfirmYourDecisionController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  import ConfirmYourDecisionController._
+  import ConfirmYourDecisionController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(confirmYourDecisionPage(ViewModel(request.application.id, request.application.name, request.markedSubmission.isFail))))

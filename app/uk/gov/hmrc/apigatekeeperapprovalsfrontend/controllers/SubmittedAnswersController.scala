@@ -57,7 +57,7 @@ class SubmittedAnswersController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
 
-  import SubmittedAnswersController._
+  import SubmittedAnswersController.*
 
   def page(rawApplicationId: java.util.UUID, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(rawApplicationId, index) { implicit request =>
     val appName    = request.application.name

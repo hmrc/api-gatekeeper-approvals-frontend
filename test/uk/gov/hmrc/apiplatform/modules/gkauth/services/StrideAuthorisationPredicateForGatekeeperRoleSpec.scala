@@ -26,7 +26,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 class StrideAuthorisationPredicateForGatekeeperRoleSpec extends AsyncHmrcSpec {
   val roles = StrideAuthRoles("admin", "super", "advanced", "user")
 
-  import roles._
+  import roles.*
 
   "StrideAuthorisationPredicateForGatekeeperRole" should {
     "contain admin role only when looking for GK.ADMIN" in {

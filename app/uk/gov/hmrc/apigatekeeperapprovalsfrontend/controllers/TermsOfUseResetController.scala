@@ -60,7 +60,7 @@ class TermsOfUseResetController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUseResetController._
+  import TermsOfUseResetController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))

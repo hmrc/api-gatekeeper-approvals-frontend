@@ -25,7 +25,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaborators, ApplicationWithCollaboratorsFixtures}
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models._
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
@@ -35,7 +35,7 @@ trait ApplicationServiceMockModule extends MockitoSugar with ApplicationWithColl
   trait BaseApplicationServiceMock {
     val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
 
-    import CHT.Implicits._
+    import CHT.Implicits.*
 
     def aMock: ApplicationService
 

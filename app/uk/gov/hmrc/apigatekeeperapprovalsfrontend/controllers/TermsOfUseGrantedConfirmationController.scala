@@ -47,7 +47,7 @@ class TermsOfUseGrantedConfirmationController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseGrantedConfirmationController._
+  import TermsOfUseGrantedConfirmationController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     successful(Ok(termsOfUseGrantedConfirmationPage(ViewModel(request.application.id, request.application.name))))

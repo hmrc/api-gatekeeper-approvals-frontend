@@ -64,7 +64,7 @@ class TermsOfUseReasonsController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseReasonsController._
+  import TermsOfUseReasonsController.*
 
   def provideReasonsPage(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)

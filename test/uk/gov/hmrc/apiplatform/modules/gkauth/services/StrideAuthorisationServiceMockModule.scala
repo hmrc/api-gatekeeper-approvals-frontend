@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.any as `*`
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 
-import play.api.mvc.Results._
+import play.api.mvc.Results.*
 import play.api.mvc.{MessagesRequest, Result}
 import uk.gov.hmrc.auth.core.InvalidBearerToken
 

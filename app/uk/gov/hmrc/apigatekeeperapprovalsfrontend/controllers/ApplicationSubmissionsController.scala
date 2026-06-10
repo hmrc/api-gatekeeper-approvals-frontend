@@ -69,10 +69,10 @@ class ApplicationSubmissionsController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
 
-  import ApplicationSubmissionsController._
+  import ApplicationSubmissionsController.*
   import cats.data.OptionT
-  import cats.implicits._
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
+  import cats.implicits.*
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits.*
 
   def whichPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
     val applicationId            = request.application.id

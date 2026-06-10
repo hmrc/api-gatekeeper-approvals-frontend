@@ -51,7 +51,7 @@ class TermsOfUseDeleteController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUseDeleteController._
+  import TermsOfUseDeleteController.*
 
   def page(rawApplicationId: java.util.UUID) = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
     successful(Ok(termsOfUseDeletePage(ViewModel(request.application.id, request.application.name))))
