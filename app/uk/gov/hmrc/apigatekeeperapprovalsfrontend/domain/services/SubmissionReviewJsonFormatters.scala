@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.play.json.Union
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 trait SubmissionReviewJsonFormatters {
-  import SubmissionReview._
+  import SubmissionReview.*
 
   implicit val reviewStatus: OFormat[Status] = Union.from[Status]("Review.StatusType")
     .andType[Status.NotStarted.type]("notstarted", () => Status.NotStarted)

@@ -1,4 +1,4 @@
-import scoverage.ScoverageKeys._
+import scoverage.ScoverageKeys.*
 
 object ScoverageSettings {
   def apply() = Seq(

@@ -40,7 +40,7 @@ object SubmissionReview {
     case object CheckPassedAnswers       extends Action
 
     def fromText(text: String): Option[Action] = {
-      import cats.implicits._
+      import cats.implicits.*
       text match {
         case "CheckFailsAndWarnings"    => CheckFailsAndWarnings.some
         case "CheckApplicationName"     => CheckApplicationName.some

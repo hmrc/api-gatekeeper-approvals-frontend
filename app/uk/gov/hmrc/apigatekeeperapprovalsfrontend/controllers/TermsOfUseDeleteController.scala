@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
 
 object TermsOfUseDeleteController {
 
@@ -51,7 +51,7 @@ class TermsOfUseDeleteController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUseDeleteController._
+  import TermsOfUseDeleteController.*
 
   def page(applicationId: ApplicationId) = loggedInThruStrideWithApplication(applicationId) { implicit request =>
     successful(Ok(termsOfUseDeletePage(ViewModel(applicationId, request.application.name))))

@@ -44,10 +44,10 @@ class ApplicationCommandConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): AppCmdResult = {
 
-    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
-    import play.api.libs.json._
-    import uk.gov.hmrc.http.HttpReads.Implicits._
-    import play.api.http.Status._
+    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters.*
+    import play.api.libs.json.*
+    import uk.gov.hmrc.http.HttpReads.Implicits.*
+    import play.api.http.Status.*
 
     def parseWithLogAndThrow[T](input: String)(implicit reads: Reads[T]): T = {
       Json.parse(input).validate[T] match {
@@ -58,7 +58,9 @@ class ApplicationCommandConnector @Inject() (
       }
     }
 
-    import cats.syntax.either._
+    import uk.gov.hmrc.apiplatform.modules.common.services.NonEmptyListFormatters.*
+    import play.api.libs.ws.writeableOf_JsValue
+    import cats.syntax.either.*
 
     http.patch(url"$serviceBaseUrl/applications/$applicationId/dispatch")
       .withBody(Json.toJson(DispatchRequest(command, adminsToEmail)))

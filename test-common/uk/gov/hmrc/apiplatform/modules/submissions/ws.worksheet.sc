@@ -3,7 +3,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Fail
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
 
 object MyData extends MarkedSubmissionsTestData
-import MyData._
+import MyData.*
 
 answer(Fail)(CustomersAuthorisingYourSoftware.question3).values
 

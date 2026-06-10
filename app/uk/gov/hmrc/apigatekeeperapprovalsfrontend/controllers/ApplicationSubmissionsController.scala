@@ -22,12 +22,12 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{MessagesControllerComponents, _}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -69,10 +69,10 @@ class ApplicationSubmissionsController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
 
-  import ApplicationSubmissionsController._
+  import ApplicationSubmissionsController.*
   import cats.data.OptionT
-  import cats.implicits._
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
+  import cats.implicits.*
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits.*
 
   def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"

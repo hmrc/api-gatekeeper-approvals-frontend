@@ -35,7 +35,7 @@ class ApplicationActionService @Inject() (
   ) {
 
   def process[A](applicationId: ApplicationId, loggedInRequest: LoggedInRequest[A])(implicit hc: HeaderCarrier): OptionT[Future, ApplicationRequest[A]] = {
-    import cats.implicits._
+    import cats.implicits.*
 
     for {
       application <- OptionT(applicationService.fetchByApplicationId(applicationId))

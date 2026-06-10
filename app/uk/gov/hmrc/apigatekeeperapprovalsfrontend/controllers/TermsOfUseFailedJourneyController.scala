@@ -23,20 +23,20 @@ import scala.concurrent.Future.successful
 import cats.data.{EitherT, NonEmptyList}
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.{MessagesControllerComponents, _}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
 
 object TermsOfUseFailedJourneyController {
 
@@ -62,7 +62,7 @@ object TermsOfUseFailedJourneyController {
     mapping(
       "first-name" -> nonEmptyText,
       "last-name"  -> nonEmptyText
-    )(ApproverForm.apply)(ApproverForm.unapply)
+    )(ApproverForm.apply)(a => Some(a.firstName, a.lastName))
   )
 
   case class ProvideNotesForm(notes: String)
@@ -70,7 +70,7 @@ object TermsOfUseFailedJourneyController {
   val provideNotesForm: Form[ProvideNotesForm] = Form(
     mapping(
       "notes" -> nonEmptyText
-    )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
+    )(ProvideNotesForm.apply)(p => Some(p.notes))
   )
 }
 
@@ -93,7 +93,7 @@ class TermsOfUseFailedJourneyController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUseFailedJourneyController._
+  import TermsOfUseFailedJourneyController.*
 
   private def setupSubmissionReview(submission: Submission, isSuccessful: Boolean, hasWarnings: Boolean) = {
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, false, false)

@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
@@ -48,7 +48,7 @@ object TermsOfUseReasonsController {
   val provideReasonsForm: Form[ProvideReasonsForm] = Form(
     mapping(
       "reasons" -> nonEmptyText
-    )(ProvideReasonsForm.apply)(ProvideReasonsForm.unapply)
+    )(ProvideReasonsForm.apply)(p => Some(p.reasons))
   )
 }
 
@@ -64,7 +64,7 @@ class TermsOfUseReasonsController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseReasonsController._
+  import TermsOfUseReasonsController.*
 
   def provideReasonsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)

@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -34,7 +34,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMo
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits.*
 
   trait BaseSetup extends AbstractSetup
       with SubscriptionServiceMockModule

@@ -22,13 +22,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.MessagesControllerComponents
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitationState, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -59,7 +59,7 @@ object TermsOfUseInvitationController {
       "failedStatus"                   -> optional(text),
       "termsOfUseV2WithWarningsStatus" -> optional(text),
       "termsOfUseV2Status"             -> optional(text)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(f => Some(f.emailSentStatus, f.overdueStatus, f.reminderEmailSentStatus, f.warningsStatus, f.failedStatus, f.termsOfUseV2WithWarningsStatus, f.termsOfUseV2Status))
   )
 }
 
@@ -75,7 +75,7 @@ class TermsOfUseInvitationController @Inject() (
     applicationService: ApplicationService
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
-  import TermsOfUseInvitationController._
+  import TermsOfUseInvitationController.*
 
   def page = loggedInOnly() { implicit request =>
     def deriveTermsOfUseStatusDisplayName(status: TermsOfUseInvitationState): String = {

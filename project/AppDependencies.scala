@@ -7,13 +7,13 @@ object AppDependencies {
   val appDomainVersion          = "1.1.0"
   val playfrontendVersion       = "12.32.0"
   lazy val mongoVersion         = "2.12.0"
-  val mockitoScalaVersion       = "2.0.0"
+  val mockitoScalaVersion       = "2.2.1"
 
   val compile = Seq(
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"      % bootstrapPlayVersion,
     "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"      % playfrontendVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"              % mongoVersion,
-    "uk.gov.hmrc"       %% "http-metrics"                    % "2.9.0",
+    // "uk.gov.hmrc"       %% "http-metrics"                    % "2.9.0",
     "org.typelevel"     %% "cats-core"                       % "2.13.0",
     "uk.gov.hmrc"       %% "internal-auth-client-play-30"    % "4.3.0",
     "uk.gov.hmrc"       %% "api-platform-application-domain" % appDomainVersion,

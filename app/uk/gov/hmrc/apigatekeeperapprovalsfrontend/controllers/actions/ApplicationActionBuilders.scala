@@ -19,12 +19,12 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
@@ -46,7 +46,7 @@ trait ApplicationActionBuilders {
 
       override def refine[A](request: LoggedInRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val implicitRequest: Request[A] = request
-        import cats.implicits._
+        import cats.implicits.*
 
         applicationActionService.process(applicationId, request)
           .toRightF(errorHandler.notFoundTemplate(Request(request, request.messagesApi)).map(NotFound(_))).value

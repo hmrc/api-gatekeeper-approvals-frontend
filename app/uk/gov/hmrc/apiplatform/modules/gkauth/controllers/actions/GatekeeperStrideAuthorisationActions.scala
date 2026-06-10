@@ -23,7 +23,7 @@ import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services._
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.*
 
 trait ForbiddenHandler {
   def handle(msgResult: MessagesRequest[_]): Result
@@ -70,7 +70,7 @@ trait GatekeeperAuthorisationActions {
             case NonFatal(_) => Left(Unauthorized(""))
           }
 
-      import cats.implicits._
+      import cats.implicits.*
       import cats.data.EitherT
       EitherT(refineStride).leftFlatMap { strideFailureResult =>
         EitherT(refineLdap).leftMap(_ => strideFailureResult)

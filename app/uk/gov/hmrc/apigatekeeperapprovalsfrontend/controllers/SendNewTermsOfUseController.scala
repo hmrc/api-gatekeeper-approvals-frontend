@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
@@ -83,7 +83,7 @@ class SendNewTermsOfUseController @Inject() (
     request.application.access match {
       // Should only be sending new terms of use invites to Standard apps
       // with a state of Production and not already invited
-      case std: Access.Standard if (request.application.state.name == domain.models.State.PRODUCTION) => checkNotAlreadyInvited
+      case std: Access.Standard if (request.application.state.name == State.Production) => checkNotAlreadyInvited
       case std: Access.Standard                                                                       =>
         errorHandler.standardErrorTemplate(
           "Application status",

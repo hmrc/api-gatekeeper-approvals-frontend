@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import cats.data.NonEmptyList
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
