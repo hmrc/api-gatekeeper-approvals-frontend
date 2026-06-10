@@ -32,6 +32,8 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
+import java.util.UUID
+import play.api.mvc.{Action,AnyContent}
 
 object ViewDeclinedSubmissionController {
 
@@ -61,7 +63,7 @@ class ViewDeclinedSubmissionController @Inject() (
 
   import ViewDeclinedSubmissionController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: UUID, index: Int) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
@@ -71,7 +73,7 @@ class ViewDeclinedSubmissionController @Inject() (
         case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
           successful(Ok(viewDeclinedSubmissionPage(ViewModel(
             appName,
-            applicationId,
+            request.application.id,
             requestedBy,
             submittedTimestamp.asText,
             declinedName,

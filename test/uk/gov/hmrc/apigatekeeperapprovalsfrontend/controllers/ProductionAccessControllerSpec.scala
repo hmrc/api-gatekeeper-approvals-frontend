@@ -49,7 +49,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, grantedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -58,7 +58,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

@@ -60,7 +60,7 @@ class CheckUrlsController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkUrlsPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps having gone thru uplift
       case std @ Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
@@ -70,7 +70,7 @@ class CheckUrlsController @Inject() (
             checkUrlsPage(
               CheckUrlsController.ViewModel(
                 request.application.name,
-                applicationId,
+                request.application.id,
                 importantSubmissionData.organisationUrl,
                 importantSubmissionData.privacyPolicyLocation,
                 importantSubmissionData.termsAndConditionsLocation,
@@ -83,6 +83,6 @@ class CheckUrlsController @Inject() (
     }
   }
 
-  def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckUrls)(applicationId)
+  def checkUrlsAction(rawApplicationId: java.util.UUID): Action[AnyContent] =
+    updateActionStatus(SubmissionReview.Action.CheckUrls)(rawApplicationId)
 }

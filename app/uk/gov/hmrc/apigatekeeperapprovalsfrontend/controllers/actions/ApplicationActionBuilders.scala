@@ -30,6 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
+import java.util.UUID
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -40,7 +41,7 @@ trait ApplicationActionBuilders {
 
   val E = EitherTHelper.make[Result]
 
-  def applicationRequestRefiner(applicationId: ApplicationId)(implicit ec: ExecutionContext): ActionRefiner[LoggedInRequest, ApplicationRequest] = {
+  def applicationRequestRefiner(rawApplicationId: UUID)(implicit ec: ExecutionContext): ActionRefiner[LoggedInRequest, ApplicationRequest] = {
     new ActionRefiner[LoggedInRequest, ApplicationRequest] {
       override protected def executionContext: ExecutionContext = ec
 
@@ -48,7 +49,7 @@ trait ApplicationActionBuilders {
         implicit val implicitRequest: Request[A] = request
         import cats.implicits.*
 
-        applicationActionService.process(applicationId, request)
+        applicationActionService.process(ApplicationId(rawApplicationId), request)
           .toRightF(errorHandler.notFoundTemplate(Request(request, request.messagesApi)).map(NotFound(_))).value
       }
     }

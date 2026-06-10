@@ -49,7 +49,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      val result = controller.checkFraudPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -61,7 +61,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      val result = controller.checkFraudPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -72,7 +72,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkFraudPage(applicationId)(fakeRequest)
+      val result = controller.checkFraudPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -85,10 +85,10 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.checkFraudAction(applicationId)(fakeSubmitCheckedRequest)
+      val result = controller.checkFraudAction(rawApplicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId).url)
+      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(rawApplicationId).url)
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
@@ -97,10 +97,10 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.checkFraudAction(applicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.checkFraudAction(rawApplicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId).url)
+      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(rawApplicationId).url)
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
@@ -108,7 +108,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.checkFraudAction(applicationId)(fakeRequest)
+      val result = controller.checkFraudAction(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

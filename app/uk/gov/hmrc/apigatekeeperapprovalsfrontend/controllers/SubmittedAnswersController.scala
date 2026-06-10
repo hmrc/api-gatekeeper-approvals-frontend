@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -59,11 +59,11 @@ class SubmittedAnswersController @Inject() (
 
   import SubmittedAnswersController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
+  def page(rawApplicationId: java.util.UUID, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(rawApplicationId, index) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
     val instance   = request.instance
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, request.application.id, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
   }
 }

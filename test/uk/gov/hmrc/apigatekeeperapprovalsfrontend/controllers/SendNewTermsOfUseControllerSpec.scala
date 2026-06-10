@@ -74,7 +74,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsString(result) should include(appWithImportantData.name.value)
     }
@@ -85,7 +85,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(appWithImportantData.id)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Application already invited")
     }
@@ -96,7 +96,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(appWithImportantData.id)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Application already invited")
     }
@@ -105,7 +105,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Invalid application status")
     }
@@ -114,7 +114,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withAccess(privilegedAccess))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Invalid application access type")
     }
@@ -123,21 +123,21 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.notAuthorised
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 303 for SessionRecordNotFound" in new Setup {
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       LdapAuthorisationServiceMock.Auth.notAuthorised
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
   }
@@ -151,7 +151,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.TermsOfUseInvite.thenReturn(applicationId, application)
 
-      val result = controller.action(applicationId)(fakeYesRequest)
+      val result = controller.action(rawApplicationId)(fakeYesRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -164,7 +164,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.TermsOfUseInvite.thenReturnError(applicationId)
 
-      val result = controller.action(applicationId)(fakeYesRequest)
+      val result = controller.action(rawApplicationId)(fakeYesRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Error inviting for terms of use")
@@ -177,7 +177,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeNoRequest)
+      val result = controller.action(rawApplicationId)(fakeNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
     }

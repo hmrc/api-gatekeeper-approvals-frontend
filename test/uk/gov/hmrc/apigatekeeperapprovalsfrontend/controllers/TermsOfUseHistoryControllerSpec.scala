@@ -58,7 +58,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -73,7 +73,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("View submitted answers")
@@ -91,7 +91,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("View submitted answers")
@@ -110,7 +110,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("View submitted answers")
@@ -129,7 +129,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("View submitted answers")
@@ -148,7 +148,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("View submitted answers")
@@ -163,7 +163,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenGranted(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should not include ("This request is from an in-house developer")
@@ -179,7 +179,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should include("This request is from an in-house developer")
@@ -195,7 +195,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should include("Email sent")
@@ -207,7 +207,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId, REMINDER_EMAIL_SENT)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should include("Reminder email sent")
@@ -222,7 +222,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId, OVERDUE)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsString(result) should include("Overdue")
@@ -239,7 +239,7 @@ class TermsOfUseHistoryControllerSpec
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -247,7 +247,7 @@ class TermsOfUseHistoryControllerSpec
     "return Not Found (404) when no application found for application id in invitations" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }
@@ -256,7 +256,7 @@ class TermsOfUseHistoryControllerSpec
       StrideAuthorisationServiceMock.Auth.invalidBearerToken()
       LdapAuthorisationServiceMock.Auth.notAuthorised
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe UNAUTHORIZED
     }

@@ -52,7 +52,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Grant production access")
@@ -63,7 +63,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Grant production access and email with warnings")
@@ -74,7 +74,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -88,10 +88,10 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeDeclineRequest)
+      val result = controller.action(rawApplicationId)(fakeDeclineRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(rawApplicationId).url
     }
 
     "redirect to correct page when grant decision is grant without warnings" in new Setup {
@@ -103,10 +103,10 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
 
-      val result = controller.action(applicationId)(fakeGrantRequest)
+      val result = controller.action(rawApplicationId)(fakeGrantRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(rawApplicationId).url
       SubmissionServiceMock.Grant.verifyCalled(applicationId)
     }
 
@@ -119,10 +119,10 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
 
-      val result = controller.action(applicationId)(fakeGrantRequest)
+      val result = controller.action(rawApplicationId)(fakeGrantRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(rawApplicationId).url
     }
 
     "redirect to correct page when grant decision is grant with warnings with no failed submission" in new Setup {
@@ -134,10 +134,10 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
 
-      val result = controller.action(applicationId)(fakeGrantRequest)
+      val result = controller.action(rawApplicationId)(fakeGrantRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(rawApplicationId).url
     }
 
     "return redirect back to page when grant decision is something we don't understand" in new Setup {
@@ -147,10 +147,10 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(brokenGrantRequest)
+      val result = controller.action(rawApplicationId)(brokenGrantRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(rawApplicationId).url
     }
 
     "return 400 if can't find submission review" in new Setup {
@@ -161,7 +161,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturnNone()
 
-      val result = controller.action(applicationId)(fakeGrantRequest)
+      val result = controller.action(rawApplicationId)(fakeGrantRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -175,7 +175,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
       SubmissionServiceMock.Grant.thenReturnError(applicationId)
 
-      val result = controller.action(applicationId)(fakeGrantRequest)
+      val result = controller.action(rawApplicationId)(fakeGrantRequest)
 
       status(result) shouldBe INTERNAL_SERVER_ERROR
     }

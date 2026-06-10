@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -59,20 +59,20 @@ class CheckSandboxController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkSandboxPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val isDeleted = request.application.state.isDeleted
 
     (
       for {
         linkedSubordinateApplication <- fromOptionM(
-                                          applicationService.fetchLinkedSubordinateApplicationByApplicationId(applicationId),
+                                          applicationService.fetchLinkedSubordinateApplicationByApplicationId(request.application.id),
                                           errorHandler.notFoundTemplate(Request(request, request.messagesApi)).map(NotFound(_))
                                         )
-        apiSubscriptions             <- liftF(subscriptionService.fetchSubscriptionsByApplicationId(applicationId))
+        apiSubscriptions             <- liftF(subscriptionService.fetchSubscriptionsByApplicationId(request.application.id))
       } yield Ok(checkSandboxPage(
         ViewModel(
           request.application.name,
-          applicationId,
+          request.application.id,
           linkedSubordinateApplication.name,
           linkedSubordinateApplication.id,
           linkedSubordinateApplication.clientId.value,
@@ -84,6 +84,6 @@ class CheckSandboxController @Inject() (
       .merge
   }
 
-  def checkSandboxAction(applicationId: ApplicationId): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckSandboxTesting)(applicationId)
+  def checkSandboxAction(rawApplicationId: java.util.UUID): Action[AnyContent] =
+    updateActionStatus(SubmissionReview.Action.CheckSandboxTesting)(rawApplicationId)
 }

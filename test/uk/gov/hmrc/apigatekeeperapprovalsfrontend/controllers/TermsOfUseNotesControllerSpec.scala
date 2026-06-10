@@ -48,7 +48,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -58,7 +58,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -73,10 +73,10 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.GrantForTouUplift.thenReturn(applicationId, application)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(rawApplicationId).url
     }
 
     "return 400 if no reasons supplied" in new Setup {
@@ -86,7 +86,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -98,7 +98,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -111,7 +111,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.GrantForTouUplift.thenReturnError(applicationId)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }

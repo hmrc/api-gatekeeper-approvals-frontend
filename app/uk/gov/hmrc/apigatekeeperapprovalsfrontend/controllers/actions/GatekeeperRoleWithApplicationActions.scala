@@ -26,6 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuth
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
+import java.util.UUID
 
 trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders with GatekeeperAuthorisationActions {
   self: GatekeeperBaseController =>
@@ -33,13 +34,13 @@ trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders
   def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     role(anyAuthenticatedUserRefiner) _
 
-  def loggedInWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+  def loggedInWithApplication: (UUID) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplication(anyAuthenticatedUserRefiner) _
 
-  def loggedInWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+  def loggedInWithApplicationAndSubmission: (UUID) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner) _
 
-  def loggedInWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+  def loggedInWithApplicationAndSubmissionAndInstance: (UUID, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner) _
 
 }

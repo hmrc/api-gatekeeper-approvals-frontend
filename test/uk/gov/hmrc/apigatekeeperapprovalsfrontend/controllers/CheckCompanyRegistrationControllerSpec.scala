@@ -52,7 +52,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -71,7 +71,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(outsideUKOrg, markedAnswers))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -90,7 +90,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(inUKWithNoRegOrg, markedAnswers))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -112,7 +112,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(inUKWithCompanyNumOrg, markedAnswers))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -126,7 +126,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -139,7 +139,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -149,7 +149,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -162,10 +162,10 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
+      val result = controller.action(rawApplicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/checklist")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${rawApplicationId}/checklist")
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
@@ -174,10 +174,10 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.action(rawApplicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/checklist")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${rawApplicationId}/checklist")
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
@@ -185,7 +185,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeRequest)
+      val result = controller.action(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

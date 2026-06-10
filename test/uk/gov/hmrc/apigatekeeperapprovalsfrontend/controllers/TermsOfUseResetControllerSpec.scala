@@ -51,7 +51,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -61,7 +61,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -76,10 +76,10 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.ResetForTouUplift.thenReturn(applicationId, application)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(rawApplicationId).url
     }
 
     "return 400 if no reasons supplied" in new Setup {
@@ -89,7 +89,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -102,7 +102,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.GrantForTouUplift.thenReturnError(applicationId)
 
-      val result = controller.action(applicationId)(fakeReasonsRequest)
+      val result = controller.action(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -114,7 +114,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.confirmationPage(applicationId)(fakeRequest)
+      val result = controller.confirmationPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }

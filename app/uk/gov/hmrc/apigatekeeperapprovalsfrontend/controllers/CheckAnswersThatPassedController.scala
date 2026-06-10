@@ -56,7 +56,7 @@ class CheckAnswersThatPassedController @Inject() (
 
   import CheckAnswersThatPassedController.*
 
-  def checkAnswersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkAnswersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
@@ -84,7 +84,7 @@ class CheckAnswersThatPassedController @Inject() (
       Ok(
         checkAnswersThatPassedPage(
           CheckAnswersThatPassedController.ViewModel(
-            applicationId,
+            request.application.id,
             request.application.name,
             groupedPassedQuestionsIds,
             isDeleted
@@ -94,5 +94,5 @@ class CheckAnswersThatPassedController @Inject() (
     )
   }
 
-  def checkAnswersThatPassedAction(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckPassedAnswers)(applicationId)
+  def checkAnswersThatPassedAction(rawApplicationId: java.util.UUID): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckPassedAnswers)(rawApplicationId)
 }

@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -61,7 +61,7 @@ class ProductionAccessController @Inject() (
 
   import ProductionAccessController.*
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName  = request.application.name
     val instance = request.markedSubmission.submission.latestInstance
 
@@ -69,7 +69,7 @@ class ProductionAccessController @Inject() (
       case (Granted(grantedTimestamp, grantedName, _, _), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                              =>
         successful(Ok(productionAccessPage(ViewModel(
           appName,
-          applicationId,
+          request.application.id,
           requestedBy,
           submittedTimestamp.asText,
           grantedName,
@@ -81,7 +81,7 @@ class ProductionAccessController @Inject() (
       case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
         successful(Ok(productionAccessPage(ViewModel(
           appName,
-          applicationId,
+          request.application.id,
           requestedBy,
           submittedTimestamp.asText,
           grantedName,

@@ -25,19 +25,20 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseControll
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
+import java.util.UUID
 
 trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBuilders {
   self: GatekeeperBaseController =>
 
   private val userRoleActionRefiner = gatekeeperRoleActionRefiner(GatekeeperRoles.USER)
 
-  def loggedInThruStrideWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+  def loggedInThruStrideWithApplication: (UUID) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplication(userRoleActionRefiner) _
 
-  def loggedInThruStrideWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+  def loggedInThruStrideWithApplicationAndSubmission: (UUID) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplicationAndSubmission(userRoleActionRefiner) _
 
   def loggedInThruStrideWithApplicationAndSubmissionAndInstance
-      : (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+      : (UUID, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     roleWithApplicationAndSubmissionAndInstance(userRoleActionRefiner) _
 }

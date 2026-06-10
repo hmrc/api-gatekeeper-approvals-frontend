@@ -55,7 +55,7 @@ class TermsOfUsePassedController @Inject() (
 
   import TermsOfUsePassedController.*
 
-  def answersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def answersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
@@ -83,7 +83,7 @@ class TermsOfUsePassedController @Inject() (
       Ok(
         termsOfUsePassedPage(
           TermsOfUsePassedController.ViewModel(
-            applicationId,
+            request.application.id,
             request.application.name,
             groupedPassedQuestionsIds,
             isDeleted

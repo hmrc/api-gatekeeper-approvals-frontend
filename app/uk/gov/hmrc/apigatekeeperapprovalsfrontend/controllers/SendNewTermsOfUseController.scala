@@ -54,8 +54,9 @@ class SendNewTermsOfUseController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
+    val applicationId = request.application.id
 
     def checkNotAlreadyInvited = {
       // Check no existing submissions and not already invited
@@ -99,8 +100,8 @@ class SendNewTermsOfUseController @Inject() (
     }
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
 
     def inviteTermsOfUse = {
       def failure(failures: NonEmptyList[CommandFailure]) = {
@@ -114,13 +115,13 @@ class SendNewTermsOfUseController @Inject() (
 
       lazy val success = Ok(
         sendNewTermsOfUseRequestedPage(
-          SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
+          SendNewTermsOfUseController.ViewModel(request.application.name, request.application.id, gatekeeperApplicationUrl)
         )
       )
 
       val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
 
-      E.fromEitherF(submissionService.termsOfUseInvite(applicationId, request.name.get))
+      E.fromEitherF(submissionService.termsOfUseInvite(request.application.id, request.name.get))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge

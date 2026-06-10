@@ -29,6 +29,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubmissionReviewService
+import java.util.UUID
 
 abstract class AbstractCheckController(
     strideAuthorisationService: StrideAuthorisationService,
@@ -55,9 +56,9 @@ abstract class AbstractCheckController(
   def updateActionStatus(
       reviewAction: SubmissionReview.Action
     )(
-      applicationId: ApplicationId
-    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
+      rawApplicationId: UUID
+    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(rawApplicationId))
     val log = logBadRequest(reviewAction) _
 
     (

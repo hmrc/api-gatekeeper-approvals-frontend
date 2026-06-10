@@ -55,7 +55,7 @@ class CheckCompanyRegistrationController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val companyDetails = CompanyDetailsExtractor(request.submission)
 
     (request.application.access, companyDetails) match {
@@ -67,7 +67,7 @@ class CheckCompanyRegistrationController @Inject() (
             checkCompanyRegistrationPage(
               CheckCompanyRegistrationController.ViewModel(
                 request.application.name,
-                applicationId,
+                request.application.id,
                 details.registrationType,
                 details.registrationValue,
                 isDeleted
@@ -79,6 +79,6 @@ class CheckCompanyRegistrationController @Inject() (
     }
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckCompanyRegistration)(applicationId)
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] =
+    updateActionStatus(SubmissionReview.Action.CheckCompanyRegistration)(rawApplicationId)
 }

@@ -41,6 +41,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(ScoverageSettings(): _*)
   .settings(
     routesImport ++= Seq(
+      "java.util.UUID",
       "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._"
     )

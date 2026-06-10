@@ -54,7 +54,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -64,7 +64,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -79,10 +79,10 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturn(submissionReview)
 
-      val result = controller.provideReasonsAction(applicationId)(fakeDeclineRequest)
+      val result = controller.provideReasonsAction(rawApplicationId)(fakeDeclineRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(rawApplicationId).url
     }
 
     "return bad request when valid form and persisting decline reasons fails" in new Setup {
@@ -93,7 +93,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturnError()
 
-      val result = controller.provideReasonsAction(applicationId)(fakeDeclineRequest)
+      val result = controller.provideReasonsAction(rawApplicationId)(fakeDeclineRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -105,7 +105,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideReasonsAction(applicationId)(brokenFormRequest)
+      val result = controller.provideReasonsAction(rawApplicationId)(brokenFormRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -117,7 +117,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.emailAddressesPage(applicationId)(fakeRequest)
+      val result = controller.emailAddressesPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) shouldNot include("LaxEmailAddress")
@@ -128,7 +128,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.emailAddressesPage(applicationId)(fakeRequest)
+      val result = controller.emailAddressesPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -142,10 +142,10 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.DeclineApplicationApprovalRequest.thenReturnSuccess()
 
-      val result = controller.emailAddressesAction(applicationId)(fakeRequest)
+      val result = controller.emailAddressesAction(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(rawApplicationId).url
     }
 
     "throw RuntimeException when the decline fails" in new Setup {
@@ -155,7 +155,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.DeclineApplicationApprovalRequest.thenReturnFailure()
 
-      intercept[RuntimeException](await(controller.emailAddressesAction(applicationId)(fakeRequest))).getMessage shouldBe "Application id not found"
+      intercept[RuntimeException](await(controller.emailAddressesAction(rawApplicationId)(fakeRequest))).getMessage shouldBe "Application id not found"
     }
   }
 
@@ -165,7 +165,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.declinedPage(applicationId)(fakeRequest)
+      val result = controller.declinedPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include(application.name.value)

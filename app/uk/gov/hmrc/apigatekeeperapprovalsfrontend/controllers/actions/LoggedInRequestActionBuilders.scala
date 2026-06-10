@@ -25,6 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseControll
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
+import java.util.UUID
 
 trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
@@ -37,14 +38,14 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   protected def roleWithApplication(
       refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
     )(
-      applicationId: ApplicationId
+      rawApplicationId: UUID
     )(
       block: ApplicationRequest[AnyContent] => Future[Result]
     ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-          applicationRequestRefiner(applicationId)
+          applicationRequestRefiner(rawApplicationId)
       )
         .invokeBlock(request, block)
     }
@@ -52,14 +53,14 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   protected def roleWithApplicationAndSubmission(
       refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
     )(
-      applicationId: ApplicationId
+      rawApplicationId: UUID
     )(
       block: MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]
     ): Action[AnyContent] =
     Action.async { implicit request =>
       (
         refiner andThen
-          applicationRequestRefiner(applicationId) andThen
+          applicationRequestRefiner(rawApplicationId) andThen
           applicationSubmissionRefiner
       )
         .invokeBlock(request, block)
@@ -68,7 +69,7 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   protected def roleWithApplicationAndSubmissionAndInstance(
       refiner: ActionRefiner[MessagesRequest, LoggedInRequest]
     )(
-      applicationId: ApplicationId,
+      rawApplicationId: UUID,
       index: Int
     )(
       block: SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]
@@ -76,7 +77,7 @@ trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
     Action.async { implicit request =>
       (
         refiner andThen
-          applicationRequestRefiner(applicationId) andThen
+          applicationRequestRefiner(rawApplicationId) andThen
           applicationSubmissionRefiner andThen
           submissionInstanceRefiner(index)
       )

@@ -67,7 +67,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "fetch latest submission by id" should {
-    val url = s"/submissions/application/${applicationId.value}"
+    val url = s"/submissions/application/${rawApplicationId}"
 
     "return a submission" in new Setup {
       stubFor(
@@ -101,7 +101,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "fetch latest marked submission by id" should {
-    val url = s"/submissions/marked/application/${applicationId.value}"
+    val url = s"/submissions/marked/application/${rawApplicationId}"
 
     "return a marked submission" in new Setup {
       stubFor(
@@ -135,7 +135,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "invite application for terms of use" should {
-    val url = s"/terms-of-use/application/${applicationId.value}"
+    val url = s"/terms-of-use/application/${rawApplicationId}"
 
     "return TermsOfUseInvitationSuccessful on success" in new Setup {
       stubFor(
@@ -155,7 +155,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "fetch terms of use invitation by app id" should {
-    val url = s"/terms-of-use/application/${applicationId.value}"
+    val url = s"/terms-of-use/application/${rawApplicationId}"
 
     "return an invitation" in new Setup {
       stubFor(
@@ -261,7 +261,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "grant with warnings application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/grant-with-warn-tou"
+    val url = s"/approvals/application/${rawApplicationId}/grant-with-warn-tou"
 
     "return an application on success" in new Setup {
       stubFor(
@@ -284,7 +284,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "decline application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/decline-tou"
+    val url = s"/approvals/application/${rawApplicationId}/decline-tou"
 
     "return an application on success" in new Setup {
       stubFor(
@@ -307,7 +307,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "reset application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/reset-tou"
+    val url = s"/approvals/application/${rawApplicationId}/reset-tou"
 
     "return an application on success" in new Setup {
       stubFor(
@@ -330,7 +330,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "delete submission for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/delete-tou"
+    val url = s"/approvals/application/${rawApplicationId}/delete-tou"
 
     "return an application on success" in new Setup {
       stubFor(
