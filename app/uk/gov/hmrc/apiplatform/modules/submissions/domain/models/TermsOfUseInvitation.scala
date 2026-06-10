@@ -23,7 +23,7 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState
 
-final case class TermsOfUseInvitation(
+case class TermsOfUseInvitation(
     applicationId: ApplicationId,
     createdOn: Instant,
     lastUpdated: Instant,
@@ -33,5 +33,5 @@ final case class TermsOfUseInvitation(
   )
 
 object TermsOfUseInvitation {
-  implicit val format: Format[TermsOfUseInvitation] = Json.format[TermsOfUseInvitation]
+  given Format[TermsOfUseInvitation] = Json.format[TermsOfUseInvitation]
 }

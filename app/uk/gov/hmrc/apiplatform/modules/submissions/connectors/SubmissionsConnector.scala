@@ -36,19 +36,19 @@ object SubmissionsConnector {
   case class Config(serviceBaseUrl: String, apiKey: String)
 
   case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, escalatedTo: Option[String] = None)
-  implicit val writesApprovedRequest: Writes[GrantedRequest] = Json.writes[GrantedRequest]
+  given Writes[GrantedRequest] = Json.writes[GrantedRequest]
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesDeclinedRequest: Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
+  given Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
 
   case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesTouUpliftRequest: Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
+  given Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
 
   case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
-  implicit val writesTouGrantedRequest: Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
+  given Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
 
   case class TouDeleteRequest(gatekeeperUserName: String)
-  implicit val writesTouDeleteRequest: Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
+  given Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
 
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }

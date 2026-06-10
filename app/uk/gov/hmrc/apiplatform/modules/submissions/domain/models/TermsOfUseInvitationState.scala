@@ -35,5 +35,5 @@ object TermsOfUseInvitationState {
 
   def apply(text: String): Option[TermsOfUseInvitationState] = TermsOfUseInvitationState.values.find(_.toString() == text.toUpperCase)
 
-  implicit val format: Format[TermsOfUseInvitationState] = SimpleEnumJsonFormatting.createFormatFor[TermsOfUseInvitationState]("Terms of use state", apply, _.toString())
+  given Format[TermsOfUseInvitationState] = SimpleEnumJsonFormatting.createFormatFor[TermsOfUseInvitationState]("Terms of use state", apply, _.toString())
 }

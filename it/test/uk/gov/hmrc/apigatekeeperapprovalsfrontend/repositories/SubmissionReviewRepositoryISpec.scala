@@ -52,7 +52,7 @@ class SubmissionReviewRepositoryISpec
   val submissionReview2 = SubmissionReview(submissionId, 1, true, false, false, true)
 
   override def beforeEach(): Unit = {
-    await(submissionReviewRepo.collection.drop().toFuture())
+    await(submissionReviewRepo.collection.drop().head())
     await(submissionReviewRepo.ensureIndexes())
   }
 
@@ -78,7 +78,7 @@ class SubmissionReviewRepositoryISpec
       await(
         submissionReviewRepo.collection
           .countDocuments()
-          .toFuture()
+          .head()
           .map(x => x.toInt)
       ) mustBe 1
     }

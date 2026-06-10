@@ -38,7 +38,7 @@ import Submission.given
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
 
-  import Submission.*
+  import Submission.given
 
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,

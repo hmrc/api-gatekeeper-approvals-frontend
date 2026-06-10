@@ -24,5 +24,5 @@ case class DispatchSuccessResult(applicationResponse: ApplicationWithCollaborato
 
 object DispatchSuccessResult {
 
-  implicit val format: Format[DispatchSuccessResult] = Json.format[DispatchSuccessResult]
+  given Format[DispatchSuccessResult] = Json.format[DispatchSuccessResult]
 }

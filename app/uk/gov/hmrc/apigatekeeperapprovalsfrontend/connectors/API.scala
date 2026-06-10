@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-final case class API(name: String) extends AnyVal
+case class API(name: String) extends AnyVal

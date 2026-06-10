@@ -37,9 +37,8 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvi
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandConnector
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationWithCollaboratorsFixtures with MockitoSugar with ArgumentMatchersSugar {
-
-  trait Setup extends FixedClock {
+class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationWithCollaboratorsFixtures {
+  trait Setup extends FixedClock with MockitoSugar with ArgumentMatchersSugar {
     implicit val hc: HeaderCarrier                                   = HeaderCarrier()
     val applicationId                                                = applicationIdOne
     val mockSubmissionsConnector: SubmissionsConnector               = mock[SubmissionsConnector]
