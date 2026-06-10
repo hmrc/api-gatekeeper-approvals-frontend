@@ -28,7 +28,7 @@
     <ol class="govuk-breadcrumbs__list">
       <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@{s"${config.applicationsPageUri}"}">@{messages("breadcrumbs.applications")}</a></li>
       @{applicationBreadcrumb match {
-        case Some(app)  => <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.whichPage(app.id).url}>{app.applicationName}</a></li>
+        case Some(app)  => <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.whichPage(app.id.value).url}>{app.applicationName}</a></li>
         case None       => 
       }}
     </ol>
