@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 
 object SubmissionQuestionsAndAnswers {

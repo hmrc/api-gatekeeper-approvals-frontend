@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
@@ -26,14 +27,12 @@ import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Applicati
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
-import java.util.UUID
-import play.api.mvc.{Action,AnyContent}
 
 object ViewDeclinedSubmissionController {
 
@@ -55,7 +54,6 @@ class ViewDeclinedSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
     viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
     errorHandler: ErrorHandler,
-    submissionReviewService: SubmissionReviewService,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
   )(implicit override val ec: ExecutionContext

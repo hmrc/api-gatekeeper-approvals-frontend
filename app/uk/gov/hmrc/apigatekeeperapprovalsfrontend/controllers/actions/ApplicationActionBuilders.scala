@@ -16,21 +16,21 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
+import java.util.UUID
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc.*
+import play.api.mvc._
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
-import java.util.UUID
 
 trait ApplicationActionBuilders {
   self: GatekeeperBaseController =>

@@ -37,7 +37,6 @@ object TermsOfUseGrantedController {
 
 @Singleton
 class TermsOfUseGrantedController @Inject() (
-    config: GatekeeperConfig,
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     errorHandler: ErrorHandler,

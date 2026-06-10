@@ -34,6 +34,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, Te
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
+import Submission.given
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
 
@@ -46,6 +47,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "metrics.jvm"                                             -> false,
     "metrics.enabled"                                         -> false
   )
+
+  val rawApplicationId = applicationIdOne.value
 
   override def fakeApplication(): PlayApplication =
     GuiceApplicationBuilder()

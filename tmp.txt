@@ -1,0 +1,139 @@
+[info] welcome to sbt 1.12.11 (Eclipse Adoptium Java 21.0.7)
+[info] loading settings for project api-gatekeeper-approvals-frontend-build-build-build from metals.sbt...
+[info] loading project definition from /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/project/project/project
+[info] loading settings for project api-gatekeeper-approvals-frontend-build-build from metals.sbt...
+[info] loading project definition from /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/project/project
+[success] Generated .bloop/api-gatekeeper-approvals-frontend-build-build.json
+[success] Total time: 1 s, completed Jun 10, 2026, 12:32:05 PM
+[info] loading settings for project api-gatekeeper-approvals-frontend-build from metals.sbt, plugins.sbt...
+[info] loading project definition from /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/project
+[success] Generated .bloop/api-gatekeeper-approvals-frontend-build.json
+[success] Total time: 1 s, completed Jun 10, 2026, 12:32:06 PM
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project api-gatekeeper-approvals-frontend from build.sbt...
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.10 running Java 21.0.7
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] sbt 0.13 shell syntax is deprecated; use slash syntax instead: Test / compile
+[info] Building 1 concat group(s)
+[info] compiling 65 Scala sources to /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/target/scala-3.3.7/test-classes ...
+[warn] Flag -deprecation set repeatedly
+[warn] Flag -unchecked set repeatedly
+[warn] Flag -encoding set repeatedly
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:72:47 
+[warn] 72 |    private def completedQuestionnaireProgress(qId: Questionnaire.Id): QuestionnaireProgress     = QuestionnaireProgress(QuestionnaireState.Completed, allQuestionIds.toList)
+[warn]    |                                               ^^^
+[warn]    |                                               unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:73:48 
+[warn] 73 |    private def notStartedQuestionnaireProgress(qId: Questionnaire.Id): QuestionnaireProgress    = QuestionnaireProgress(QuestionnaireState.NotStarted, allQuestionIds.toList)
+[warn]    |                                                ^^^
+[warn]    |                                               unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:74:51 
+[warn] 74 |    private def notApplicableQuestionnaireProgress(qId: Questionnaire.Id): QuestionnaireProgress = QuestionnaireProgress(QuestionnaireState.NotApplicable, allQuestionIds.toList)
+[warn]    |                                                   ^^^
+[warn]    |                                               unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:199:18 
+[warn] 199 |            case (pa, Mark.Pass) => true; case _ => false
+[warn]     |                  ^^
+[warn]     |                  unused pattern variable
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:202:18 
+[warn] 202 |            case (pa, Mark.Pass) => true; case _ => false
+[warn]     |                  ^^
+[warn]     |                  unused pattern variable
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:223:35 
+[warn] 223 |  def buildFullyAnsweredSubmission(applicationId: ApplicationId = ApplicationId.random, submission: Submission = buildSubmissionWithQuestions(applicationId)): Submission =
+[warn]     |                                   ^^^^^^^^^^^^^
+[warn]     |                                   unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:251:20 
+[warn] 251 |          case (pa, mark) => Some(ActualAnswer.SingleChoiceAnswer(pa.value))
+[warn]     |                    ^^^^
+[warn]     |                    unused pattern variable
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:326:17 
+[warn] 326 |  def markAsPass(now: Instant = instant, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
+[warn]     |                 ^^^
+[warn]     |                 unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:326:41 
+[warn] 326 |  def markAsPass(now: Instant = instant, requestedBy: String = "bob@example.com")(submission: Submission): MarkedSubmission = {
+[warn]     |                                         ^^^^^^^^^^^
+[warn]     |                                         unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:328:41 
+[warn] 328 |    val marks   = answers.map { case (q, a) => q -> Mark.Pass }
+[warn]     |                                         ^
+[warn]     |                                         unused pattern variable
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:335:17 
+[warn] 335 |  def markAsWarn(now: Instant = instant, requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
+[warn]     |                 ^^^
+[warn]     |                 unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test-common/uk/gov/hmrc/apiplatform/modules/submissions/SubmissionsTestData.scala:335:41 
+[warn] 335 |  def markAsWarn(now: Instant = instant, requestedBy: String = "bob@example.com")(submission: Submission, warnCount: Int = 1): MarkedSubmission = {
+[warn]     |                                         ^^^^^^^^^^^
+[warn]     |                                         unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apigatekeeperapprovalsfrontend/connectors/ApplicationCommandConnectorSpec.scala:34:85 
+[warn] 34 |import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters.*
+[warn]    |                                                                                     ^
+[warn]    |                                                           unused import
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apigatekeeperapprovalsfrontend/connectors/ApplicationCommandConnectorSpec.scala:76:14 
+[warn] 76 |  class Setup(proxyEnabled: Boolean = false) {
+[warn]    |              ^^^^^^^^^^^^
+[warn]    |              unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/ApplicationActionServiceMockModule.scala:44:23 
+[warn] 44 |          .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.pure[Future](new ApplicationRequest[A](application, req)))
+[warn]    |                       ^
+[warn]    |                       unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/ApplicationActionServiceMockModule.scala:51:23 
+[warn] 51 |          .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none[Future, ApplicationRequest[A]])
+[warn]    |                       ^
+[warn]    |                       unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/ApplicationActionServiceMockModule.scala:51:41 
+[warn] 51 |          .thenAnswer((a: ApplicationId, req: LoggedInRequest[A]) => OptionT.none[Future, ApplicationRequest[A]])
+[warn]    |                                         ^^^
+[warn]    |                                         unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/StrideAuthorisationServiceMockModule.scala:47:17 
+[warn] 47 |        wrap[A]((msg) => failed(new InvalidBearerToken))
+[warn]    |                 ^^^
+[warn]    |                 unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/StrideAuthorisationServiceMockModule.scala:51:17 
+[warn] 51 |        wrap[A]((msg) => successful(Left(Forbidden("You do not have permission"))))
+[warn]    |                 ^^^
+[warn]    |                 unused explicit parameter
+[warn] -- [E198] Unused Symbol Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/StrideAuthorisationServiceMockModule.scala:55:17 
+[warn] 55 |        wrap[A]((msg) => successful(Left(Redirect("http://example.com"))))
+[warn]    |                 ^^^
+[warn]    |                 unused explicit parameter
+[warn] -- Deprecation Warning: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apigatekeeperapprovalsfrontend/connectors/ThirdPartyApplicationConnectorSpec.scala:85:119 
+[warn] 85 |      val result = await(connector.query[Option[ApplicationWithSubscriptions]](ApplicationQuery.ById(appId, Nil, true)))
+[warn]    |                                                                                                                       ^
+[warn]    |method readOptionOf in trait HttpReadsLegacyOption is deprecated since 11.0.0: Use uk.gov.hmrc.http.HttpReads.Implicits instead. See README for differences.
+[error] -- [E058] Type Mismatch Error: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apigatekeeperapprovalsfrontend/controllers/DeclinedJourneyControllerSpec.scala:29:6 
+[error] 29 |class DeclinedJourneyControllerSpec extends AbstractControllerSpec
+[error]    |      ^
+[error]    |illegal inheritance: self type uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.
+[error]    |  DeclinedJourneyControllerSpec of class DeclinedJourneyControllerSpec does not conform to self type org.mockito.MockitoSugar & org.mockito.ArgumentMatchersSugar
+[error]    |of parent trait StrideAuthorisationServiceMockModule
+[error]    |
+[error]    | longer explanation available when compiling with `-explain`
+[error] -- [E058] Type Mismatch Error: /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/test/uk/gov/hmrc/apiplatform/modules/gkauth/services/StrideAuthorisationServiceSpec.scala:36:6 
+[error] 36 |class StrideAuthorisationServiceSpec extends AsyncHmrcSpec with StrideAuthConnectorMockModule with StubMessagesFactory with TableDrivenPropertyChecks {
+[error]    |      ^
+[error]    |illegal inheritance: self type uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceSpec of class StrideAuthorisationServiceSpec does not conform to self type org.mockito.MockitoSugar & org.mockito.ArgumentMatchersSugar
+[error]    |of parent trait StrideAuthConnectorMockModule
+[error]    |
+[error]    | longer explanation available when compiling with `-explain`
+[warn] there were 5 feature warnings; re-run with -feature for details
+[warn] 25 warnings found
+[error] two errors found
+[error] (Test / compileIncremental) Compilation failed
+[error] Total time: 17 s, completed Jun 10, 2026, 12:32:24 PM

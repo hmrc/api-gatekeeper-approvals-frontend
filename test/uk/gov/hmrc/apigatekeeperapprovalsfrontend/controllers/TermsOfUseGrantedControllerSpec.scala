@@ -22,11 +22,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import cats.data.NonEmptyList
 
 import play.api.http.Status
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
-import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -43,7 +43,6 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     val termsOfUseGrantedPage = app.injector.instanceOf[TermsOfUseGrantedPage]
 
     val controller = new TermsOfUseGrantedController(
-      config,
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
@@ -76,7 +75,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
       val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
     }
 
     "return 404 if no application is found" in new Setup {

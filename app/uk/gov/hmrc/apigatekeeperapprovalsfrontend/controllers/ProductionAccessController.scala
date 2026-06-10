@@ -20,13 +20,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc.*
+import play.api.mvc._
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.*
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler

@@ -40,6 +40,8 @@ trait BaseConnectorIntegrationISpec
   val wireMockUrl    = s"http://$stubHost:$stubPort"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
+  val rawApplicationId = apiIdentifierOne.value
+
   override def beforeAll(): Unit = {
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)

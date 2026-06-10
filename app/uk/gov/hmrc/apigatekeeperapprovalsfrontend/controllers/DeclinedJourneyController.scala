@@ -21,11 +21,11 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.data.Form
-import play.api.data.Forms.*
-import play.api.mvc.*
+import play.api.data.Forms._
+import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -33,7 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresDemo, SubmissionRequiresFraudCheck}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 object DeclinedJourneyController {
   case class ViewModel(applicationId: ApplicationId, appName: ApplicationName, adminsToEmail: Set[Collaborator] = Set.empty)
@@ -111,7 +111,7 @@ class DeclinedJourneyController @Inject() (
                   requiresFraudCheck,
                   requiresDemo
                 )
-      result <- applicationService.declineApplicationApprovalRequest(request.application.id, request.name.get, review.declineReasons, adminsToEmail)
+      _      <- applicationService.declineApplicationApprovalRequest(request.application.id, request.name.get, review.declineReasons, adminsToEmail)
     } yield ok
   }
 }

@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import cats.data.NonEmptyList
 
 import play.api.http.Status
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationStateData, ApplicationWithCollaboratorsFixtures}
@@ -84,7 +84,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
       val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
       contentAsString(result) should include("The responsible individual has not verified yet, so you can only decline this request.")
       contentAsString(result) shouldNot include("Production access granted")
       contentAsString(result) shouldNot include("Previously declined")
@@ -103,7 +103,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
       val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
       contentAsString(result) shouldNot include("Production access granted")
       contentAsString(result) should include("Previously declined")
       contentAsString(result) shouldNot include("This application has been deleted")
@@ -121,7 +121,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
       val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
       contentAsString(result) should include("Production access granted")
       contentAsString(result) shouldNot include("Previously declined")
       contentAsString(result) shouldNot include("This application has been deleted")

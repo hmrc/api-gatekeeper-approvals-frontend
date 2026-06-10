@@ -19,13 +19,13 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
@@ -138,7 +138,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.answersWithWarningsOrFails(applicationId)(fakeRequest)
+      val result = controller.answersWithWarningsOrFails(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -195,7 +195,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(
-        applicationId
+        rawApplicationId
       ).url
     }
   }
@@ -237,7 +237,9 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.overrideApproverAction(rawApplicationId)(fakeSubmitApproverRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(rawApplicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideNotesPage(
+        rawApplicationId
+      ).url
     }
 
     "return 400 when no names submitted" in new Setup {
@@ -275,7 +277,9 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.overrideNotesAction(rawApplicationId)(fakeSubmitApproverRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmPage(rawApplicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideConfirmPage(
+        rawApplicationId
+      ).url
     }
 
     "return 400 when nothing submitted" in new Setup {

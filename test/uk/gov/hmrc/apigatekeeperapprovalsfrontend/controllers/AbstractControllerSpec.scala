@@ -19,6 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -38,6 +39,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRF
 
 class AbstractControllerSpec
     extends AsyncHmrcSpec
+    with MockitoSugar with ArgumentMatchersSugar
     with GuiceOneAppPerSuite
     with WithCSRFAddToken
     with ApplicationWithCollaboratorsFixtures
@@ -56,13 +58,15 @@ class AbstractControllerSpec
       with SubmissionServiceMockModule
       with SubmissionReviewServiceMockModule {
 
+    val rawApplicationId = applicationIdOne.value
+
     val config           = app.injector.instanceOf[GatekeeperConfig]
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]
     val forbiddenHandler = app.injector.instanceOf[HandleForbiddenWithView]
     val mcc              = app.injector.instanceOf[MessagesControllerComponents]
     val errorHandler     = app.injector.instanceOf[ErrorHandler]
 
-    val application = standardApp.withCollaborators(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Roles.ADMINISTRATOR, UserId.random))
+    val application = standardApp.withCollaborators(Collaborator(LaxEmailAddress("pete@example.com"), Collaborator.Role.Administrator, UserId.random))
 
     val inHouseApplication = application.modifyStdAccess(_.copy(sellResellOrDistribute = Some(SellResellOrDistribute("No"))))
     val fakeRequest        = FakeRequest().withMethod("POST").withCSRFToken

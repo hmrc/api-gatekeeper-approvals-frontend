@@ -44,7 +44,6 @@ class ApplicationCommandConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): AppCmdResult = {
 
-    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters.*
     import play.api.libs.json.*
     import uk.gov.hmrc.http.HttpReads.Implicits.*
     import play.api.http.Status.*

@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -168,7 +168,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
       val result = controller.declinedPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(application.name.value)
+      contentAsString(result) should include(application.name)
       contentAsString(result) should include("You have declined this request")
     }
   }

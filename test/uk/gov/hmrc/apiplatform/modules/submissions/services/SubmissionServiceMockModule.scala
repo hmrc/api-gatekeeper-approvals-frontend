@@ -28,8 +28,8 @@ import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Applicati
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailures, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.MarkedSubmissionsTestData
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.*
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 
 trait SubmissionServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with MarkedSubmissionsTestData {
 

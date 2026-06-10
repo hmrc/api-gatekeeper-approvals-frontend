@@ -23,7 +23,7 @@ import scala.concurrent.Future.successful
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
@@ -59,7 +59,7 @@ class ArrangeDemoController @Inject() (
   def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     (request.application.access, request.submission.latestInstance.statusHistory.find(_.isSubmitted)) match {
       // Should only be uplifting and checking Standard apps
-      case (std: Access.Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if (request.submission.status.isSubmitted) =>
+      case (_: Access.Standard, Some(Submission.Status.Submitted(timestamp, requestedBy))) if (request.submission.status.isSubmitted) =>
         val isDeleted = request.application.state.isDeleted
         successful(
           Ok(
@@ -73,7 +73,7 @@ class ArrangeDemoController @Inject() (
             )
           )
         )
-      case _                                                                                                                            => errorHandler.badRequestTemplate.map(BadRequest(_))
+      case _                                                                                                                          => errorHandler.badRequestTemplate.map(BadRequest(_))
     }
   }
 

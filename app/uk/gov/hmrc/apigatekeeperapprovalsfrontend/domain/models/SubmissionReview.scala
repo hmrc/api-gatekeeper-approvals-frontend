@@ -121,7 +121,7 @@ object SubmissionReview {
     }
 }
 
-case class SubmissionReview private (
+case class SubmissionReview(
     submissionId: SubmissionId,
     instanceIndex: Int,
     declineReasons: String,

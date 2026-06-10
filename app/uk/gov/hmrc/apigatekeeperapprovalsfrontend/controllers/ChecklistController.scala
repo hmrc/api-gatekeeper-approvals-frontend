@@ -16,23 +16,24 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
-import play.api.mvc.*
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
+import play.api.mvc._
+
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apiplatform.modules.submissions.services.*
+import uk.gov.hmrc.apiplatform.modules.submissions.services._
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresDemo, SubmissionRequiresFraudCheck}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
-import java.util.UUID
 
 object ChecklistController {
 
@@ -102,7 +103,7 @@ class ChecklistController @Inject() (
     val isSuccessful = !request.markedSubmission.isFail
     val hasWarnings  = request.markedSubmission.isWarn
     for {
-      review <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
+      _ <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
     } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(rawApplicationId))
   }
 

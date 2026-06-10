@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.mockito.captor.ArgCaptor
 
 import play.api.http.Status
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles

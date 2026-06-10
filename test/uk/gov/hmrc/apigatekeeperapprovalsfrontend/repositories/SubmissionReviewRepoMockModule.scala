@@ -25,7 +25,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
 
 trait SubmissionReviewRepoMockModule extends MockitoSugar with ArgumentMatchersSugar with SubmissionsTestData {
 

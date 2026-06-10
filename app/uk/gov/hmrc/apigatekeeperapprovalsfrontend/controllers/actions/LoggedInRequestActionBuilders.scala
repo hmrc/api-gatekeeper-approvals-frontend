@@ -16,16 +16,15 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
+import java.util.UUID
 import scala.concurrent.Future
 
-import play.api.mvc.*
+import play.api.mvc._
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
-import java.util.UUID
 
 trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
