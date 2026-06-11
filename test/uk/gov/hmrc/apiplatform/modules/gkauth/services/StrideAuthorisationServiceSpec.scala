@@ -35,7 +35,12 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRole, Gat
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class StrideAuthorisationServiceSpec extends AsyncHmrcSpec with StrideAuthConnectorMockModule with StubMessagesFactory with TableDrivenPropertyChecks with MockitoSugar
+class StrideAuthorisationServiceSpec
+    extends AsyncHmrcSpec
+    with StrideAuthConnectorMockModule
+    with StubMessagesFactory
+    with TableDrivenPropertyChecks
+    with MockitoSugar
     with ArgumentMatchersSugar {
   val strideAuthRoles = StrideAuthRoles(adminRole = "test-admin", superUserRole = "test-superUser", advancedUserRole = "test-advancedUser", userRole = "test-user")
   val fakeRequest     = FakeRequest()

@@ -30,7 +30,7 @@ trait SubmissionReviewJsonFormatters {
     .andType[Status.Completed.type]("completed", () => Status.Completed)
     .format
 
-  given KeyReads[Action]   = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
+  given KeyReads[Action]  = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
   given KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
 
   given Format[SubmissionReview] = Json.format[SubmissionReview]

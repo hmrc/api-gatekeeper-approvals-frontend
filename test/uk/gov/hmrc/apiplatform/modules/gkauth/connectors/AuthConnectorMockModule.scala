@@ -18,6 +18,7 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
 import scala.concurrent.Future
 
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.auth.core.retrieve.{Name, ~}
@@ -78,6 +79,6 @@ trait StrideAuthConnectorMockModule {
   }
 
   object StrideAuthConnectorMock extends BaseStrideAuthConnectorMock {
-    val aMock = mock[StrideAuthConnector]
+    val aMock = mock[StrideAuthConnector](withSettings.strictness(Strictness.LENIENT))
   }
 }

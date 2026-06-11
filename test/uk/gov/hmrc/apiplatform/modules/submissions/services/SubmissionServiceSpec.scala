@@ -38,6 +38,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandC
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
 class SubmissionServiceSpec extends AsyncHmrcSpec with MarkedSubmissionsTestData with ApplicationWithCollaboratorsFixtures {
+
   trait Setup extends FixedClock with MockitoSugar with ArgumentMatchersSugar {
     implicit val hc: HeaderCarrier                                   = HeaderCarrier()
     val applicationId                                                = applicationIdOne

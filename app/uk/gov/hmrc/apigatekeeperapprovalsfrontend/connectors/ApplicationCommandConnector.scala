@@ -32,8 +32,10 @@ class ApplicationCommandConnector @Inject() (
     val http: HttpClientV2,
     val config: ApmConnector.Config
   )(implicit val ec: ExecutionContext
-  ) extends CommandHandlerTypes[DispatchSuccessResult]
-    with ApplicationLogger {
+  ) extends ApplicationLogger {
+
+  val x = new CommandHandlerTypes[DispatchSuccessResult] {}
+  import x._
 
   val serviceBaseUrl = config.serviceBaseUrl
 

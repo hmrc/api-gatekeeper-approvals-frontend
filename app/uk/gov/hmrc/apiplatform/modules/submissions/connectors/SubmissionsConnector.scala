@@ -63,7 +63,7 @@ class SubmissionsConnector @Inject() (
 
   import SubmissionsConnector.*
   import config.*
-  import Submission.{*, given}
+  import Submission.given
 
   val api = API("third-party-application-submissions")
 
