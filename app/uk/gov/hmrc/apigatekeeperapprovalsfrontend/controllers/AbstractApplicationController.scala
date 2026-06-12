@@ -42,6 +42,6 @@ abstract class AbstractApplicationController(
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
 
   extension (dateTime: Instant) {
-    def asText    = dateTimeFormatter.format(dateTime)
+    def asText = dateTimeFormatter.format(dateTime)
   }
 }

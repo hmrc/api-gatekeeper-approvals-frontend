@@ -29,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Applicati
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{API, ConnectorMetrics}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApiName, ConnectorMetrics}
 
 object SubmissionsConnector {
 
@@ -65,7 +65,7 @@ class SubmissionsConnector @Inject() (
   import config.*
   import Submission.given
 
-  val api = API("third-party-application-submissions")
+  val api = ApiName("third-party-application-submissions")
 
   def fetchLatestSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = {
     metrics.record(api) {

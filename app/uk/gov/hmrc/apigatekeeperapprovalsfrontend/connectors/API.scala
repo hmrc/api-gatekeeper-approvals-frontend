@@ -16,4 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
-case class API(name: String) extends AnyVal
+opaque type ApiName <: String = String
+
+object ApiName {
+  def apply(text: String): ApiName = text
+}

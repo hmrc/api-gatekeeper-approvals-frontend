@@ -42,7 +42,7 @@ class ThirdPartyApplicationConnector @Inject() (
   ) {
 
   val serviceBaseUrl = config.serviceBaseUrl
-  val api            = API("third-party-application")
+  val api            = ApiName("third-party-application")
 
   def fetchApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
 

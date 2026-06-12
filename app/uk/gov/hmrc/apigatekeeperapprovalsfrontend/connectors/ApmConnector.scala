@@ -40,7 +40,7 @@ class ApmConnector @Inject() (
 
   val serviceBaseUrl = config.serviceBaseUrl
 
-  val api = API("api-platform-microservice")
+  val api = ApiName("api-platform-microservice")
 
   def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
     import uk.gov.hmrc.http.HttpReads.Implicits.*
