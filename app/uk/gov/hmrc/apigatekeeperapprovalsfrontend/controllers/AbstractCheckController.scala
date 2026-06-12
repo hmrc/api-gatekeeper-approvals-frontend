@@ -40,7 +40,7 @@ abstract class AbstractCheckController(
 
   type Fn = (SubmissionReview.Status) => (SubmissionId, Int) => Future[Option[SubmissionReview]]
 
-  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[?]): Future[Result] = {
+  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(using request: MarkedSubmissionApplicationRequest[?]): Future[Result] = {
     val description = SubmissionReview.Action.toText(reviewAction)
     logger.error(s"$description : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
     errorHandler.badRequestTemplate.map(BadRequest(_))

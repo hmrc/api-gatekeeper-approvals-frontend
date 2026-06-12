@@ -20,9 +20,9 @@ import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationWithCollaborators, CoreApplication}
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.ImportantSubmissionData
 
-object Implicits {
+object Extensions {
 
-  implicit class ApplicationSyntax(app: ApplicationWithCollaborators) {
+  extension (app: ApplicationWithCollaborators) {
 
     def importantSubmissionData: Option[ImportantSubmissionData] = app.details.access match {
       case Access.Standard(_, _, _, _, _, _, Some(submissionData)) => Some(submissionData)
@@ -37,7 +37,7 @@ object Implicits {
     def isInHouseSoftware = sellResellOrDistribute.fold(false)(_ == SellResellOrDistribute("No"))
   }
 
-  implicit class CoreApplicationSyntax(app: CoreApplication) {
+  extension (app: CoreApplication) {
 
     def importantSubmissionData: Option[ImportantSubmissionData] = app.access match {
       case Access.Standard(_, _, _, _, _, _, Some(submissionData)) => Some(submissionData)

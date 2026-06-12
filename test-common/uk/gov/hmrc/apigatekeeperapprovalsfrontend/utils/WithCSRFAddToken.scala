@@ -26,7 +26,7 @@ trait WithCSRFAddToken {
 
   val addToken = app.injector.instanceOf[CSRFAddToken]
 
-  implicit class CSRFRequest[T](request: FakeRequest[T]) {
+  extension[T] (request: FakeRequest[T]) {
     def withCSRFToken: FakeRequest[T] = CSRFTokenHelper.addCSRFToken(request).asInstanceOf[FakeRequest[T]]
   }
 }

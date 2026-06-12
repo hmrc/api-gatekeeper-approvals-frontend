@@ -34,8 +34,8 @@ class ApplicationCommandConnector @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends ApplicationLogger {
 
-  val x = new CommandHandlerTypes[DispatchSuccessResult] {}
-  import x.*
+  private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {} // TODO
+  import CHT.*
 
   val serviceBaseUrl = config.serviceBaseUrl
 
@@ -50,7 +50,7 @@ class ApplicationCommandConnector @Inject() (
     import uk.gov.hmrc.http.HttpReads.Implicits.*
     import play.api.http.Status.*
 
-    def parseWithLogAndThrow[T](input: String)(implicit reads: Reads[T]): T = {
+    def parseWithLogAndThrow[T](input: String)(using Reads[T]): T = {
       Json.parse(input).validate[T] match {
         case JsSuccess(t, _) => t
         case JsError(err)    =>
@@ -59,7 +59,7 @@ class ApplicationCommandConnector @Inject() (
       }
     }
 
-    import uk.gov.hmrc.apiplatform.modules.common.services.NonEmptyListFormatters.*
+    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters.given
     import play.api.libs.ws.writeableOf_JsValue
     import cats.syntax.either.*
 

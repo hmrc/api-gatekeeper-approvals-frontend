@@ -56,7 +56,7 @@ class ChecklistController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
   import ChecklistController.*
-  import Implicits.*
+  import Extensions.*
 
   type RequiredActions = Map[SubmissionReview.Action, SubmissionReview.Status]
 

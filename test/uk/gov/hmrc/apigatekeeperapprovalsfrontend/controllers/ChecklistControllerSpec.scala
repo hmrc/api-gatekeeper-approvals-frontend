@@ -34,7 +34,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.SubscriptionServiceMo
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
 
 class ChecklistControllerSpec extends AbstractControllerSpec {
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits.*
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Extensions.*
 
   trait BaseSetup extends AbstractSetup
       with SubscriptionServiceMockModule

@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.AskWhen.Context
 
 trait StatusTestDataHelper extends FixedClock {
 
-  implicit class StatusHistorySyntax(submission: Submission) {
+  extension (submission: Submission) {
 
     def hasCompletelyAnsweredWith(answers: Submission.AnswersToQuestions): Submission = {
       (
@@ -62,9 +62,9 @@ trait StatusTestDataHelper extends FixedClock {
 
 trait ProgressTestDataHelper {
 
-  implicit class ProgressSyntax(submission: Submission) {
-    private val allQuestionnaireIds: NonEmptyList[Questionnaire.Id] = submission.allQuestionnaires.map(_.id)
-    private val allQuestionIds                                      = submission.allQuestions.map(_.id)
+  extension (submission: Submission) {
+    private def allQuestionnaireIds: NonEmptyList[Questionnaire.Id] = submission.allQuestionnaires.map(_.id)
+    private def allQuestionIds                                      = submission.allQuestions.map(_.id)
     private def questionnaire(qId: Questionnaire.Id): Questionnaire = submission.allQuestionnaires.find(q => q.id == qId).get
     private def allQuestionIds(qId: Questionnaire.Id)               = questionnaire(qId).questions.map(_.question).map(_.id).toList
 

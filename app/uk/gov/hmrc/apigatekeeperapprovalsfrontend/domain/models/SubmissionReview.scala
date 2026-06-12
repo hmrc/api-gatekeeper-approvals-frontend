@@ -19,6 +19,9 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
 object SubmissionReview {
+  // enum Status {
+  //   case NotStarted, InProgress, Completed
+  // }
   sealed trait Status
 
   object Status {

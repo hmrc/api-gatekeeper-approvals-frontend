@@ -39,9 +39,9 @@ abstract class AbstractApplicationController(
     with EitherTHelper[Result]
     with ApplicationLogger {
 
-  implicit class TimestampSyntax(datetime: Instant) {
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
-    def asText    = formatter.format(datetime)
-  }
+  private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
 
+  extension (dateTime: Instant) {
+    def asText    = dateTimeFormatter.format(dateTime)
+  }
 }

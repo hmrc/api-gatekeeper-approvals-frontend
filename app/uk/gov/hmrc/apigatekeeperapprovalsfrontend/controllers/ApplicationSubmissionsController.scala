@@ -72,7 +72,7 @@ class ApplicationSubmissionsController @Inject() (
   import ApplicationSubmissionsController.*
   import cats.data.OptionT
   import cats.implicits.*
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits.*
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Extensions.*
 
   def whichPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"

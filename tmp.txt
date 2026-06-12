@@ -1,0 +1,38 @@
+[info] welcome to sbt 1.12.1 (Eclipse Adoptium Java 21.0.7)
+[info] loading settings for project api-gatekeeper-approvals-frontend-build-build-build from metals.sbt...
+[info] loading project definition from /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/project/project/project
+[info] loading settings for project api-gatekeeper-approvals-frontend-build-build from metals.sbt...
+[info] loading project definition from /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/project/project
+[success] Generated .bloop/api-gatekeeper-approvals-frontend-build-build.json
+[success] Total time: 2 s, completed Jun 12, 2026, 8:39:08 AM
+[info] loading settings for project api-gatekeeper-approvals-frontend-build from metals.sbt, plugins.sbt...
+[info] loading project definition from /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/project
+[success] Generated .bloop/api-gatekeeper-approvals-frontend-build.json
+[success] Total time: 1 s, completed Jun 12, 2026, 8:39:10 AM
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project api-gatekeeper-approvals-frontend from build.sbt...
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.10 running Java 21.0.7
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] sbt 0.13 shell syntax is deprecated; use slash syntax instead: Test / compile
+[info] compiling 2 Scala sources to /home/andy/projects/ee/hmrc/api-gatekeeper-approvals-frontend/target/scala-3.7.4/classes ...
+[info] Building 1 concat group(s)
+[warn] Flag -deprecation set repeatedly
+[warn] Flag -unchecked set repeatedly
+[warn] Flag -encoding set repeatedly
+[warn] three warnings found
+[info] done compiling
+[success] Total time: 9 s, completed Jun 12, 2026, 8:39:20 AM
