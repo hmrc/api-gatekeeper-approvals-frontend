@@ -20,7 +20,7 @@ import java.util.UUID
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
@@ -40,7 +40,7 @@ abstract class AbstractCheckController(
 
   type Fn = (SubmissionReview.Status) => (SubmissionId, Int) => Future[Option[SubmissionReview]]
 
-  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[_]): Future[Result] = {
+  def logBadRequest(reviewAction: SubmissionReview.Action)(errorMsg: String)(implicit request: MarkedSubmissionApplicationRequest[?]): Future[Result] = {
     val description = SubmissionReview.Action.toText(reviewAction)
     logger.error(s"$description : $errorMsg for ${request.submission.id}-${request.submission.latestInstance.index}")
     errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -58,7 +58,7 @@ abstract class AbstractCheckController(
       rawApplicationId: UUID
     ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(rawApplicationId))
-    val log = logBadRequest(reviewAction) _
+    val log = logBadRequest(reviewAction)
 
     (
       for {

@@ -33,7 +33,7 @@ trait HttpClientMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
       def thenReturn[T](response: T) = {
         when(aMock.get(*)(*)).thenReturn(requestBuilderMock)
-        when(requestBuilderMock.execute[T](*, *)).thenReturn(Future.successful(response))
+        when(requestBuilderMock.execute[T](using *, *)).thenReturn(Future.successful(response))
       }
 
       def verifyUrl(url: URL) = {

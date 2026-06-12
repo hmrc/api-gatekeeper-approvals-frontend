@@ -20,12 +20,12 @@ import java.util.UUID
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler

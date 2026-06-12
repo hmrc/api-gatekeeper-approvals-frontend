@@ -20,17 +20,17 @@ import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.data.NonEmptyList
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationState, ApplicationWithCollaborators, Collaborators, CoreApplicationData, State}
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, CommandFailure, CommandFailures, DispatchRequest, DispatchSuccessResult}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax.toLaxEmail
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{Actors, UserId, _}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{Actors, UserId, *}
 import uk.gov.hmrc.apiplatform.modules.common.services.NonEmptyListFormatters.given
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 

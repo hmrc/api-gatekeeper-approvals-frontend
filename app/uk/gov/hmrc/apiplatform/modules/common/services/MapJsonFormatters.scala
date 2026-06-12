@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatform.modules.common.services
 
 import scala.collection.immutable.ListMap
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 trait MapJsonFormatters {
 
@@ -48,7 +48,7 @@ trait MapJsonFormatters {
                   case JsError(e)        => Left(locate(e.map(err => (err._1, err._2.toSeq)).toSeq, fs.keySet.head))
                 }
               case (Right(_), JsError(e))       => Left(locate(e.map(err => (err._1, err._2.toSeq)).toSeq, fs.keySet.head))
-              case (Left(e), _: JsSuccess[_])   => Left(e)
+              case (Left(e), _: JsSuccess[?])   => Left(e)
               case (Left(e1), JsError(e2))      => Left(e1 ++ locate(e2.map(err => (err._1, err._2.toSeq)).toSeq, fs.keySet.head))
             }
 

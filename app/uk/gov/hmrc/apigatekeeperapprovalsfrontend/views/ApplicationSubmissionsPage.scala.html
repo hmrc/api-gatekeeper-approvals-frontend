@@ -21,7 +21,7 @@
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(model: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
+@(model: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @titleText = @{
   if(model.grantedInstance.isDefined)

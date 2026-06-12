@@ -57,13 +57,13 @@ class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComp
   }
 
   trait Authorised {
-    self: Setup with SessionPresent =>
+    self: Setup & SessionPresent =>
 
     stub(true)
   }
 
   trait Unauthorised {
-    self: Setup with SessionPresent =>
+    self: Setup & SessionPresent =>
 
     stub(false)
   }
@@ -77,7 +77,7 @@ class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComp
 
     result.isRight shouldBe true
 
-    inside(result) { case Right(lir: LoggedInRequest[_]) =>
+    inside(result) { case Right(lir: LoggedInRequest[?]) =>
       lir.name shouldBe Some("Bob")
       lir.role shouldBe GatekeeperRoles.READ_ONLY
     }

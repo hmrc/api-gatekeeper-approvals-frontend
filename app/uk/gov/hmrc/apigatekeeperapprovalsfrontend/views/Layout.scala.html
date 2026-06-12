@@ -55,7 +55,7 @@
       <p class="govuk-body-s govuk-!-margin-top-4">
         @{
           requestHeader match {
-            case loggedInRequest: LoggedInRequest[_] => loggedInRequest.name.getOrElse("")
+            case loggedInRequest: LoggedInRequest[?] => loggedInRequest.name.getOrElse("")
             case _                                   => ""
           }
         }

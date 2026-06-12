@@ -21,14 +21,14 @@ import scala.concurrent.Future.{failed, successful}
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import play.api.mvc.Results._
+import play.api.mvc.Results.*
 import play.api.mvc.{MessagesRequest, Result}
 import uk.gov.hmrc.auth.core.InvalidBearerToken
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperStrideRole, LoggedInRequest}
 
 trait StrideAuthorisationServiceMockModule {
-  self: MockitoSugar with ArgumentMatchersSugar =>
+  self: MockitoSugar & ArgumentMatchersSugar =>
 
   protected trait BaseStrideAuthorisationServiceMock {
     def aMock: StrideAuthorisationService

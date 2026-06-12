@@ -21,13 +21,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.writeableOf_JsValue
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{API, ConnectorMetrics}
 

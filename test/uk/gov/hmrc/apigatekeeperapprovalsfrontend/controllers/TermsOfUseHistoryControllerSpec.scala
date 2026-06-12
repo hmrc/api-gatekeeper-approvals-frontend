@@ -20,12 +20,12 @@ import java.time.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status.OK
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.*
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 

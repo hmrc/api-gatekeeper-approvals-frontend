@@ -5,7 +5,7 @@ val appName = "api-gatekeeper-approvals-frontend"
 Global / bloopAggregateSourceDependencies := true
 Global / bloopExportJarClassifiers := Some(Set("sources"))
 
-ThisBuild / scalaVersion := "3.3.7"
+ThisBuild / scalaVersion := "3.7.4"
 ThisBuild / majorVersion := 0
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
@@ -38,7 +38,7 @@ lazy val microservice = Project(appName, file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     )
   )
-  .settings(ScoverageSettings(): _*)
+  .settings(ScoverageSettings()*)
   .settings(
     routesImport ++= Seq(
       "java.util.UUID",
@@ -53,7 +53,11 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalacOptions ++= Seq(
       "-Wconf:src=routes/.*:s",
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s", // TODO - remove
       "-Wconf:msg=unused import&src=html/.*:s"
+    ),
+    Test / scalacOptions ++= Seq(
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s"
     )
   )
 

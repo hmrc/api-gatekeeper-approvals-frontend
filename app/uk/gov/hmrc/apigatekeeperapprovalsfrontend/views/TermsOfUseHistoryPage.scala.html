@@ -20,7 +20,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(viewModel: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
+@(viewModel: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @buildStatus(status: String) = @{
   status.toUpperCase() match {

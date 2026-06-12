@@ -22,7 +22,7 @@
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
-@(form: Form[ProvideNotesForm], model: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
+@(form: Form[ProvideNotesForm], model: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @layout(pageTitle = Some(messages("termsofusereset.pagetitle")), beforeContent = Some(backbreadcrumb())) {
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/application.css")'>

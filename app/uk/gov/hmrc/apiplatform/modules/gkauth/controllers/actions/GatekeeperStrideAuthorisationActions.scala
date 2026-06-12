@@ -23,10 +23,10 @@ import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services._
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.*
 
 trait ForbiddenHandler {
-  def handle(msgResult: MessagesRequest[_]): Result
+  def handle(msgResult: MessagesRequest[?]): Result
 }
 
 trait GatekeeperStrideAuthorisationActions {
@@ -47,7 +47,7 @@ trait GatekeeperStrideAuthorisationActions {
 }
 
 trait GatekeeperAuthorisationActions {
-  self: FrontendBaseController with GatekeeperStrideAuthorisationActions =>
+  self: FrontendBaseController & GatekeeperStrideAuthorisationActions =>
 
   def ldapAuthorisationService: LdapAuthorisationService
 

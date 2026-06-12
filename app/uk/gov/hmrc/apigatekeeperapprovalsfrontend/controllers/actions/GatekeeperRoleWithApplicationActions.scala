@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 import java.util.UUID
 import scala.concurrent.Future
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
@@ -31,15 +31,15 @@ trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders
   self: GatekeeperBaseController =>
 
   def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    role(anyAuthenticatedUserRefiner) _
+    role(anyAuthenticatedUserRefiner)
 
   def loggedInWithApplication: (UUID) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplication(anyAuthenticatedUserRefiner) _
+    roleWithApplication(anyAuthenticatedUserRefiner)
 
   def loggedInWithApplicationAndSubmission: (UUID) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner) _
+    roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner)
 
   def loggedInWithApplicationAndSubmissionAndInstance: (UUID, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner) _
+    roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner)
 
 }

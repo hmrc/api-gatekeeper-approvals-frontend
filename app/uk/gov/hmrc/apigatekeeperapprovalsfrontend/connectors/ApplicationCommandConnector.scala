@@ -23,8 +23,8 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, InternalServerException, StringContextOps}
 
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, _}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, _}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, *}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, *}
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 
 @Singleton
@@ -35,7 +35,7 @@ class ApplicationCommandConnector @Inject() (
   ) extends ApplicationLogger {
 
   val x = new CommandHandlerTypes[DispatchSuccessResult] {}
-  import x._
+  import x.*
 
   val serviceBaseUrl = config.serviceBaseUrl
 

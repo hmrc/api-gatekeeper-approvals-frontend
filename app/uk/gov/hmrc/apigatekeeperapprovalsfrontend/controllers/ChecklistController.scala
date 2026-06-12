@@ -21,16 +21,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc._
+import play.api.mvc.*
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
-import uk.gov.hmrc.apiplatform.modules.submissions.services._
+import uk.gov.hmrc.apiplatform.modules.submissions.services.*
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.{SubmissionRequiresDemo, SubmissionRequiresFraudCheck}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ChecklistPage
@@ -166,62 +166,62 @@ class ChecklistController @Inject() (
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(_).url,
     "checkwarnings",
     SubmissionReview.Action.CheckFailsAndWarnings
-  ) _
+  )
 
   private def buildCheckFailuresAndWarningsItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkfailed.linktext",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatFailedController.page(_).url,
     "checkfailed",
     SubmissionReview.Action.CheckFailsAndWarnings
-  ) _
+  )
 
   private def buildCheckApplicationNameItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.name",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckApplicationNameController.page(_).url,
     "checkname",
     SubmissionReview.Action.CheckApplicationName
-  ) _
+  )
 
   private def buildCheckCompanyRegistrationItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.company",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckCompanyRegistrationController.page(_).url,
     "checkcompany",
     SubmissionReview.Action.CheckCompanyRegistration
-  ) _
+  )
 
   private def buildCheckUrlsItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.urls",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckUrlsController.checkUrlsPage(_).url,
     "checkurls",
     SubmissionReview.Action.CheckUrls
-  ) _
+  )
 
   private def buildCheckSandboxTestingItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.sandbox",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckSandboxController.checkSandboxPage(_).url,
     "checksandbox",
     SubmissionReview.Action.CheckSandboxTesting
-  ) _
+  )
 
   private def buildCheckFraudItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.fraud",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckFraudController.checkFraudPage(_).url,
     "checkfraud",
     SubmissionReview.Action.CheckFraudPreventionData
-  ) _
+  )
 
   private def buildArrangeDemoItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkapplication.linktext.demo",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ArrangeDemoController.page(_).url,
     "arrangedemo",
     SubmissionReview.Action.ArrangedDemo
-  ) _
+  )
 
   private def buildAnswersThatPassedItem = buildChecklistItemIfActionIsRequired(
     "checklist.checkpassed.linktext",
     uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedPage(_).url,
     "checkpassed",
     SubmissionReview.Action.CheckPassedAnswers
-  ) _
+  )
 
 }
