@@ -34,7 +34,7 @@ class ApplicationCommandConnector @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends ApplicationLogger {
 
-  private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {} // TODO
+  private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
   import CHT.*
 
   val serviceBaseUrl = config.serviceBaseUrl

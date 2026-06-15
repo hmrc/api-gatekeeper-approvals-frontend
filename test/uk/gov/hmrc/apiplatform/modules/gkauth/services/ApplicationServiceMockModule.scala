@@ -31,7 +31,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationService
 trait ApplicationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar with ApplicationWithCollaboratorsFixtures {
 
   trait BaseApplicationServiceMock {
-    val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
+    private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
 
     import CHT.Implicits.*
 

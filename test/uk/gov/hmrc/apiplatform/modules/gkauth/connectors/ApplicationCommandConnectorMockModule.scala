@@ -29,7 +29,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ApplicationCommandC
 trait ApplicationCommandConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
   trait BaseApplicationCommandConnectorMock {
-    val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
+    private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
 
     import CHT.Implicits.*
 

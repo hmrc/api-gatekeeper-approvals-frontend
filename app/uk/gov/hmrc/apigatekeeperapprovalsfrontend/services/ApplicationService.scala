@@ -38,8 +38,8 @@ class ApplicationService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends ClockNow {
 
-  val x = new CommandHandlerTypes[DispatchSuccessResult] {}
-  import x.*
+  private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
+  import CHT.*
 
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)
