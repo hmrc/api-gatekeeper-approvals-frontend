@@ -22,7 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.MessagesControllerComponents
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.SubmittedAnswersPage
 
@@ -57,13 +57,13 @@ class SubmittedAnswersController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
 
-  import SubmittedAnswersController._
+  import SubmittedAnswersController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
+  def page(rawApplicationId: java.util.UUID, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(rawApplicationId, index) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
     val instance   = request.instance
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, request.application.id, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
   }
 }

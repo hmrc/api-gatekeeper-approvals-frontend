@@ -21,38 +21,37 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
-import uk.gov.hmrc.play.http.metrics.common.API
 
 sealed trait Timer {
   def stop(): Unit
 }
 
 trait ConnectorMetrics {
-  def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A]
+  def record[A](apiName: ApiName)(f: => Future[A])(implicit ec: ExecutionContext): Future[A]
 }
 
 @Singleton
 class ConnectorMetricsImpl @Inject() (metrics: Metrics) extends ConnectorMetrics {
 
-  def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
-    val timer = startTimer(api)
+  def record[A](apiName: ApiName)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
+    val timer = startTimer(apiName)
 
     f.andThen {
       case _ => timer.stop()
     }.andThen {
-      case Success(_) => recordSuccess(api)
-      case Failure(_) => recordFailure(api)
+      case Success(_) => recordSuccess(apiName)
+      case Failure(_) => recordFailure(apiName)
     }
   }
 
-  private def recordFailure(api: API): Unit =
-    metrics.defaultRegistry.counter(api.name ++ "-failed-counter").inc()
+  private def recordFailure(apiName: ApiName): Unit =
+    metrics.defaultRegistry.counter(apiName ++ "-failed-counter").inc()
 
-  private def recordSuccess(api: API): Unit =
-    metrics.defaultRegistry.counter(api.name ++ "-success-counter").inc()
+  private def recordSuccess(apiName: ApiName): Unit =
+    metrics.defaultRegistry.counter(apiName ++ "-success-counter").inc()
 
-  private def startTimer(api: API): Timer = {
-    val context = metrics.defaultRegistry.timer(api.name ++ "-timer").time()
+  private def startTimer(apiName: ApiName): Timer = {
+    val context = metrics.defaultRegistry.timer(apiName ++ "-timer").time()
 
     new Timer {
       def stop(): Unit = context.stop()
@@ -62,5 +61,5 @@ class ConnectorMetricsImpl @Inject() (metrics: Metrics) extends ConnectorMetrics
 
 @Singleton
 class NoopConnectorMetrics extends ConnectorMetrics {
-  def record[A](api: API)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = f
+  def record[A](apiName: ApiName)(f: => Future[A])(implicit ec: ExecutionContext): Future[A] = f
 }

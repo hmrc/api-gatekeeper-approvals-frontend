@@ -22,7 +22,7 @@ import scala.concurrent.Future.successful
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -48,11 +48,11 @@ class CheckFraudController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkFraudPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val isDeleted = request.application.state.isDeleted
-    successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
+    successful(Ok(page(CheckFraudController.ViewModel(request.application.name, request.application.id, isDeleted))))
   }
 
-  def checkFraudAction(applicationId: ApplicationId): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckFraudPreventionData)(applicationId)
+  def checkFraudAction(rawApplicationId: java.util.UUID): Action[AnyContent] =
+    updateActionStatus(SubmissionReview.Action.CheckFraudPreventionData)(rawApplicationId)
 }

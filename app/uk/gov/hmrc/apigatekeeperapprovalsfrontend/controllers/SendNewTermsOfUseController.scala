@@ -25,8 +25,7 @@ import cats.data.NonEmptyList
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
@@ -54,8 +53,9 @@ class SendNewTermsOfUseController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
+    val applicationId            = request.application.id
 
     def checkNotAlreadyInvited = {
       // Check no existing submissions and not already invited
@@ -83,14 +83,14 @@ class SendNewTermsOfUseController @Inject() (
     request.application.access match {
       // Should only be sending new terms of use invites to Standard apps
       // with a state of Production and not already invited
-      case std: Access.Standard if (request.application.state.name == domain.models.State.PRODUCTION) => checkNotAlreadyInvited
-      case std: Access.Standard                                                                       =>
+      case _: Access.Standard if (request.application.state.name == State.Production) => checkNotAlreadyInvited
+      case _: Access.Standard                                                         =>
         errorHandler.standardErrorTemplate(
           "Application status",
           "Invalid application status",
           "The application must have Production status"
         ).map(BadRequest(_))
-      case _                                                                                          =>
+      case _                                                                          =>
         errorHandler.standardErrorTemplate(
           "Application access type",
           "Invalid application access type",
@@ -99,8 +99,8 @@ class SendNewTermsOfUseController @Inject() (
     }
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
 
     def inviteTermsOfUse = {
       def failure(failures: NonEmptyList[CommandFailure]) = {
@@ -114,13 +114,13 @@ class SendNewTermsOfUseController @Inject() (
 
       lazy val success = Ok(
         sendNewTermsOfUseRequestedPage(
-          SendNewTermsOfUseController.ViewModel(request.application.name, applicationId, gatekeeperApplicationUrl)
+          SendNewTermsOfUseController.ViewModel(request.application.name, request.application.id, gatekeeperApplicationUrl)
         )
       )
 
       val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
 
-      E.fromEitherF(submissionService.termsOfUseInvite(applicationId, request.name.get))
+      E.fromEitherF(submissionService.termsOfUseInvite(request.application.id, request.name.get))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge

@@ -19,6 +19,8 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.services
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import org.mockito.scalatest.MockitoSugar
+
 import play.api.mvc.{ControllerComponents, MessagesRequest}
 import play.api.test.{FakeRequest, StubControllerComponentsFactory}
 import uk.gov.hmrc.internalauth.client.Retrieval
@@ -28,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, Lo
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.AsyncHmrcSpec
 
-class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComponentsFactory {
+class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComponentsFactory with MockitoSugar {
   val fakeRequest = FakeRequest()
 
   val cc: ControllerComponents = stubMessagesControllerComponents()
@@ -55,13 +57,13 @@ class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComp
   }
 
   trait Authorised {
-    self: Setup with SessionPresent =>
+    self: Setup & SessionPresent =>
 
     stub(true)
   }
 
   trait Unauthorised {
-    self: Setup with SessionPresent =>
+    self: Setup & SessionPresent =>
 
     stub(false)
   }
@@ -75,7 +77,7 @@ class LdapAuthorisationServiceSpec extends AsyncHmrcSpec with StubControllerComp
 
     result.isRight shouldBe true
 
-    inside(result) { case Right(lir: LoggedInRequest[_]) =>
+    inside(result) { case Right(lir: LoggedInRequest[?]) =>
       lir.name shouldBe Some("Bob")
       lir.role shouldBe GatekeeperRoles.READ_ONLY
     }

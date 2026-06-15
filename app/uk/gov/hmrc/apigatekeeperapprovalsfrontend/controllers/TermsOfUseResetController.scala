@@ -21,8 +21,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Forms.*
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
@@ -32,7 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
 
 object TermsOfUseResetController {
 
@@ -43,7 +43,7 @@ object TermsOfUseResetController {
   val provideNotesForm: Form[ProvideNotesForm] = Form(
     mapping(
       "notes" -> nonEmptyText
-    )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
+    )(ProvideNotesForm.apply)(p => Some(p.notes))
   )
 }
 
@@ -60,13 +60,13 @@ class TermsOfUseResetController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUseResetController._
+  import TermsOfUseResetController.*
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -75,25 +75,25 @@ class TermsOfUseResetController @Inject() (
           err
         ).map(BadRequest(_))
 
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(rawApplicationId))
 
       val E = EitherTHelper.make[String]
 
-      E.fromEitherF(submissionService.resetForTouUplift(applicationId, request.name.get, form.notes))
+      E.fromEitherF(submissionService.resetForTouUplift(request.application.id, request.name.get, form.notes))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseResetPage(form, ViewModel(applicationId, request.application.name))))
+      successful(BadRequest(termsOfUseResetPage(form, ViewModel(request.application.id, request.application.name))))
     }
 
     TermsOfUseResetController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
 
   }
 
-  def confirmationPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
+  def confirmationPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseConfirmPage(ViewModel(request.application.id, request.application.name))))
   }
 }

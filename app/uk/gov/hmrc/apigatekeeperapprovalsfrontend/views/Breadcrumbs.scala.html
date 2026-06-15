@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.GatekeeperConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 @import views.html.helper.CSPNonce
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
 
 @this(
   config: GatekeeperConfig
@@ -28,7 +28,7 @@
     <ol class="govuk-breadcrumbs__list">
       <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@{s"${config.applicationsPageUri}"}">@{messages("breadcrumbs.applications")}</a></li>
       @{applicationBreadcrumb match {
-        case Some(app)  => <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.whichPage(app.id).url}>{app.applicationName}</a></li>
+        case Some(app)  => <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href={uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.whichPage(app.id.value).url}>{app.applicationName}</a></li>
         case None       => 
       }}
     </ol>

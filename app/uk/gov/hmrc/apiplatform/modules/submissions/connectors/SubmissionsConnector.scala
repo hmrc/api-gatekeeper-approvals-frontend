@@ -20,35 +20,35 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import play.api.libs.ws.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
-import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.ConnectorMetrics
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors.{ApiName, ConnectorMetrics}
 
 object SubmissionsConnector {
 
   case class Config(serviceBaseUrl: String, apiKey: String)
 
   case class GrantedRequest(gatekeeperUserName: String, warnings: Option[String] = None, escalatedTo: Option[String] = None)
-  implicit val writesApprovedRequest: Writes[GrantedRequest] = Json.writes[GrantedRequest]
+  given Writes[GrantedRequest] = Json.writes[GrantedRequest]
 
   case class DeclinedRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesDeclinedRequest: Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
+  given Writes[DeclinedRequest] = Json.writes[DeclinedRequest]
 
   case class TouUpliftRequest(gatekeeperUserName: String, reasons: String)
-  implicit val writesTouUpliftRequest: Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
+  given Writes[TouUpliftRequest] = Json.writes[TouUpliftRequest]
 
   case class TouGrantedRequest(gatekeeperUserName: String, reasons: String, escalatedTo: Option[String])
-  implicit val writesTouGrantedRequest: Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
+  given Writes[TouGrantedRequest] = Json.writes[TouGrantedRequest]
 
   case class TouDeleteRequest(gatekeeperUserName: String)
-  implicit val writesTouDeleteRequest: Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
+  given Writes[TouDeleteRequest] = Json.writes[TouDeleteRequest]
 
   type ErrorOrUnit = Either[UpstreamErrorResponse, Unit]
 }
@@ -61,11 +61,11 @@ class SubmissionsConnector @Inject() (
   )(implicit val ec: ExecutionContext
   ) {
 
-  import SubmissionsConnector._
-  import config._
-  import Submission._
+  import SubmissionsConnector.*
+  import config.*
+  import Submission.given
 
-  val api = API("third-party-application-submissions")
+  val api = ApiName("third-party-application-submissions")
 
   def fetchLatestSubmission(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[Submission]] = {
     metrics.record(api) {
@@ -74,7 +74,7 @@ class SubmissionsConnector @Inject() (
   }
 
   def fetchLatestMarkedSubmission(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[MarkedSubmission]] = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
+    import uk.gov.hmrc.http.HttpReads.Implicits.*
     metrics.record(api) {
       http.get(url"$serviceBaseUrl/submissions/marked/application/$id").execute[Option[MarkedSubmission]]
     }
@@ -117,7 +117,7 @@ class SubmissionsConnector @Inject() (
       warnings: String
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, ApplicationWithCollaborators]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (err: UpstreamErrorResponse) => s"Failed to grant with warnings application ${applicationId}: ${err}"
 
     metrics.record(api) {
@@ -134,7 +134,7 @@ class SubmissionsConnector @Inject() (
       reasons: String
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, ApplicationWithCollaborators]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (err: UpstreamErrorResponse) => s"Failed to decline application ${applicationId}: ${err}"
 
     metrics.record(api) {
@@ -151,7 +151,7 @@ class SubmissionsConnector @Inject() (
       reasons: String
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, ApplicationWithCollaborators]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (err: UpstreamErrorResponse) => s"Failed to reset application ${applicationId}: ${err}"
 
     metrics.record(api) {
@@ -167,7 +167,7 @@ class SubmissionsConnector @Inject() (
       requestedBy: String
     )(implicit hc: HeaderCarrier
     ): Future[Either[String, ApplicationWithCollaborators]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (err: UpstreamErrorResponse) => s"Failed to delete submission for application ${applicationId}: ${err}"
 
     metrics.record(api) {

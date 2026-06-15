@@ -21,7 +21,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, MappedApiDefinitions}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
@@ -41,10 +40,10 @@ class ApmConnector @Inject() (
 
   val serviceBaseUrl = config.serviceBaseUrl
 
-  val api = API("api-platform-microservice")
+  val api = ApiName("api-platform-microservice")
 
   def fetchLinkedSubordinateApplicationById(id: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
+    import uk.gov.hmrc.http.HttpReads.Implicits.*
 
     metrics.record(api) {
       httpClient.get(url"$serviceBaseUrl/applications/$id/linked-subordinate").execute[Option[ApplicationWithCollaborators]]
@@ -52,12 +51,12 @@ class ApmConnector @Inject() (
   }
 
   def fetchSubscribableApisForApplication(id: ApplicationId)(implicit hc: HeaderCarrier): Future[List[ApiDefinition]] = {
-    import uk.gov.hmrc.http.HttpReads.Implicits._
+    import uk.gov.hmrc.http.HttpReads.Implicits.*
 
     metrics.record(api) {
       httpClient.get(url"$serviceBaseUrl/api-definitions?applicationId=$id")
         .execute[MappedApiDefinitions]
-        .map(_.wrapped.values.toList)
+        .map(_.values.toList)
     }
   }
 }

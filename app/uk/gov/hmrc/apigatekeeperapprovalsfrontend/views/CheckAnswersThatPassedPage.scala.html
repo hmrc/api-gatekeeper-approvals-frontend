@@ -14,8 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController._
-@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.CheckAnswersThatPassedController.*
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
@@ -46,7 +46,7 @@
     </dl>
   }
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedAction(model.applicationId), Symbol("class") -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.CheckAnswersThatPassedController.checkAnswersThatPassedAction(model.applicationId.value), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group">

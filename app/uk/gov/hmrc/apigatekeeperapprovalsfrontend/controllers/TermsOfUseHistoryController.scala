@@ -18,22 +18,23 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationName, ApplicationWithCollaborators}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{AskWhen, Submission, TermsOfUseInvitation, TermsOfUseInvitationState}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, ApplicationService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseHistoryPage
 
 object TermsOfUseHistoryController {
@@ -68,26 +69,25 @@ class TermsOfUseHistoryController @Inject() (
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService,
     val ldapAuthorisationService: LdapAuthorisationService,
-    termsOfUseHistoryPage: TermsOfUseHistoryPage,
-    applicationService: ApplicationService
+    termsOfUseHistoryPage: TermsOfUseHistoryPage
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
-  import TermsOfUseHistoryController._
+  import TermsOfUseHistoryController.*
 
-  def page(applicationId: ApplicationId) = loggedInWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+  def page(rawApplicationId: UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
 
     def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
       status match {
-        case s: Answering                    => "In progress"
-        case s: Created                      => "In progress"
-        case s: Declined                     => "Declined"
-        case s: Failed                       => "Failed"
-        case s: Granted                      => "Terms of use V2"
-        case s: GrantedWithWarnings          => "Terms of use V2 with warnings"
-        case s: PendingResponsibleIndividual => "Pending responsible individual"
-        case s: Submitted                    => "Submitted"
-        case s: Warnings                     => "Warnings"
+        case _: Answering                    => "In progress"
+        case _: Created                      => "In progress"
+        case _: Declined                     => "Declined"
+        case _: Failed                       => "Failed"
+        case _: Granted                      => "Terms of use V2"
+        case _: GrantedWithWarnings          => "Terms of use V2 with warnings"
+        case _: PendingResponsibleIndividual => "Pending responsible individual"
+        case _: Submitted                    => "Submitted"
+        case _: Warnings                     => "Warnings"
       }
     }
 
@@ -101,14 +101,14 @@ class TermsOfUseHistoryController @Inject() (
 
     def deriveSubmissionStatusDescription(status: Submission.Status): String = {
       status match {
-        case s: Answering                    => "The submission was started"
-        case s: Created                      => "The submission was started"
+        case _: Answering                    => "The submission was started"
+        case _: Created                      => "The submission was started"
         case s: Declined                     => s"${s.name} declined that the application complies with the terms of use V2"
         case s: Failed                       => s"${s.name} submitted the terms of use checklist.  The application did not comply with version 2 of the terms of use."
         case s: Granted                      => s"${s.name} accepted that the application complies with the terms of use V2"
         case s: GrantedWithWarnings          => s"${s.name} has contacted the application admins to action the warnings generated by the submission."
-        case s: PendingResponsibleIndividual => "The submission is waiting for the responsible individual to accept the terms of use"
-        case s: Submitted                    => "The submission was submitted"
+        case _: PendingResponsibleIndividual => "The submission is waiting for the responsible individual to accept the terms of use"
+        case _: Submitted                    => "The submission was submitted"
         case s: Warnings                     => s"${s.name} submitted the terms of use checklist.  The application did not comply with version 2 of the terms of use."
       }
     }
@@ -123,29 +123,29 @@ class TermsOfUseHistoryController @Inject() (
 
     def deriveSubmissionStatusDetail(status: Submission.Status): Option[String] = {
       status match {
-        case s: Answering                    => None
-        case s: Created                      => None
+        case _: Answering                    => None
+        case _: Created                      => None
         case s: Declined                     => Some(s.reasons)
-        case s: Failed                       => None
+        case _: Failed                       => None
         case s: Granted                      => s.comments
         case s: GrantedWithWarnings          => Some(s.warnings)
-        case s: PendingResponsibleIndividual => None
-        case s: Submitted                    => None
-        case s: Warnings                     => None
+        case _: PendingResponsibleIndividual => None
+        case _: Submitted                    => None
+        case _: Warnings                     => None
       }
     }
 
     def deriveSubmissionEscalatedTo(status: Submission.Status): Option[String] = {
       status match {
-        case s: Answering                    => None
-        case s: Created                      => None
-        case s: Declined                     => None
-        case s: Failed                       => None
+        case _: Answering                    => None
+        case _: Created                      => None
+        case _: Declined                     => None
+        case _: Failed                       => None
         case s: Granted                      => s.escalatedTo
         case s: GrantedWithWarnings          => s.escalatedTo
-        case s: PendingResponsibleIndividual => None
-        case s: Submitted                    => None
-        case s: Warnings                     => None
+        case _: PendingResponsibleIndividual => None
+        case _: Submitted                    => None
+        case _: Warnings                     => None
       }
     }
 
@@ -259,8 +259,8 @@ class TermsOfUseHistoryController @Inject() (
 
     (
       for {
-        invite     <- fromOptionF(submissionService.fetchTermsOfUseInvitation(applicationId), BadRequest("Unable to find terms of use invitation"))
-        submission <- liftF(submissionService.fetchLatestSubmission(applicationId))
+        invite     <- fromOptionF(submissionService.fetchTermsOfUseInvitation(request.application.id), BadRequest("Unable to find terms of use invitation"))
+        submission <- liftF(submissionService.fetchLatestSubmission(request.application.id))
         viewModel   = buildViewModel(invite, request.application, submission)
       } yield Ok(termsOfUseHistoryPage(viewModel))
     ).fold(identity(_), identity(_))

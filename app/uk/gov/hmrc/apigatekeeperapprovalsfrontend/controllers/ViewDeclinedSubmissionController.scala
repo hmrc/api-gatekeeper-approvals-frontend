@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
@@ -25,12 +26,12 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ViewDeclinedSubmissionPage
 
 object ViewDeclinedSubmissionController {
@@ -53,15 +54,14 @@ class ViewDeclinedSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
     viewDeclinedSubmissionPage: ViewDeclinedSubmissionPage,
     errorHandler: ErrorHandler,
-    submissionReviewService: SubmissionReviewService,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  import ViewDeclinedSubmissionController._
+  import ViewDeclinedSubmissionController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: UUID, index: Int) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
@@ -71,7 +71,7 @@ class ViewDeclinedSubmissionController @Inject() (
         case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
           successful(Ok(viewDeclinedSubmissionPage(ViewModel(
             appName,
-            applicationId,
+            request.application.id,
             requestedBy,
             submittedTimestamp.asText,
             declinedName,

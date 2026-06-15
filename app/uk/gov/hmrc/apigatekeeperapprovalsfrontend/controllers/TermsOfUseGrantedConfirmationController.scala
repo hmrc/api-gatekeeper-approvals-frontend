@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
@@ -47,9 +47,9 @@ class TermsOfUseGrantedConfirmationController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseGrantedConfirmationController._
+  import TermsOfUseGrantedConfirmationController.*
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseGrantedConfirmationPage(ViewModel(applicationId, request.application.name))))
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseGrantedConfirmationPage(ViewModel(request.application.id, request.application.name))))
   }
 }

@@ -21,8 +21,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Forms.*
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
@@ -48,7 +48,7 @@ object TermsOfUseReasonsController {
   val provideReasonsForm: Form[ProvideReasonsForm] = Form(
     mapping(
       "reasons" -> nonEmptyText
-    )(ProvideReasonsForm.apply)(ProvideReasonsForm.unapply)
+    )(ProvideReasonsForm.apply)(p => Some(p.reasons))
   )
 }
 
@@ -64,18 +64,19 @@ class TermsOfUseReasonsController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseReasonsController._
+  import TermsOfUseReasonsController.*
 
-  def provideReasonsPage(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
     val hasWarnings = request.markedSubmission.isWarn
-    successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
+    successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(request.application.id, request.application.name, hasFails, hasWarnings))))
   }
 
-  def provideReasonsAction(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def handleValidForm(form: ProvideReasonsForm) = {
       submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId)))
+        case Some(value) =>
+          successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(rawApplicationId)))
         case None        => {
           logger.warn("Persisting reasons failed")
           errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -86,7 +87,7 @@ class TermsOfUseReasonsController @Inject() (
     def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
       val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
       val hasWarnings = request.markedSubmission.isWarn
-      successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
+      successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(request.application.id, request.application.name, hasFails, hasWarnings))))
     }
     TermsOfUseReasonsController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }

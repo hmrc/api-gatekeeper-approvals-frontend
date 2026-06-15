@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -68,7 +68,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
         ("serviceName2", "name2", "context2")
       )
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
     }
@@ -87,7 +87,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
         ("serviceName2", "name2", "context2")
       )
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
     }
@@ -99,7 +99,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
       ApplicationServiceMock.FetchLinkedSubordinateApplicationByApplicationId.thenReturnNone()
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -107,7 +107,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.checkSandboxPage(applicationId)(fakeRequest)
+      val result = controller.checkSandboxPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }
@@ -119,9 +119,9 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.checkSandboxAction(applicationId)(fakeSubmitCheckedRequest)
+      val result = controller.checkSandboxAction(rawApplicationId)(fakeSubmitCheckedRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/checklist")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${rawApplicationId}/checklist")
     }
 
     "update checked status and redirect to checklist page when Come Back Later button is clicked" in new Setup {
@@ -130,9 +130,9 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.checkSandboxAction(applicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.checkSandboxAction(rawApplicationId)(fakeSubmitComebackLaterRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/checklist")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${rawApplicationId}/checklist")
     }
   }
 

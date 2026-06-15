@@ -16,24 +16,24 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.play.json.Union
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 
 trait SubmissionReviewJsonFormatters {
-  import SubmissionReview._
+  import SubmissionReview.*
 
-  implicit val reviewStatus: OFormat[Status] = Union.from[Status]("Review.StatusType")
+  given OFormat[Status] = Union.from[Status]("Review.StatusType")
     .andType[Status.NotStarted.type]("notstarted", () => Status.NotStarted)
     .andType[Status.InProgress.type]("inprogress", () => Status.InProgress)
     .andType[Status.Completed.type]("completed", () => Status.Completed)
     .format
 
-  implicit val actionKeyReads: KeyReads[Action]   = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
-  implicit val actionKeyWrites: KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
+  given KeyReads[Action]  = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
+  given KeyWrites[Action] = action => SubmissionReview.Action.toText(action)
 
-  implicit val submissionReviewFormat: Format[SubmissionReview] = Json.format[SubmissionReview]
+  given Format[SubmissionReview] = Json.format[SubmissionReview]
 }
 
 object SubmissionReviewJsonFormatters extends SubmissionReviewJsonFormatters

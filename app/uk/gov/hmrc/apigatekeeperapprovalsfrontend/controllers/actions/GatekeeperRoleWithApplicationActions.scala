@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
+import java.util.UUID
 import scala.concurrent.Future
 
-import play.api.mvc._
+import play.api.mvc.*
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
@@ -31,15 +31,15 @@ trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders
   self: GatekeeperBaseController =>
 
   def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    role(anyAuthenticatedUserRefiner) _
+    role(anyAuthenticatedUserRefiner)
 
-  def loggedInWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplication(anyAuthenticatedUserRefiner) _
+  def loggedInWithApplication: (UUID) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    roleWithApplication(anyAuthenticatedUserRefiner)
 
-  def loggedInWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner) _
+  def loggedInWithApplicationAndSubmission: (UUID) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner)
 
-  def loggedInWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner) _
+  def loggedInWithApplicationAndSubmissionAndInstance: (UUID, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner)
 
 }

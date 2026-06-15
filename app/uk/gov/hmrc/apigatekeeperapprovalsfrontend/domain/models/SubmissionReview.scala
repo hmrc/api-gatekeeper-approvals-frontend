@@ -19,28 +19,26 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
 
 object SubmissionReview {
-  sealed trait Status
 
-  object Status {
-    case object NotStarted extends Status
-    case object InProgress extends Status
-    case object Completed  extends Status
+  enum Status {
+    case NotStarted, InProgress, Completed
   }
 
-  sealed trait Action
+  enum Action {
+    case CheckFailsAndWarnings
+    case CheckApplicationName
+    case CheckCompanyRegistration
+    case CheckUrls
+    case CheckSandboxTesting
+    case CheckFraudPreventionData
+    case ArrangedDemo
+    case CheckPassedAnswers
+  }
 
   object Action {
-    case object CheckFailsAndWarnings    extends Action
-    case object CheckApplicationName     extends Action
-    case object CheckCompanyRegistration extends Action
-    case object CheckUrls                extends Action
-    case object CheckSandboxTesting      extends Action
-    case object CheckFraudPreventionData extends Action
-    case object ArrangedDemo             extends Action
-    case object CheckPassedAnswers       extends Action
 
     def fromText(text: String): Option[Action] = {
-      import cats.implicits._
+      import cats.implicits.*
       text match {
         case "CheckFailsAndWarnings"    => CheckFailsAndWarnings.some
         case "CheckApplicationName"     => CheckApplicationName.some
@@ -121,7 +119,7 @@ object SubmissionReview {
     }
 }
 
-case class SubmissionReview private (
+case class SubmissionReview(
     submissionId: SubmissionId,
     instanceIndex: Int,
     declineReasons: String,

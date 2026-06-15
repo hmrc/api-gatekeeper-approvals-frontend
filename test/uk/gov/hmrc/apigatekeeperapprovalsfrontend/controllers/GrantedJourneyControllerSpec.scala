@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -52,7 +52,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.provideWarningsPage(applicationId)(fakeRequest)
+      val result = controller.provideWarningsPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -62,7 +62,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideWarningsPage(applicationId)(fakeRequest)
+      val result = controller.provideWarningsPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }
@@ -78,10 +78,10 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
       SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
 
-      val result = controller.provideWarningsAction(applicationId)(grantWithWarningsRequest)
+      val result = controller.provideWarningsAction(rawApplicationId)(grantWithWarningsRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(rawApplicationId).url
     }
 
     "go to the warnings input page when an invalid form without warnings is submitted" in new Setup {
@@ -91,7 +91,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
       SubmissionServiceMock.GrantWithWarnings.thenReturn(applicationId, application)
 
-      val result = controller.provideWarningsAction(applicationId)(fakeRequest)
+      val result = controller.provideWarningsAction(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -103,7 +103,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
+      val result = controller.provideEscalatedToPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -113,7 +113,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideEscalatedToPage(applicationId)(fakeRequest)
+      val result = controller.provideEscalatedToPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }
@@ -128,10 +128,10 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
       SubmissionReviewServiceMock.UpdateEscalatedTo.thenReturn(submissionReview)
 
-      val result = controller.provideEscalatedToAction(applicationId)(grantWithEscalatedToRequest)
+      val result = controller.provideEscalatedToAction(rawApplicationId)(grantWithEscalatedToRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(rawApplicationId).url
     }
 
     "go to the escalated by input page when an invalid form without first or last names is submitted" in new Setup {
@@ -139,7 +139,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.provideEscalatedToAction(applicationId)(fakeRequest)
+      val result = controller.provideEscalatedToAction(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -151,7 +151,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
-      val result = controller.grantedPage(applicationId)(fakeRequest)
+      val result = controller.grantedPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe OK
     }
@@ -161,7 +161,7 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.grantedPage(applicationId)(fakeRequest)
+      val result = controller.grantedPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }

@@ -20,14 +20,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
-import play.api.mvc.{MessagesControllerComponents, _}
+import play.api.mvc.{MessagesControllerComponents, *}
 
-import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Submitted
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
@@ -69,13 +69,13 @@ class ApplicationSubmissionsController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperAuthorisationActions with GatekeeperRoleWithApplicationActions {
 
-  import ApplicationSubmissionsController._
+  import ApplicationSubmissionsController.*
   import cats.data.OptionT
-  import cats.implicits._
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Implicits._
+  import cats.implicits.*
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Extensions.*
 
-  def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+  def whichPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission =>
       submission.instances.find(i =>
@@ -90,12 +90,12 @@ class ApplicationSubmissionsController @Inject() (
     )
       .fold(
         Redirect(gatekeeperApplicationUrl)
-      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))
+      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(rawApplicationId)))
   }
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     val appName                  = request.application.name
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId.value}"
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
 
     val latestInstance       = request.markedSubmission.submission.latestInstance
     val latestInstanceStatus = latestInstance.statusHistory.head
@@ -127,7 +127,7 @@ class ApplicationSubmissionsController @Inject() (
 
     successful(Ok(applicationSubmissionsPage(
       ViewModel(
-        applicationId,
+        request.application.id,
         appName,
         gatekeeperApplicationUrl,
         currentSubmission,

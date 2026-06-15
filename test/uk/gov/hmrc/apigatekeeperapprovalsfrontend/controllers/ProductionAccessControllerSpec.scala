@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
@@ -49,7 +49,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, grantedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -58,7 +58,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

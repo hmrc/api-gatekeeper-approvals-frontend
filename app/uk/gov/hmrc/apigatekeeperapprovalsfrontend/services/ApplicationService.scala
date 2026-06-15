@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult, _}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{ApplicationCommands, DispatchSuccessResult, *}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApplicationId, LaxEmailAddress}
 import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
 
@@ -36,8 +36,10 @@ class ApplicationService @Inject() (
     applicationCommandConnector: ApplicationCommandConnector,
     val clock: Clock
   )(implicit val ec: ExecutionContext
-  ) extends CommandHandlerTypes[DispatchSuccessResult]
-    with ClockNow {
+  ) extends ClockNow {
+
+  private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
+  import CHT.*
 
   def fetchByApplicationId(applicationId: ApplicationId)(implicit hc: HeaderCarrier): Future[Option[ApplicationWithCollaborators]] = {
     thirdPartyApplicationConnector.fetchApplicationById(applicationId)

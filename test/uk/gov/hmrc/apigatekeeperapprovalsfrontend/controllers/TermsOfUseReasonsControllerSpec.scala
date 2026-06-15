@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
@@ -51,7 +51,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -61,7 +61,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -76,10 +76,12 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
 
-      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
+      val result = controller.provideReasonsAction(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(
+        rawApplicationId
+      ).url
     }
 
     "return 400 if no reasons supplied" in new Setup {
@@ -90,7 +92,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
 
-      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
+      val result = controller.provideReasonsAction(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -103,7 +105,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturnError()
 
-      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
+      val result = controller.provideReasonsAction(rawApplicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }

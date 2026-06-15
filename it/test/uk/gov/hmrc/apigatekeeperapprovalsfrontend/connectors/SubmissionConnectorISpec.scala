@@ -18,17 +18,18 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.connectors
 
 import java.time.Instant
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application => PlayApplication, Configuration, Mode}
+import play.api.{Application as PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector
 import uk.gov.hmrc.apiplatform.modules.submissions.connectors.SubmissionsConnector.TouUpliftRequest
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.EMAIL_SENT
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{Submission, TermsOfUseInvitation, TermsOfUseInvitationSuccessful, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.{MarkedSubmissionsTestData, ProgressTestDataHelper}
@@ -37,8 +38,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.WireMockExtensions
 
 class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceOneAppPerSuite with WireMockExtensions with MarkedSubmissionsTestData {
 
-  import Submission._
-
   private val appConfig = Configuration(
     "microservice.services.third-party-application.port"      -> stubPort,
     "microservice.services.third-party-application.use-proxy" -> false,
@@ -46,6 +45,8 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
     "metrics.jvm"                                             -> false,
     "metrics.enabled"                                         -> false
   )
+
+  val rawApplicationId = applicationIdOne.value
 
   override def fakeApplication(): PlayApplication =
     GuiceApplicationBuilder()
@@ -67,7 +68,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "fetch latest submission by id" should {
-    val url = s"/submissions/application/${applicationId.value}"
+    val url = s"/submissions/application/${rawApplicationId}"
 
     "return a submission" in new Setup {
       stubFor(
@@ -101,7 +102,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "fetch latest marked submission by id" should {
-    val url = s"/submissions/marked/application/${applicationId.value}"
+    val url = s"/submissions/marked/application/${rawApplicationId}"
 
     "return a marked submission" in new Setup {
       stubFor(
@@ -135,7 +136,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "invite application for terms of use" should {
-    val url = s"/terms-of-use/application/${applicationId.value}"
+    val url = s"/terms-of-use/application/${rawApplicationId}"
 
     "return TermsOfUseInvitationSuccessful on success" in new Setup {
       stubFor(
@@ -155,7 +156,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "fetch terms of use invitation by app id" should {
-    val url = s"/terms-of-use/application/${applicationId.value}"
+    val url = s"/terms-of-use/application/${rawApplicationId}"
 
     "return an invitation" in new Setup {
       stubFor(
@@ -261,7 +262,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "grant with warnings application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/grant-with-warn-tou"
+    val url = s"/approvals/application/${rawApplicationId}/grant-with-warn-tou"
 
     "return an application on success" in new Setup {
       stubFor(
@@ -284,7 +285,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "decline application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/decline-tou"
+    val url = s"/approvals/application/${rawApplicationId}/decline-tou"
 
     "return an application on success" in new Setup {
       stubFor(
@@ -307,7 +308,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "reset application for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/reset-tou"
+    val url = s"/approvals/application/${rawApplicationId}/reset-tou"
 
     "return an application on success" in new Setup {
       stubFor(
@@ -330,7 +331,7 @@ class SubmissionConnectorISpec extends BaseConnectorIntegrationISpec with GuiceO
   }
 
   "delete submission for ToU" should {
-    val url = s"/approvals/application/${applicationId.value}/delete-tou"
+    val url = s"/approvals/application/${rawApplicationId}/delete-tou"
 
     "return an application on success" in new Setup {
       stubFor(

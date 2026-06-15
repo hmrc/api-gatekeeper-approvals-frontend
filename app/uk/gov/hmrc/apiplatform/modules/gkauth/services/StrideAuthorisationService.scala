@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{MessagesRequest, Result}
-import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.{Name, ~}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +40,7 @@ class StrideAuthorisationService @Inject() (
   )(implicit val ec: ExecutionContext
   ) {
 
-  import strideAuthConfig.roles._
+  import strideAuthConfig.roles.*
 
   def refineStride[A](strideRoleRequired: GatekeeperStrideRole): (MessagesRequest[A]) => Future[Either[Result, LoggedInRequest[A]]] = (msgRequest) => {
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(msgRequest, msgRequest.session)
@@ -72,7 +72,7 @@ class StrideAuthorisationService @Inject() (
           case _               => Left(forbiddenHandler.handle(msgRequest))
         }
 
-      case None ~ authorisedEnrolments => Left(forbiddenHandler.handle(msgRequest))
+      case None ~ _ => Left(forbiddenHandler.handle(msgRequest))
     } recover {
       case _: NoActiveSession        => Left(loginRedirect)
       case _: InsufficientEnrolments => Left(forbiddenHandler.handle(msgRequest))

@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions.domain.models
 
 import play.api.libs.json.Format
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.services.SealedTraitJsonFormatting
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.SimpleEnumJsonFormatting
 
 sealed trait TermsOfUseInvitationState
 
@@ -35,5 +35,5 @@ object TermsOfUseInvitationState {
 
   def apply(text: String): Option[TermsOfUseInvitationState] = TermsOfUseInvitationState.values.find(_.toString() == text.toUpperCase)
 
-  implicit val format: Format[TermsOfUseInvitationState] = SealedTraitJsonFormatting.createFormatFor[TermsOfUseInvitationState]("Terms of use state", apply)
+  given Format[TermsOfUseInvitationState] = SimpleEnumJsonFormatting.createFormatFor[TermsOfUseInvitationState]("Terms of use state", apply, _.toString())
 }

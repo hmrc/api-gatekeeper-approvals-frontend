@@ -23,18 +23,16 @@ import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
-import uk.gov.hmrc.apiplatform.modules.gkauth.services._
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.*
 
 trait ForbiddenHandler {
-  def handle(msgResult: MessagesRequest[_]): Result
+  def handle(msgResult: MessagesRequest[?]): Result
 }
 
-trait GatekeeperStrideAuthorisationActions {
+trait GatekeeperStrideAuthorisationActions(using ec: ExecutionContext) {
   self: FrontendBaseController =>
 
   def strideAuthorisationService: StrideAuthorisationService
-
-  implicit def ec: ExecutionContext
 
   def gatekeeperRoleActionRefiner(minimumRoleRequired: GatekeeperStrideRole): ActionRefiner[MessagesRequest, LoggedInRequest] =
     new ActionRefiner[MessagesRequest, LoggedInRequest] {
@@ -46,8 +44,8 @@ trait GatekeeperStrideAuthorisationActions {
     }
 }
 
-trait GatekeeperAuthorisationActions {
-  self: FrontendBaseController with GatekeeperStrideAuthorisationActions =>
+trait GatekeeperAuthorisationActions(using ec: ExecutionContext) {
+  self: FrontendBaseController & GatekeeperStrideAuthorisationActions =>
 
   def ldapAuthorisationService: LdapAuthorisationService
 
@@ -70,7 +68,7 @@ trait GatekeeperAuthorisationActions {
             case NonFatal(_) => Left(Unauthorized(""))
           }
 
-      import cats.implicits._
+      import cats.implicits.*
       import cats.data.EitherT
       EitherT(refineStride).leftFlatMap { strideFailureResult =>
         EitherT(refineLdap).leftMap(_ => strideFailureResult)

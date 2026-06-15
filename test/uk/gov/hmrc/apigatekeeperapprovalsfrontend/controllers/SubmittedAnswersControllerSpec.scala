@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -51,7 +51,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId, 0)(fakeRequest)
+      val result = controller.page(rawApplicationId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -61,7 +61,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId, 0)(fakeRequest)
+      val result = controller.page(rawApplicationId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -70,7 +70,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId, 1)(fakeRequest)
+      val result = controller.page(rawApplicationId, 1)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
 
@@ -78,7 +78,7 @@ class SubmittedAnswersControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(applicationId, 0)(fakeRequest)
+      val result = controller.page(rawApplicationId, 0)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }

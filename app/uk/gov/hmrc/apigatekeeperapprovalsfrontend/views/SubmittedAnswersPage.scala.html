@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SubmittedAnswersController._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.SubmittedAnswersController.*
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.Breadcrumbs
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
 
@@ -52,9 +52,9 @@
   }
 
   @if(model.isGranted) {
-    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId.value)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
   } else {
-    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId, model.index)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ViewDeclinedSubmissionController.page(model.applicationId.value, model.index)}" class="govuk-button govuk-button">@{messages("submittedanswers.continue")}</a>
   }
   
 }

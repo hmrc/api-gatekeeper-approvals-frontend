@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import cats.data.NonEmptyList
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.{ApplicationStateData, ApplicationWithCollaboratorsFixtures}
@@ -82,9 +82,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.pendingRIVerification))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
       contentAsString(result) should include("The responsible individual has not verified yet, so you can only decline this request.")
       contentAsString(result) shouldNot include("Production access granted")
       contentAsString(result) shouldNot include("Previously declined")
@@ -101,9 +101,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
         Declined(declinedTimestamp, requesterEmail, "reasons")
       ))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
       contentAsString(result) shouldNot include("Production access granted")
       contentAsString(result) should include("Previously declined")
       contentAsString(result) shouldNot include("This application has been deleted")
@@ -119,9 +119,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
         Granted(grantedTimestamp, requesterEmail, None, None)
       ))
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
       contentAsString(result) should include("Production access granted")
       contentAsString(result) shouldNot include("Previously declined")
       contentAsString(result) shouldNot include("This application has been deleted")
@@ -135,7 +135,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
@@ -143,21 +143,21 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.notAuthorised
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 303 for SessionRecordNotFound" in new Setup {
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       LdapAuthorisationServiceMock.Auth.notAuthorised
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
   }
@@ -168,9 +168,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
-      val result = controller.whichPage(applicationId)(fakeRequest)
+      val result = controller.whichPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${applicationId.value}/reviews")
+      redirectLocation(result) shouldBe Some(s"/api-gatekeeper-approvals/applications/${rawApplicationId}/reviews")
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
@@ -178,9 +178,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
 
-      val result = controller.whichPage(applicationId)(fakeRequest)
+      val result = controller.whichPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${rawApplicationId}")
     }
 
     "redirect to Gatekeeper when no submission found and authorised using stride" in new Setup {
@@ -188,9 +188,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
-      val result = controller.whichPage(applicationId)(fakeRequest)
+      val result = controller.whichPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${rawApplicationId}")
     }
 
     "redirect to Gatekeeper when no submission found and authorised using ldap" in new Setup {
@@ -199,9 +199,9 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
-      val result = controller.whichPage(applicationId)(fakeRequest)
+      val result = controller.whichPage(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId.value}")
+      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${rawApplicationId}")
     }
   }
 }

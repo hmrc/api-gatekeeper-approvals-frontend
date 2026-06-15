@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.helpers
 
 object GlobalSection {
 
-  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.helpers.FormKeys._
+  import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.helpers.FormKeys.*
 
   private def a(em: String)(found: String => String, notFound: () => String) = {
     (globalKeys.contains(em), globalToField.get(em)) match {

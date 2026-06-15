@@ -27,5 +27,5 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ForbiddenView
 
 @Singleton
 class HandleForbiddenWithView @Inject() (forbiddenView: ForbiddenView) extends ForbiddenHandler {
-  def handle(m: MessagesRequest[_]) = Forbidden(forbiddenView()(m, m.messages))
+  def handle(m: MessagesRequest[?]) = Forbidden(forbiddenView()(m, m.messages))
 }

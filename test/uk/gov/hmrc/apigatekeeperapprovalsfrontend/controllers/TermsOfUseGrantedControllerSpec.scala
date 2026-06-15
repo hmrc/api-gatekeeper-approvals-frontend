@@ -22,11 +22,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import cats.data.NonEmptyList
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullName
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
-import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
@@ -43,7 +43,6 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     val termsOfUseGrantedPage = app.injector.instanceOf[TermsOfUseGrantedPage]
 
     val controller = new TermsOfUseGrantedController(
-      config,
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
@@ -74,30 +73,30 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(appWithImportantData.name.value)
+      contentAsString(result) should include(appWithImportantData.name)
     }
 
     "return 404 if no application is found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
 
     "return 403 for InsufficientEnrolments" in new Setup {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.notAuthorised
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 303 for SessionRecordNotFound" in new Setup {
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
       LdapAuthorisationServiceMock.Auth.notAuthorised
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
   }
@@ -110,10 +109,10 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeYesRequest)
+      val result = controller.action(rawApplicationId)(fakeYesRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(applicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseNotesController.page(rawApplicationId).url
     }
 
     "redirect when no selected" in new Setup {
@@ -123,7 +122,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeNoRequest)
+      val result = controller.action(rawApplicationId)(fakeNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseInvitationController.page.url

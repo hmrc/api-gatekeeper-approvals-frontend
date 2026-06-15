@@ -18,18 +18,19 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.connectors
 
 import scala.concurrent.Future
 
+import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.auth.core.retrieve.{Name, ~}
-import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, _}
+import uk.gov.hmrc.auth.core.{Enrolment, Enrolments, *}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.config.StrideAuthRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles._
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles.*
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationPredicateForGatekeeperRole
 
 trait StrideAuthConnectorMockModule {
-  self: MockitoSugar with ArgumentMatchersSugar =>
+  self: MockitoSugar & ArgumentMatchersSugar =>
 
   val strideAuthRoles: StrideAuthRoles
 
@@ -38,7 +39,7 @@ trait StrideAuthConnectorMockModule {
 
     object Authorise {
       private val defaultName = Name(Some("Bobby"), Some("Example"))
-      import strideAuthRoles._
+      import strideAuthRoles.*
 
       private lazy val predicateUserRole      = StrideAuthorisationPredicateForGatekeeperRole(strideAuthRoles)(USER)
       private lazy val predicateSuperUserRole = StrideAuthorisationPredicateForGatekeeperRole(strideAuthRoles)(SUPERUSER)
@@ -78,6 +79,6 @@ trait StrideAuthConnectorMockModule {
   }
 
   object StrideAuthConnectorMock extends BaseStrideAuthConnectorMock {
-    val aMock = mock[StrideAuthConnector]
+    val aMock = mock[StrideAuthConnector](withSettings.strictness(Strictness.LENIENT))
   }
 }

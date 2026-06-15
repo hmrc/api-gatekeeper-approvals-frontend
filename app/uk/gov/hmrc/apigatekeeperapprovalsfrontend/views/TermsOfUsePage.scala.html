@@ -20,7 +20,7 @@
 
 @this(layout: Layout, breadcrumbs: Breadcrumbs)
 
-@(form: Form[FilterForm], viewModels: List[ViewModel])(implicit request: LoggedInRequest[_], messages: Messages)
+@(form: Form[FilterForm], viewModels: List[ViewModel])(implicit request: LoggedInRequest[?], messages: Messages)
 
 @buildStatus(status: String) = @{
   status.toUpperCase() match {
@@ -156,7 +156,7 @@
         @for(model <- viewModels) {
           <tr class="govuk-table__row">
             <td class="govuk-table__cell">
-              <a class="govuk-link govuk-link--no-visited-state" href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(model.applicationId).url}>@{model.applicationName}</a>
+              <a class="govuk-link govuk-link--no-visited-state" href=@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(model.applicationId.value).url}>@{model.applicationName}</a>
             </td>
             <td class="govuk-table__cell">@{model.lastUpdated}</td>
             <td class="govuk-table__cell govuk-!-text-align-right">

@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatform.modules.submissions
 
 import scala.collection.immutable.ListMap
 
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
 trait MakeOptional[T <: Question] {
   def makeOptional(text: String, mark: Mark): T
@@ -29,19 +29,19 @@ trait MakeOptional[T <: Question] {
 
 trait QuestionBuilder {
 
-  implicit class TextQuestionSyntax(question: Question.TextQuestion) extends MakeOptional[Question.TextQuestion] {
+  extension (question: Question.TextQuestion) {
     def makeOptional(text: String, mark: Mark): Question.TextQuestion = question.copy(absence = Some((text, mark)))
   }
 
-  implicit class MultiChoiceQuestionSyntax(question: Question.MultiChoiceQuestion) extends MakeOptional[Question.MultiChoiceQuestion] {
+  extension (question: Question.MultiChoiceQuestion) {
     def makeOptional(text: String, mark: Mark): Question.MultiChoiceQuestion = question.copy(absence = Some((text, mark)))
   }
 
-  implicit class YesNoQuestionSyntax(question: Question.YesNoQuestion) extends MakeOptional[Question.YesNoQuestion] {
+  extension (question: Question.YesNoQuestion) {
     def makeOptional(text: String, mark: Mark): Question.YesNoQuestion = question.copy(absence = Some((text, mark)))
   }
 
-  implicit class ChooseOneOfQuestionSyntax(question: Question.ChooseOneOfQuestion) extends MakeOptional[Question.ChooseOneOfQuestion] {
+  extension (question: Question.ChooseOneOfQuestion) {
     def makeOptional(text: String, mark: Mark): Question.ChooseOneOfQuestion = question.copy(absence = Some((text, mark)))
   }
 

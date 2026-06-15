@@ -23,8 +23,8 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, InternalServerException, StringContextOps}
 
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, _}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, _}
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandHandlerTypes, *}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, *}
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 
 @Singleton
@@ -32,8 +32,10 @@ class ApplicationCommandConnector @Inject() (
     val http: HttpClientV2,
     val config: ApmConnector.Config
   )(implicit val ec: ExecutionContext
-  ) extends CommandHandlerTypes[DispatchSuccessResult]
-    with ApplicationLogger {
+  ) extends ApplicationLogger {
+
+  private val CHT = new CommandHandlerTypes[DispatchSuccessResult] {}
+  import CHT.*
 
   val serviceBaseUrl = config.serviceBaseUrl
 
@@ -44,12 +46,11 @@ class ApplicationCommandConnector @Inject() (
     )(implicit hc: HeaderCarrier
     ): AppCmdResult = {
 
-    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters._
-    import play.api.libs.json._
-    import uk.gov.hmrc.http.HttpReads.Implicits._
-    import play.api.http.Status._
+    import play.api.libs.json.*
+    import uk.gov.hmrc.http.HttpReads.Implicits.*
+    import play.api.http.Status.*
 
-    def parseWithLogAndThrow[T](input: String)(implicit reads: Reads[T]): T = {
+    def parseWithLogAndThrow[T](input: String)(using Reads[T]): T = {
       Json.parse(input).validate[T] match {
         case JsSuccess(t, _) => t
         case JsError(err)    =>
@@ -58,7 +59,9 @@ class ApplicationCommandConnector @Inject() (
       }
     }
 
-    import cats.syntax.either._
+    import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters.given
+    import play.api.libs.ws.writeableOf_JsValue
+    import cats.syntax.either.*
 
     http.patch(url"$serviceBaseUrl/applications/$applicationId/dispatch")
       .withBody(Json.toJson(DispatchRequest(command, adminsToEmail)))

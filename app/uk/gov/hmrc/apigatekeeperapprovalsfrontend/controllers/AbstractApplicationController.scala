@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 import scala.concurrent.ExecutionContext
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
@@ -39,9 +39,9 @@ abstract class AbstractApplicationController(
     with EitherTHelper[Result]
     with ApplicationLogger {
 
-  implicit class TimestampSyntax(datetime: Instant) {
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
-    def asText    = formatter.format(datetime)
-  }
+  private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
 
+  extension (dateTime: Instant) {
+    def asText = dateTimeFormatter.format(dateTime)
+  }
 }

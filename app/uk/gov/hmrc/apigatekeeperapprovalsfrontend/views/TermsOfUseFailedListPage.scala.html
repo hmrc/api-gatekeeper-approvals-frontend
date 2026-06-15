@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController._
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models._
-@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.*
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
+@import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
 @this(layout: Layout, backbreadcrumb: BackBreadcrumb)
 
@@ -63,12 +63,12 @@
 
   <p class="govuk-body">
     @{messages("termsofusefailedlist.youcancheck")}
-    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUsePassedController.answersThatPassedPage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
+    <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUsePassedController.answersThatPassedPage(model.applicationId.value)}" class="govuk-link govuk-link--no-visited-state">
       @{messages("termsofusefailedlist.answersthatpassed")}
     </a>
   </p>
 
-  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listAction(model.applicationId), Symbol("class") -> "form") {
+  @helper.form(action = uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.listAction(model.applicationId.value), Symbol("class") -> "form") {
     @helper.CSRF.formField
 
     <div class="govuk-button-group govuk-!-margin-top-7">
@@ -79,7 +79,7 @@
 
   @if(model.submissionStatus.isFailed) {
     <p class="govuk-body">
-      <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.failOverridePage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
+      <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.failOverridePage(model.applicationId.value)}" class="govuk-link govuk-link--no-visited-state">
         @{messages("termsofusefailedlist.override")}
       </a>
     </p>

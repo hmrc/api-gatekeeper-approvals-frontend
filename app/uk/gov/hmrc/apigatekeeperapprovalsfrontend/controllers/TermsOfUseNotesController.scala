@@ -23,8 +23,8 @@ import scala.concurrent.Future.successful
 import cats.data.NonEmptyList
 
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Forms.*
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
@@ -47,7 +47,7 @@ object TermsOfUseNotesController {
   val provideNotesForm: Form[ProvideNotesForm] = Form(
     mapping(
       "notes" -> nonEmptyText
-    )(ProvideNotesForm.apply)(ProvideNotesForm.unapply)
+    )(ProvideNotesForm.apply)(p => Some(p.notes))
   )
 }
 
@@ -62,13 +62,13 @@ class TermsOfUseNotesController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with WithUrlEncodedOnlyFormBinding {
 
-  import TermsOfUseNotesController._
+  import TermsOfUseNotesController.*
 
-  def page(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
+  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+    successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(errs: NonEmptyList[CommandFailure]) =
         errorHandler.standardErrorTemplate(
@@ -77,18 +77,18 @@ class TermsOfUseNotesController @Inject() (
           errs.toList.map(error => CommandFailures.describe(error)).mkString(", ")
         ).map(BadRequest(_))
 
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(rawApplicationId))
 
       val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
 
-      E.fromEitherF(submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None))
+      E.fromEitherF(submissionService.grantForTouUplift(request.application.id, request.name.get, form.notes, None))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseNotesPage(form, ViewModel(applicationId, request.application.name))))
+      successful(BadRequest(termsOfUseNotesPage(form, ViewModel(request.application.id, request.application.name))))
     }
 
     TermsOfUseNotesController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)

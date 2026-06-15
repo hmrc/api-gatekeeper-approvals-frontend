@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.helpers.GlobalSection._
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.helpers.GlobalSection.*
 
-@(form: Form[_])(implicit messages: Messages)
+@(form: Form[?])(implicit messages: Messages)
 
 @if(form.hasGlobalErrors) {
   <div id="error-summary-display" class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">

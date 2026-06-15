@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
-import uk.gov.hmrc.apiplatform.modules.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -53,9 +53,9 @@ class TermsOfUsePassedController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  import TermsOfUsePassedController._
+  import TermsOfUsePassedController.*
 
-  def answersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def answersThatPassedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
     def isPass(id: Question.Id): Boolean = {
       request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
     }
@@ -76,14 +76,14 @@ class TermsOfUsePassedController @Inject() (
           )
         )
         .collect {
-          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail: _*))
+          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail*))
         }
 
     successful(
       Ok(
         termsOfUsePassedPage(
           TermsOfUsePassedController.ViewModel(
-            applicationId,
+            request.application.id,
             request.application.name,
             groupedPassedQuestionsIds,
             isDeleted

@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
@@ -55,7 +55,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -69,7 +69,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -82,7 +82,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -92,7 +92,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(applicationId)(fakeRequest)
+      val result = controller.page(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -105,7 +105,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
+      val result = controller.action(rawApplicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -116,7 +116,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.action(rawApplicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -126,7 +126,7 @@ class ArrangeDemoControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(applicationId)(fakeRequest)
+      val result = controller.action(rawApplicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
