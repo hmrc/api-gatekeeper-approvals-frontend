@@ -60,9 +60,11 @@ class ChecklistController @Inject() (
 
   type RequiredActions = Map[SubmissionReview.Action, SubmissionReview.Status]
 
-  object AutomaticChecksResult extends Enumeration {
-    type AutomaticChecksResult = Value
-    val PASSED_WITHOUT_WARNINGS, PASSED_WITH_WARNINGS, FAILED = Value
+  enum AutomaticChecksResult {
+    case PASSED_WITHOUT_WARNINGS, PASSED_WITH_WARNINGS, FAILED
+  }
+
+  object AutomaticChecksResult {
 
     def apply(isSuccessful: Boolean, hasWarnings: Boolean): AutomaticChecksResult = {
       (isSuccessful, hasWarnings) match {
@@ -72,6 +74,7 @@ class ChecklistController @Inject() (
       }
     }
   }
+
   import AutomaticChecksResult.*
 
   private def setupSubmissionReview(submission: Submission, isSuccessful: Boolean, hasWarnings: Boolean) = {
@@ -96,6 +99,7 @@ class ChecklistController @Inject() (
     for {
       review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
       sections = buildChecklistSections(rawApplicationId, review.requiredActions, automaticChecksResult)
+      _ = logger.info("Section Item Statuses "+sections.flatMap(_.items).flatMap(i => s"${i.labelMsgId} : ${i.status}"))
     } yield Ok(checklistPage(ViewModel(request.application.id, appName, topMsgId, sections, isInHouseSoftware, isDeleted)))
   }
 
