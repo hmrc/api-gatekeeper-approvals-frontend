@@ -78,12 +78,10 @@
                             </td>
                             <td class="govuk-table__cell align-right">
                             @{
-                                if (item.status == SubmissionReview.Status.Completed) {
-                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.completed")}</div>
-                                } else if (item.status == SubmissionReview.Status.InProgress) {
-                                    <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
-                                } else if (item.status == SubmissionReview.Status.NotStarted) {
-                                    <div class="govuk-tag govuk-tag--grey app-task-list__tag">{messages("checklist.status.notstarted")}</div>
+                                item.status match {
+                                    case SubmissionReview.Status.Completed => <div class="govuk-tag app-task-list__tag">{messages("checklist.status.completed")}</div>
+                                    case SubmissionReview.Status.InProgress => <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
+                                    case SubmissionReview.Status.NotStarted => <div class="govuk-tag govuk-tag--grey app-task-list__tag">{messages("checklist.status.notstarted")}</div>
                                 }
                             }
                             </td>
