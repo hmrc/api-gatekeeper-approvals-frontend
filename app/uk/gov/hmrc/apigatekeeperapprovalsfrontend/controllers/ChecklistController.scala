@@ -99,7 +99,6 @@ class ChecklistController @Inject() (
     for {
       review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
       sections = buildChecklistSections(rawApplicationId, review.requiredActions, automaticChecksResult)
-      _        = logger.info("Section Item Statuses " + sections.flatMap(_.items).flatMap(i => s"${i.labelMsgId} : ${i.status}"))
     } yield Ok(checklistPage(ViewModel(request.application.id, appName, topMsgId, sections, isInHouseSoftware, isDeleted)))
   }
 
