@@ -60,9 +60,11 @@ class ChecklistController @Inject() (
 
   type RequiredActions = Map[SubmissionReview.Action, SubmissionReview.Status]
 
-  object AutomaticChecksResult extends Enumeration {
-    type AutomaticChecksResult = Value
-    val PASSED_WITHOUT_WARNINGS, PASSED_WITH_WARNINGS, FAILED = Value
+  enum AutomaticChecksResult {
+    case PASSED_WITHOUT_WARNINGS, PASSED_WITH_WARNINGS, FAILED
+  }
+
+  object AutomaticChecksResult {
 
     def apply(isSuccessful: Boolean, hasWarnings: Boolean): AutomaticChecksResult = {
       (isSuccessful, hasWarnings) match {
@@ -72,6 +74,7 @@ class ChecklistController @Inject() (
       }
     }
   }
+
   import AutomaticChecksResult.*
 
   private def setupSubmissionReview(submission: Submission, isSuccessful: Boolean, hasWarnings: Boolean) = {

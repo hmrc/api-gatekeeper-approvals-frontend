@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ChecklistController.*
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
-@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status.*
+@import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview.Status
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.Breadcrumbs
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
 
@@ -78,12 +78,10 @@
                             </td>
                             <td class="govuk-table__cell align-right">
                             @{
-                                if (item.status == Completed) {
-                                    <div class="govuk-tag app-task-list__tag">{messages("checklist.status.completed")}</div>
-                                } else if (item.status == InProgress) {
-                                    <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
-                                } else if (item.status == NotStarted) {
-                                    <div class="govuk-tag govuk-tag--grey app-task-list__tag">{messages("checklist.status.notstarted")}</div>
+                                item.status match {
+                                    case SubmissionReview.Status.Completed => <div class="govuk-tag app-task-list__tag">{messages("checklist.status.completed")}</div>
+                                    case SubmissionReview.Status.InProgress => <div class="govuk-tag app-task-list__tag govuk-tag--blue">{messages("checklist.status.inprogress")}</div>
+                                    case SubmissionReview.Status.NotStarted => <div class="govuk-tag govuk-tag--grey app-task-list__tag">{messages("checklist.status.notstarted")}</div>
                                 }
                             }
                             </td>
