@@ -32,7 +32,9 @@ class SubmissionReviewSpec extends BaseJsonFormattersSpec with SubmissionReviewD
 
   "SubmissionReview" should {
     "read from Json" in {
-      testFromJson[SubmissionReview](s"""{"submissionId":"$submissionIdOneText","instanceIndex":0,"declineReasons":"","grantWarnings":"","requiredActions":{"CheckCompanyRegistration":{"Review.StatusType":"notstarted"},"CheckPassedAnswers":{"Review.StatusType":"notstarted"},"CheckApplicationName":{"Review.StatusType":"notstarted"},"CheckUrls":{"Review.StatusType":"notstarted"},"CheckFailsAndWarnings":{"Review.StatusType":"notstarted"},"ArrangedDemo":{"Review.StatusType":"notstarted"},"CheckFraudPreventionData":{"Review.StatusType":"notstarted"},"CheckSandboxTesting":{"Review.StatusType":"notstarted"}}}""")(submissionReviewOne)
+      testFromJson[SubmissionReview](s"""{"submissionId":"$submissionIdOneText","instanceIndex":0,"declineReasons":"","grantWarnings":"","requiredActions":{"CheckCompanyRegistration":{"Review.StatusType":"notstarted"},"CheckPassedAnswers":{"Review.StatusType":"notstarted"},"CheckApplicationName":{"Review.StatusType":"notstarted"},"CheckUrls":{"Review.StatusType":"notstarted"},"CheckFailsAndWarnings":{"Review.StatusType":"notstarted"},"ArrangedDemo":{"Review.StatusType":"notstarted"},"CheckFraudPreventionData":{"Review.StatusType":"notstarted"},"CheckSandboxTesting":{"Review.StatusType":"notstarted"}}}""")(
+        submissionReviewOne
+      )
     }
 
     "write to Json" in {

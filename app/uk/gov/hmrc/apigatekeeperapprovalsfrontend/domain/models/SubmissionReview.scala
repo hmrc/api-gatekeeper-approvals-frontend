@@ -31,6 +31,7 @@ object SubmissionReview {
 
     def unsafeApply(raw: String): Status = apply(raw).getOrElse(throw new RuntimeException(s"$raw is not a valid SubmissionReview.Status"))
 
+    // Note: This is not used in SubmissionReview or the Database (yet?)
     given Format[Status] = SimpleEnumJsonFormatting.createStringFormatFor[Status]("SubmissionReview.Status", apply(_), _.toString().toLowerCase())
   }
 

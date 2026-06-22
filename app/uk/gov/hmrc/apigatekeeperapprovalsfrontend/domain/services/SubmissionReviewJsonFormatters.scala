@@ -24,6 +24,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview.*
 
+  // This causes excessive json bloat but is now in the database.
   given OFormat[Status] = Union.from[Status]("Review.StatusType")
     .andType[Status.NotStarted.type]("notstarted", () => Status.NotStarted)
     .andType[Status.InProgress.type]("inprogress", () => Status.InProgress)
