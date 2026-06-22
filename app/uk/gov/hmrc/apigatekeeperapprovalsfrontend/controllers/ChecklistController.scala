@@ -60,7 +60,7 @@ class ChecklistController @Inject() (
 
   type RequiredActions = Map[SubmissionReview.Action, SubmissionReview.Status]
 
-  enum AutomaticChecksResult {
+  enum AutomaticChecksResult derives CanEqual {
     case PASSED_WITHOUT_WARNINGS, PASSED_WITH_WARNINGS, FAILED
   }
 

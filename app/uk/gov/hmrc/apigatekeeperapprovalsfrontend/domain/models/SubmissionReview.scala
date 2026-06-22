@@ -17,11 +17,21 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.SimpleEnumJsonFormatting
 
 object SubmissionReview {
 
   enum Status {
     case NotStarted, InProgress, Completed
+  }
+
+  object Status {
+    import play.api.libs.json.Format
+    def apply(raw: String): Option[Status] = values.find(_.toString().equalsIgnoreCase(raw))
+
+    def unsafeApply(raw: String): Status = apply(raw).getOrElse(throw new RuntimeException(s"$raw is not a valid SubmissionReview.Status"))
+
+    given Format[Status] = SimpleEnumJsonFormatting.createStringFormatFor[Status]("SubmissionReview.Status", apply(_), _.toString().toLowerCase())
   }
 
   enum Action {
