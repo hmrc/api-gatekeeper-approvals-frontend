@@ -24,6 +24,12 @@ object SubmissionReview {
     case NotStarted, InProgress, Completed
   }
 
+  object Status {
+    def apply(raw: String): Option[Status] = values.find(_.toString().equalsIgnoreCase(raw))
+
+    def unsafeApply(raw: String): Status = apply(raw).getOrElse(throw new RuntimeException(s"$raw is not a valid SubmissionReview.Status"))
+  }
+
   enum Action {
     case CheckFailsAndWarnings
     case CheckApplicationName

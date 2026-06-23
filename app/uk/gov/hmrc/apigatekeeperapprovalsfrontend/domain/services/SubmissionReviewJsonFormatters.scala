@@ -24,10 +24,11 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 trait SubmissionReviewJsonFormatters {
   import SubmissionReview.*
 
+  // This causes excessive json bloat but is now in the database.
   given OFormat[Status] = Union.from[Status]("Review.StatusType")
-    .andType[Status.NotStarted.type]("notstarted", () => Status.NotStarted)
-    .andType[Status.InProgress.type]("inprogress", () => Status.InProgress)
-    .andType[Status.Completed.type]("completed", () => Status.Completed)
+    .andValue("notstarted", Status.NotStarted)
+    .andValue("inprogress", Status.InProgress)
+    .andValue("completed", Status.Completed)
     .format
 
   given KeyReads[Action]  = key => SubmissionReview.Action.fromText(key).fold[JsResult[Action]](JsError(s"Bad action key $key"))(a => JsSuccess(a))
