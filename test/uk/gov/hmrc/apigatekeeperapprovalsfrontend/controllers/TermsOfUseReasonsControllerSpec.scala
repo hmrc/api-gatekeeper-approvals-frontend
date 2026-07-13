@@ -51,7 +51,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.provideReasonsPage(rawApplicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -61,7 +61,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.provideReasonsPage(rawApplicationId)(fakeRequest)
+      val result = controller.provideReasonsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -76,11 +76,11 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
 
-      val result = controller.provideReasonsAction(rawApplicationId)(fakeReasonsRequest)
+      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(
-        rawApplicationId
+        applicationId
       ).url
     }
 
@@ -92,7 +92,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
 
-      val result = controller.provideReasonsAction(rawApplicationId)(fakeReasonsRequest)
+      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -105,7 +105,7 @@ class TermsOfUseReasonsControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturnError()
 
-      val result = controller.provideReasonsAction(rawApplicationId)(fakeReasonsRequest)
+      val result = controller.provideReasonsAction(applicationId)(fakeReasonsRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }

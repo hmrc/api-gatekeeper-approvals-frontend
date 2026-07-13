@@ -53,19 +53,19 @@ class ConfirmYourDecisionController @Inject() (
 
   import ConfirmYourDecisionController.*
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(confirmYourDecisionPage(ViewModel(request.application.id, request.application.name, request.markedSubmission.isFail))))
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(confirmYourDecisionPage(ViewModel(applicationId, request.application.name, request.markedSubmission.isFail))))
   }
 
-  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("grant-decision").flatMap(_.headOption) match {
-      case Some("decline")                                                   => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(rawApplicationId)))
+      case Some("decline")                                                   => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId)))
       case Some("grant-with-warnings") if (!request.markedSubmission.isFail) =>
-        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(rawApplicationId)))
+        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideWarningsPage(applicationId)))
       case Some("grant-with-warnings") if (request.markedSubmission.isFail)  =>
-        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(rawApplicationId)))
-      case Some("grant")                                                     => grantAccess(request.application.id)
-      case _                                                                 => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(rawApplicationId)))
+        successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.provideEscalatedToPage(applicationId)))
+      case Some("grant")                                                     => grantAccess(applicationId)
+      case _                                                                 => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
     }
   }
 
@@ -79,7 +79,7 @@ class ConfirmYourDecisionController @Inject() (
       for {
         _ <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
         _ <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(handleCommandFailures)
-      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId.value).url)
+      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url)
     ).fold(identity(_), identity(_))
   }
 

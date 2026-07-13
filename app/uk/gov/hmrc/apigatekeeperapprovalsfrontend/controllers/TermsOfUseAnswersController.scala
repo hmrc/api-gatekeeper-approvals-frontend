@@ -58,12 +58,12 @@ class TermsOfUseAnswersController @Inject() (
 
   import TermsOfUseAnswersController.*
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
     val instance   = request.submission.latestInstance
     val index      = instance.index
 
-    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, request.application.id, index, SubmissionQuestionsAndAnswers(submission, instance)))))
+    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance)))))
   }
 }

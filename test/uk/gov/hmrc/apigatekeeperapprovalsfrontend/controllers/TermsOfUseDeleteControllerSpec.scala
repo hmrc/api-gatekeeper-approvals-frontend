@@ -51,7 +51,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(rawApplicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -66,10 +66,10 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.DeleteTouUplift.thenReturn(applicationId, application)
 
-      val result = controller.action(rawApplicationId)(fakeYesNoRequest)
+      val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(rawApplicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(applicationId).url
     }
 
     "redirect back to ToU history page if select no" in new Setup {
@@ -79,10 +79,10 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(rawApplicationId)(fakeYesNoRequest)
+      val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(rawApplicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
     }
 
     "redirect back to ToU history page if select nothing" in new Setup {
@@ -92,10 +92,10 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(rawApplicationId)(fakeYesNoRequest)
+      val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(rawApplicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
     }
 
     "redirect back to ToU history page if no form" in new Setup {
@@ -103,10 +103,10 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(rawApplicationId)(fakeRequest)
+      val result = controller.action(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(rawApplicationId).url
+      redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId).url
     }
 
     "return 400 if failed to delete" in new Setup {
@@ -117,7 +117,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.DeleteTouUplift.thenReturnError(applicationId)
 
-      val result = controller.action(rawApplicationId)(fakeYesNoRequest)
+      val result = controller.action(applicationId)(fakeYesNoRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -129,7 +129,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.confirmationPage(rawApplicationId)(fakeRequest)
+      val result = controller.confirmationPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
@@ -54,11 +53,11 @@ class TermsOfUseDeleteController @Inject() (
 
   import TermsOfUseDeleteController.*
 
-  def page(rawApplicationId: UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseDeletePage(ViewModel(request.application.id, request.application.name))))
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+    successful(Ok(termsOfUseDeletePage(ViewModel(applicationId, request.application.name))))
   }
 
-  def action(rawApplicationId: UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
     def deleteSubmission() = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -67,11 +66,11 @@ class TermsOfUseDeleteController @Inject() (
           err
         ).map(BadRequest(_))
 
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(rawApplicationId))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseDeleteController.confirmationPage(applicationId))
 
       val E = EitherTHelper.make[String]
 
-      E.fromEitherF(submissionService.deleteTouUplift(request.application.id, request.name.get))
+      E.fromEitherF(submissionService.deleteTouUplift(applicationId, request.name.get))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge
@@ -79,11 +78,11 @@ class TermsOfUseDeleteController @Inject() (
 
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("tou-delete").flatMap(_.headOption) match {
       case Some("yes") => deleteSubmission()
-      case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(rawApplicationId)))
+      case _           => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseHistoryController.page(applicationId)))
     }
   }
 
-  def confirmationPage(rawApplicationId: UUID): Action[AnyContent] = loggedInThruStrideWithApplication(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmPage(ViewModel(request.application.id, request.application.name))))
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+    successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
   }
 }

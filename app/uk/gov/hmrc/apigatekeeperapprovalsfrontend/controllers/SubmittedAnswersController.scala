@@ -59,11 +59,11 @@ class SubmittedAnswersController @Inject() (
 
   import SubmittedAnswersController.*
 
-  def page(rawApplicationId: java.util.UUID, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(rawApplicationId, index) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = loggedInWithApplicationAndSubmissionAndInstance(applicationId, index) { implicit request =>
     val appName    = request.application.name
     val submission = request.submission
     val instance   = request.instance
 
-    successful(Ok(submittedAnswersPage(ViewModel(appName, request.application.id, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
+    successful(Ok(submittedAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance), instance.isGranted))))
   }
 }

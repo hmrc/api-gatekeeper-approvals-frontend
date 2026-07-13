@@ -50,7 +50,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(rawApplicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -61,7 +61,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
-      val result = controller.page(rawApplicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -72,7 +72,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.page(rawApplicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -83,7 +83,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.page(rawApplicationId)(fakeRequest)
+      val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -96,7 +96,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.action(rawApplicationId)(fakeSubmitCheckedRequest)
+      val result = controller.action(applicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -107,7 +107,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.action(rawApplicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.action(applicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -117,7 +117,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(rawApplicationId)(brokenRequest)
+      val result = controller.action(applicationId)(brokenRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -127,7 +127,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
-      val result = controller.action(rawApplicationId)(fakeRequest)
+      val result = controller.action(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

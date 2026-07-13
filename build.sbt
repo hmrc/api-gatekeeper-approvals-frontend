@@ -35,13 +35,18 @@ lazy val microservice = Project(appName, file("."))
       "views.html.helper.CSPNonce",
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
+      "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.ApplicationToSimpleApplicationId.given"
     )
   )
   .settings(ScoverageSettings()*)
   .settings(
     routesImport ++= Seq(
-      "java.util.UUID",
+      "uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.binders.given",
+      "uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.binders.RouteModels.*",
+      "uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.binders.RouteModels.Conversions.given",
+      
+      // "java.util.UUID",
       "uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._"
     )

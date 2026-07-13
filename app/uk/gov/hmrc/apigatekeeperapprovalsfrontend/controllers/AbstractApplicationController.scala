@@ -28,6 +28,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServic
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperStrideRoleWithApplicationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.ApplicationToSimpleApplicationId
 
 abstract class AbstractApplicationController(
     strideAuthorisationService: StrideAuthorisationService,
@@ -37,7 +38,8 @@ abstract class AbstractApplicationController(
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc)
     with GatekeeperStrideRoleWithApplicationActions
     with EitherTHelper[Result]
-    with ApplicationLogger {
+    with ApplicationLogger
+    with ApplicationToSimpleApplicationId {
 
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault())
 

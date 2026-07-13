@@ -60,7 +60,7 @@ class CheckAnswersThatFailedController @Inject() (
 
   import CheckAnswersThatFailedController.*
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
     val isDeleted = request.application.state.isDeleted
 
@@ -87,7 +87,7 @@ class CheckAnswersThatFailedController @Inject() (
       Ok(
         checkAnswersThatFailedPage(
           ViewModel(
-            request.application.id,
+            applicationId,
             appName,
             answerDetails,
             isDeleted
@@ -97,5 +97,5 @@ class CheckAnswersThatFailedController @Inject() (
     )
   }
 
-  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings)(rawApplicationId)
+  def action(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings)(applicationId)
 }

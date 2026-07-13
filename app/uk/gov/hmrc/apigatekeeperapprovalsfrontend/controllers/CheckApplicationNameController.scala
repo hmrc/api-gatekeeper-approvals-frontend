@@ -49,7 +49,7 @@ class CheckApplicationNameController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.application.access match {
       // Should only be uplifting and checking Standard apps
       case _: Access.Standard if (request.submission.status.isSubmitted) =>
@@ -59,7 +59,7 @@ class CheckApplicationNameController @Inject() (
             checkApplicationNamePage(
               CheckApplicationNameController.ViewModel(
                 request.application.name,
-                request.application.id,
+                applicationId,
                 isDeleted
               )
             )
@@ -69,6 +69,6 @@ class CheckApplicationNameController @Inject() (
     }
   }
 
-  def action(rawApplicationId: java.util.UUID): Action[AnyContent] =
-    updateActionStatus(SubmissionReview.Action.CheckApplicationName)(rawApplicationId)
+  def action(applicationId: ApplicationId): Action[AnyContent] =
+    updateActionStatus(SubmissionReview.Action.CheckApplicationName)(applicationId)
 }

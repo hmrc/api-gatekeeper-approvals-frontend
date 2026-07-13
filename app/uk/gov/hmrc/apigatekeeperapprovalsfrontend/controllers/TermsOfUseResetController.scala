@@ -62,11 +62,11 @@ class TermsOfUseResetController @Inject() (
 
   import TermsOfUseResetController.*
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def action(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -75,25 +75,25 @@ class TermsOfUseResetController @Inject() (
           err
         ).map(BadRequest(_))
 
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(rawApplicationId))
+      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId))
 
       val E = EitherTHelper.make[String]
 
-      E.fromEitherF(submissionService.resetForTouUplift(request.application.id, request.name.get, form.notes))
+      E.fromEitherF(submissionService.resetForTouUplift(applicationId, request.name.get, form.notes))
         .map(_ => success)
         .leftSemiflatMap(err => failure(err))
         .merge
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseResetPage(form, ViewModel(request.application.id, request.application.name))))
+      successful(BadRequest(termsOfUseResetPage(form, ViewModel(applicationId, request.application.name))))
     }
 
     TermsOfUseResetController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
 
   }
 
-  def confirmationPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmPage(ViewModel(request.application.id, request.application.name))))
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
   }
 }

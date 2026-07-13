@@ -74,7 +74,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithData())
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should not include ("This application has been deleted")
@@ -85,7 +85,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl"), TermsAndConditionsLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -95,7 +95,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -105,7 +105,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithData(termsAndConditionsLocation = TermsAndConditionsLocation.Url("aurl")))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -115,7 +115,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithData(PrivacyPolicyLocation.NoneProvided, TermsAndConditionsLocation.NoneProvided))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
     }
@@ -126,7 +126,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("This application has been deleted")
@@ -138,7 +138,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(noImportantSubData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -148,7 +148,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
-      val result = controller.checkUrlsPage(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsPage(applicationId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
     }
@@ -161,7 +161,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.checkUrlsAction(rawApplicationId)(fakeSubmitCheckedRequest)
+      val result = controller.checkUrlsAction(applicationId)(fakeSubmitCheckedRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -172,7 +172,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
 
-      val result = controller.checkUrlsAction(rawApplicationId)(fakeSubmitComebackLaterRequest)
+      val result = controller.checkUrlsAction(applicationId)(fakeSubmitComebackLaterRequest)
 
       status(result) shouldBe SEE_OTHER
     }
@@ -182,7 +182,7 @@ class CheckUrlsControllerSpec extends AbstractControllerSpec with ApplicationWit
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationIdOne)
 
-      val result = controller.checkUrlsAction(rawApplicationId)(fakeRequest)
+      val result = controller.checkUrlsAction(applicationId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }

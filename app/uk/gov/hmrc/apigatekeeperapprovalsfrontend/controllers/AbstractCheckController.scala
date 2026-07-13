@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.util.UUID
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.SubmissionId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
@@ -55,9 +55,9 @@ abstract class AbstractCheckController(
   def updateActionStatus(
       reviewAction: SubmissionReview.Action
     )(
-      rawApplicationId: UUID
-    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(rawApplicationId))
+      applicationId: ApplicationId
+    ): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    val ok  = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(applicationId))
     val log = logBadRequest(reviewAction)
 
     (

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
@@ -61,7 +60,7 @@ class ViewDeclinedSubmissionController @Inject() (
 
   import ViewDeclinedSubmissionController.*
 
-  def page(rawApplicationId: UUID, index: Int) = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(
@@ -71,7 +70,7 @@ class ViewDeclinedSubmissionController @Inject() (
         case (Declined(declinedTimestamp, declinedName, reasons), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
           successful(Ok(viewDeclinedSubmissionPage(ViewModel(
             appName,
-            request.application.id,
+            applicationId,
             requestedBy,
             submittedTimestamp.asText,
             declinedName,

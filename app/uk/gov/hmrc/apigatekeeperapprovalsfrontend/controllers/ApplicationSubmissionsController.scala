@@ -74,8 +74,8 @@ class ApplicationSubmissionsController @Inject() (
   import cats.implicits.*
   import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Extensions.*
 
-  def whichPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
+  def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission =>
       submission.instances.find(i =>
@@ -84,18 +84,18 @@ class ApplicationSubmissionsController @Inject() (
 
     (
       for {
-        submission <- OptionT(submissionService.fetchLatestSubmission(request.application.id))
+        submission <- OptionT(submissionService.fetchLatestSubmission(applicationId))
         if hasEverBeenSubmitted(submission)
       } yield submission
     )
       .fold(
         Redirect(gatekeeperApplicationUrl)
-      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(rawApplicationId)))
+      )(_ => Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))
   }
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName                  = request.application.name
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 
     val latestInstance       = request.markedSubmission.submission.latestInstance
     val latestInstanceStatus = latestInstance.statusHistory.head
@@ -127,7 +127,7 @@ class ApplicationSubmissionsController @Inject() (
 
     successful(Ok(applicationSubmissionsPage(
       ViewModel(
-        request.application.id,
+        applicationId,
         appName,
         gatekeeperApplicationUrl,
         currentSubmission,

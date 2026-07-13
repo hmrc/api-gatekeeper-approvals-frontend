@@ -35,6 +35,7 @@ import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.services.{SubmissionReviewServiceMockModule, SubmissionServiceMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.{ErrorHandler, GatekeeperConfig}
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.ApplicationToSimpleApplicationId
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.utils.{AsyncHmrcSpec, WithCSRFAddToken}
 
 class AbstractControllerSpec
@@ -43,6 +44,7 @@ class AbstractControllerSpec
     with GuiceOneAppPerSuite
     with WithCSRFAddToken
     with ApplicationWithCollaboratorsFixtures
+    with ApplicationToSimpleApplicationId
     with SubmissionsTestData {
 
   override def fakeApplication() =
@@ -57,8 +59,6 @@ class AbstractControllerSpec
       extends ApplicationActionServiceMockModule
       with SubmissionServiceMockModule
       with SubmissionReviewServiceMockModule {
-
-    val rawApplicationId = applicationIdOne.value
 
     val config           = app.injector.instanceOf[GatekeeperConfig]
     val strideAuthConfig = app.injector.instanceOf[StrideAuthConfig]

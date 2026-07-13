@@ -64,14 +64,14 @@ class DeclinedJourneyController @Inject() (
 
   import DeclinedJourneyController.*
 
-  def provideReasonsPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(request.application.id, request.application.name))))
+  def provideReasonsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(provideReasonsForDecliningPage(provideReasonsForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def provideReasonsAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def provideReasonsAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: DeclinedJourneyController.ProvideReasonsForm) = {
       submissionReviewService.updateDeclineReasons(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(rawApplicationId)))
+        case Some(value) => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.emailAddressesPage(applicationId)))
         case None        => {
           logger.warn("Persisting decline reasons failed")
           errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -80,27 +80,27 @@ class DeclinedJourneyController @Inject() (
     }
 
     def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
-      successful(BadRequest(provideReasonsForDecliningPage(form, ViewModel(request.application.id, request.application.name))))
+      successful(BadRequest(provideReasonsForDecliningPage(form, ViewModel(applicationId, request.application.name))))
     }
 
     DeclinedJourneyController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def declinedPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(applicationDeclinedPage(ViewModel(request.application.id, request.application.name))))
+  def declinedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(applicationDeclinedPage(ViewModel(applicationId, request.application.name))))
   }
 
-  def emailAddressesPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def emailAddressesPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
-    successful(Ok(adminsToEmailPage(ViewModel(request.application.id, request.application.name, adminsToEmail))))
+    successful(Ok(adminsToEmailPage(ViewModel(applicationId, request.application.name, adminsToEmail))))
   }
 
-  def emailAddressesAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def emailAddressesAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val requiresFraudCheck = SubmissionRequiresFraudCheck(request.submission)
     val requiresDemo       = SubmissionRequiresDemo(request.submission)
     val adminsToEmail      = request.application.collaborators.filter(_.role.isAdministrator).map(_.emailAddress)
-    val ok                 = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(rawApplicationId))
+    val ok                 = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.declinedPage(applicationId))
 
     for {
       review <- submissionReviewService.findOrCreateReview(
@@ -111,7 +111,7 @@ class DeclinedJourneyController @Inject() (
                   requiresFraudCheck,
                   requiresDemo
                 )
-      _      <- applicationService.declineApplicationApprovalRequest(request.application.id, request.name.get, review.declineReasons, adminsToEmail)
+      _      <- applicationService.declineApplicationApprovalRequest(applicationId, request.name.get, review.declineReasons, adminsToEmail)
     } yield ok
   }
 }

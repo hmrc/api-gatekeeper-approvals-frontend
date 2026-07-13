@@ -66,17 +66,17 @@ class TermsOfUseReasonsController @Inject() (
 
   import TermsOfUseReasonsController.*
 
-  def provideReasonsPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def provideReasonsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
     val hasWarnings = request.markedSubmission.isWarn
-    successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(request.application.id, request.application.name, hasFails, hasWarnings))))
+    successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
   }
 
-  def provideReasonsAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def provideReasonsAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideReasonsForm) = {
       submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
         case Some(value) =>
-          successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(rawApplicationId)))
+          successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId)))
         case None        => {
           logger.warn("Persisting reasons failed")
           errorHandler.badRequestTemplate.map(BadRequest(_))
@@ -87,7 +87,7 @@ class TermsOfUseReasonsController @Inject() (
     def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
       val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
       val hasWarnings = request.markedSubmission.isWarn
-      successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(request.application.id, request.application.name, hasFails, hasWarnings))))
+      successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
     }
     TermsOfUseReasonsController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }

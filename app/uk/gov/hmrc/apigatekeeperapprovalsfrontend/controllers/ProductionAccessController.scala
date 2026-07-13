@@ -61,7 +61,7 @@ class ProductionAccessController @Inject() (
 
   import ProductionAccessController.*
 
-  def page(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName  = request.application.name
     val instance = request.markedSubmission.submission.latestInstance
 
@@ -69,7 +69,7 @@ class ProductionAccessController @Inject() (
       case (Granted(grantedTimestamp, grantedName, _, _), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                              =>
         successful(Ok(productionAccessPage(ViewModel(
           appName,
-          request.application.id,
+          applicationId,
           requestedBy,
           submittedTimestamp.asText,
           grantedName,
@@ -81,7 +81,7 @@ class ProductionAccessController @Inject() (
       case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
         successful(Ok(productionAccessPage(ViewModel(
           appName,
-          request.application.id,
+          applicationId,
           requestedBy,
           submittedTimestamp.asText,
           grantedName,

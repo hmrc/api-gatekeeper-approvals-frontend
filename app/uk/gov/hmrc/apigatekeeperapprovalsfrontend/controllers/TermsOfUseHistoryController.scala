@@ -18,7 +18,6 @@ package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
@@ -74,8 +73,8 @@ class TermsOfUseHistoryController @Inject() (
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
   import TermsOfUseHistoryController.*
 
-  def page(rawApplicationId: UUID): Action[AnyContent] = loggedInWithApplication(rawApplicationId) { implicit request =>
-    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${rawApplicationId}"
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+    val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 
     def deriveSubmissionStatusDisplayName(status: Submission.Status): String = {
       status match {
@@ -259,8 +258,8 @@ class TermsOfUseHistoryController @Inject() (
 
     (
       for {
-        invite     <- fromOptionF(submissionService.fetchTermsOfUseInvitation(request.application.id), BadRequest("Unable to find terms of use invitation"))
-        submission <- liftF(submissionService.fetchLatestSubmission(request.application.id))
+        invite     <- fromOptionF(submissionService.fetchTermsOfUseInvitation(applicationId), BadRequest("Unable to find terms of use invitation"))
+        submission <- liftF(submissionService.fetchLatestSubmission(applicationId))
         viewModel   = buildViewModel(invite, request.application, submission)
       } yield Ok(termsOfUseHistoryPage(viewModel))
     ).fold(identity(_), identity(_))

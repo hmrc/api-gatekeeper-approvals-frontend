@@ -99,7 +99,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, false, false)
   }
 
-  def listPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def listPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
     val isDeleted = request.application.state.isDeleted
 
@@ -130,7 +130,7 @@ class TermsOfUseFailedJourneyController @Inject() (
     } yield Ok(
       termsOfUseFailedListPage(
         AnswersViewModel(
-          request.application.id,
+          applicationId,
           appName,
           answerDetails,
           isDeleted,
@@ -140,14 +140,14 @@ class TermsOfUseFailedJourneyController @Inject() (
     )
   }
 
-  def listAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def listAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
-      case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(rawApplicationId)))
+      case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
       case _                => successful(Redirect(routes.TermsOfUseInvitationController.page))
     }
   }
 
-  def answersWithWarningsOrFails(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def answersWithWarningsOrFails(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName   = request.application.name
     val isDeleted = request.application.state.isDeleted
 
@@ -172,7 +172,7 @@ class TermsOfUseFailedJourneyController @Inject() (
 
     successful(Ok(termsOfUseFailedPage(
       AnswersViewModel(
-        request.application.id,
+        applicationId,
         appName,
         answerDetails,
         isDeleted,
@@ -181,14 +181,14 @@ class TermsOfUseFailedJourneyController @Inject() (
     )))
   }
 
-  def emailAddressesPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def emailAddressesPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
-    successful(Ok(termsOfUseAdminsPage(EmailsViewModel(request.application.id, request.application.name, adminsToEmail))))
+    successful(Ok(termsOfUseAdminsPage(EmailsViewModel(applicationId, request.application.name, adminsToEmail))))
   }
 
-  def emailAddressesAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(rawApplicationId))
+  def emailAddressesAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
 
     for {
       review <- submissionReviewService.findOrCreateReview(
@@ -199,66 +199,66 @@ class TermsOfUseFailedJourneyController @Inject() (
                   false,
                   false
                 )
-      _      <- submissionService.grantWithWarningsOrDeclineForTouUplift(request.application.id, request.submission, request.name.get, review.grantWarnings)
+      _      <- submissionService.grantWithWarningsOrDeclineForTouUplift(applicationId, request.submission, request.name.get, review.grantWarnings)
     } yield ok
   }
 
-  def failOverridePage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseFailOverridePage(ViewModel(request.application.id, request.application.name))))
+  def failOverridePage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseFailOverridePage(ViewModel(applicationId, request.application.name))))
   }
 
-  def failOverrideAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def failOverrideAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
-      case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(rawApplicationId)))
-      case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(rawApplicationId)))
+      case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
+      case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
     }
   }
 
-  def overrideApproverPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(request.application.id, request.application.name))))
+  def overrideApproverPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def overrideApproverAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def overrideApproverAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ApproverForm) = {
       submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(rawApplicationId)))
+        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId)))
         case None        => {
-          logger.warn(s"Failed to save escalated to in submission review for applicationId: ${request.application.id}")
+          logger.warn(s"Failed to save escalated to in submission review for applicationId: ${applicationId}")
           errorHandler.badRequestTemplate.map(BadRequest(_))
         }
       }
     }
 
     def handleInvalidForm(form: Form[ApproverForm]) = {
-      successful(BadRequest(termsOfUseOverrideApproverPage(form, ViewModel(request.application.id, request.application.name))))
+      successful(BadRequest(termsOfUseOverrideApproverPage(form, ViewModel(applicationId, request.application.name))))
     }
 
     TermsOfUseFailedJourneyController.approverForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def overrideNotesPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(request.application.id, request.application.name))))
+  def overrideNotesPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def overrideNotesAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def overrideNotesAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(rawApplicationId)))
+        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId)))
         case None        => {
-          logger.warn(s"Failed to save reasons in submission review for applicationId: ${request.application.id}")
+          logger.warn(s"Failed to save reasons in submission review for applicationId: ${applicationId}")
           errorHandler.badRequestTemplate.map(BadRequest(_))
         }
       }
     }
 
     def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseOverrideNotesPage(form, ViewModel(request.application.id, request.application.name))))
+      successful(BadRequest(termsOfUseOverrideNotesPage(form, ViewModel(applicationId, request.application.name))))
     }
 
     TermsOfUseFailedJourneyController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
-  def overrideConfirmPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def overrideConfirmPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     (
       for {
         review      <- fromOptionF(
@@ -269,11 +269,11 @@ class TermsOfUseFailedJourneyController @Inject() (
                          review.escalatedTo,
                          BadRequest("Unable to get escalatedTo in submission review")
                        )
-      } yield Ok(termsOfUseOverrideConfirmPage(OverrideViewModel(request.application.id, request.application.name, escalatedTo, review.grantWarnings)))
+      } yield Ok(termsOfUseOverrideConfirmPage(OverrideViewModel(applicationId, request.application.name, escalatedTo, review.grantWarnings)))
     ).fold(identity(_), identity(_))
   }
 
-  def overrideConfirmAction(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
+  def overrideConfirmAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
       val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
       InternalServerError(errString)
@@ -284,12 +284,12 @@ class TermsOfUseFailedJourneyController @Inject() (
                     submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index),
                     BadRequest("Unable to find submission review")
                   )
-        _      <- EitherT(submissionService.grantForTouUplift(request.application.id, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(handleCommandFailures)
-      } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(rawApplicationId).url)
+        _      <- EitherT(submissionService.grantForTouUplift(applicationId, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(handleCommandFailures)
+      } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(applicationId).url)
     ).fold(identity(_), identity(_))
   }
 
-  def confirmationPage(rawApplicationId: java.util.UUID): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(rawApplicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmationPage(ViewModel(request.application.id, request.application.name))))
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+    successful(Ok(termsOfUseConfirmationPage(ViewModel(applicationId, request.application.name))))
   }
 }

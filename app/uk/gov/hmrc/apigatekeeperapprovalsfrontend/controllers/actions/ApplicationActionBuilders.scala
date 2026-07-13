@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions
 
-import java.util.UUID
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,7 +40,7 @@ trait ApplicationActionBuilders {
 
   val E = EitherTHelper.make[Result]
 
-  def applicationRequestRefiner(rawApplicationId: UUID)(implicit ec: ExecutionContext): ActionRefiner[LoggedInRequest, ApplicationRequest] = {
+  def applicationRequestRefiner(applicationId: ApplicationId)(implicit ec: ExecutionContext): ActionRefiner[LoggedInRequest, ApplicationRequest] = {
     new ActionRefiner[LoggedInRequest, ApplicationRequest] {
       override protected def executionContext: ExecutionContext = ec
 
@@ -49,7 +48,7 @@ trait ApplicationActionBuilders {
         implicit val implicitRequest: Request[A] = request
         import cats.implicits.*
 
-        applicationActionService.process(ApplicationId(rawApplicationId), request)
+        applicationActionService.process(applicationId, request)
           .toRightF(errorHandler.notFoundTemplate(Request(request, request.messagesApi)).map(NotFound(_))).value
       }
     }

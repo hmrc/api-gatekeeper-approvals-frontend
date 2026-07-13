@@ -50,7 +50,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, declinedSubmission)
 
-      val result = controller.page(rawApplicationId, 0)(fakeRequest)
+      val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
@@ -59,7 +59,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, declinedSubmission)
 
-      val result = controller.page(rawApplicationId, 1)(fakeRequest)
+      val result = controller.page(applicationId, 1)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
 
@@ -68,7 +68,7 @@ class ViewDeclinedSubmissionControllerSpec extends AbstractControllerSpec {
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 
-      val result = controller.page(rawApplicationId, 0)(fakeRequest)
+      val result = controller.page(applicationId, 0)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }
