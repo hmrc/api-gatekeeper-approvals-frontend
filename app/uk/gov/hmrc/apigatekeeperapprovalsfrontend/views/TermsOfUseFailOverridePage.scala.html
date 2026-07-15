@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseFailedJourneyController.*
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -62,7 +62,14 @@
     </div>
 
     <div class="govuk-button-group">
-      <button id="continue" class="govuk-button govuk-button" type="submit" name="submit-action" value="continue">@{messages("termsofusefailoverride.continue")}</button>
+      @govukButton(Button(
+        id = Some("continue"),
+        name = Some("submit-action"),
+        value = Some("continue"),
+        inputType = Some("submit"),
+        content = Text(messages("termsofusefailoverride.continue")),
+        preventDoubleClick = Some(true)
+      ))
     </div>
   }
 }

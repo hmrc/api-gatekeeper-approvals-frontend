@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(model: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
@@ -54,9 +54,11 @@
     </div>
 
     @if(request.role.isSuperUser) {
-      <button class="govuk-button" data-module="govuk-button">
-        @{messages("termsofusedelete.button.continue")}
-      </button>
+      @govukButton(Button(
+        inputType = Some("submit"),
+        content = Text(messages("termsofusedelete.button.continue")),
+        preventDoubleClick = Some(true)
+      ))
     }
   }
 }

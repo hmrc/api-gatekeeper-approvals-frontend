@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.ConfirmYourDecisionController.*
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -71,7 +71,13 @@
     </div>
 
     <div class="govuk-button-group">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action">@{messages("confirmyourdecision.continue")}</button>
+      @govukButton(Button(
+        id = Some("checked"),
+        name = Some("submit-action"),
+        inputType = Some("submit"),
+        content = Text(messages("confirmyourdecision.continue")),
+        preventDoubleClick = Some(true)
+      ))
     </div>
 
     @if(!model.isFailed) {

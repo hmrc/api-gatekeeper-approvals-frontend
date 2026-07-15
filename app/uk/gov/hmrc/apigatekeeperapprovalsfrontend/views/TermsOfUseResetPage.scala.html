@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(form: Form[ProvideNotesForm], model: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
@@ -47,9 +47,11 @@
     <textarea class="govuk-textarea @if(form.errors("reasons").nonEmpty) {govuk-textarea--error}" id="notes" name="notes" rows="5" aria-describedby="notes-hint">@form.data.get("notes")</textarea>
 
     @if(request.role.isSuperUser) {
-      <button class="govuk-button" data-module="govuk-button">
-        @{messages("termsofusereset.button.continue")}
-      </button>
+      @govukButton(Button(
+        inputType = Some("submit"),
+        content = Text(messages("termsofusereset.button.continue")),
+        preventDoubleClick = Some(true)
+      ))
     }
   }
 }

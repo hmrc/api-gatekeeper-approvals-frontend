@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseGrantedController.*
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -54,7 +54,14 @@
     </div>
 
     <div class="govuk-button-group">
-      <button id="continue" class="govuk-button govuk-button" type="submit" name="submit-action" value="continue">@{messages("termsofusegranted.continue")}</button>
+      @govukButton(Button(
+        id = Some("continue"),
+        name = Some("submit-action"),
+        value = Some("continue"),
+        inputType = Some("submit"),
+        content = Text(messages("termsofusegranted.continue")),
+        preventDoubleClick = Some(true)
+      ))
     </div>
   }
 }

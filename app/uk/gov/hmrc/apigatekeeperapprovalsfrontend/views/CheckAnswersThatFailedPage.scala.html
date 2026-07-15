@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -66,8 +66,23 @@
 
     <div class="govuk-button-group">
       @if(!model.isDeleted) {
-        <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="checked">@{messages(s"answersthatfailed.${model.messageKey}.completed")}</button>
-        <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("answersthatfailed.save")}</button>
+        @govukButton(Button(
+          id = Some("checked"),
+          name = Some("submit-action"),
+          value = Some("checked"),
+          inputType = Some("submit"),
+          content = Text(messages(s"answersthatfailed.${model.messageKey}.completed")),
+          preventDoubleClick = Some(true)
+        ))
+        @govukButton(Button(
+          id = Some("come-back-later"),
+          name = Some("submit-action"),
+          value = Some("come-back-later"),
+          inputType = Some("submit"),
+          classes = "govuk-button--secondary",
+          content = Text(messages("answersthatfailed.save")),
+          preventDoubleClick = Some(true)
+        ))
       }
     </div>
   }

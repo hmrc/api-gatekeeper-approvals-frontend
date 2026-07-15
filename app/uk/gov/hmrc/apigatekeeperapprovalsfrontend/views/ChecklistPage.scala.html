@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.Breadcrumbs
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
 
-@this(layout: Layout, breadcrumbs: Breadcrumbs)
+@this(layout: Layout, breadcrumbs: Breadcrumbs, govukButton: GovukButton)
 
 @(model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -99,8 +99,23 @@
     
         <div class="govuk-button-group">
           @if(!model.isDeleted) {
-            <button id="completed" class="govuk-button" type="submit" name="submit-action" value="checked">@{messages("checklist.completed")}</button>
-            <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("checklist.save")}</button>
+            @govukButton(Button(
+              id = Some("completed"),
+              name = Some("submit-action"),
+              value = Some("checked"),
+              inputType = Some("submit"),
+              content = Text(messages("checklist.completed")),
+              preventDoubleClick = Some(true)
+            ))
+            @govukButton(Button(
+              id = Some("come-back-later"),
+              name = Some("submit-action"),
+              value = Some("come-back-later"),
+              inputType = Some("submit"),
+              classes = "govuk-button--secondary",
+              content = Text(messages("checklist.save")),
+              preventDoubleClick = Some(true)
+            ))
           }
         </div>
       }

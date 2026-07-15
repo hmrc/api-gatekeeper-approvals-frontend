@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.*
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(model: AnswersViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -72,8 +72,23 @@
     @helper.CSRF.formField
 
     <div class="govuk-button-group govuk-!-margin-top-7">
-      <button id="checked" class="govuk-button govuk-button" type="submit" name="submit-action" value="continue">@{messages(s"termsofusefailedlist.continue")}</button>
-      <button id="come-back-later" class="govuk-button govuk-button--secondary" type="submit" name="submit-action" value="come-back-later">@{messages("termsofusefailedlist.comebacklater")}</button>
+      @govukButton(Button(
+        id = Some("checked"),
+        name = Some("submit-action"),
+        value = Some("continue"),
+        inputType = Some("submit"),
+        content = Text(messages(s"termsofusefailedlist.continue")),
+        preventDoubleClick = Some(true)
+      ))
+      @govukButton(Button(
+        id = Some("come-back-later"),
+        name = Some("submit-action"),
+        value = Some("come-back-later"),
+        inputType = Some("submit"),
+        classes = "govuk-button--secondary",
+        content = Text(messages("termsofusefailedlist.comebacklater")),
+        preventDoubleClick = Some(true)
+      ))
     </div>
   }
 

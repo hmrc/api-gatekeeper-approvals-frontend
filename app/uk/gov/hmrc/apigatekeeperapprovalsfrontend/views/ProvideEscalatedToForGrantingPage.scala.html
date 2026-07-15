@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.ErrorSummary
 @import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 
-@this(layout: Layout, backbreadcrumb: BackBreadcrumb)
+@this(layout: Layout, backbreadcrumb: BackBreadcrumb, govukButton: GovukButton)
 
 @(form: Form[ProvideEscalatedToForm], model: ViewModel)(implicit requestHeader: RequestHeader, messages: Messages)
 
@@ -55,8 +55,10 @@
       <input class="govuk-input govuk-input--width-10" id="last-name" name="last-name" type="text">
     </div>
     
-    <button class="govuk-button" data-module="govuk-button">
-      @{messages("escalatedtouser.button.continue")}
-    </button>
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text(messages("escalatedtouser.button.continue")),
+      preventDoubleClick = Some(true)
+    ))
   }
 }
