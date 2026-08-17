@@ -5,8 +5,8 @@ object AppDependencies {
   lazy val bootstrapPlayVersion = "10.7.0"
   val apiDomainVersion          = "1.5.0"
   val appDomainVersion          = "1.2.0"
-  val playfrontendVersion       = "12.32.0"
-  lazy val mongoVersion         = "2.12.0"
+  val playfrontendVersion       = "13.11.0"
+  lazy val mongoVersion         = "2.13.0"
   val mockitoScalaVersion       = "2.2.1"
 
   val compile = Seq(
