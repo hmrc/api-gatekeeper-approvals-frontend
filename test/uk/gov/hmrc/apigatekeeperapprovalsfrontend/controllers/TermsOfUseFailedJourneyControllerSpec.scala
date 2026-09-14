@@ -29,7 +29,8 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
-  trait Setup extends AbstractSetup with SubmissionReviewServiceMockModule
+  trait Setup 
+      extends AbstractSetup with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val listPage         = app.injector.instanceOf[TermsOfUseFailedListPage]
     val failedPage       = app.injector.instanceOf[TermsOfUseFailedPage]
@@ -173,8 +174,8 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   }
 
   "failOverridePage" should {
-    "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+    "return 200 for Advanced User" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -182,12 +183,22 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe Status.OK
     }
+
+    "return FORBIDDEN for Basic User" in new Setup {
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.failOverridePage(applicationId)(fakeRequest)
+
+      status(result) shouldBe Status.FORBIDDEN
+    }
   }
 
   "failOverrideYesAction" should {
-    "return 200" in new Setup {
+    "return 200 for Advanced User" in new Setup {
       val fakeSubmitOverrideYesRequest = fakeRequest.withFormUrlEncodedBody("override" -> "yes")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -197,6 +208,17 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.overrideApproverPage(
         applicationId
       ).url
+    }
+
+    "return FORBIDDEN for Basic User" in new Setup {
+      val fakeSubmitOverrideYesRequest = fakeRequest.withFormUrlEncodedBody("override" -> "yes")
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
+
+      val result = controller.failOverrideAction(applicationId)(fakeSubmitOverrideYesRequest)
+
+      status(result) shouldBe Status.FORBIDDEN
     }
   }
 

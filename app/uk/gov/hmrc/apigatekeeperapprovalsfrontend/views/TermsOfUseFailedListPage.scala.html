@@ -92,7 +92,7 @@
     </div>
   }
 
-  @if(model.submissionStatus.isFailed) {
+  @if(model.submissionStatus.isFailed && model.role.isAdvancedUser) {
     <p class="govuk-body">
       <a href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.failOverridePage(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">
         @{messages("termsofusefailedlist.override")}

@@ -27,8 +27,7 @@ import uk.gov.hmrc.auth.core.InvalidBearerToken
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperStrideRole, LoggedInRequest}
 
-trait StrideAuthorisationServiceMockModule {
-  self: MockitoSugar & ArgumentMatchersSugar =>
+trait StrideAuthorisationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
   protected trait BaseStrideAuthorisationServiceMock {
     def aMock: StrideAuthorisationService

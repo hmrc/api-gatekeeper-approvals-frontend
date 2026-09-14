@@ -29,6 +29,7 @@ import play.api.mvc.{MessagesControllerComponents, *}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRole, GatekeeperRoles}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
@@ -46,7 +47,14 @@ object TermsOfUseFailedJourneyController {
 
   case class AnswerDetails(question: String, answer: String, status: Mark)
 
-  case class AnswersViewModel(applicationId: ApplicationId, appName: ApplicationName, answers: List[AnswerDetails], isDeleted: Boolean, submissionStatus: Submission.Status) {
+  case class AnswersViewModel(
+      applicationId: ApplicationId,
+      appName: ApplicationName,
+      answers: List[AnswerDetails],
+      isDeleted: Boolean,
+      submissionStatus: Submission.Status,
+      role: GatekeeperRole
+    ) {
     lazy val hasFails: Boolean = answers.exists(_.status == Mark.Fail)
     lazy val hasWarns: Boolean = answers.exists(_.status == Mark.Warn)
 
@@ -134,7 +142,8 @@ class TermsOfUseFailedJourneyController @Inject() (
           appName,
           answerDetails,
           isDeleted,
-          request.submission.latestInstance.status
+          request.submission.latestInstance.status,
+          request.role
         )
       )
     )
@@ -176,7 +185,8 @@ class TermsOfUseFailedJourneyController @Inject() (
         appName,
         answerDetails,
         isDeleted,
-        request.submission.latestInstance.status
+        request.submission.latestInstance.status,
+        request.role
       )
     )))
   }
@@ -203,16 +213,18 @@ class TermsOfUseFailedJourneyController @Inject() (
     } yield ok
   }
 
-  def failOverridePage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseFailOverridePage(ViewModel(applicationId, request.application.name))))
-  }
-
-  def failOverrideAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
-      case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
-      case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
+  def failOverridePage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseFailOverridePage(ViewModel(applicationId, request.application.name))))
     }
-  }
+
+  def failOverrideAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      request.body.asFormUrlEncoded.getOrElse(Map.empty).get("override").flatMap(_.headOption) match {
+        case Some("yes") => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideApproverPage(applicationId)))
+        case _           => successful(Redirect(routes.TermsOfUseFailedJourneyController.listPage(applicationId)))
+      }
+    }
 
   def overrideApproverPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(applicationId, request.application.name))))
