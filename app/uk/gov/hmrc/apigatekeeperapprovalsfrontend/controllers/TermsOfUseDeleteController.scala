@@ -53,11 +53,11 @@ class TermsOfUseDeleteController @Inject() (
 
   import TermsOfUseDeleteController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseDeletePage(ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def deleteSubmission() = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -82,7 +82,7 @@ class TermsOfUseDeleteController @Inject() (
     }
   }
 
-  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
   }
 }

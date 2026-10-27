@@ -53,7 +53,7 @@ class SendNewTermsOfUseController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplication(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 
     def checkNotAlreadyInvited = {
@@ -98,7 +98,7 @@ class SendNewTermsOfUseController @Inject() (
     }
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 
     def inviteTermsOfUse = {

@@ -64,11 +64,11 @@ class TermsOfUseNotesController @Inject() (
 
   import TermsOfUseNotesController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideNotesForm) = {
       def failure(errs: NonEmptyList[CommandFailure]) =
         errorHandler.standardErrorTemplate(
