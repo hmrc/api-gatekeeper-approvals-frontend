@@ -61,7 +61,7 @@ class ProductionAccessController @Inject() (
 
   import ProductionAccessController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName  = request.application.name
     val instance = request.markedSubmission.submission.latestInstance
 

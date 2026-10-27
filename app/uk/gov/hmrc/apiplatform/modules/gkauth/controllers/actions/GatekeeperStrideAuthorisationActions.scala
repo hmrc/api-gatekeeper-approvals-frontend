@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
+import play.api.mvc.{Action, ActionRefiner, AnyContent, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
@@ -42,6 +42,23 @@ trait GatekeeperStrideAuthorisationActions(using ec: ExecutionContext) {
         strideAuthorisationService.refineStride(minimumRoleRequired)(msgRequest)
       }
     }
+
+  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperStrideRole)(block: LoggedInRequest[?] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      gatekeeperRoleActionRefiner(minimumRoleRequired).invokeBlock(request, block)
+    }
+
+  def anyStrideUserAction(block: LoggedInRequest[?] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.USER)(block)
+
+  def atLeastAdvancedUserAction(block: LoggedInRequest[?] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.ADVANCEDUSER)(block)
+
+  def atLeastSuperUserAction(block: LoggedInRequest[?] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.SUPERUSER)(block)
+
+  def adminOnlyAction(block: LoggedInRequest[?] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.ADMIN)(block)
 }
 
 trait GatekeeperAuthorisationActions(using ec: ExecutionContext) {
@@ -64,6 +81,33 @@ trait GatekeeperAuthorisationActions(using ec: ExecutionContext) {
 
       def refineStride: FERLIR =
         strideAuthorisationService.refineStride(GatekeeperRoles.USER)(msgRequest)
+          .recover {
+            case NonFatal(_) => Left(Unauthorized(""))
+          }
+
+      import cats.implicits.*
+      import cats.data.EitherT
+      EitherT(refineStride).leftFlatMap { strideFailureResult =>
+        EitherT(refineLdap).leftMap(_ => strideFailureResult)
+      }
+        .value
+    }
+  }
+
+  def authenticatedLdapUserOrStrideUserWithRole(role: GatekeeperStrideRole) = new ActionRefiner[MessagesRequest, LoggedInRequest] {
+    override def executionContext = ec
+
+    override protected def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
+      type FERLIR = Future[Either[Result, LoggedInRequest[A]]]
+
+      def refineLdap =
+        ldapAuthorisationService.refineLdap(msgRequest)
+          .recover {
+            case NonFatal(_) => Left(())
+          }
+
+      def refineStride: FERLIR =
+        strideAuthorisationService.refineStride(role)(msgRequest)
           .recover {
             case NonFatal(_) => Left(Unauthorized(""))
           }

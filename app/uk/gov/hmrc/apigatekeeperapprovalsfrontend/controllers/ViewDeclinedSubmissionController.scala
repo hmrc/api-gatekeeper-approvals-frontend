@@ -60,7 +60,7 @@ class ViewDeclinedSubmissionController @Inject() (
 
   import ViewDeclinedSubmissionController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(

@@ -48,7 +48,7 @@ class CheckFraudController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val isDeleted = request.application.state.isDeleted
     successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
   }

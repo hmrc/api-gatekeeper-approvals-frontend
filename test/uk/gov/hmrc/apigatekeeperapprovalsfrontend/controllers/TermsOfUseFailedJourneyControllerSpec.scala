@@ -29,7 +29,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.*
 
 class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
-  trait Setup 
+  trait Setup
       extends AbstractSetup with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val listPage         = app.injector.instanceOf[TermsOfUseFailedListPage]
