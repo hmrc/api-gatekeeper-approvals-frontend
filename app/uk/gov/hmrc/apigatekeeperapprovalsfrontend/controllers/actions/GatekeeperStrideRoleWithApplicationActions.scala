@@ -29,13 +29,6 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{Applicatio
 trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBuilders {
   self: GatekeeperBaseController =>
 
-  // private def roleActionRefiner(role: GatekeeperStrideRole) = gatekeeperRoleActionRefiner(role)
-
-  // private val userRoleActionRefiner = gatekeeperRoleActionRefiner(GatekeeperRoles.USER)
-
-  // def loggedInThruStrideWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-  //   loggedInThruStrideWithRoleAndApplication(GatekeeperRoles.USER)
-
   private def loggedInThruStrideRoleWithApplication: (GatekeeperStrideRole) => (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     (role) => roleWithApplication(gatekeeperRoleActionRefiner(role))
 
@@ -56,11 +49,4 @@ trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBu
   def strideAdvancedUserWithApplicationAndSubmissionAndInstance
       : (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     loggedInThruStrideRoleWithApplicationAndSubmissionAndInstance(GatekeeperRoles.ADVANCEDUSER)
-
-  // def loggedInThruStrideWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-  //   roleWithApplicationAndSubmission(userRoleActionRefiner)
-
-  // def loggedInThruStrideWithApplicationAndSubmissionAndInstance
-  //     : (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-  //   roleWithApplicationAndSubmissionAndInstance(userRoleActionRefiner)
 }
