@@ -23,7 +23,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.GatekeeperAuthorisationActions
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, LoggedInRequest}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
 
@@ -31,15 +31,15 @@ trait GatekeeperRoleWithApplicationActions extends LoggedInRequestActionBuilders
   self: GatekeeperBaseController =>
 
   def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    role(anyAuthenticatedUserRefiner)
+    role(authenticatedLdapUserOrStrideUserWithRole(GatekeeperRoles.ADVANCEDUSER))
 
   def loggedInWithApplication: (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplication(anyAuthenticatedUserRefiner)
+    roleWithApplication(authenticatedLdapUserOrStrideUserWithRole(GatekeeperRoles.ADVANCEDUSER))
 
   def loggedInWithApplicationAndSubmission: (ApplicationId) => (MarkedSubmissionApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmission(anyAuthenticatedUserRefiner)
+    roleWithApplicationAndSubmission(authenticatedLdapUserOrStrideUserWithRole(GatekeeperRoles.ADVANCEDUSER))
 
   def loggedInWithApplicationAndSubmissionAndInstance: (ApplicationId, Int) => (SubmissionInstanceApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    roleWithApplicationAndSubmissionAndInstance(anyAuthenticatedUserRefiner)
+    roleWithApplicationAndSubmissionAndInstance(authenticatedLdapUserOrStrideUserWithRole(GatekeeperRoles.ADVANCEDUSER))
 
 }

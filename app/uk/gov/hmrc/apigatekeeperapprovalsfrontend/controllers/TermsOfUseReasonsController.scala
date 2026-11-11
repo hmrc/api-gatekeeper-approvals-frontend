@@ -66,13 +66,13 @@ class TermsOfUseReasonsController @Inject() (
 
   import TermsOfUseReasonsController.*
 
-  def provideReasonsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsPage(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
     val hasWarnings = request.markedSubmission.isWarn
     successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
   }
 
-  def provideReasonsAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def provideReasonsAction(applicationId: ApplicationId): Action[AnyContent] = strideAdvancedUserWithApplicationAndSubmission(applicationId) { implicit request =>
     def handleValidForm(form: ProvideReasonsForm) = {
       submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
         case Some(value) =>
