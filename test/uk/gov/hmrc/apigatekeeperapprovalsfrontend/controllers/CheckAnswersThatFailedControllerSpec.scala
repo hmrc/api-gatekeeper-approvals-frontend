@@ -46,7 +46,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
 
   "checkAnswersThatFailedPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -57,7 +57,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 if unknown questions exist" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
 
@@ -68,7 +68,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
 
     "return 200 with a deleted application" in new Setup {
       val deletedApp = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -79,7 +79,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -91,7 +91,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
 
   "checkAnswersThatFailedAction" should {
     "redirect to correct page when marking answers as checked" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -102,7 +102,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when marking answers as come-back-later" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -113,7 +113,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when marking answers as anything that we don't understand" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -123,7 +123,7 @@ class CheckAnswersThatFailedControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

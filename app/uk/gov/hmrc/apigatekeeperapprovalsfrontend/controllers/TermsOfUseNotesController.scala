@@ -31,6 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.Applicati
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -64,33 +65,35 @@ class TermsOfUseNotesController @Inject() (
 
   import TermsOfUseNotesController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
-  }
-
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleValidForm(form: ProvideNotesForm) = {
-      def failure(errs: NonEmptyList[CommandFailure]) =
-        errorHandler.standardErrorTemplate(
-          "Terms of use grant",
-          "Error granting terms of use",
-          errs.toList.map(error => CommandFailures.describe(error)).mkString(", ")
-        ).map(BadRequest(_))
-
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
-
-      val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
-
-      E.fromEitherF(submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None))
-        .map(_ => success)
-        .leftSemiflatMap(err => failure(err))
-        .merge
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
     }
 
-    def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseNotesPage(form, ViewModel(applicationId, request.application.name))))
-    }
+  def action(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def handleValidForm(form: ProvideNotesForm) = {
+        def failure(errs: NonEmptyList[CommandFailure]) =
+          errorHandler.standardErrorTemplate(
+            "Terms of use grant",
+            "Error granting terms of use",
+            errs.toList.map(error => CommandFailures.describe(error)).mkString(", ")
+          ).map(BadRequest(_))
 
-    TermsOfUseNotesController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
-  }
+        lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseGrantedConfirmationController.page(applicationId))
+
+        val E = EitherTHelper.make[NonEmptyList[CommandFailure]]
+
+        E.fromEitherF(submissionService.grantForTouUplift(applicationId, request.name.get, form.notes, None))
+          .map(_ => success)
+          .leftSemiflatMap(err => failure(err))
+          .merge
+      }
+
+      def handleInvalidForm(form: Form[ProvideNotesForm]) = {
+        successful(BadRequest(termsOfUseNotesPage(form, ViewModel(applicationId, request.application.name))))
+      }
+
+      TermsOfUseNotesController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+    }
 }

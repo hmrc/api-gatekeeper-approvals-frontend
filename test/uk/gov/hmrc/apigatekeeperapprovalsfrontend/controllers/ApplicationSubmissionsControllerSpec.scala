@@ -78,7 +78,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.pendingRIVerification))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
@@ -95,7 +95,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Declined(declinedTimestamp, requesterEmail, "reasons")
@@ -113,7 +113,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "return 200 when submission has been granted" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Granted(grantedTimestamp, requesterEmail, None, None)
@@ -131,7 +131,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "return 404 if no marked application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -140,7 +140,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "return 404 if no application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -164,8 +164,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
       val result = controller.whichPage(applicationId)(fakeRequest)
@@ -174,30 +172,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
-
-      val result = controller.whichPage(applicationId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId}")
-    }
-
-    "redirect to Gatekeeper when no submission found and authorised using stride" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
-
-      val result = controller.whichPage(applicationId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId}")
-    }
-
-    "redirect to Gatekeeper when no submission found and authorised using ldap" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.succeeds
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
       val result = controller.whichPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER

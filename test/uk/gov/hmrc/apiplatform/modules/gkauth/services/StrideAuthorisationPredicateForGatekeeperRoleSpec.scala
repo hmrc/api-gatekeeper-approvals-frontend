@@ -41,13 +41,13 @@ class StrideAuthorisationPredicateForGatekeeperRoleSpec extends AsyncHmrcSpec {
       predicate shouldBe (Enrolment(adminRole) or Enrolment(superUserRole))
     }
 
-    "contain admin, super user and advancded user roles when looking for GK.ADVANCEDUSER" in {
+    "contain admin, super user and advanced user roles when looking for GK.ADVANCEDUSER" in {
       val predicate = StrideAuthorisationPredicateForGatekeeperRole(roles)(GatekeeperRoles.ADVANCEDUSER)
 
       predicate shouldBe (Enrolment(adminRole) or Enrolment(superUserRole) or Enrolment(advancedUserRole))
     }
 
-    "contain admin, super user and user roles when looking for GK.USER" in {
+    "contain admin, super user, advanced user and user roles when looking for GK.USER" in {
       val predicate = StrideAuthorisationPredicateForGatekeeperRole(roles)(GatekeeperRoles.USER)
 
       predicate shouldBe (Enrolment(adminRole) or Enrolment(superUserRole) or Enrolment(advancedUserRole) or Enrolment(userRole))

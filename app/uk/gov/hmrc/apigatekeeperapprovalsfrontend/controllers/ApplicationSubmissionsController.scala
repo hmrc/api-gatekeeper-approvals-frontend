@@ -74,7 +74,7 @@ class ApplicationSubmissionsController @Inject() (
   import cats.implicits.*
   import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.Extensions.*
 
-  def whichPage(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplication(applicationId) { implicit request =>
+  def whichPage(applicationId: ApplicationId): Action[AnyContent] = Action.async { implicit request =>
     val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 
     val hasEverBeenSubmitted: Submission => Boolean = submission =>

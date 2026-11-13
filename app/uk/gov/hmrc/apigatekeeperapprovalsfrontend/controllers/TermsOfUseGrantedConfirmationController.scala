@@ -25,6 +25,7 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -49,7 +50,8 @@ class TermsOfUseGrantedConfirmationController @Inject() (
 
   import TermsOfUseGrantedConfirmationController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseGrantedConfirmationPage(ViewModel(applicationId, request.application.name))))
-  }
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseGrantedConfirmationPage(ViewModel(applicationId, request.application.name))))
+    }
 }

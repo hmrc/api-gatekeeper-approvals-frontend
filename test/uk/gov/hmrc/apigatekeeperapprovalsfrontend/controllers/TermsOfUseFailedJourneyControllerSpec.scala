@@ -61,7 +61,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "termsOfUseFailedListPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -74,7 +74,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
     "return 200 with a deleted application" in new Setup {
       val deletedApp = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -86,7 +86,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 if unknown questions exist" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnIncludingAnUnknownQuestion(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -97,7 +97,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -110,7 +110,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   "checkAnswersThatFailedAction" should {
     "redirect to correct page when marking answers as continue" in new Setup {
       val fakeSubmitContinueRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "continue")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -122,7 +122,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
     "redirect to terms of use page when marking answers as come back later" in new Setup {
       val fakeSubmitComeBackLaterRequest = fakeRequest.withFormUrlEncodedBody("submit-action" -> "come-back-later")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -135,7 +135,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "answersWithWarningsOrFails" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -147,7 +147,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "emailAddressesPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -160,7 +160,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "emailAddressesAction" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -225,7 +225,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   "failOverrideNoAction" should {
     "return 200" in new Setup {
       val fakeSubmitOverrideYesRequest = fakeRequest.withFormUrlEncodedBody("override" -> "no")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -238,7 +238,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "overrideApproverPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -251,7 +251,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   "overrideApproverAction" should {
     "return 200" in new Setup {
       val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "Bob", "last-name" -> "Mortimer")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateEscalatedTo.thenReturn(submissionReview)
@@ -266,7 +266,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
     "return 400 when no names submitted" in new Setup {
       val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("first-name" -> "", "last-name" -> "Mortimer")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -278,7 +278,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "overrideNotesPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -291,7 +291,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   "overrideNotesAction" should {
     "return 200" in new Setup {
       val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "Reasons to be cheerful")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateGrantWarnings.thenReturn(submissionReview)
@@ -306,7 +306,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
     "return 400 when nothing submitted" in new Setup {
       val fakeSubmitApproverRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "")
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -319,7 +319,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   "overrideConfirmPage" should {
     "return 200" in new Setup {
       val review = submissionReview.copy(escalatedTo = Some("Mr Bob"))
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturn(review)
@@ -330,7 +330,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 if no submission review" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturnNone()
@@ -341,7 +341,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 if escalated to not set" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturn(submissionReview)
@@ -355,7 +355,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
   "overrideConfirmAction" should {
     "return 200" in new Setup {
       val review = submissionReview.copy(escalatedTo = Some("Mr Bob"))
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturn(review)
@@ -370,7 +370,7 @@ class TermsOfUseFailedJourneyControllerSpec extends AbstractControllerSpec {
 
   "confirmationPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

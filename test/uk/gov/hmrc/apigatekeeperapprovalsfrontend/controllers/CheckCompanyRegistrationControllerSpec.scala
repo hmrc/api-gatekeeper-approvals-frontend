@@ -48,7 +48,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
 
   "checkCompanyRegistrationPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
@@ -67,7 +67,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
           + (registrationTypeQuestionId -> ActualAnswer.SingleChoiceAnswer("My organisation is outside the UK and doesn't have any of these"))
       )(submittedSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(outsideUKOrg, markedAnswers))
 
@@ -86,7 +86,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
           + (registrationTypeQuestionId -> ActualAnswer.SingleChoiceAnswer("My organisation is in the UK and doesn't have any of these"))
       )(submittedSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(inUKWithNoRegOrg, markedAnswers))
 
@@ -108,7 +108,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
           + (companyNumberQuestionId    -> ActualAnswer.TextAnswer("AB1234567"))
       )(submittedSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(MarkedSubmission(inUKWithCompanyNumOrg, markedAnswers))
 
@@ -122,7 +122,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
 
     "return 200 with a deleted application" in new Setup {
       val deletedApp = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmission)
 
@@ -135,7 +135,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     "return 400 if the submission is not submitted" in new Setup {
       val mySubmission = MarkedSubmission(answeredSubmission, markedAnswers)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -145,7 +145,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     }
 
     "return 404 if not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -157,7 +157,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
 
   "checkCompanyRegistrationAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -169,7 +169,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -181,7 +181,7 @@ class CheckCompanyRegistrationControllerSpec extends AbstractControllerSpec with
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

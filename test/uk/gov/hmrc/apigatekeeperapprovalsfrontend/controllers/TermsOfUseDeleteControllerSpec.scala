@@ -61,7 +61,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "return 303" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "yes")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.DeleteTouUplift.thenReturn(applicationId, application)
@@ -75,7 +75,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "redirect back to ToU history page if select no" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "no")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -88,7 +88,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "redirect back to ToU history page if select nothing" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -99,7 +99,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect back to ToU history page if no form" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -112,7 +112,7 @@ class TermsOfUseDeleteControllerSpec extends AbstractControllerSpec {
     "return 400 if failed to delete" in new Setup {
       val fakeYesNoRequest = fakeRequest.withFormUrlEncodedBody("tou-delete" -> "yes")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.DeleteTouUplift.thenReturnError(applicationId)

@@ -45,7 +45,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
 
   "checkFraudPage" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -57,7 +57,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
 
     "return 200 with a deleted application" in new Setup {
       val deletedApp = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -68,7 +68,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -80,7 +80,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
 
   "checkFraudAction" should {
     "redirect to correct page when marking fraud check as complete" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -92,7 +92,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -104,7 +104,7 @@ class CheckFraudControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

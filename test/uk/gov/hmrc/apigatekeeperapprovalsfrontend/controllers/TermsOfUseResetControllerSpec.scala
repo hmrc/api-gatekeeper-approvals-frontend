@@ -71,7 +71,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
     "return 303" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.ResetForTouUplift.thenReturn(applicationId, application)
@@ -85,7 +85,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
     "return 400 if no reasons supplied" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -97,7 +97,7 @@ class TermsOfUseResetControllerSpec extends AbstractControllerSpec {
     "return 400 if failed to save" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.GrantForTouUplift.thenReturnError(applicationId)

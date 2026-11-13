@@ -69,7 +69,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200 when standard app" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -79,7 +79,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -105,7 +105,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     "return OK when yes selected" in new Setup {
       val fakeYesRequest = fakeRequest.withFormUrlEncodedBody("grant" -> "yes")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -118,7 +118,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     "redirect when no selected" in new Setup {
       val fakeNoRequest = fakeRequest.withFormUrlEncodedBody("grant" -> "no")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

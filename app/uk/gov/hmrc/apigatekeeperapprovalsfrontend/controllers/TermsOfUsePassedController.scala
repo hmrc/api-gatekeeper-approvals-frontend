@@ -26,6 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
@@ -55,41 +56,42 @@ class TermsOfUsePassedController @Inject() (
 
   import TermsOfUsePassedController.*
 
-  def answersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def isPass(id: Question.Id): Boolean = {
-      request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
-    }
-    val isDeleted                        = request.application.state.isDeleted
+  def answersThatPassedPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def isPass(id: Question.Id): Boolean = {
+        request.markedAnswers.get(id).map(_ == Mark.Pass).getOrElse(false)
+      }
+      val isDeleted                        = request.application.state.isDeleted
 
-    val groupedPassedQuestionsIds =
-      request.submission.groups
-        .map(group =>
-          (
-            group.heading,
-            group.links
-              .flatMap(l => l.questions.map(_.question))
-              .filter(q => isPass(q.id))
-              .map(q => (q, request.answersToQuestions.get(q.id)))
-              .collect {
-                case (question, Some(answer)) => AnswerDetails(question.wording.value, ActualAnswersAsText(answer))
-              }
+      val groupedPassedQuestionsIds =
+        request.submission.groups
+          .map(group =>
+            (
+              group.heading,
+              group.links
+                .flatMap(l => l.questions.map(_.question))
+                .filter(q => isPass(q.id))
+                .map(q => (q, request.answersToQuestions.get(q.id)))
+                .collect {
+                  case (question, Some(answer)) => AnswerDetails(question.wording.value, ActualAnswersAsText(answer))
+                }
+            )
           )
-        )
-        .collect {
-          case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail*))
-        }
+          .collect {
+            case (heading, head :: tail) => Section(heading, NonEmptyList.of(head, tail*))
+          }
 
-    successful(
-      Ok(
-        termsOfUsePassedPage(
-          TermsOfUsePassedController.ViewModel(
-            applicationId,
-            request.application.name,
-            groupedPassedQuestionsIds,
-            isDeleted
+      successful(
+        Ok(
+          termsOfUsePassedPage(
+            TermsOfUsePassedController.ViewModel(
+              applicationId,
+              request.application.name,
+              groupedPassedQuestionsIds,
+              isDeleted
+            )
           )
         )
       )
-    )
-  }
+    }
 }

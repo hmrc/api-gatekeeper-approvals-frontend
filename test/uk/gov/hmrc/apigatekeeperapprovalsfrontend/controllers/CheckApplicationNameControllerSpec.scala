@@ -49,7 +49,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     "return 200" in new Setup {
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -63,7 +63,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
       val deletedApp   = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
       val mySubmission = MarkedSubmission(submittedSubmission, markedAnswers)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -76,7 +76,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     "return 400 if the submission is not submitted" in new Setup {
       val mySubmission = MarkedSubmission(answeredSubmission, markedAnswers)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(mySubmission)
 
@@ -86,7 +86,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -98,7 +98,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
 
   "checkApplicationNameAction" should {
     "redirect to correct page when marking URLs as checked" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -109,7 +109,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "redirect to correct page when marking URLs as come-back-later" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -120,7 +120,7 @@ class CheckApplicationNameControllerSpec extends AbstractControllerSpec {
     }
 
     "return bad request when sending an empty submit-action" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

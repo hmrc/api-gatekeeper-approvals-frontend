@@ -24,6 +24,7 @@ import play.api.mvc.{MessagesControllerComponents, *}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.ActualAnswersAsText
@@ -60,42 +61,43 @@ class CheckAnswersThatFailedController @Inject() (
 
   import CheckAnswersThatFailedController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName   = request.application.name
-    val isDeleted = request.application.state.isDeleted
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val appName   = request.application.name
+      val isDeleted = request.application.state.isDeleted
 
-    val questionsAndAnswers: Map[Question, ActualAnswer] =
-      request.submission.latestInstance.answersToQuestions.map {
-        case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
-      }
-        .collect {
-          case (q: Some[Question], a) => q.get -> a
+      val questionsAndAnswers: Map[Question, ActualAnswer] =
+        request.submission.latestInstance.answersToQuestions.map {
+          case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
         }
+          .collect {
+            case (q: Some[Question], a) => q.get -> a
+          }
 
-    val answerDetails = questionsAndAnswers.map {
-      case (question, answer) =>
-        AnswerDetails(
-          question.wording.value,
-          ActualAnswersAsText(answer),
-          request.markedAnswers.getOrElse(question.id, Mark.Pass)
-        )
-    }
-      .toList
-      .filter(_.status != Mark.Pass)
+      val answerDetails = questionsAndAnswers.map {
+        case (question, answer) =>
+          AnswerDetails(
+            question.wording.value,
+            ActualAnswersAsText(answer),
+            request.markedAnswers.getOrElse(question.id, Mark.Pass)
+          )
+      }
+        .toList
+        .filter(_.status != Mark.Pass)
 
-    successful(
-      Ok(
-        checkAnswersThatFailedPage(
-          ViewModel(
-            applicationId,
-            appName,
-            answerDetails,
-            isDeleted
+      successful(
+        Ok(
+          checkAnswersThatFailedPage(
+            ViewModel(
+              applicationId,
+              appName,
+              answerDetails,
+              isDeleted
+            )
           )
         )
       )
-    )
-  }
+    }
 
   def action(applicationId: ApplicationId): Action[AnyContent] = updateActionStatus(SubmissionReview.Action.CheckFailsAndWarnings)(applicationId)
 }

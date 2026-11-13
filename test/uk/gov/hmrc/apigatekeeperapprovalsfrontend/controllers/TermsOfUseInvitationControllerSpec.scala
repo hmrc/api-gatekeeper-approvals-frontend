@@ -48,7 +48,7 @@ class TermsOfUseInvitationControllerSpec
 
   "GET /" should {
     "return Ok (200) for Stride users" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
       val result = controller.page()(fakeRequest)
@@ -57,7 +57,7 @@ class TermsOfUseInvitationControllerSpec
     }
 
     "return Ok (200) for Stride users with passed in status filter" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
       val request = fakeRequest.withCSRFToken.withFormUrlEncodedBody("emailSentStatus" -> "true", "overdueStatus" -> "true")

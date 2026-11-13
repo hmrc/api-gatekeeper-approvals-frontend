@@ -24,6 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.Declined
@@ -60,7 +61,7 @@ class ViewDeclinedSubmissionController @Inject() (
 
   import ViewDeclinedSubmissionController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(

@@ -47,7 +47,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -66,7 +66,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when given an application that doesn't exist" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)

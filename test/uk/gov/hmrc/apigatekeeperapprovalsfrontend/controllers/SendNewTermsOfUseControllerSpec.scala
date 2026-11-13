@@ -69,7 +69,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200 when standard app" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.production))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
@@ -80,7 +80,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when app already has submissions" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.production))
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(appWithImportantData.id)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenNotFound()
@@ -91,7 +91,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when app already invited" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.production))
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(appWithImportantData.id)
@@ -102,7 +102,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when app not in Production" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -111,7 +111,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when app not Standard" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withAccess(privilegedAccess))
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -120,7 +120,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -146,7 +146,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     "return OK when yes selected" in new Setup {
       val fakeYesRequest = fakeRequest.withFormUrlEncodedBody("invite-admins" -> "yes")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.TermsOfUseInvite.thenReturn(applicationId, application)
@@ -159,7 +159,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     "return 400 when yes selected and error calling TPA" in new Setup {
       val fakeYesRequest = fakeRequest.withFormUrlEncodedBody("invite-admins" -> "yes")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.TermsOfUseInvite.thenReturnError(applicationId)
@@ -173,7 +173,7 @@ class SendNewTermsOfUseControllerSpec extends AbstractControllerSpec {
     "redirect when no selected" in new Setup {
       val fakeNoRequest = fakeRequest.withFormUrlEncodedBody("invite-admins" -> "no")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

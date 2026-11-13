@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -62,38 +63,41 @@ class TermsOfUseResetController @Inject() (
 
   import TermsOfUseResetController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
-  }
-
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleValidForm(form: ProvideNotesForm) = {
-      def failure(err: String) =
-        errorHandler.standardErrorTemplate(
-          "Terms of use reset",
-          "Error resetting of use",
-          err
-        ).map(BadRequest(_))
-
-      lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId))
-
-      val E = EitherTHelper.make[String]
-
-      E.fromEitherF(submissionService.resetForTouUplift(applicationId, request.name.get, form.notes))
-        .map(_ => success)
-        .leftSemiflatMap(err => failure(err))
-        .merge
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseResetPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
     }
 
-    def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseResetPage(form, ViewModel(applicationId, request.application.name))))
+  def action(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def handleValidForm(form: ProvideNotesForm) = {
+        def failure(err: String) =
+          errorHandler.standardErrorTemplate(
+            "Terms of use reset",
+            "Error resetting of use",
+            err
+          ).map(BadRequest(_))
+
+        lazy val success = Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseResetController.confirmationPage(applicationId))
+
+        val E = EitherTHelper.make[String]
+
+        E.fromEitherF(submissionService.resetForTouUplift(applicationId, request.name.get, form.notes))
+          .map(_ => success)
+          .leftSemiflatMap(err => failure(err))
+          .merge
+      }
+
+      def handleInvalidForm(form: Form[ProvideNotesForm]) = {
+        successful(BadRequest(termsOfUseResetPage(form, ViewModel(applicationId, request.application.name))))
+      }
+
+      TermsOfUseResetController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+
     }
 
-    TermsOfUseResetController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
-
-  }
-
-  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
-  }
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
+    }
 }

@@ -50,7 +50,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
 
   "provide reasons page" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -60,7 +60,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -74,7 +74,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
     "go to the email admins page when valid form with decline reasons is submitted" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturn(submissionReview)
@@ -88,7 +88,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
     "return bad request when valid form and persisting decline reasons fails" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("reasons" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateDeclineReasons.thenReturnError()
@@ -101,7 +101,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
     "return bad request and go back to page when not a valid form" in new Setup {
       val brokenFormRequest = fakeRequest.withFormUrlEncodedBody()
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -113,7 +113,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
 
   "admins to email page" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -124,7 +124,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -136,7 +136,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
 
   "admins to email action" should {
     "go to the application declined page" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -149,7 +149,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
     }
 
     "throw RuntimeException when the decline fails" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -161,7 +161,7 @@ class DeclinedJourneyControllerSpec extends AbstractControllerSpec
 
   "declined page" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

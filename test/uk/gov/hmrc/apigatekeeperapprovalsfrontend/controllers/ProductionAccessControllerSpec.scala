@@ -45,7 +45,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
   "GET /" should {
 
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, grantedSubmission)
 
@@ -54,7 +54,7 @@ class ProductionAccessControllerSpec extends AbstractControllerSpec {
     }
 
     "return 400 when given a submission that isn't granted" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, submittedSubmission)
 
