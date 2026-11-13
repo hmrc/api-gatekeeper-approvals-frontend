@@ -26,13 +26,14 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.DateFormatter
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.{TermsOfUseInvitationState, TermsOfUseInvitationWithApplication}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperStrideRoleWithApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
@@ -71,13 +72,12 @@ class TermsOfUseInvitationController @Inject() (
     errorHandler: ErrorHandler,
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService,
-    val ldapAuthorisationService: LdapAuthorisationService,
     termsOfUsePage: TermsOfUsePage
   )(implicit override val ec: ExecutionContext
-  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions with ApplicationLogger {
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperStrideRoleWithApplicationActions with ApplicationLogger {
   import TermsOfUseInvitationController.*
 
-  def page = loggedInOnly() { implicit request =>
+  def page = loggedInThruStride(GatekeeperRoles.USER) { implicit request =>
     def deriveTermsOfUseStatusDisplayName(status: TermsOfUseInvitationState): String = {
       status match {
         case EMAIL_SENT                    => "Email sent"

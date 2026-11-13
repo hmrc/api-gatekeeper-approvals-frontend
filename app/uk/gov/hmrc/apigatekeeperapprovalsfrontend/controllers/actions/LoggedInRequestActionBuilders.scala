@@ -29,7 +29,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{Applicatio
 trait LoggedInRequestActionBuilders extends ApplicationActionBuilders {
   self: GatekeeperBaseController =>
 
-  protected def role(refiner: ActionRefiner[MessagesRequest, LoggedInRequest])()(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  protected def role(refiner: ActionRefiner[MessagesRequest, LoggedInRequest])(block: LoggedInRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request =>
       refiner.invokeBlock(request, block)
     }

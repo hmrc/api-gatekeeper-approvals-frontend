@@ -21,7 +21,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers.*
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.TermsOfUseNotesController
@@ -44,7 +43,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -54,7 +53,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -68,7 +67,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
     "return 303" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.GrantForTouUplift.thenReturn(applicationId, application)
@@ -82,7 +81,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
     "return 400 if no reasons supplied" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -94,7 +93,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
     "return 400 if wrong name of field" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("wrong-name" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -106,7 +105,7 @@ class TermsOfUseNotesControllerSpec extends AbstractControllerSpec {
     "return 400 if failed to grant" in new Setup {
       val fakeReasonsRequest = fakeRequest.withFormUrlEncodedBody("notes" -> "submission looks bad")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.GrantForTouUplift.thenReturnError(applicationId)

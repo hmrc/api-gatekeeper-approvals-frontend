@@ -22,7 +22,7 @@ import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperStrideRole, LoggedInRequest}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.{ApplicationRequest, MarkedSubmissionApplicationRequest, SubmissionInstanceApplicationRequest}
 
@@ -30,6 +30,9 @@ trait GatekeeperStrideRoleWithApplicationActions extends LoggedInRequestActionBu
   self: GatekeeperBaseController =>
 
   private def roleActionRefiner(role: GatekeeperStrideRole) = gatekeeperRoleActionRefiner(role)
+
+  def loggedInThruStride: (GatekeeperStrideRole) => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
+    (aRole) => role(roleActionRefiner(aRole))
 
   def loggedInThruStrideWithRoleAndApplication: (GatekeeperStrideRole) => (ApplicationId) => (ApplicationRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
     (role) => roleWithApplication(roleActionRefiner(role))
