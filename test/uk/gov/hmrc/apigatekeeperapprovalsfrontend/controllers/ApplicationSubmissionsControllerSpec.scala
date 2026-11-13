@@ -76,7 +76,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
 
-      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.ADVANCEDUSER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.pendingRIVerification))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
@@ -88,12 +88,11 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       contentAsString(result) shouldNot include("Previously declined")
       contentAsString(result) shouldNot include("This application has been deleted")
       contentAsString(result) should include("Decline request")
-      contentAsString(result) shouldNot include("Check the request")
       contentAsString(result) should include(requesterEmail)
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Declined(declinedTimestamp, requesterEmail, "reasons")
@@ -125,6 +124,42 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       contentAsString(result) shouldNot include("This application has been deleted")
       contentAsString(result) shouldNot include("Decline request")
       contentAsString(result) should include("Check")
+      contentAsString(result) should include(formatDMY(grantedTimestamp))
+    }
+
+    "return 200 when submission has been granted but no check for user role " in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
+        Granted(grantedTimestamp, requesterEmail, None, None)
+      ))
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(appWithImportantData.name)
+      contentAsString(result) should include("Production access granted")
+      contentAsString(result) shouldNot include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) shouldNot include("Decline request")
+      contentAsString(result) should not include ("Check")
+      contentAsString(result) should include(formatDMY(grantedTimestamp))
+    }
+
+    "return 200 when submission has been granted but without check button for user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
+        Granted(grantedTimestamp, requesterEmail, None, None)
+      ))
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(appWithImportantData.name)
+      contentAsString(result) should include("Production access granted")
+      contentAsString(result) shouldNot include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) shouldNot include("Decline request")
+      contentAsString(result) should not include ("Check")
       contentAsString(result) should include(formatDMY(grantedTimestamp))
     }
 

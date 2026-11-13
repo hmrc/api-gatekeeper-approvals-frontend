@@ -25,7 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{StrideAuthorisationService}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler

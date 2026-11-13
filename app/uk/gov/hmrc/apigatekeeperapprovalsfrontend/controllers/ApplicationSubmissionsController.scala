@@ -93,7 +93,7 @@ class ApplicationSubmissionsController @Inject() (
   }
 
   def page(applicationId: ApplicationId): Action[AnyContent] =
-    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
       val appName                  = request.application.name
       val gatekeeperApplicationUrl = s"${config.applicationsPageUri}/${applicationId}"
 

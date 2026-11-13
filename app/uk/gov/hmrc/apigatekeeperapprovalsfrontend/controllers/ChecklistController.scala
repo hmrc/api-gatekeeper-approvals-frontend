@@ -104,7 +104,7 @@ class ChecklistController @Inject() (
     }
 
   def declineRequest(applicationId: ApplicationId): Action[AnyContent] =
-    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
       val isSuccessful = !request.markedSubmission.isFail
       val hasWarnings  = request.markedSubmission.isWarn
       for {
