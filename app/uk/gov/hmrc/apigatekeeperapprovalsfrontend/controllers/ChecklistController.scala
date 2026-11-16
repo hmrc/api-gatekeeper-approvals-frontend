@@ -24,6 +24,7 @@ import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.services.*
@@ -82,40 +83,43 @@ class ChecklistController @Inject() (
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, requiresFraudCheck, requiresDemo)
   }
 
-  def checklistPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName                    = request.application.name
-    val isSuccessful               = !request.markedSubmission.isFail
-    val hasWarnings                = request.markedSubmission.isWarn
-    val automaticChecksResult      = AutomaticChecksResult(isSuccessful, hasWarnings)
-    val topMsgId                   = automaticChecksResult match {
-      case PASSED_WITHOUT_WARNINGS => "checklist.requestpassed"
-      case PASSED_WITH_WARNINGS    => "checklist.requestpassedwithwarnings"
-      case FAILED                  => "checklist.requestfailed"
+  def checklistPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val appName                    = request.application.name
+      val isSuccessful               = !request.markedSubmission.isFail
+      val hasWarnings                = request.markedSubmission.isWarn
+      val automaticChecksResult      = AutomaticChecksResult(isSuccessful, hasWarnings)
+      val topMsgId                   = automaticChecksResult match {
+        case PASSED_WITHOUT_WARNINGS => "checklist.requestpassed"
+        case PASSED_WITH_WARNINGS    => "checklist.requestpassedwithwarnings"
+        case FAILED                  => "checklist.requestfailed"
+      }
+      val isInHouseSoftware: Boolean = request.application.isInHouseSoftware
+      val isDeleted                  = request.application.state.isDeleted
+
+      for {
+        review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
+        sections = buildChecklistSections(applicationId, review.requiredActions, automaticChecksResult)
+      } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, sections, isInHouseSoftware, isDeleted)))
     }
-    val isInHouseSoftware: Boolean = request.application.isInHouseSoftware
-    val isDeleted                  = request.application.state.isDeleted
 
-    for {
-      review  <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
-      sections = buildChecklistSections(applicationId, review.requiredActions, automaticChecksResult)
-    } yield Ok(checklistPage(ViewModel(applicationId, appName, topMsgId, sections, isInHouseSoftware, isDeleted)))
-  }
-
-  def declineRequest(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val isSuccessful = !request.markedSubmission.isFail
-    val hasWarnings  = request.markedSubmission.isWarn
-    for {
-      _ <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
-    } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId))
-  }
-
-  def checklistAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
-      case Some("checked")         => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
-      case Some("come-back-later") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))
-      case _                       => successful(BadRequest("Invalid submit-action found in request"))
+  def declineRequest(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
+      val isSuccessful = !request.markedSubmission.isFail
+      val hasWarnings  = request.markedSubmission.isWarn
+      for {
+        _ <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
+      } yield Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.DeclinedJourneyController.provideReasonsPage(applicationId))
     }
-  }
+
+  def checklistAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
+        case Some("checked")         => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId)))
+        case Some("come-back-later") => successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ApplicationSubmissionsController.page(applicationId)))
+        case _                       => successful(BadRequest("Invalid submit-action found in request"))
+      }
+    }
 
   private def buildChecklistSections(applicationId: ApplicationId, requiredActions: RequiredActions, automaticChecksResult: AutomaticChecksResult): List[ChecklistSection] = {
     List(

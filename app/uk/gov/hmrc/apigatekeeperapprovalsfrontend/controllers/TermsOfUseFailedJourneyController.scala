@@ -107,36 +107,82 @@ class TermsOfUseFailedJourneyController @Inject() (
     submissionReviewService.findOrCreateReview(submission.id, submission.latestInstance.index, isSuccessful, hasWarnings, false, false)
   }
 
-  def listPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName   = request.application.name
-    val isDeleted = request.application.state.isDeleted
+  def listPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val appName   = request.application.name
+      val isDeleted = request.application.state.isDeleted
 
-    val questionsAndAnswers: Map[Question, ActualAnswer] =
-      request.submission.latestInstance.answersToQuestions.map {
-        case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
-      }
-        .collect {
-          case (q: Some[Question], a) => q.get -> a
+      val questionsAndAnswers: Map[Question, ActualAnswer] =
+        request.submission.latestInstance.answersToQuestions.map {
+          case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
         }
+          .collect {
+            case (q: Some[Question], a) => q.get -> a
+          }
 
-    val answerDetails = questionsAndAnswers.map {
-      case (question, answer) =>
-        AnswerDetails(
-          question.wording.value,
-          ActualAnswersAsText(answer),
-          request.markedAnswers.getOrElse(question.id, Mark.Pass)
+      val answerDetails = questionsAndAnswers.map {
+        case (question, answer) =>
+          AnswerDetails(
+            question.wording.value,
+            ActualAnswersAsText(answer),
+            request.markedAnswers.getOrElse(question.id, Mark.Pass)
+          )
+      }
+        .toList
+        .filter(_.status != Mark.Pass)
+
+      val isSuccessful = !request.markedSubmission.isFail
+      val hasWarnings  = request.markedSubmission.isWarn
+
+      for {
+        _ <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
+      } yield Ok(
+        termsOfUseFailedListPage(
+          AnswersViewModel(
+            applicationId,
+            appName,
+            answerDetails,
+            isDeleted,
+            request.submission.latestInstance.status,
+            request.role
+          )
         )
+      )
     }
-      .toList
-      .filter(_.status != Mark.Pass)
 
-    val isSuccessful = !request.markedSubmission.isFail
-    val hasWarnings  = request.markedSubmission.isWarn
+  def listAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
+        case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
+        case _                => successful(Redirect(routes.TermsOfUseInvitationController.page))
+      }
+    }
 
-    for {
-      _ <- setupSubmissionReview(request.submission, isSuccessful, hasWarnings)
-    } yield Ok(
-      termsOfUseFailedListPage(
+  def answersWithWarningsOrFails(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val appName   = request.application.name
+      val isDeleted = request.application.state.isDeleted
+
+      val questionsAndAnswers: Map[Question, ActualAnswer] =
+        request.submission.latestInstance.answersToQuestions.map {
+          case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
+        }
+          .collect {
+            case (q: Some[Question], a) => q.get -> a
+          }
+
+      val answerDetails = questionsAndAnswers.map {
+        case (question, answer) =>
+          AnswerDetails(
+            question.wording.value,
+            ActualAnswersAsText(answer),
+            request.markedAnswers.getOrElse(question.id, Mark.Pass)
+          )
+      }
+        .toList
+        .filter(_.status != Mark.Pass)
+
+      successful(Ok(termsOfUseFailedPage(
         AnswersViewModel(
           applicationId,
           appName,
@@ -145,73 +191,32 @@ class TermsOfUseFailedJourneyController @Inject() (
           request.submission.latestInstance.status,
           request.role
         )
-      )
-    )
-  }
-
-  def listAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    request.body.asFormUrlEncoded.getOrElse(Map.empty).get("submit-action").flatMap(_.headOption) match {
-      case Some("continue") => successful(Redirect(routes.TermsOfUseReasonsController.provideReasonsPage(applicationId)))
-      case _                => successful(Redirect(routes.TermsOfUseInvitationController.page))
+      )))
     }
-  }
 
-  def answersWithWarningsOrFails(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName   = request.application.name
-    val isDeleted = request.application.state.isDeleted
+  def emailAddressesPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
 
-    val questionsAndAnswers: Map[Question, ActualAnswer] =
-      request.submission.latestInstance.answersToQuestions.map {
-        case (questionId, answer) => (request.submission.findQuestion(questionId) -> answer)
-      }
-        .collect {
-          case (q: Some[Question], a) => q.get -> a
-        }
-
-    val answerDetails = questionsAndAnswers.map {
-      case (question, answer) =>
-        AnswerDetails(
-          question.wording.value,
-          ActualAnswersAsText(answer),
-          request.markedAnswers.getOrElse(question.id, Mark.Pass)
-        )
+      successful(Ok(termsOfUseAdminsPage(EmailsViewModel(applicationId, request.application.name, adminsToEmail))))
     }
-      .toList
-      .filter(_.status != Mark.Pass)
 
-    successful(Ok(termsOfUseFailedPage(
-      AnswersViewModel(
-        applicationId,
-        appName,
-        answerDetails,
-        isDeleted,
-        request.submission.latestInstance.status,
-        request.role
-      )
-    )))
-  }
+  def emailAddressesAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
 
-  def emailAddressesPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val adminsToEmail = request.application.collaborators.filter(_.role.isAdministrator)
-
-    successful(Ok(termsOfUseAdminsPage(EmailsViewModel(applicationId, request.application.name, adminsToEmail))))
-  }
-
-  def emailAddressesAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val ok = Redirect(routes.TermsOfUseFailedJourneyController.confirmationPage(applicationId))
-
-    for {
-      review <- submissionReviewService.findOrCreateReview(
-                  request.submission.id,
-                  request.submission.latestInstance.index,
-                  !request.markedSubmission.isFail,
-                  request.markedSubmission.isWarn,
-                  false,
-                  false
-                )
-      _      <- submissionService.grantWithWarningsOrDeclineForTouUplift(applicationId, request.submission, request.name.get, review.grantWarnings)
-    } yield ok
-  }
+      for {
+        review <- submissionReviewService.findOrCreateReview(
+                    request.submission.id,
+                    request.submission.latestInstance.index,
+                    !request.markedSubmission.isFail,
+                    request.markedSubmission.isWarn,
+                    false,
+                    false
+                  )
+        _      <- submissionService.grantWithWarningsOrDeclineForTouUplift(applicationId, request.submission, request.name.get, review.grantWarnings)
+      } yield ok
+    }
 
   def failOverridePage(applicationId: ApplicationId): Action[AnyContent] =
     loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
@@ -226,82 +231,89 @@ class TermsOfUseFailedJourneyController @Inject() (
       }
     }
 
-  def overrideApproverPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(applicationId, request.application.name))))
-  }
+  def overrideApproverPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseOverrideApproverPage(approverForm, ViewModel(applicationId, request.application.name))))
+    }
 
-  def overrideApproverAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleValidForm(form: ApproverForm) = {
-      submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId)))
-        case None        => {
-          logger.warn(s"Failed to save escalated to in submission review for applicationId: ${applicationId}")
-          errorHandler.badRequestTemplate.map(BadRequest(_))
+  def overrideApproverAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def handleValidForm(form: ApproverForm) = {
+        submissionReviewService.updateEscalatedTo(form.firstName + " " + form.lastName)(request.submission.id, request.submission.latestInstance.index).flatMap {
+          case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideNotesPage(applicationId)))
+          case None        => {
+            logger.warn(s"Failed to save escalated to in submission review for applicationId: ${applicationId}")
+            errorHandler.badRequestTemplate.map(BadRequest(_))
+          }
         }
       }
+
+      def handleInvalidForm(form: Form[ApproverForm]) = {
+        successful(BadRequest(termsOfUseOverrideApproverPage(form, ViewModel(applicationId, request.application.name))))
+      }
+
+      TermsOfUseFailedJourneyController.approverForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
     }
 
-    def handleInvalidForm(form: Form[ApproverForm]) = {
-      successful(BadRequest(termsOfUseOverrideApproverPage(form, ViewModel(applicationId, request.application.name))))
+  def overrideNotesPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
     }
 
-    TermsOfUseFailedJourneyController.approverForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
-  }
-
-  def overrideNotesPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseOverrideNotesPage(provideNotesForm, ViewModel(applicationId, request.application.name))))
-  }
-
-  def overrideNotesAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleValidForm(form: ProvideNotesForm) = {
-      submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId)))
-        case None        => {
-          logger.warn(s"Failed to save reasons in submission review for applicationId: ${applicationId}")
-          errorHandler.badRequestTemplate.map(BadRequest(_))
+  def overrideNotesAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def handleValidForm(form: ProvideNotesForm) = {
+        submissionReviewService.updateGrantWarnings(form.notes)(request.submission.id, request.submission.latestInstance.index).flatMap {
+          case Some(value) => successful(Redirect(routes.TermsOfUseFailedJourneyController.overrideConfirmPage(applicationId)))
+          case None        => {
+            logger.warn(s"Failed to save reasons in submission review for applicationId: ${applicationId}")
+            errorHandler.badRequestTemplate.map(BadRequest(_))
+          }
         }
       }
+
+      def handleInvalidForm(form: Form[ProvideNotesForm]) = {
+        successful(BadRequest(termsOfUseOverrideNotesPage(form, ViewModel(applicationId, request.application.name))))
+      }
+
+      TermsOfUseFailedJourneyController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
     }
 
-    def handleInvalidForm(form: Form[ProvideNotesForm]) = {
-      successful(BadRequest(termsOfUseOverrideNotesPage(form, ViewModel(applicationId, request.application.name))))
+  def overrideConfirmPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      (
+        for {
+          review      <- fromOptionF(
+                           submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index),
+                           BadRequest("Unable to find submission review")
+                         )
+          escalatedTo <- fromOption(
+                           review.escalatedTo,
+                           BadRequest("Unable to get escalatedTo in submission review")
+                         )
+        } yield Ok(termsOfUseOverrideConfirmPage(OverrideViewModel(applicationId, request.application.name, escalatedTo, review.grantWarnings)))
+      ).fold(identity(_), identity(_))
     }
 
-    TermsOfUseFailedJourneyController.provideNotesForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
-  }
-
-  def overrideConfirmPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    (
-      for {
-        review      <- fromOptionF(
-                         submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index),
-                         BadRequest("Unable to find submission review")
-                       )
-        escalatedTo <- fromOption(
-                         review.escalatedTo,
-                         BadRequest("Unable to get escalatedTo in submission review")
-                       )
-      } yield Ok(termsOfUseOverrideConfirmPage(OverrideViewModel(applicationId, request.application.name, escalatedTo, review.grantWarnings)))
-    ).fold(identity(_), identity(_))
-  }
-
-  def overrideConfirmAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
-      val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
-      InternalServerError(errString)
+  def overrideConfirmAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
+        val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
+        InternalServerError(errString)
+      }
+      (
+        for {
+          review <- fromOptionF(
+                      submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index),
+                      BadRequest("Unable to find submission review")
+                    )
+          _      <- EitherT(submissionService.grantForTouUplift(applicationId, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(handleCommandFailures)
+        } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(applicationId).url)
+      ).fold(identity(_), identity(_))
     }
-    (
-      for {
-        review <- fromOptionF(
-                    submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index),
-                    BadRequest("Unable to find submission review")
-                  )
-        _      <- EitherT(submissionService.grantForTouUplift(applicationId, request.name.get, review.grantWarnings, review.escalatedTo)).leftMap(handleCommandFailures)
-      } yield Redirect(routes.TermsOfUseGrantedConfirmationController.page(applicationId).url)
-    ).fold(identity(_), identity(_))
-  }
 
-  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmationPage(ViewModel(applicationId, request.application.name))))
-  }
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseConfirmationPage(ViewModel(applicationId, request.application.name))))
+    }
 }

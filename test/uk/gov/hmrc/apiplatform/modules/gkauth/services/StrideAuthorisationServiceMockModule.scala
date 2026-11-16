@@ -17,13 +17,12 @@
 package uk.gov.hmrc.apiplatform.modules.gkauth.services
 
 import scala.concurrent.Future
-import scala.concurrent.Future.{failed, successful}
+import scala.concurrent.Future.successful
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import play.api.mvc.Results.*
 import play.api.mvc.{MessagesRequest, Result}
-import uk.gov.hmrc.auth.core.InvalidBearerToken
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperStrideRole, LoggedInRequest}
 
@@ -38,12 +37,12 @@ trait StrideAuthorisationServiceMockModule extends MockitoSugar with ArgumentMat
         when(aMock.refineStride[A](*)).thenReturn(fn)
       }
 
-      def succeeds[A](role: GatekeeperStrideRole) = {
-        wrap[A]((msg) => successful(Right(new LoggedInRequest(Some("Bobby Example"), role, msg))))
+      def succeeds[A]() = {
+        wrap[A]((msg) => successful(Right(new LoggedInRequest(Some("Bobby Example"), mock[GatekeeperStrideRole], msg))))
       }
 
-      def invalidBearerToken[A]() = {
-        wrap[A]((_) => failed(new InvalidBearerToken))
+      def succeedsWithRole[A](role: GatekeeperStrideRole) = {
+        wrap[A]((msg) => successful(Right(new LoggedInRequest(Some("Bobby Example"), role, msg))))
       }
 
       def hasInsufficientEnrolments[A]() = {

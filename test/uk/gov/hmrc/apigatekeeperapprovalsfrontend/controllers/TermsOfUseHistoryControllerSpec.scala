@@ -23,7 +23,7 @@ import play.api.http.Status.OK
 import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.TermsOfUseInvitationState.*
 
@@ -34,7 +34,6 @@ class TermsOfUseHistoryControllerSpec
 
   trait Setup extends AbstractSetup
       with StrideAuthorisationServiceMockModule
-      with LdapAuthorisationServiceMockModule
       with ApplicationServiceMockModule {
     val termsOfUsePage = app.injector.instanceOf[TermsOfUseHistoryPage]
 
@@ -45,14 +44,13 @@ class TermsOfUseHistoryControllerSpec
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      LdapAuthorisationServiceMock.aMock,
       termsOfUsePage
     )
   }
 
   "GET /" should {
     "return Ok (200) for Stride users with an application and a submitted submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
@@ -67,7 +65,7 @@ class TermsOfUseHistoryControllerSpec
     }
 
     "return Ok (200) for Stride users with an application and a created submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
@@ -85,7 +83,7 @@ class TermsOfUseHistoryControllerSpec
         andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
         andThen Submission.pendingResponsibleIndividual(instant, "user"))(aSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
@@ -104,7 +102,7 @@ class TermsOfUseHistoryControllerSpec
         andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
         andThen Submission.warnings(instant, "user"))(aSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
@@ -123,7 +121,7 @@ class TermsOfUseHistoryControllerSpec
         andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
         andThen Submission.fail(instant, "user"))(aSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
@@ -142,7 +140,7 @@ class TermsOfUseHistoryControllerSpec
         andThen Submission.submit(instant.minus(Duration.ofDays(9)), "user")
         andThen Submission.grantWithWarnings(instant, "user", "Warning comments", None))(aSubmission)
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId, submission)
@@ -157,7 +155,7 @@ class TermsOfUseHistoryControllerSpec
     }
 
     "return Ok (200) for Stride users with an application and a granted submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenGranted(applicationId)
@@ -173,7 +171,7 @@ class TermsOfUseHistoryControllerSpec
     }
 
     "return Ok (200) for Stride users with an application and a granted submission with in-house developer context" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenGrantedWithInHouseDeveloper(applicationId)
@@ -189,7 +187,7 @@ class TermsOfUseHistoryControllerSpec
     }
 
     "return Ok (200) for Stride users with an application but no submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
@@ -201,7 +199,7 @@ class TermsOfUseHistoryControllerSpec
     }
 
     "return Ok (200) for Stride users with an application but no submission with reminder sent" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId, REMINDER_EMAIL_SENT)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
@@ -216,7 +214,7 @@ class TermsOfUseHistoryControllerSpec
     }
 
     "return Ok (200) for Stride users with an application but no submission overdue" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId, OVERDUE)
       SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
@@ -231,33 +229,20 @@ class TermsOfUseHistoryControllerSpec
       contentAsString(result) should not include ("In progress")
     }
 
-    "return Ok (200) for LDAP users with an application and a submitted submission" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.succeeds
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchTermsOfUseInvitation.thenReturn(applicationId)
-      SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
-
-      val result = controller.page(applicationId)(fakeRequest)
-
-      status(result) shouldBe OK
-    }
-
     "return Not Found (404) when no application found for application id in invitations" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenNotFound()
       val result = controller.page(applicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
     }
 
-    "return unauthorised (401) when not authorised" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.notAuthorised
+    "return redirect when not authorised" in new Setup {
+      StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
 
-      status(result) shouldBe UNAUTHORIZED
+      status(result) shouldBe SEE_OTHER
     }
   }
 }

@@ -21,8 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status.OK
 import play.api.test.Helpers.*
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUsePage
 
@@ -31,7 +30,6 @@ class TermsOfUseInvitationControllerSpec
 
   trait Setup extends AbstractSetup
       with StrideAuthorisationServiceMockModule
-      with LdapAuthorisationServiceMockModule
       with ApplicationServiceMockModule {
     val termsOfUsePage = app.injector.instanceOf[TermsOfUsePage]
 
@@ -41,14 +39,13 @@ class TermsOfUseInvitationControllerSpec
       errorHandler,
       ApplicationActionServiceMock.aMock,
       SubmissionServiceMock.aMock,
-      LdapAuthorisationServiceMock.aMock,
       termsOfUsePage
     )
   }
 
   "GET /" should {
     "return Ok (200) for Stride users" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
       val result = controller.page()(fakeRequest)
@@ -57,7 +54,7 @@ class TermsOfUseInvitationControllerSpec
     }
 
     "return Ok (200) for Stride users with passed in status filter" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       SubmissionServiceMock.SearchTermsOfUseInvitations.thenReturn()
 
       val request = fakeRequest.withCSRFToken.withFormUrlEncodedBody("emailSentStatus" -> "true", "overdueStatus" -> "true")
@@ -68,13 +65,12 @@ class TermsOfUseInvitationControllerSpec
       SubmissionServiceMock.SearchTermsOfUseInvitations.verifyCalled(Seq("status" -> "EMAIL_SENT", "status" -> "OVERDUE"))
     }
 
-    "return Unauthorised (401) when user not logged in" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.notAuthorised
+    "return Redirect when user not logged in" in new Setup {
+      StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
 
       val result = controller.page()(fakeRequest)
 
-      status(result) shouldBe UNAUTHORIZED
+      status(result) shouldBe SEE_OTHER
     }
   }
 }

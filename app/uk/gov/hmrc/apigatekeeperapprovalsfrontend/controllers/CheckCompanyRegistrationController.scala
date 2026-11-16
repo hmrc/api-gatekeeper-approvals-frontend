@@ -25,6 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.services.CompanyDetailsExtractor
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -55,29 +56,30 @@ class CheckCompanyRegistrationController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val companyDetails = CompanyDetailsExtractor(request.submission)
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val companyDetails = CompanyDetailsExtractor(request.submission)
 
-    (request.application.access, companyDetails) match {
-      // Should only be uplifting and checking Standard apps
-      case (_: Access.Standard, Some(details)) if (request.submission.status.isSubmitted) =>
-        val isDeleted = request.application.state.isDeleted
-        successful(
-          Ok(
-            checkCompanyRegistrationPage(
-              CheckCompanyRegistrationController.ViewModel(
-                request.application.name,
-                applicationId,
-                details.registrationType,
-                details.registrationValue,
-                isDeleted
+      (request.application.access, companyDetails) match {
+        // Should only be uplifting and checking Standard apps
+        case (_: Access.Standard, Some(details)) if (request.submission.status.isSubmitted) =>
+          val isDeleted = request.application.state.isDeleted
+          successful(
+            Ok(
+              checkCompanyRegistrationPage(
+                CheckCompanyRegistrationController.ViewModel(
+                  request.application.name,
+                  applicationId,
+                  details.registrationType,
+                  details.registrationValue,
+                  isDeleted
+                )
               )
             )
           )
-        )
-      case _                                                                              => errorHandler.badRequestTemplate.map(BadRequest(_))
+        case _                                                                              => errorHandler.badRequestTemplate.map(BadRequest(_))
+      }
     }
-  }
 
   def action(applicationId: ApplicationId): Action[AnyContent] =
     updateActionStatus(SubmissionReview.Action.CheckCompanyRegistration)(applicationId)

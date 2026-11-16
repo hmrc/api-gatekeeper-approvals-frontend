@@ -21,7 +21,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers.*
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
@@ -48,7 +47,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
 
   "confirmYourDecision page" should {
     "return 200 when marked submission is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
 
@@ -59,7 +58,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     }
 
     "return 200 with no grant when marked submission has fails" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -70,7 +69,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when no marked submission is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -84,7 +83,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when grant decision is decline" in new Setup {
       val fakeDeclineRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "decline")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -97,7 +96,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when grant decision is grant without warnings" in new Setup {
       val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
@@ -113,7 +112,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when grant decision is grant with warnings with failed submission" in new Setup {
       val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant-with-warnings")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
@@ -128,7 +127,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "redirect to correct page when grant decision is grant with warnings with no failed submission" in new Setup {
       val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant-with-warnings")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(passMarkedSubmission)
       SubmissionServiceMock.Grant.thenReturn(applicationId, application)
@@ -143,7 +142,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "return redirect back to page when grant decision is something we don't understand" in new Setup {
       val brokenGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "bobbins")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -156,7 +155,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "return 400 if can't find submission review" in new Setup {
       val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturnNone()
@@ -169,7 +168,7 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
     "return 500 if grant fails" in new Setup {
       val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))

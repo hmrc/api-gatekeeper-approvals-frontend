@@ -21,8 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.http.Status
 import play.api.test.Helpers.*
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseAnswersPage
 
@@ -30,12 +29,10 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
 
   trait Setup
       extends AbstractSetup
-      with LdapAuthorisationServiceMockModule
       with StrideAuthorisationServiceMockModule {
     val termsOfUseAnswersPage = app.injector.instanceOf[TermsOfUseAnswersPage]
 
     val controller = new TermsOfUseAnswersController(
-      LdapAuthorisationServiceMock.aMock,
       StrideAuthorisationServiceMock.aMock,
       mcc,
       errorHandler,
@@ -47,17 +44,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
 
   "GET /" should {
     "return 200" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-
-      val result = controller.page(applicationId)(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
-
-    "return 200 for LDAP user" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.succeeds
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -66,7 +53,7 @@ class TermsOfUseAnswersControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 when given an application that doesn't exist" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
