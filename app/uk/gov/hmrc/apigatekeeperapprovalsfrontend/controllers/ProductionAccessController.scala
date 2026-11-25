@@ -24,6 +24,7 @@ import play.api.mvc.*
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.*
@@ -61,39 +62,40 @@ class ProductionAccessController @Inject() (
 
   import ProductionAccessController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName  = request.application.name
-    val instance = request.markedSubmission.submission.latestInstance
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val appName  = request.application.name
+      val instance = request.markedSubmission.submission.latestInstance
 
-    (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
-      case (Granted(grantedTimestamp, grantedName, _, _), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                              =>
-        successful(Ok(productionAccessPage(ViewModel(
-          appName,
-          applicationId,
-          requestedBy,
-          submittedTimestamp.asText,
-          grantedName,
-          grantedTimestamp.asText,
-          None,
-          None,
-          instance.index
-        ))))
-      case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
-        successful(Ok(productionAccessPage(ViewModel(
-          appName,
-          applicationId,
-          requestedBy,
-          submittedTimestamp.asText,
-          grantedName,
-          grantedTimestamp.asText,
-          Some(warnings),
-          escalatedTo,
-          instance.index
-        ))))
-      case _                                                                                                                                               =>
-        logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
-        errorHandler.badRequestTemplate(request).map(BadRequest(_))
+      (instance.statusHistory.head, instance.statusHistory.find(_.isSubmitted)) match {
+        case (Granted(grantedTimestamp, grantedName, _, _), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy)))                              =>
+          successful(Ok(productionAccessPage(ViewModel(
+            appName,
+            applicationId,
+            requestedBy,
+            submittedTimestamp.asText,
+            grantedName,
+            grantedTimestamp.asText,
+            None,
+            None,
+            instance.index
+          ))))
+        case (GrantedWithWarnings(grantedTimestamp, grantedName, warnings, escalatedTo), Some(Submission.Status.Submitted(submittedTimestamp, requestedBy))) =>
+          successful(Ok(productionAccessPage(ViewModel(
+            appName,
+            applicationId,
+            requestedBy,
+            submittedTimestamp.asText,
+            grantedName,
+            grantedTimestamp.asText,
+            Some(warnings),
+            escalatedTo,
+            instance.index
+          ))))
+        case _                                                                                                                                               =>
+          logger.warn("Unexpectedly could not find a submitted status for an instance with a granted status")
+          errorHandler.badRequestTemplate(request).map(BadRequest(_))
+      }
+
     }
-
-  }
 }

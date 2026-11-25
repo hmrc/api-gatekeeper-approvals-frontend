@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Mark
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
@@ -66,29 +67,31 @@ class TermsOfUseReasonsController @Inject() (
 
   import TermsOfUseReasonsController.*
 
-  def provideReasonsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
-    val hasWarnings = request.markedSubmission.isWarn
-    successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
-  }
-
-  def provideReasonsAction(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    def handleValidForm(form: ProvideReasonsForm) = {
-      submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
-        case Some(value) =>
-          successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId)))
-        case None        => {
-          logger.warn("Persisting reasons failed")
-          errorHandler.badRequestTemplate.map(BadRequest(_))
-        }
-      }
-    }
-
-    def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
+  def provideReasonsPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
       val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
       val hasWarnings = request.markedSubmission.isWarn
-      successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
+      successful(Ok(termsOfUseReasonsPage(provideReasonsForm, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
     }
-    TermsOfUseReasonsController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
-  }
+
+  def provideReasonsAction(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      def handleValidForm(form: ProvideReasonsForm) = {
+        submissionReviewService.updateGrantWarnings(form.reasons)(request.submission.id, request.submission.latestInstance.index).flatMap {
+          case Some(value) =>
+            successful(Redirect(uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.TermsOfUseFailedJourneyController.emailAddressesPage(applicationId)))
+          case None        => {
+            logger.warn("Persisting reasons failed")
+            errorHandler.badRequestTemplate.map(BadRequest(_))
+          }
+        }
+      }
+
+      def handleInvalidForm(form: Form[ProvideReasonsForm]) = {
+        val hasFails    = request.markedSubmission.markedAnswers.values.toList.contains(Mark.Fail)
+        val hasWarnings = request.markedSubmission.isWarn
+        successful(BadRequest(termsOfUseReasonsPage(form, ViewModel(applicationId, request.application.name, hasFails, hasWarnings))))
+      }
+      TermsOfUseReasonsController.provideReasonsForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+    }
 }

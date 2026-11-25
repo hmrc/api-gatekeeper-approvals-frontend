@@ -88,7 +88,7 @@ class StrideAuthorisationServiceSpec
     "return a redirect when there is no active session" in new Setup {
       StrideAuthConnectorMock.Authorise.failsWithNoActiveSession
 
-      val result: Either[Result, LoggedInRequest[?]] = await(underTest.refineStride(GatekeeperRoles.USER)(msgRequest))
+      val result: Either[Result, LoggedInRequest[?]] = await(underTest.refineStride(GatekeeperRoles.ADVANCEDUSER)(msgRequest))
 
       result.left.value.header.status shouldBe SEE_OTHER
       result.left.value.header.headers(LOCATION) should startWith(strideAuthConfig.strideLoginUrl)

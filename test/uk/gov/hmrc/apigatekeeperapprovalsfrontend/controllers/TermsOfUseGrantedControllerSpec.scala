@@ -28,8 +28,7 @@ import uk.gov.hmrc.apiplatform.modules.applications.common.domain.models.FullNam
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationStateData
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPage
@@ -37,8 +36,7 @@ import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.TermsOfUseGrantedPa
 class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
   trait Setup extends AbstractSetup
-      with StrideAuthorisationServiceMockModule
-      with LdapAuthorisationServiceMockModule {
+      with StrideAuthorisationServiceMockModule {
 
     val termsOfUseGrantedPage = app.injector.instanceOf[TermsOfUseGrantedPage]
 
@@ -69,7 +67,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
   "page" should {
     "return 200 when standard app" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -79,7 +77,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     }
 
     "return 404 if no application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -88,14 +86,12 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
 
     "return 403 for InsufficientEnrolments" in new Setup {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 303 for SessionRecordNotFound" in new Setup {
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
@@ -105,7 +101,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     "return OK when yes selected" in new Setup {
       val fakeYesRequest = fakeRequest.withFormUrlEncodedBody("grant" -> "yes")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 
@@ -118,7 +114,7 @@ class TermsOfUseGrantedControllerSpec extends AbstractControllerSpec {
     "redirect when no selected" in new Setup {
       val fakeNoRequest = fakeRequest.withFormUrlEncodedBody("grant" -> "no")
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
 

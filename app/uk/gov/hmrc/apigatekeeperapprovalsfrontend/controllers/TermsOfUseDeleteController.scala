@@ -25,6 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationName
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -53,11 +54,11 @@ class TermsOfUseDeleteController @Inject() (
 
   import TermsOfUseDeleteController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithRoleAndApplication(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
     successful(Ok(termsOfUseDeletePage(ViewModel(applicationId, request.application.name))))
   }
 
-  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
+  def action(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithRoleAndApplication(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
     def deleteSubmission() = {
       def failure(err: String) =
         errorHandler.standardErrorTemplate(
@@ -82,7 +83,8 @@ class TermsOfUseDeleteController @Inject() (
     }
   }
 
-  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplication(applicationId) { implicit request =>
-    successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
-  }
+  def confirmationPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplication(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      successful(Ok(termsOfUseConfirmPage(ViewModel(applicationId, request.application.name))))
+    }
 }

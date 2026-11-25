@@ -24,6 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -48,10 +49,11 @@ class CheckFraudController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    val isDeleted = request.application.state.isDeleted
-    successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
-  }
+  def checkFraudPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val isDeleted = request.application.state.isDeleted
+      successful(Ok(page(CheckFraudController.ViewModel(request.application.name, applicationId, isDeleted))))
+    }
 
   def checkFraudAction(applicationId: ApplicationId): Action[AnyContent] =
     updateActionStatus(SubmissionReview.Action.CheckFraudPreventionData)(applicationId)

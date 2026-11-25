@@ -54,7 +54,7 @@
         <dd class="govuk-summary-list__value">
           <p id="grantedTimestamp" class="govuk-body">@{model.grantedInstance.get.timestamp}</p>
         </dd>
-        @if(request.role.isUser) {
+        @if(request.role.isAdvancedUser) {
           <dd class="govuk-summary-list__actions">
             <p class="govuk-body govuk-!-margin-bottom-2">
               <a id="checkGrantedLink" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ProductionAccessController.page(model.applicationId)}" class="govuk-link govuk-link--no-visited-state">@{messages("applicationsubmissions.check")}</a>
@@ -75,7 +75,7 @@
           </p>
         }
       } else {
-        @if(request.role.isUser) {
+        @if(request.role.isAdvancedUser) {
           <p class="govuk-body">
             <a id="checkRequest" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">
             @{messages("applicationsubmissions.checkrequest")}

@@ -22,7 +22,6 @@ import play.api.http.Status
 import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.submissions.SubmissionsTestData
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
@@ -58,7 +57,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
     "return 200" in new Setup {
       val subordinateApplicationId = ApplicationId.random
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -77,7 +76,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
       val deletedApp               = application.modifyState(_.toDeleted(instant).copy(requestedByName = Some("delete-user@example.com")))
       val subordinateApplicationId = ApplicationId.random
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(deletedApp)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -93,7 +92,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
     }
 
     "return 404 when subordinate app not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.FindOrCreateReview.thenReturn(submissionReview)
@@ -104,7 +103,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
     }
 
     "return 404 if no application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.checkSandboxPage(applicationId)(fakeRequest)
@@ -114,7 +113,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
 
   "POST /" should {
     "update checked status and redirect to checklist page when Checked button is clicked" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)
@@ -125,7 +124,7 @@ class CheckSandboxControllerSpec extends AbstractControllerSpec with Submissions
     }
 
     "update checked status and redirect to checklist page when Come Back Later button is clicked" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
       SubmissionReviewServiceMock.UpdateActionStatus.thenReturn(submissionReview)

@@ -26,6 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.applications.access.domain.models.Access
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.{PrivacyPolicyLocation, TermsAndConditionsLocation}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
@@ -60,28 +61,29 @@ class CheckUrlsController @Inject() (
   )(implicit override val ec: ExecutionContext
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
-  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] = loggedInThruStrideWithApplicationAndSubmission(applicationId) { implicit request =>
-    request.application.access match {
-      // Should only be uplifting and checking Standard apps having gone thru uplift
-      case Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
-        val isDeleted = request.application.state.isDeleted
-        successful(
-          Ok(
-            checkUrlsPage(
-              CheckUrlsController.ViewModel(
-                request.application.name,
-                applicationId,
-                importantSubmissionData.organisationUrl,
-                importantSubmissionData.privacyPolicyLocation,
-                importantSubmissionData.termsAndConditionsLocation,
-                isDeleted
+  def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      request.application.access match {
+        // Should only be uplifting and checking Standard apps having gone thru uplift
+        case Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>
+          val isDeleted = request.application.state.isDeleted
+          successful(
+            Ok(
+              checkUrlsPage(
+                CheckUrlsController.ViewModel(
+                  request.application.name,
+                  applicationId,
+                  importantSubmissionData.organisationUrl,
+                  importantSubmissionData.privacyPolicyLocation,
+                  importantSubmissionData.termsAndConditionsLocation,
+                  isDeleted
+                )
               )
             )
           )
-        )
-      case _                                                                => errorHandler.badRequestTemplate.map(BadRequest(_))
+        case _                                                                => errorHandler.badRequestTemplate.map(BadRequest(_))
+      }
     }
-  }
 
   def checkUrlsAction(applicationId: ApplicationId): Action[AnyContent] =
     updateActionStatus(SubmissionReview.Action.CheckUrls)(applicationId)

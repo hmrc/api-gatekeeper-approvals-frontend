@@ -24,11 +24,12 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
-import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperRoleWithApplicationActions
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.actions.GatekeeperStrideRoleWithApplicationActions
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.services.SubmissionQuestionsAndAnswers.*
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.ApplicationActionService
@@ -46,7 +47,6 @@ object TermsOfUseAnswersController {
 
 @Singleton
 class TermsOfUseAnswersController @Inject() (
-    val ldapAuthorisationService: LdapAuthorisationService,
     strideAuthorisationService: StrideAuthorisationService,
     mcc: MessagesControllerComponents,
     errorHandler: ErrorHandler,
@@ -54,16 +54,17 @@ class TermsOfUseAnswersController @Inject() (
     val applicationActionService: ApplicationActionService,
     val submissionService: SubmissionService
   )(implicit override val ec: ExecutionContext
-  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperRoleWithApplicationActions {
+  ) extends AbstractApplicationController(strideAuthorisationService, mcc, errorHandler) with GatekeeperStrideRoleWithApplicationActions {
 
   import TermsOfUseAnswersController.*
 
-  def page(applicationId: ApplicationId): Action[AnyContent] = loggedInWithApplicationAndSubmission(applicationId) { implicit request =>
-    val appName    = request.application.name
-    val submission = request.submission
-    val instance   = request.submission.latestInstance
-    val index      = instance.index
+  def page(applicationId: ApplicationId): Action[AnyContent] =
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+      val appName    = request.application.name
+      val submission = request.submission
+      val instance   = request.submission.latestInstance
+      val index      = instance.index
 
-    successful(Ok(termsOfUseAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance)))))
-  }
+      successful(Ok(termsOfUseAnswersPage(ViewModel(appName, applicationId, index, SubmissionQuestionsAndAnswers(submission, instance)))))
+    }
 }

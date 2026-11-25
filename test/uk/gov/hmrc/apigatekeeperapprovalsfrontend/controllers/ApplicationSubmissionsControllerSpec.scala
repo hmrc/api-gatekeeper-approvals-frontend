@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.applications.submissions.domain.models.Re
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
-import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationServiceMockModule
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission
 import uk.gov.hmrc.apiplatform.modules.submissions.domain.models.Submission.Status.{Declined, Granted, Submitted}
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionReviewServiceMockModule
@@ -42,7 +42,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
   trait Setup extends AbstractSetup
       with SubmissionReviewServiceMockModule
       with StrideAuthorisationServiceMockModule
-      with LdapAuthorisationServiceMockModule
       with FixedClock {
 
     val page = app.injector.instanceOf[ApplicationSubmissionsPage]
@@ -50,7 +49,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     val controller = new ApplicationSubmissionsController(
       config,
       StrideAuthorisationServiceMock.aMock,
-      LdapAuthorisationServiceMock.aMock,
       mcc,
       page,
       errorHandler,
@@ -78,7 +76,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
   "page" should {
     "return 200 when submitted app with no previous declines" in new Setup {
 
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData.withState(ApplicationStateData.pendingRIVerification))
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(Submitted(submittedTimestamp, requesterEmail)))
 
@@ -90,12 +88,11 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       contentAsString(result) shouldNot include("Previously declined")
       contentAsString(result) shouldNot include("This application has been deleted")
       contentAsString(result) should include("Decline request")
-      contentAsString(result) shouldNot include("Check the request")
       contentAsString(result) should include(requesterEmail)
     }
 
     "return 200 when no current submission but with previous declines" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(appWithImportantData)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Declined(declinedTimestamp, requesterEmail, "reasons")
@@ -113,7 +110,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "return 200 when submission has been granted" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.ADVANCEDUSER)
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
         Granted(grantedTimestamp, requesterEmail, None, None)
@@ -130,8 +127,44 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
       contentAsString(result) should include(formatDMY(grantedTimestamp))
     }
 
+    "return 200 when submission has been granted but no check for user role " in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
+        Granted(grantedTimestamp, requesterEmail, None, None)
+      ))
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(appWithImportantData.name)
+      contentAsString(result) should include("Production access granted")
+      contentAsString(result) shouldNot include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) shouldNot include("Decline request")
+      contentAsString(result) should not include ("Check")
+      contentAsString(result) should include(formatDMY(grantedTimestamp))
+    }
+
+    "return 200 when submission has been granted but without check button for user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeedsWithRole(GatekeeperRoles.USER)
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(markedSubmissionWithStatusHistoryOf(
+        Granted(grantedTimestamp, requesterEmail, None, None)
+      ))
+
+      val result = controller.page(applicationId)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(appWithImportantData.name)
+      contentAsString(result) should include("Production access granted")
+      contentAsString(result) shouldNot include("Previously declined")
+      contentAsString(result) shouldNot include("This application has been deleted")
+      contentAsString(result) shouldNot include("Decline request")
+      contentAsString(result) should not include ("Check")
+      contentAsString(result) should include(formatDMY(grantedTimestamp))
+    }
+
     "return 404 if no marked application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenNotFound()
 
@@ -140,7 +173,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "return 404 if no application is found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenNotFound()
 
       val result = controller.page(applicationId)(fakeRequest)
@@ -149,14 +182,12 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
     "return 403 for InsufficientEnrolments" in new Setup {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 303 for SessionRecordNotFound" in new Setup {
       StrideAuthorisationServiceMock.Auth.sessionRecordNotFound()
-      LdapAuthorisationServiceMock.Auth.notAuthorised
       val result = controller.page(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER
     }
@@ -164,8 +195,6 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
 
   "whichPage" should {
     "redirect to index page when submission found and hasEverBeenSubmitted is true" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturnHasBeenSubmitted(applicationId)
 
       val result = controller.whichPage(applicationId)(fakeRequest)
@@ -174,30 +203,7 @@ class ApplicationSubmissionsControllerSpec extends AbstractControllerSpec with A
     }
 
     "redirect to Gatekeeper when submission found but hasEverBeenSubmitted is false" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestSubmission.thenReturn(applicationId)
-
-      val result = controller.whichPage(applicationId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId}")
-    }
-
-    "redirect to Gatekeeper when no submission found and authorised using stride" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
-
-      val result = controller.whichPage(applicationId)(fakeRequest)
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(s"http://localhost:9684/api-gatekeeper/applications/${applicationId}")
-    }
-
-    "redirect to Gatekeeper when no submission found and authorised using ldap" in new Setup {
-      StrideAuthorisationServiceMock.Auth.invalidBearerToken()
-      LdapAuthorisationServiceMock.Auth.succeeds
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestSubmission.thenNotFound()
 
       val result = controller.whichPage(applicationId)(fakeRequest)
       status(result) shouldBe Status.SEE_OTHER

@@ -17,12 +17,11 @@
 package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
 
 import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperStrideRole, LoggedInRequest}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.*
 
 trait ForbiddenHandler {
@@ -42,38 +41,4 @@ trait GatekeeperStrideAuthorisationActions(using ec: ExecutionContext) {
         strideAuthorisationService.refineStride(minimumRoleRequired)(msgRequest)
       }
     }
-}
-
-trait GatekeeperAuthorisationActions(using ec: ExecutionContext) {
-  self: FrontendBaseController & GatekeeperStrideAuthorisationActions =>
-
-  def ldapAuthorisationService: LdapAuthorisationService
-
-  val anyAuthenticatedUserRefiner = new ActionRefiner[MessagesRequest, LoggedInRequest] {
-
-    override def executionContext = ec
-
-    override protected def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
-      type FERLIR = Future[Either[Result, LoggedInRequest[A]]]
-
-      def refineLdap =
-        ldapAuthorisationService.refineLdap(msgRequest)
-          .recover {
-            case NonFatal(_) => Left(())
-          }
-
-      def refineStride: FERLIR =
-        strideAuthorisationService.refineStride(GatekeeperRoles.USER)(msgRequest)
-          .recover {
-            case NonFatal(_) => Left(Unauthorized(""))
-          }
-
-      import cats.implicits.*
-      import cats.data.EitherT
-      EitherT(refineStride).leftFlatMap { strideFailureResult =>
-        EitherT(refineLdap).leftMap(_ => strideFailureResult)
-      }
-        .value
-    }
-  }
 }
