@@ -61,7 +61,7 @@ class CheckSandboxController @Inject() (
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   def checkSandboxPage(applicationId: ApplicationId): Action[AnyContent] =
-    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
       val isDeleted = request.application.state.isDeleted
 
       (

@@ -59,7 +59,7 @@ class TermsOfUseAnswersController @Inject() (
   import TermsOfUseAnswersController.*
 
   def page(applicationId: ApplicationId): Action[AnyContent] =
-    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
       val appName    = request.application.name
       val submission = request.submission
       val instance   = request.submission.latestInstance

@@ -62,7 +62,7 @@ class CheckUrlsController @Inject() (
   ) extends AbstractCheckController(strideAuthorisationService, mcc, errorHandler, submissionReviewService) {
 
   def checkUrlsPage(applicationId: ApplicationId): Action[AnyContent] =
-    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
       request.application.access match {
         // Should only be uplifting and checking Standard apps having gone thru uplift
         case Access.Standard(_, _, _, _, _, _, Some(importantSubmissionData)) =>

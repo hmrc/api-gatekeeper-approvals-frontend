@@ -75,7 +75,7 @@
           </p>
         }
       } else {
-        @if(request.role.isAdvancedUser) {
+        @if(request.role.isUser) {
           <p class="govuk-body">
             <a id="checkRequest" href="@{uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ChecklistController.checklistPage(model.applicationId)}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">
             @{messages("applicationsubmissions.checkrequest")}

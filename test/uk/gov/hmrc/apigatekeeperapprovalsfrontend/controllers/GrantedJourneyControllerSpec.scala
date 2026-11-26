@@ -22,6 +22,7 @@ import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{ApplicationServiceMockModule, StrideAuthorisationServiceMockModule}
 
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.domain.models.SubmissionReview
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideEscalatedToForGrantingPage, ProvideWarningsForGrantingPage}
 
 class GrantedJourneyControllerSpec extends AbstractControllerSpec {
@@ -149,10 +150,13 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
+      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
 
       val result = controller.grantedPage(applicationId)(fakeRequest)
 
       status(result) shouldBe OK
+      SubmissionServiceMock.Grant.verifyCalled(applicationId)
     }
 
     "return 404 when no marked submission is found" in new Setup {
@@ -163,6 +167,29 @@ class GrantedJourneyControllerSpec extends AbstractControllerSpec {
       val result = controller.grantedPage(applicationId)(fakeRequest)
 
       status(result) shouldBe NOT_FOUND
+    }
+
+    "return 400 if can't find submission review" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+      SubmissionReviewServiceMock.FindReview.thenReturnNone()
+
+      val result = controller.grantedPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+
+    "return 500 if grant fails" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds()
+      ApplicationActionServiceMock.Process.thenReturn(application)
+      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturnWith(applicationId, passMarkedSubmission)
+      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
+      SubmissionServiceMock.Grant.thenReturnError(applicationId)
+
+      val result = controller.grantedPage(applicationId)(fakeRequest)
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
     }
   }
 }

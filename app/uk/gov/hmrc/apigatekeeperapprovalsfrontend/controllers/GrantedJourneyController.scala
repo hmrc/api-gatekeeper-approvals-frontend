@@ -17,8 +17,8 @@
 package uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
+import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.{EitherT, NonEmptyList}
 
@@ -28,14 +28,15 @@ import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.*
-import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.CommandFailures
 import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.CommandFailures.GenericFailure
+import uk.gov.hmrc.apiplatform.modules.commands.applications.domain.models.{CommandFailure, CommandFailures}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.submissions.services.SubmissionService
 
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.config.ErrorHandler
+import uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.models.MarkedSubmissionApplicationRequest
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.services.{ApplicationActionService, SubmissionReviewService}
 import uk.gov.hmrc.apigatekeeperapprovalsfrontend.views.html.{ApplicationApprovedPage, ProvideEscalatedToForGrantingPage, ProvideWarningsForGrantingPage}
 
@@ -137,6 +138,20 @@ class GrantedJourneyController @Inject() (
 
   def grantedPage(applicationId: ApplicationId): Action[AnyContent] =
     loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
-      successful(Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId))))
+      grantAccess(applicationId)
     }
+
+  private def grantAccess(applicationId: ApplicationId)(implicit request: MarkedSubmissionApplicationRequest[AnyContent]): Future[Result] = {
+
+    def handleCommandFailures(failures: NonEmptyList[CommandFailure]): Result = {
+      val errString = failures.toList.map(error => CommandFailures.describe(error)).mkString(", ")
+      InternalServerError(errString)
+    }
+    (
+      for {
+        _ <- fromOptionF(submissionReviewService.findReview(request.submission.id, request.submission.latestInstance.index), BadRequest("Unable to find submission review"))
+        _ <- EitherT(submissionService.grant(applicationId, request.name.get)).leftMap(handleCommandFailures)
+      } yield Ok(applicationApprovedPage(GrantedJourneyController.ViewModel(request.application.name, applicationId)))
+    ).fold(identity, identity)
+  }
 }
