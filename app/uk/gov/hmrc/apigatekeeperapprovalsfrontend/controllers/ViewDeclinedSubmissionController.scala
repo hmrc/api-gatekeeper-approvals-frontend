@@ -61,7 +61,7 @@ class ViewDeclinedSubmissionController @Inject() (
 
   import ViewDeclinedSubmissionController.*
 
-  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+  def page(applicationId: ApplicationId, index: Int) = loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
     val appName = request.application.name
 
     request.markedSubmission.submission.instances.find(i => i.index == index && i.isDeclined).fold(

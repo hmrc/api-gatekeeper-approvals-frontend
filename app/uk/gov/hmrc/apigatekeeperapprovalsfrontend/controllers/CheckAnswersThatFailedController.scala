@@ -62,7 +62,7 @@ class CheckAnswersThatFailedController @Inject() (
   import CheckAnswersThatFailedController.*
 
   def page(applicationId: ApplicationId): Action[AnyContent] =
-    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.ADVANCEDUSER)(applicationId) { implicit request =>
+    loggedInThruStrideWithRoleAndApplicationAndSubmission(GatekeeperRoles.USER)(applicationId) { implicit request =>
       val appName   = request.application.name
       val isDeleted = request.application.state.isDeleted
 

@@ -60,7 +60,7 @@ class SubmittedAnswersController @Inject() (
   import SubmittedAnswersController.*
 
   def page(applicationId: ApplicationId, index: Int) =
-    loggedInThruStrideWitRoleAndApplicationAndSubmissionAndInstance(GatekeeperRoles.ADVANCEDUSER)(applicationId, index) { implicit request =>
+    loggedInThruStrideWitRoleAndApplicationAndSubmissionAndInstance(GatekeeperRoles.USER)(applicationId, index) { implicit request =>
       val appName    = request.application.name
       val submission = request.submission
       val instance   = request.instance

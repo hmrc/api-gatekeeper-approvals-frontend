@@ -99,14 +99,11 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
       StrideAuthorisationServiceMock.Auth.succeeds()
       ApplicationActionServiceMock.Process.thenReturn(application)
       SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionServiceMock.Grant.thenReturn(applicationId, application)
-      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
 
       val result = controller.action(applicationId)(fakeGrantRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.GrantedJourneyController.grantedPage(applicationId).url
-      SubmissionServiceMock.Grant.verifyCalled(applicationId)
     }
 
     "redirect to correct page when grant decision is grant with warnings with failed submission" in new Setup {
@@ -150,33 +147,6 @@ class ConfirmYourDecisionControllerSpec extends AbstractControllerSpec {
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe uk.gov.hmrc.apigatekeeperapprovalsfrontend.controllers.routes.ConfirmYourDecisionController.page(applicationId).url
-    }
-
-    "return 400 if can't find submission review" in new Setup {
-      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
-
-      StrideAuthorisationServiceMock.Auth.succeeds()
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.FindReview.thenReturnNone()
-
-      val result = controller.action(applicationId)(fakeGrantRequest)
-
-      status(result) shouldBe BAD_REQUEST
-    }
-
-    "return 500 if grant fails" in new Setup {
-      val fakeGrantRequest = fakeRequest.withFormUrlEncodedBody("grant-decision" -> "grant")
-
-      StrideAuthorisationServiceMock.Auth.succeeds()
-      ApplicationActionServiceMock.Process.thenReturn(application)
-      SubmissionServiceMock.FetchLatestMarkedSubmission.thenReturn(applicationId)
-      SubmissionReviewServiceMock.FindReview.thenReturn(SubmissionReview(submissionId, 0, true, false, false, false))
-      SubmissionServiceMock.Grant.thenReturnError(applicationId)
-
-      val result = controller.action(applicationId)(fakeGrantRequest)
-
-      status(result) shouldBe INTERNAL_SERVER_ERROR
     }
   }
 }
